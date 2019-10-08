@@ -27,7 +27,7 @@ struct Widget: View {
                 } else {
                     Image(systemName: "exclamationmark.circle.fill").foregroundColor(.orange)
                 }
-                title
+                title.fontWeight(.bold)
                 Spacer()
                 Button(action: {
                     self.isCollapsed.toggle()
