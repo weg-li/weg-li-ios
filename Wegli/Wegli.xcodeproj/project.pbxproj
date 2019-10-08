@@ -64,8 +64,8 @@
 			children = (
 				F834758D234C61CE00244D6F /* AppDelegate.swift */,
 				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
-				F8EDCA85234CBCE2001E8D9C /* ReportForm.swift */,
 				F8EDCA83234CBC81001E8D9C /* MainView.swift */,
+				F8EDCA85234CBCE2001E8D9C /* ReportForm.swift */,
 				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
 				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
 				F8347593234C61CF00244D6F /* Assets.xcassets */,
