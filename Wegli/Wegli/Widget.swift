@@ -9,14 +9,14 @@
 import SwiftUI
 
 struct Widget: View {
-    enum State {
+    enum Status {
         case incomplete
         case completed
     }
     
     let content: AnyView
     let title: Text
-    let state: State
+    let state: Status
     
     var body: some View {
         VStack(alignment: .leading) {

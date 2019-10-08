@@ -61,9 +61,9 @@ struct UnsupportedLocationButton: View {
 }
 
 struct SubmitButton: View {
-    let state: State
+    let state: Status
     
-    enum State {
+    enum Status {
         case unsupportedLocation
         case missingData
         case readyToSubmit(ordnungsamt: String)
