@@ -79,3 +79,14 @@ struct SubmitButton: View {
         }
     }
 }
+
+
+struct SubmitButton_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            SubmitButton(state: .readyToSubmit(ordnungsamt: "München"))
+            SubmitButton(state: .unsupportedLocation)
+            SubmitButton(state: .missingData)
+        }
+    }
+}
