@@ -17,6 +17,7 @@ struct DiscardButton: View {
                 Image(systemName: "trash")
                 Text("Anzeige verwerfen")
             }
+            .font(.subheadline)
             .foregroundColor(.red)
             .padding()
             .background(Color(.secondarySystemBackground))
