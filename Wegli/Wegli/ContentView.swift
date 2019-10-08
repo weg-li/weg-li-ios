@@ -10,7 +10,11 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello World")
+        VStack {
+            SubmitButton(state: .readyToSubmit(ordnungsamt: "München"))
+            SubmitButton(state: .unsupportedLocation)
+            SubmitButton(state: .missingData)
+        }
     }
 }
 
