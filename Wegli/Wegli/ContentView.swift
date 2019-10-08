@@ -11,9 +11,8 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
+            Widget(content: AnyView(Text("Foobar")), title: Text("Fotos"), state: .completed)
             SubmitButton(state: .readyToSubmit(ordnungsamt: "München"))
-            SubmitButton(state: .unsupportedLocation)
-            SubmitButton(state: .missingData)
         }
     }
 }
