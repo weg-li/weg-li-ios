@@ -13,6 +13,7 @@ struct MainView: View {
     
     var body: some View {
         VStack {
+            Spacer()
             Button(action: {
                 self.showReportForm.toggle()
             }) {
@@ -22,6 +23,9 @@ struct MainView: View {
                 }
                 .font(.headline)
             }
+            
+            Spacer()
+            Text("Du hast bereits 30 Anzeigen versendet.").foregroundColor(.secondary)
         }
         .sheet(isPresented: $showReportForm) {
             ReportForm()
