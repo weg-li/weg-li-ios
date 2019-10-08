@@ -17,6 +17,7 @@ struct Widget: View {
     let content: AnyView
     let title: Text
     let state: Status
+    @State private var isCollapsed: Bool = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -28,8 +29,20 @@ struct Widget: View {
                 }
                 title
                 Spacer()
+                Button(action: {
+                    self.isCollapsed.toggle()
+                }) {
+                    if isCollapsed {
+                        Image(systemName: "chevron.down.circle")
+                    } else {
+                        Image(systemName: "chevron.up.circle")
+                    }
+                }
+                .foregroundColor(.secondary)
             }.font(.largeTitle)
-            content
+            if !isCollapsed {
+                content
+            }
         }
         .padding()
         .background(Color.white)
