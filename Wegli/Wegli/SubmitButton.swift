@@ -62,6 +62,7 @@ struct UnsupportedLocationButton: View {
 
 struct SubmitButton: View {
     let state: Status
+    let action: () -> Void
     
     enum Status {
         case unsupportedLocation
@@ -71,11 +72,11 @@ struct SubmitButton: View {
     
     var body: some View {
         if case .readyToSubmit(let ordnungsamt) = state {
-            return AnyView(ReadySubmitButton(ordnungsamt: ordnungsamt))
+            return AnyView(Button(action: action) { ReadySubmitButton(ordnungsamt: ordnungsamt) })
         } else if case .unsupportedLocation = state {
-            return AnyView(UnsupportedLocationButton())
+            return AnyView(Button(action: action) { UnsupportedLocationButton() })
         } else {
-            return AnyView(MissingDataButton())
+            return AnyView(Button(action: action) { MissingDataButton() })
         }
     }
 }
@@ -84,9 +85,9 @@ struct SubmitButton: View {
 struct SubmitButton_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            SubmitButton(state: .readyToSubmit(ordnungsamt: "München"))
-            SubmitButton(state: .unsupportedLocation)
-            SubmitButton(state: .missingData)
+            SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
+            SubmitButton(state: .unsupportedLocation) {}
+            SubmitButton(state: .missingData) {}
         }
     }
 }
