@@ -39,7 +39,7 @@ struct Widget: View {
                     }
                 }
                 .foregroundColor(.secondary)
-            }.font(.largeTitle)
+            }.font(.title)
             if !isCollapsed {
                 content
             }
