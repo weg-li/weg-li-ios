@@ -8,9 +8,33 @@
 
 import SwiftUI
 
-struct PersonalData: View {
+private struct DataRow: View {
+    let title: Text
+    let placeholder: String
+    @Binding var binding: String
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            title
+            Spacer()
+            TextField(placeholder, text: $binding).multilineTextAlignment(.trailing)
+        }
+    }
+}
+
+struct PersonalData: View {
+    @State private var name = ""
+    @State private var street = ""
+    @State private var town = ""
+    @State private var phone = ""
+    
+    var body: some View {
+        VStack {
+            DataRow(title: Text("Name"), placeholder: "Max Mustermann", binding: $name)
+            DataRow(title: Text("Straße, Hausnr."), placeholder: "Siemensallee, 17", binding: $street)
+            DataRow(title: Text("PLZ Ort"), placeholder: "76341 Mannheim", binding: $town)
+            DataRow(title: Text("Telefon"), placeholder: "0173 2234 6642", binding: $phone)
+        }
     }
 }
 
