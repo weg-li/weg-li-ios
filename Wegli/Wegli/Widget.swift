@@ -14,9 +14,9 @@ struct Widget: View {
         case completed
     }
     
-    let content: AnyView
     let title: Text
     let state: Status
+    let content: AnyView
     @State private var isCollapsed: Bool = false
     
     var body: some View {
@@ -54,6 +54,6 @@ struct Widget: View {
 
 struct Widget_Previews: PreviewProvider {
     static var previews: some View {
-        Widget(content: AnyView(Text("Foobar")), title: Text("Fotos"), state: .completed)
+        Widget(title: Text("Fotos"), state: .completed, content: AnyView(Text("Foobar")))
     }
 }

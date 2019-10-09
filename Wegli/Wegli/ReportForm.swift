@@ -11,7 +11,7 @@ import SwiftUI
 struct ReportForm: View {
     var body: some View {
         VStack {
-            Widget(content: AnyView(Text("Foobar")), title: Text("Fotos"), state: .completed)
+            Widget(title: Text("Fotos"), state: .completed, content: AnyView(Text("Foobar")))
             SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
             DiscardButton() {}
         }
