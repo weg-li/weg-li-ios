@@ -23,17 +23,14 @@ private struct DataRow: View {
 }
 
 struct PersonalData: View {
-    @State private var name = ""
-    @State private var street = ""
-    @State private var town = ""
-    @State private var phone = ""
+    @ObservedObject var personalDataStore = PersonalDataStore()
     
     var body: some View {
         VStack {
-            DataRow(title: Text("Name"), placeholder: "Max Mustermann", binding: $name)
-            DataRow(title: Text("Straße, Hausnr."), placeholder: "Siemensallee, 17", binding: $street)
-            DataRow(title: Text("PLZ Ort"), placeholder: "76341 Mannheim", binding: $town)
-            DataRow(title: Text("Telefon"), placeholder: "0173 2234 6642", binding: $phone)
+            DataRow(title: Text("Name"), placeholder: "Max Mustermann", binding: $personalDataStore.name)
+            DataRow(title: Text("Straße, Hausnr."), placeholder: "Siemensallee, 17", binding: $personalDataStore.street)
+            DataRow(title: Text("PLZ Ort"), placeholder: "76341 Mannheim", binding: $personalDataStore.town)
+            DataRow(title: Text("Telefon"), placeholder: "0173 2234 6642", binding: $personalDataStore.phone)
         }
     }
 }
