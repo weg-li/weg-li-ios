@@ -25,9 +25,13 @@ private struct DataRow: View {
     let title: Text
     let placeholder: String
     @Binding var binding: String
+    let isValid: Bool = false
     
     var body: some View {
         HStack {
+            if !isValid {
+                Image(systemName: "exclamationmark.circle.fill").foregroundColor(.orange)
+            }
             title
             Spacer()
             TextField(placeholder, text: $binding).multilineTextAlignment(.trailing)
