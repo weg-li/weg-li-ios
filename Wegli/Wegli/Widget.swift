@@ -30,7 +30,9 @@ struct Widget: View {
                 title.fontWeight(.bold)
                 Spacer()
                 Button(action: {
-                    self.isCollapsed.toggle()
+                    withAnimation {
+                        self.isCollapsed.toggle()
+                    }
                 }) {
                     if isCollapsed {
                         Image(systemName: "chevron.down.circle")
