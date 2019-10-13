@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82097304260C254FE2182F75 /* Pods_Wegli.framework */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
 		F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758F234C61CE00244D6F /* SceneDelegate.swift */; };
 		F8347594234C61CF00244D6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8347593234C61CF00244D6F /* Assets.xcassets */; };
@@ -24,6 +25,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
+		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
+		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758A234C61CE00244D6F /* Wegli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wegli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758D234C61CE00244D6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F834758F234C61CE00244D6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -47,17 +51,38 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8804C73C854F02D3A18D5A3B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */,
+				8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		E55709E615D9A26CD12B94C1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				82097304260C254FE2182F75 /* Pods_Wegli.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F8347581234C61CE00244D6F = {
 			isa = PBXGroup;
 			children = (
 				F834758C234C61CE00244D6F /* Wegli */,
 				F834758B234C61CE00244D6F /* Products */,
+				8804C73C854F02D3A18D5A3B /* Pods */,
+				E55709E615D9A26CD12B94C1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -106,9 +131,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F834759E234C61CF00244D6F /* Build configuration list for PBXNativeTarget "Wegli" */;
 			buildPhases = (
+				513E4CC67A2D739A7460526E /* [CP] Check Pods Manifest.lock */,
 				F8347586234C61CE00244D6F /* Sources */,
 				F8347587234C61CE00244D6F /* Frameworks */,
 				F8347588234C61CE00244D6F /* Resources */,
+				87DF60F775981E5173C1A4EB /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -164,6 +191,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		513E4CC67A2D739A7460526E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Wegli-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		87DF60F775981E5173C1A4EB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F8347586234C61CE00244D6F /* Sources */ = {
@@ -316,6 +385,7 @@
 		};
 		F834759F234C61CF00244D6F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -336,6 +406,7 @@
 		};
 		F83475A0234C61CF00244D6F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
