@@ -13,5 +13,5 @@ final class ImageDataStore: ObservableObject {
     let didChange = PassthroughSubject<Void, Never>()
     
     @Published
-    var images = [UIImage]()
+    var images = [UIImage(systemName: "bookshelf"), UIImage(systemName: "bookshelf"), UIImage(systemName: "bookshelf"), UIImage(systemName: "bookshelf")]
 }
