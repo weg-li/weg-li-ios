@@ -8,30 +8,6 @@
 
 import SwiftUI
 
-struct ImageGrid: View {
-    var images: [UIImage]
-    var columnCount: Int
-    
-    var body: some View {
-        ForEach(images.chunked(into: columnCount), id: \.self) { images in
-            HStack {
-                ForEach(images, id: \.self) { image in
-                    Image(systemName: "book")
-                        .resizable()
-//                        .scaledToFit()
-                        .background(Color.orange)
-                        .aspectRatio(1, contentMode: .fill)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                // fill empty cells with clear color to make layout work
-                ForEach(0 ..< self.columnCount - images.count) { _ in
-                    Color.clear.scaledToFit()
-                }
-            }
-        }
-    }
-}
-
 struct Images: View {
     @ObservedObject var imageDataStore = ImageDataStore()
     
