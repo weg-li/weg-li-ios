@@ -47,7 +47,7 @@ struct Widget: View {
             }
         }
         .padding()
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color(.lightGray), radius: 10, x: 0, y: 0)
         .padding()
