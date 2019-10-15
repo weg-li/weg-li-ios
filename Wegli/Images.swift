@@ -12,7 +12,29 @@ struct Images: View {
     @ObservedObject var imageDataStore = ImageDataStore()
     
     var body: some View {
-        ImageGrid(images: imageDataStore.images, columnCount: 3)
+        VStack {
+            ImageGrid(images: imageDataStore.images, columnCount: 3)
+            HStack {
+                Button(action: {
+                    
+                }) {
+                    Image(systemName: "photo.fill.on.rectangle.fill")
+                    Text("Foto importieren")
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                Button(action: {
+                    
+                }) {
+                    Image(systemName: "camera.fill")
+                    Text("Kamera")
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+        }
     }
 }
 
