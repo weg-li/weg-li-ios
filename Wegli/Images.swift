@@ -8,12 +8,12 @@
 
 import SwiftUI
 
-struct Images: View {
-    @ObservedObject var imageDataStore = ImageDataStore()
-    let columnCount = 3
+struct ImageGrid: View {
+    var images: [UIImage]
+    var columnCount: Int
     
     var body: some View {
-        ForEach(imageDataStore.images.chunked(into: columnCount), id: \.self) { images in
+        ForEach(images.chunked(into: columnCount), id: \.self) { images in
             HStack {
                 ForEach(images, id: \.self) { image in
                     Image(systemName: "book")
@@ -29,6 +29,14 @@ struct Images: View {
                 }
             }
         }
+    }
+}
+
+struct Images: View {
+    @ObservedObject var imageDataStore = ImageDataStore()
+    
+    var body: some View {
+        ImageGrid(images: imageDataStore.images, columnCount: 3)
     }
 }
 
