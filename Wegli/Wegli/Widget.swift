@@ -34,11 +34,8 @@ struct Widget: View {
                         self.isCollapsed.toggle()
                     }
                 }) {
-                    if isCollapsed {
-                        Image(systemName: "chevron.down.circle")
-                    } else {
-                        Image(systemName: "chevron.up.circle")
-                    }
+                    Image(systemName: "chevron.up.circle")
+                        .rotationEffect(.degrees(isCollapsed ? 180 : 0))
                 }
                 .foregroundColor(.secondary)
             }.font(.title)
