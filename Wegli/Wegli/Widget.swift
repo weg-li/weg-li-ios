@@ -30,7 +30,7 @@ struct Widget: View {
                 title.fontWeight(.bold)
                 Spacer()
                 Button(action: {
-                    withAnimation {
+                    withAnimation(.spring()) {
                         self.isCollapsed.toggle()
                     }
                 }) {
@@ -40,7 +40,7 @@ struct Widget: View {
                 .foregroundColor(.secondary)
             }.font(.title)
             if !isCollapsed {
-                content
+                content.transition(.opacity)
             }
         }
         .padding()
