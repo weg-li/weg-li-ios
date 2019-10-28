@@ -13,6 +13,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     @Binding var isShown: Bool
     let dataStore: ImageDataStore
+    let sourceType: UIImagePickerController.SourceType
 
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
 
@@ -43,6 +44,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let picker = UIImagePickerController()
+        picker.sourceType = sourceType
         picker.delegate = context.coordinator
         return picker
     }

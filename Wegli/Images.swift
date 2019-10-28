@@ -8,39 +8,50 @@
 
 import SwiftUI
 
-struct Images: View {
-    @ObservedObject var imageDataStore = ImageDataStore()
+struct ImagePickerButtons: View {
     @State private var showImagePicker: Bool = false
+    @State private var imagePickerSourceType = UIImagePickerController.SourceType.photoLibrary
+    let imageDataStore: ImageDataStore
     
     var body: some View {
-        VStack {
-            ImageGrid(images: imageDataStore.images, columnCount: 3)
-            HStack {
-                Button(action: {
-                    self.showImagePicker.toggle()
-                }) {
-                    Image(systemName: "photo.fill.on.rectangle.fill")
-                    Text("Foto importieren")
-                }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                Button(action: {
-                    self.showImagePicker.toggle()
-                }) {
-                    Image(systemName: "camera.fill")
-                    Text("Kamera")
-                }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+        HStack {
+            Button(action: {
+                self.imagePickerSourceType = .photoLibrary
+                self.showImagePicker.toggle()
+            }) {
+                Image(systemName: "photo.fill.on.rectangle.fill")
+                Text("Foto importieren")
             }
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            Button(action: {
+                self.imagePickerSourceType = .camera
+                self.showImagePicker.toggle()
+            }) {
+                Image(systemName: "camera.fill")
+                Text("Kamera")
+            }
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .sheet(isPresented: $showImagePicker, onDismiss: {
             self.showImagePicker = false
         }, content: {
-            ImagePicker(isShown: self.$showImagePicker, dataStore: self.imageDataStore)
+            ImagePicker(isShown: self.$showImagePicker, dataStore: self.imageDataStore, sourceType: self.imagePickerSourceType)
         })
+    }
+}
+
+struct Images: View {
+    @ObservedObject var imageDataStore = ImageDataStore()
+    
+    var body: some View {
+        VStack {
+            ImageGrid(images: imageDataStore.images, columnCount: 3)
+            ImagePickerButtons(imageDataStore: imageDataStore)
+        }
     }
 }
 
