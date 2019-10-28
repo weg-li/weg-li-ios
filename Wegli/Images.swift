@@ -25,16 +25,19 @@ struct ImagePickerButtons: View {
             .padding()
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 10))
-            Button(action: {
-                self.imagePickerSourceType = .camera
-                self.showImagePicker.toggle()
-            }) {
-                Image(systemName: "camera.fill")
-                Text("Kamera")
+            
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                Button(action: {
+                    self.imagePickerSourceType = .camera
+                    self.showImagePicker.toggle()
+                }) {
+                    Image(systemName: "camera.fill")
+                    Text("Kamera")
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .sheet(isPresented: $showImagePicker, onDismiss: {
             self.showImagePicker = false
