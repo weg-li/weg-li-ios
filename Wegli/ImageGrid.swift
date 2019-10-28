@@ -16,7 +16,7 @@ struct ImageGrid: View {
         ForEach(images.chunked(into: columnCount), id: \.self) { images in
             HStack {
                 ForEach(images, id: \.self) { image in
-                    Image(systemName: "book")
+                    Image(uiImage: image)
                         .resizable()
 //                        .scaledToFit()
                         .background(Color.orange)

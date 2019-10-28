@@ -10,8 +10,6 @@ import SwiftUI
 import Combine
 
 final class ImageDataStore: ObservableObject {
-    let didChange = PassthroughSubject<Void, Never>()
-    
     @Published
     var images = [UIImage]()
 }
