@@ -28,7 +28,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             let imagePicked = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
-            dataStore.images.append(imagePicked)
+            dataStore.add(image: imagePicked)
             isShown = false
         }
 

@@ -11,7 +11,7 @@ import SwiftUI
 struct ImagePickerButtons: View {
     @State private var showImagePicker: Bool = false
     @State private var imagePickerSourceType = UIImagePickerController.SourceType.photoLibrary
-    let imageDataStore: ImageDataStore
+    let imageDataStore: ReportImageDataStore
     
     var body: some View {
         HStack {
@@ -49,6 +49,6 @@ struct ImagePickerButtons: View {
 
 struct ImagePickerButtons_Previews: PreviewProvider {
     static var previews: some View {
-        ImagePickerButtons(imageDataStore: ImageDataStore())
+        ImagePickerButtons(imageDataStore: ReportImageDataStore())
     }
 }

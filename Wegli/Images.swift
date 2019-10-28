@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct Images: View {
-    @ObservedObject var imageDataStore = ImageDataStore()
+    @ObservedObject var imageDataStore = ReportImageDataStore()
     
     var body: some View {
         VStack {

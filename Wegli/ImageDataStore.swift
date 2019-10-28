@@ -9,7 +9,21 @@
 import SwiftUI
 import Combine
 
-final class ImageDataStore: ObservableObject {
+protocol ImageDataStore {
+    func add(image: UIImage)
+    func clear()
+    var images: [UIImage] { get }
+}
+
+final class ReportImageDataStore: ObservableObject, ImageDataStore {
     @Published
-    var images = [UIImage]()
+    private(set) var images = [UIImage]()
+    
+    func add(image: UIImage) {
+        images.append(image)
+    }
+    
+    func clear() {
+        images.removeAll()
+    }
 }
