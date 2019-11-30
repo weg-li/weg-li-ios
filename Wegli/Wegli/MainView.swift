@@ -10,6 +10,8 @@ import SwiftUI
 
 struct MainView: View {
     @State private var showReportForm: Bool = false
+
+    private let recognizer = NumberPlateRecognizerService.sharedInstance
     
     var body: some View {
         VStack {
@@ -22,6 +24,40 @@ struct MainView: View {
                     Text("Neue Anzeige")
                 }
                 .font(.headline)
+            }
+
+
+            Button(action: {
+                print("Scan Example Images Bulk")
+                self.recognizer.setConfidenceDelimiter(value: 90.0)
+                self.recognizer.scanExampleImagesBulk()
+            }) {
+                VStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Scan Example Images Bulk")
+                }.font(.subheadline)
+            }
+
+            Button(action: {
+                print("Scan Example Images")
+                self.recognizer.setConfidenceDelimiter(value: 90.0)
+                self.recognizer.scanExampleImages()
+            }) {
+                VStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Scan Example Images")
+                }.font(.subheadline)
+            }
+
+
+
+
+            Button(action: {
+                print("Scanner Log Contents: \n \(self.recognizer.scannedNumberPlatesLog)")
+            }) {
+                VStack {
+                    Text("Print Scanner Log")
+                }.font(.title)
             }
             
             Spacer()
