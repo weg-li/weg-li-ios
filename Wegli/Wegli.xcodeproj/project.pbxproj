@@ -3,10 +3,21 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82097304260C254FE2182F75 /* Pods_Wegli.framework */; };
+		4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */; };
+		4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */; };
+		4C9F6DF7238DBA680072A63A /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
+		4C9F6DF8238DBA680072A63A /* 91.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF0238DBA660072A63A /* 91.jpg */; };
+		4C9F6DF9238DBA680072A63A /* 56.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF1238DBA660072A63A /* 56.jpg */; };
+		4C9F6DFA238DBA680072A63A /* 44.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF2238DBA660072A63A /* 44.jpg */; };
+		4C9F6DFB238DBA680072A63A /* 52.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF3238DBA670072A63A /* 52.jpg */; };
+		4C9F6DFC238DBA680072A63A /* 36.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF4238DBA670072A63A /* 36.jpg */; };
+		4C9F6DFD238DBA680072A63A /* 39.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF5238DBA670072A63A /* 39.jpg */; };
+		4C9F6DFE238DBA680072A63A /* 79.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF6238DBA680072A63A /* 79.jpg */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
 		F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758F234C61CE00244D6F /* SceneDelegate.swift */; };
 		F8347594234C61CF00244D6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8347593234C61CF00244D6F /* Assets.xcassets */; };
@@ -24,6 +35,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateRecognizerService.swift; sourceTree = "<group>"; };
+		4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlate.swift; sourceTree = "<group>"; };
+		4C9F6DEF238DBA650072A63A /* 32.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 32.jpg; sourceTree = "<group>"; };
+		4C9F6DF0238DBA660072A63A /* 91.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 91.jpg; sourceTree = "<group>"; };
+		4C9F6DF1238DBA660072A63A /* 56.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 56.jpg; sourceTree = "<group>"; };
+		4C9F6DF2238DBA660072A63A /* 44.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 44.jpg; sourceTree = "<group>"; };
+		4C9F6DF3238DBA670072A63A /* 52.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 52.jpg; sourceTree = "<group>"; };
+		4C9F6DF4238DBA670072A63A /* 36.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 36.jpg; sourceTree = "<group>"; };
+		4C9F6DF5238DBA670072A63A /* 39.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 39.jpg; sourceTree = "<group>"; };
+		4C9F6DF6238DBA680072A63A /* 79.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 79.jpg; sourceTree = "<group>"; };
+		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
+		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
+		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758A234C61CE00244D6F /* Wegli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wegli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758D234C61CE00244D6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F834758F234C61CE00244D6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -47,17 +71,62 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */ = {
+			isa = PBXGroup;
+			children = (
+				4C9F6DEE238DBA570072A63A /* ExampleImages */,
+				4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */,
+				4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */,
+			);
+			path = NumberPlateRecognizer;
+			sourceTree = "<group>";
+		};
+		4C9F6DEE238DBA570072A63A /* ExampleImages */ = {
+			isa = PBXGroup;
+			children = (
+				4C9F6DEF238DBA650072A63A /* 32.jpg */,
+				4C9F6DF4238DBA670072A63A /* 36.jpg */,
+				4C9F6DF5238DBA670072A63A /* 39.jpg */,
+				4C9F6DF2238DBA660072A63A /* 44.jpg */,
+				4C9F6DF3238DBA670072A63A /* 52.jpg */,
+				4C9F6DF1238DBA660072A63A /* 56.jpg */,
+				4C9F6DF6238DBA680072A63A /* 79.jpg */,
+				4C9F6DF0238DBA660072A63A /* 91.jpg */,
+			);
+			path = ExampleImages;
+			sourceTree = "<group>";
+		};
+		8804C73C854F02D3A18D5A3B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */,
+				8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		E55709E615D9A26CD12B94C1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				82097304260C254FE2182F75 /* Pods_Wegli.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F8347581234C61CE00244D6F = {
 			isa = PBXGroup;
 			children = (
 				F834758C234C61CE00244D6F /* Wegli */,
 				F834758B234C61CE00244D6F /* Products */,
+				8804C73C854F02D3A18D5A3B /* Pods */,
+				E55709E615D9A26CD12B94C1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -72,6 +141,7 @@
 		F834758C234C61CE00244D6F /* Wegli */ = {
 			isa = PBXGroup;
 			children = (
+				4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */,
 				F834758D234C61CE00244D6F /* AppDelegate.swift */,
 				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
 				F8EDCA83234CBC81001E8D9C /* MainView.swift */,
@@ -106,9 +176,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F834759E234C61CF00244D6F /* Build configuration list for PBXNativeTarget "Wegli" */;
 			buildPhases = (
+				513E4CC67A2D739A7460526E /* [CP] Check Pods Manifest.lock */,
 				F8347586234C61CE00244D6F /* Sources */,
 				F8347587234C61CE00244D6F /* Frameworks */,
 				F8347588234C61CE00244D6F /* Resources */,
+				87DF60F775981E5173C1A4EB /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -157,13 +229,63 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C9F6DFA238DBA680072A63A /* 44.jpg in Resources */,
+				4C9F6DF8238DBA680072A63A /* 91.jpg in Resources */,
 				F834759A234C61CF00244D6F /* LaunchScreen.storyboard in Resources */,
+				4C9F6DFE238DBA680072A63A /* 79.jpg in Resources */,
+				4C9F6DF9238DBA680072A63A /* 56.jpg in Resources */,
+				4C9F6DFB238DBA680072A63A /* 52.jpg in Resources */,
+				4C9F6DFD238DBA680072A63A /* 39.jpg in Resources */,
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
+				4C9F6DFC238DBA680072A63A /* 36.jpg in Resources */,
+				4C9F6DF7238DBA680072A63A /* 32.jpg in Resources */,
 				F8347594234C61CF00244D6F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		513E4CC67A2D739A7460526E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Wegli-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		87DF60F775981E5173C1A4EB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F8347586234C61CE00244D6F /* Sources */ = {
@@ -175,11 +297,13 @@
 				F8897520234E017D0014FCC8 /* PersonalData.swift in Sources */,
 				F889751E234E01770014FCC8 /* Description.swift in Sources */,
 				F8EDCA84234CBC81001E8D9C /* MainView.swift in Sources */,
+				4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				F889751C234E01700014FCC8 /* Location.swift in Sources */,
 				F8EDCA82234CB8B7001E8D9C /* Widget.swift in Sources */,
 				F889751A234E015E0014FCC8 /* Images.swift in Sources */,
 				F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */,
+				4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -233,6 +357,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -294,6 +419,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -316,11 +442,13 @@
 		};
 		F834759F234C61CF00244D6F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Wegli/Preview Content\"";
-				DEVELOPMENT_TEAM = Y85FVF2A97;
+				DEVELOPMENT_TEAM = 6E5RVX7ELK;
+				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Wegli/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -336,11 +464,13 @@
 		};
 		F83475A0234C61CF00244D6F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Wegli/Preview Content\"";
-				DEVELOPMENT_TEAM = Y85FVF2A97;
+				DEVELOPMENT_TEAM = 6E5RVX7ELK;
+				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Wegli/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
