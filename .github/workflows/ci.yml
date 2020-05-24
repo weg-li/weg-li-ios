@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-and-test:
+    runs-on: macOS-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Install dependencies
+    - name: Bundle install
+      run: |
+        gem install bundler
+        cd Wegli && bundle install
+        pod install
+
+    - name: Run tests
+      run: cd Wegli && bundle exec fastlane test
