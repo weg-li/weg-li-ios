@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites name='WegliTests.xctest' tests='2' failures='0'>
+  <testsuite name='WegliTests.WegliTests' tests='2' failures='0'>
+    <testcase classname='WegliTests.WegliTests' name='testExample' time='0.001'/>
+    <testcase classname='WegliTests.WegliTests' name='testPerformanceExample' time='0.286'/>
+  </testsuite>
+</testsuites>
