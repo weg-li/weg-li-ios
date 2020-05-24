@@ -18,6 +18,7 @@
 		4C9F6DFC238DBA680072A63A /* 36.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF4238DBA670072A63A /* 36.jpg */; };
 		4C9F6DFD238DBA680072A63A /* 39.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF5238DBA670072A63A /* 39.jpg */; };
 		4C9F6DFE238DBA680072A63A /* 79.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF6238DBA680072A63A /* 79.jpg */; };
+		9F971E90247ABFCB00A68959 /* WegliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F971E8F247ABFCB00A68959 /* WegliTests.swift */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
 		F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758F234C61CE00244D6F /* SceneDelegate.swift */; };
 		F8347594234C61CF00244D6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8347593234C61CF00244D6F /* Assets.xcassets */; };
@@ -34,6 +35,16 @@
 		F8EDCA86234CBCE2001E8D9C /* ReportForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EDCA85234CBCE2001E8D9C /* ReportForm.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		9F971E92247ABFCB00A68959 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8347582234C61CE00244D6F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F8347589234C61CE00244D6F;
+			remoteInfo = Wegli;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateRecognizerService.swift; sourceTree = "<group>"; };
 		4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlate.swift; sourceTree = "<group>"; };
@@ -48,6 +59,9 @@
 		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
 		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
 		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F971E8D247ABFCB00A68959 /* WegliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WegliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F971E8F247ABFCB00A68959 /* WegliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WegliTests.swift; sourceTree = "<group>"; };
+		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F834758A234C61CE00244D6F /* Wegli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wegli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758D234C61CE00244D6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F834758F234C61CE00244D6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -67,6 +81,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9F971E8A247ABFCB00A68959 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8347587234C61CE00244D6F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -112,6 +133,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		9F971E8E247ABFCB00A68959 /* WegliTests */ = {
+			isa = PBXGroup;
+			children = (
+				9F971E8F247ABFCB00A68959 /* WegliTests.swift */,
+				9F971E91247ABFCB00A68959 /* Info.plist */,
+			);
+			path = WegliTests;
+			sourceTree = "<group>";
+		};
 		E55709E615D9A26CD12B94C1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +154,7 @@
 			isa = PBXGroup;
 			children = (
 				F834758C234C61CE00244D6F /* Wegli */,
+				9F971E8E247ABFCB00A68959 /* WegliTests */,
 				F834758B234C61CE00244D6F /* Products */,
 				8804C73C854F02D3A18D5A3B /* Pods */,
 				E55709E615D9A26CD12B94C1 /* Frameworks */,
@@ -134,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				F834758A234C61CE00244D6F /* Wegli.app */,
+				9F971E8D247ABFCB00A68959 /* WegliTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,6 +204,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9F971E8C247ABFCB00A68959 /* WegliTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F971E96247ABFCB00A68959 /* Build configuration list for PBXNativeTarget "WegliTests" */;
+			buildPhases = (
+				9F971E89247ABFCB00A68959 /* Sources */,
+				9F971E8A247ABFCB00A68959 /* Frameworks */,
+				9F971E8B247ABFCB00A68959 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9F971E93247ABFCB00A68959 /* PBXTargetDependency */,
+			);
+			name = WegliTests;
+			productName = WegliTests;
+			productReference = 9F971E8D247ABFCB00A68959 /* WegliTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F8347589234C61CE00244D6F /* Wegli */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F834759E234C61CF00244D6F /* Build configuration list for PBXNativeTarget "Wegli" */;
@@ -197,10 +247,14 @@
 		F8347582234C61CE00244D6F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1110;
+				LastSwiftUpdateCheck = 1140;
 				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "Stefan Trauth";
 				TargetAttributes = {
+					9F971E8C247ABFCB00A68959 = {
+						CreatedOnToolsVersion = 11.4.1;
+						TestTargetID = F8347589234C61CE00244D6F;
+					};
 					F8347589234C61CE00244D6F = {
 						CreatedOnToolsVersion = 11.1;
 					};
@@ -220,11 +274,19 @@
 			projectRoot = "";
 			targets = (
 				F8347589234C61CE00244D6F /* Wegli */,
+				9F971E8C247ABFCB00A68959 /* WegliTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		9F971E8B247ABFCB00A68959 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8347588234C61CE00244D6F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -288,6 +350,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9F971E89247ABFCB00A68959 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F971E90247ABFCB00A68959 /* WegliTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8347586234C61CE00244D6F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -310,6 +380,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		9F971E93247ABFCB00A68959 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F8347589234C61CE00244D6F /* Wegli */;
+			targetProxy = 9F971E92247ABFCB00A68959 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		F8347598234C61CF00244D6F /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -322,6 +400,48 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		9F971E94247ABFCB00A68959 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BP8836JVQR;
+				INFOPLIST_FILE = WegliTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.stefantrauth.Wegli.WegliTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wegli.app/Wegli";
+			};
+			name = Debug;
+		};
+		9F971E95247ABFCB00A68959 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BP8836JVQR;
+				INFOPLIST_FILE = WegliTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.stefantrauth.Wegli.WegliTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wegli.app/Wegli";
+			};
+			name = Release;
+		};
 		F834759C234C61CF00244D6F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -487,6 +607,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9F971E96247ABFCB00A68959 /* Build configuration list for PBXNativeTarget "WegliTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F971E94247ABFCB00A68959 /* Debug */,
+				9F971E95247ABFCB00A68959 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F8347585234C61CE00244D6F /* Build configuration list for PBXProject "Wegli" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
