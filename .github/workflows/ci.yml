@@ -4,14 +4,27 @@ on:
   pull_request:
     branches: [ develop ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-and-test:
     runs-on: macOS-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Caches
+    - uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gem-
+    - uses: actions/cache@v1
+      with:
+        path: Pods
+        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
     
     # Install dependencies
     - name: Bundle install
