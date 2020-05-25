@@ -30,7 +30,6 @@ struct MainView: View {
             Button(action: {
                 print("Scan Example Images Bulk")
                 self.recognizer.setConfidenceDelimiter(value: 90.0)
-                self.recognizer.scanExampleImagesBulk()
             }) {
                 VStack {
                     Image(systemName: "plus.circle.fill")
@@ -41,7 +40,6 @@ struct MainView: View {
             Button(action: {
                 print("Scan Example Images")
                 self.recognizer.setConfidenceDelimiter(value: 90.0)
-                self.recognizer.scanExampleImages()
             }) {
                 VStack {
                     Image(systemName: "plus.circle.fill")

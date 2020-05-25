@@ -10,15 +10,8 @@
 		3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82097304260C254FE2182F75 /* Pods_Wegli.framework */; };
 		4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */; };
 		4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */; };
-		4C9F6DF7238DBA680072A63A /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
-		4C9F6DF8238DBA680072A63A /* 91.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF0238DBA660072A63A /* 91.jpg */; };
-		4C9F6DF9238DBA680072A63A /* 56.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF1238DBA660072A63A /* 56.jpg */; };
-		4C9F6DFA238DBA680072A63A /* 44.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF2238DBA660072A63A /* 44.jpg */; };
-		4C9F6DFB238DBA680072A63A /* 52.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF3238DBA670072A63A /* 52.jpg */; };
-		4C9F6DFC238DBA680072A63A /* 36.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF4238DBA670072A63A /* 36.jpg */; };
-		4C9F6DFD238DBA680072A63A /* 39.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF5238DBA670072A63A /* 39.jpg */; };
-		4C9F6DFE238DBA680072A63A /* 79.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DF6238DBA680072A63A /* 79.jpg */; };
-		9F971E90247ABFCB00A68959 /* WegliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F971E8F247ABFCB00A68959 /* WegliTests.swift */; };
+		9F971E98247BAF6500A68959 /* NumberPlateServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */; };
+		9F971E99247BAFB700A68959 /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
 		F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758F234C61CE00244D6F /* SceneDelegate.swift */; };
 		F8347594234C61CF00244D6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8347593234C61CF00244D6F /* Assets.xcassets */; };
@@ -49,19 +42,12 @@
 		4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateRecognizerService.swift; sourceTree = "<group>"; };
 		4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlate.swift; sourceTree = "<group>"; };
 		4C9F6DEF238DBA650072A63A /* 32.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 32.jpg; sourceTree = "<group>"; };
-		4C9F6DF0238DBA660072A63A /* 91.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 91.jpg; sourceTree = "<group>"; };
-		4C9F6DF1238DBA660072A63A /* 56.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 56.jpg; sourceTree = "<group>"; };
-		4C9F6DF2238DBA660072A63A /* 44.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 44.jpg; sourceTree = "<group>"; };
-		4C9F6DF3238DBA670072A63A /* 52.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 52.jpg; sourceTree = "<group>"; };
-		4C9F6DF4238DBA670072A63A /* 36.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 36.jpg; sourceTree = "<group>"; };
-		4C9F6DF5238DBA670072A63A /* 39.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 39.jpg; sourceTree = "<group>"; };
-		4C9F6DF6238DBA680072A63A /* 79.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 79.jpg; sourceTree = "<group>"; };
 		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
 		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
 		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F971E8D247ABFCB00A68959 /* WegliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WegliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9F971E8F247ABFCB00A68959 /* WegliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WegliTests.swift; sourceTree = "<group>"; };
 		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateServiceTests.swift; sourceTree = "<group>"; };
 		F834758A234C61CE00244D6F /* Wegli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wegli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758D234C61CE00244D6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F834758F234C61CE00244D6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -102,7 +88,6 @@
 		4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */ = {
 			isa = PBXGroup;
 			children = (
-				4C9F6DEE238DBA570072A63A /* ExampleImages */,
 				4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */,
 				4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */,
 			);
@@ -113,13 +98,6 @@
 			isa = PBXGroup;
 			children = (
 				4C9F6DEF238DBA650072A63A /* 32.jpg */,
-				4C9F6DF4238DBA670072A63A /* 36.jpg */,
-				4C9F6DF5238DBA670072A63A /* 39.jpg */,
-				4C9F6DF2238DBA660072A63A /* 44.jpg */,
-				4C9F6DF3238DBA670072A63A /* 52.jpg */,
-				4C9F6DF1238DBA660072A63A /* 56.jpg */,
-				4C9F6DF6238DBA680072A63A /* 79.jpg */,
-				4C9F6DF0238DBA660072A63A /* 91.jpg */,
 			);
 			path = ExampleImages;
 			sourceTree = "<group>";
@@ -136,8 +114,9 @@
 		9F971E8E247ABFCB00A68959 /* WegliTests */ = {
 			isa = PBXGroup;
 			children = (
-				9F971E8F247ABFCB00A68959 /* WegliTests.swift */,
+				4C9F6DEE238DBA570072A63A /* ExampleImages */,
 				9F971E91247ABFCB00A68959 /* Info.plist */,
+				9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */,
 			);
 			path = WegliTests;
 			sourceTree = "<group>";
@@ -284,6 +263,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F971E99247BAFB700A68959 /* 32.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,16 +271,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C9F6DFA238DBA680072A63A /* 44.jpg in Resources */,
-				4C9F6DF8238DBA680072A63A /* 91.jpg in Resources */,
 				F834759A234C61CF00244D6F /* LaunchScreen.storyboard in Resources */,
-				4C9F6DFE238DBA680072A63A /* 79.jpg in Resources */,
-				4C9F6DF9238DBA680072A63A /* 56.jpg in Resources */,
-				4C9F6DFB238DBA680072A63A /* 52.jpg in Resources */,
-				4C9F6DFD238DBA680072A63A /* 39.jpg in Resources */,
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
-				4C9F6DFC238DBA680072A63A /* 36.jpg in Resources */,
-				4C9F6DF7238DBA680072A63A /* 32.jpg in Resources */,
 				F8347594234C61CF00244D6F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -354,7 +326,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F971E90247ABFCB00A68959 /* WegliTests.swift in Sources */,
+				9F971E98247BAF6500A68959 /* NumberPlateServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
