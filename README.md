@@ -1,15 +1,35 @@
-## 🚲 weg-li iOS App
+# 🚲 weg-li iOS App
 
-With weg-li you can easily report wrong parking cars.  
-**Website**: [weg-li](https://www.weg-li.de)
+With [weg-li](https://www.weg-li.de) you can easily report wrong parking cars.  
 
-### Setup
+## Setup
 
-* Install latest Xcode and dev tools.
-* Install [Bundler](https://bundler.io) with: `gem install bundler`
-* Install ruby dependencies with: `cd Wegli && bundle install` 
-* Run `cd Wegli && pod install` to install project dependencies
+* Install latest Xcode version via macOS App Store
+* Install [Homebrew](https://brew.sh/)
+* Install [Ruby](https://www.ruby-lang.org/) via Homebrew
 
-### 🎨 Designs
+```shell
+brew install ruby
+```
 
-[sketch cloud](https://sketch.cloud/s/Jynbk)
+* Install [Bundler](https://bundler.io) via Ruby
+
+```shell
+gem install bundler
+```
+
+* Install Ruby dependencies
+
+```shell
+bundle install
+```
+
+* Install project dependencies
+
+```shell
+pod install
+```
+
+## 🎨 Designs
+
+* [sketch cloud](https://sketch.cloud/s/Jynbk)
