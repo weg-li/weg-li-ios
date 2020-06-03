@@ -17,6 +17,10 @@
 		9F971E98247BAF6500A68959 /* NumberPlateServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */; };
 		9F971E99247BAFB700A68959 /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
 		9FB7509424878FDB00193948 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9FB7509324878FDB00193948 /* README.md */; };
+		9FB750A22487B09500193948 /* PersonalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509E2487B09500193948 /* PersonalData.swift */; };
+		9FB750A32487B09500193948 /* PersonalDataStore+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509F2487B09500193948 /* PersonalDataStore+Validation.swift */; };
+		9FB750A52487B0FC00193948 /* PersonalDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A42487B0FC00193948 /* PersonalDataStore.swift */; };
+		9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
 		F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758F234C61CE00244D6F /* SceneDelegate.swift */; };
 		F8347594234C61CF00244D6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8347593234C61CF00244D6F /* Assets.xcassets */; };
@@ -26,7 +30,6 @@
 		F889751A234E015E0014FCC8 /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8897519234E015E0014FCC8 /* Images.swift */; };
 		F889751C234E01700014FCC8 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = F889751B234E01700014FCC8 /* Location.swift */; };
 		F889751E234E01770014FCC8 /* Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = F889751D234E01770014FCC8 /* Description.swift */; };
-		F8897520234E017D0014FCC8 /* PersonalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F889751F234E017D0014FCC8 /* PersonalData.swift */; };
 		F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */; };
 		F8EDCA82234CB8B7001E8D9C /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EDCA81234CB8B7001E8D9C /* Widget.swift */; };
 		F8EDCA84234CBC81001E8D9C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EDCA83234CBC81001E8D9C /* MainView.swift */; };
@@ -58,6 +61,10 @@
 		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateServiceTests.swift; sourceTree = "<group>"; };
 		9FB7509324878FDB00193948 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9FB7509E2487B09500193948 /* PersonalData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalData.swift; sourceTree = "<group>"; };
+		9FB7509F2487B09500193948 /* PersonalDataStore+Validation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonalDataStore+Validation.swift"; sourceTree = "<group>"; };
+		9FB750A42487B0FC00193948 /* PersonalDataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDataStore.swift; sourceTree = "<group>"; };
+		9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UserDefault+PropertyWrapper.swift"; path = "Wegli/UserDefault+PropertyWrapper.swift"; sourceTree = SOURCE_ROOT; };
 		F834758A234C61CE00244D6F /* Wegli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wegli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F834758D234C61CE00244D6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F834758F234C61CE00244D6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,7 +76,6 @@
 		F8897519234E015E0014FCC8 /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
 		F889751B234E01700014FCC8 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		F889751D234E01770014FCC8 /* Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Description.swift; sourceTree = "<group>"; };
-		F889751F234E017D0014FCC8 /* PersonalData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalData.swift; sourceTree = "<group>"; };
 		F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmitButton.swift; sourceTree = "<group>"; };
 		F8EDCA81234CB8B7001E8D9C /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		F8EDCA83234CBC81001E8D9C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -124,6 +130,7 @@
 		9F73E8F424878B84002E22F4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				9FB7509A2487B08200193948 /* PersonalData */,
 				9F73E8F524878BB2002E22F4 /* Images */,
 			);
 			path = Features;
@@ -167,6 +174,24 @@
 			path = WegliTests;
 			sourceTree = "<group>";
 		};
+		9FB7509A2487B08200193948 /* PersonalData */ = {
+			isa = PBXGroup;
+			children = (
+				9FB750A42487B0FC00193948 /* PersonalDataStore.swift */,
+				9FB7509E2487B09500193948 /* PersonalData.swift */,
+				9FB7509F2487B09500193948 /* PersonalDataStore+Validation.swift */,
+			);
+			path = PersonalData;
+			sourceTree = "<group>";
+		};
+		9FB750A62487B15B00193948 /* PropertyWrapper */ = {
+			isa = PBXGroup;
+			children = (
+				9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */,
+			);
+			path = PropertyWrapper;
+			sourceTree = "<group>";
+		};
 		E55709E615D9A26CD12B94C1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,22 +224,22 @@
 		F834758C234C61CE00244D6F /* Wegli */ = {
 			isa = PBXGroup;
 			children = (
-				9F73E8F424878B84002E22F4 /* Features */,
-				4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */,
+				F834759B234C61CF00244D6F /* Info.plist */,
 				F834758D234C61CE00244D6F /* AppDelegate.swift */,
-				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
+				F889751D234E01770014FCC8 /* Description.swift */,
+				F83853CE234D11A900DF1A9D /* DiscardButton.swift */,
+				F889751B234E01700014FCC8 /* Location.swift */,
 				F8EDCA83234CBC81001E8D9C /* MainView.swift */,
 				F8EDCA85234CBCE2001E8D9C /* ReportForm.swift */,
-				F889751B234E01700014FCC8 /* Location.swift */,
-				F889751D234E01770014FCC8 /* Description.swift */,
-				F889751F234E017D0014FCC8 /* PersonalData.swift */,
-				F83853CE234D11A900DF1A9D /* DiscardButton.swift */,
-				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
+				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
 				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
+				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
 				F8347593234C61CF00244D6F /* Assets.xcassets */,
+				9F73E8F424878B84002E22F4 /* Features */,
 				F8347598234C61CF00244D6F /* LaunchScreen.storyboard */,
-				F834759B234C61CF00244D6F /* Info.plist */,
+				4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */,
 				F8347595234C61CF00244D6F /* Preview Content */,
+				9FB750A62487B15B00193948 /* PropertyWrapper */,
 			);
 			path = Wegli;
 			sourceTree = "<group>";
@@ -386,10 +411,10 @@
 				F8EDCA86234CBCE2001E8D9C /* ReportForm.swift in Sources */,
 				F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */,
 				9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */,
-				F8897520234E017D0014FCC8 /* PersonalData.swift in Sources */,
 				9F73E8FA24878D91002E22F4 /* ImagePicker.swift in Sources */,
 				F889751E234E01770014FCC8 /* Description.swift in Sources */,
 				F8EDCA84234CBC81001E8D9C /* MainView.swift in Sources */,
+				9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */,
 				4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				F889751C234E01700014FCC8 /* Location.swift in Sources */,
@@ -398,7 +423,10 @@
 				F889751A234E015E0014FCC8 /* Images.swift in Sources */,
 				F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */,
 				4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */,
+				9FB750A52487B0FC00193948 /* PersonalDataStore.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
+				9FB750A32487B09500193948 /* PersonalDataStore+Validation.swift in Sources */,
+				9FB750A22487B09500193948 /* PersonalData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
