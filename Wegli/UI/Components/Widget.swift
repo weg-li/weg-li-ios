@@ -53,6 +53,6 @@ struct Widget: View {
 
 struct Widget_Previews: PreviewProvider {
     static var previews: some View {
-        Widget(title: Text("Fotos"), state: .completed, content: AnyView(Text("Foobar")))
+        Widget(title: Text("Fotos"), state: .completed, content: Text("Foobar").eraseToAnyView())
     }
 }
