@@ -10,59 +10,38 @@ import SwiftUI
 
 struct MainView: View {
     @State private var showReportForm: Bool = false
-
-    private let recognizer = NumberPlateRecognizerService.sharedInstance
+    @State private var showPersonalData: Bool = false
+    @Environment(\.environment) var environment: EnvironmentContainer
     
     var body: some View {
-        VStack {
-            Spacer()
-            Button(action: {
-                self.showReportForm.toggle()
-            }) {
-                VStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Neue Anzeige")
+        NavigationView {
+            VStack {
+                Button(action: {
+                    self.showReportForm.toggle()
+                }) {
+                    VStack {
+                        Image(systemName: "plus.circle.fill")
+                            .iconModifier()
+                        Text("Neue Anzeige")
+                    }
+                    .font(.headline)
                 }
-                .font(.headline)
             }
-
-
-            Button(action: {
-                print("Scan Example Images Bulk")
-                self.recognizer.setConfidenceDelimiter(value: 90.0)
-            }) {
-                VStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Scan Example Images Bulk")
-                }.font(.subheadline)
+            .navigationBarTitle("weg-li")
+            .navigationBarItems(trailing:
+                Button(action: {
+                    self.showPersonalData.toggle()
+                }, label: {
+                    Image(systemName: "person.circle.fill")
+                        .iconModifier()
+                })
+            )
+            .sheet(isPresented: $showReportForm) {
+                ReportForm()
             }
-
-            Button(action: {
-                print("Scan Example Images")
-                self.recognizer.setConfidenceDelimiter(value: 90.0)
-            }) {
-                VStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Scan Example Images")
-                }.font(.subheadline)
-            }
-
-
-
-
-            Button(action: {
-                print("Scanner Log Contents: \n \(self.recognizer.scannedNumberPlatesLog)")
-            }) {
-                VStack {
-                    Text("Print Scanner Log")
-                }.font(.title)
-            }
-            
-            Spacer()
-            Text("Du hast bereits 30 Anzeigen versendet.").foregroundColor(.secondary)
         }
-        .sheet(isPresented: $showReportForm) {
-            ReportForm()
+        .sheet(isPresented: $showPersonalData) {
+            PersonalData(isPresented: self.$showPersonalData, viewModel: PersonalDataViewModel(repository: self.environment.personalDataRepository))
         }
     }
 }

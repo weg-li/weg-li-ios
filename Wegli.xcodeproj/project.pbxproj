@@ -10,16 +10,20 @@
 		3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82097304260C254FE2182F75 /* Pods_Wegli.framework */; };
 		4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */; };
 		4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */; };
+		9F24263A248ACDF600318989 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F242639248ACDF600318989 /* User.swift */; };
+		9F6498492488F34800514BD3 /* PersonsalDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */; };
+		9F64984D2488F3EA00514BD3 /* PersonalDataWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */; };
+		9F6498572489460300514BD3 /* DataRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6498562489460300514BD3 /* DataRow.swift */; };
 		9F73E8FA24878D91002E22F4 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F624878D91002E22F4 /* ImagePicker.swift */; };
 		9F73E8FB24878D91002E22F4 /* ImageGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F724878D91002E22F4 /* ImageGrid.swift */; };
 		9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F924878D91002E22F4 /* ImageDataStore.swift */; };
 		9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E90124878E2F002E22F4 /* ImagePickerButtons.swift */; };
 		9F971E98247BAF6500A68959 /* NumberPlateServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */; };
 		9F971E99247BAFB700A68959 /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
+		9F9C4308248BAC5900FF514B /* EnvironmentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */; };
 		9FB7509424878FDB00193948 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9FB7509324878FDB00193948 /* README.md */; };
 		9FB750A22487B09500193948 /* PersonalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509E2487B09500193948 /* PersonalData.swift */; };
-		9FB750A32487B09500193948 /* PersonalDataStore+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509F2487B09500193948 /* PersonalDataStore+Validation.swift */; };
-		9FB750A52487B0FC00193948 /* PersonalDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A42487B0FC00193948 /* PersonalDataStore.swift */; };
+		9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */; };
 		9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */; };
 		9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750AF2487BEF900193948 /* View+Additions.swift */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
@@ -54,6 +58,10 @@
 		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
 		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
 		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F242639248ACDF600318989 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonsalDataRepository.swift; sourceTree = "<group>"; };
+		9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDataWidget.swift; sourceTree = "<group>"; };
+		9F6498562489460300514BD3 /* DataRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataRow.swift; sourceTree = "<group>"; };
 		9F73E8F624878D91002E22F4 /* ImagePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImagePicker.swift; path = Wegli/Features/Images/View/ImagePicker.swift; sourceTree = SOURCE_ROOT; };
 		9F73E8F724878D91002E22F4 /* ImageGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImageGrid.swift; path = Wegli/Features/Images/View/ImageGrid.swift; sourceTree = SOURCE_ROOT; };
 		9F73E8F924878D91002E22F4 /* ImageDataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImageDataStore.swift; path = Wegli/ImageDataStore.swift; sourceTree = SOURCE_ROOT; };
@@ -61,10 +69,10 @@
 		9F971E8D247ABFCB00A68959 /* WegliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WegliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateServiceTests.swift; sourceTree = "<group>"; };
+		9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentContainer.swift; sourceTree = "<group>"; };
 		9FB7509324878FDB00193948 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FB7509E2487B09500193948 /* PersonalData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalData.swift; sourceTree = "<group>"; };
-		9FB7509F2487B09500193948 /* PersonalDataStore+Validation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonalDataStore+Validation.swift"; sourceTree = "<group>"; };
-		9FB750A42487B0FC00193948 /* PersonalDataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDataStore.swift; sourceTree = "<group>"; };
+		9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDataViewModel.swift; sourceTree = "<group>"; };
 		9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UserDefault+PropertyWrapper.swift"; path = "Wegli/UserDefault+PropertyWrapper.swift"; sourceTree = SOURCE_ROOT; };
 		9FB750AF2487BEF900193948 /* View+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Additions.swift"; sourceTree = "<group>"; };
 		F834758A234C61CE00244D6F /* Wegli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wegli.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -129,6 +137,32 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		9F242638248ACDF000318989 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				9F242639248ACDF600318989 /* User.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9F649854248945CC00514BD3 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				9F649855248945D800514BD3 /* Components */,
+				9FB7509E2487B09500193948 /* PersonalData.swift */,
+				9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		9F649855248945D800514BD3 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				9F6498562489460300514BD3 /* DataRow.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		9F73E8F424878B84002E22F4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -178,12 +212,22 @@
 			path = WegliTests;
 			sourceTree = "<group>";
 		};
+		9F9C4306248BAC3D00FF514B /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				9FB750AE2487BEEC00193948 /* Extensions */,
+				9FB750A62487B15B00193948 /* PropertyWrapper */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		9FB7509A2487B08200193948 /* PersonalData */ = {
 			isa = PBXGroup;
 			children = (
-				9FB750A42487B0FC00193948 /* PersonalDataStore.swift */,
-				9FB7509E2487B09500193948 /* PersonalData.swift */,
-				9FB7509F2487B09500193948 /* PersonalDataStore+Validation.swift */,
+				9F242638248ACDF000318989 /* Model */,
+				9F649854248945CC00514BD3 /* UI */,
+				9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */,
+				9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */,
 			);
 			path = PersonalData;
 			sourceTree = "<group>";
@@ -211,6 +255,7 @@
 			children = (
 				F834758D234C61CE00244D6F /* AppDelegate.swift */,
 				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
+				9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -283,11 +328,10 @@
 		F834758C234C61CE00244D6F /* Wegli */ = {
 			isa = PBXGroup;
 			children = (
-				9FB750AE2487BEEC00193948 /* Extensions */,
 				9FB750AA2487BCE600193948 /* App */,
 				9F73E8F424878B84002E22F4 /* Features */,
 				F8347595234C61CF00244D6F /* Preview Content */,
-				9FB750A62487B15B00193948 /* PropertyWrapper */,
+				9F9C4306248BAC3D00FF514B /* Utils */,
 				9FB750A92487BCA600193948 /* Resources */,
 				9FB750AD2487BD4800193948 /* Services */,
 				9FB750AB2487BD2D00193948 /* UI */,
@@ -461,22 +505,26 @@
 				9F73E8FB24878D91002E22F4 /* ImageGrid.swift in Sources */,
 				F8EDCA86234CBCE2001E8D9C /* ReportForm.swift in Sources */,
 				F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */,
+				9F24263A248ACDF600318989 /* User.swift in Sources */,
 				9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */,
 				9F73E8FA24878D91002E22F4 /* ImagePicker.swift in Sources */,
 				F889751E234E01770014FCC8 /* Description.swift in Sources */,
+				9F9C4308248BAC5900FF514B /* EnvironmentContainer.swift in Sources */,
 				F8EDCA84234CBC81001E8D9C /* MainView.swift in Sources */,
 				9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */,
 				4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				F889751C234E01700014FCC8 /* Location.swift in Sources */,
+				9F64984D2488F3EA00514BD3 /* PersonalDataWidget.swift in Sources */,
+				9F6498492488F34800514BD3 /* PersonsalDataRepository.swift in Sources */,
 				F8EDCA82234CB8B7001E8D9C /* Widget.swift in Sources */,
 				9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */,
 				F889751A234E015E0014FCC8 /* Images.swift in Sources */,
 				F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */,
+				9F6498572489460300514BD3 /* DataRow.swift in Sources */,
 				4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */,
-				9FB750A52487B0FC00193948 /* PersonalDataStore.swift in Sources */,
+				9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
-				9FB750A32487B09500193948 /* PersonalDataStore+Validation.swift in Sources */,
 				9FB750A22487B09500193948 /* PersonalData.swift in Sources */,
 				9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */,
 			);

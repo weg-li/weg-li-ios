@@ -9,24 +9,15 @@
 import SwiftUI
 
 struct Widget: View {
-    enum Status {
-        case incomplete
-        case completed
-    }
-    
     let title: Text
-    let state: Status
+    var isCompleted: Bool
     let content: AnyView
     @State private var isCollapsed: Bool = false
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                if state == .completed {
-                    Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
-                } else {
-                    Image(systemName: "exclamationmark.circle.fill").foregroundColor(.orange)
-                }
+                completionIndicator()
                 title.fontWeight(.bold)
                 Spacer()
                 Button(action: {
@@ -49,10 +40,18 @@ struct Widget: View {
         .shadow(color: Color(.black).opacity(0.3), radius: 10, x: 0, y: 0)
         .padding()
     }
+    
+    private func completionIndicator() -> some View {
+        if isCompleted {
+            return Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+        } else {
+            return Image(systemName: "exclamationmark.circle.fill").foregroundColor(.orange)
+        }
+    }
 }
 
 struct Widget_Previews: PreviewProvider {
     static var previews: some View {
-        Widget(title: Text("Fotos"), state: .completed, content: Text("Foobar").eraseToAnyView())
+        Widget(title: Text("Fotos"), isCompleted: true, content: Text("Foobar").eraseToAnyView())
     }
 }

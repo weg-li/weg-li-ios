@@ -9,31 +9,34 @@
 import SwiftUI
 
 struct ReportForm: View {
+    @Environment(\.environment) var environmentContainer: EnvironmentContainer
+    
     var body: some View {
-        ScrollView {
+        let pvm = PersonalDataViewModel(repository: environmentContainer.personalDataRepository)
+        return ScrollView {
             VStack {
                 Widget(
                     title: Text("Fotos"),
-                    state: .completed,
+                    isCompleted: true,
                     content: Images()
                         .eraseToAnyView()
                 )
                 Widget(
                     title: Text("Ort"),
-                    state: .completed,
+                    isCompleted: true,
                     content: Location()
                         .eraseToAnyView()
                 )
                 Widget(
                     title: Text("Beschreibung"),
-                    state: .completed,
+                    isCompleted: true,
                     content: Description()
                         .eraseToAnyView()
                 )
                 Widget(
                     title: Text("Persönliche Daten"),
-                    state: .completed,
-                    content: PersonalData()
+                    isCompleted: pvm.isFormValid,
+                    content: PersonalDataWidget(viewModel: pvm)
                     .eraseToAnyView()
                 )
                 SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
