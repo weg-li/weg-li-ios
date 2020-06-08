@@ -8,10 +8,10 @@
 
 import SwiftUI
 
-struct Widget: View {
+struct Widget<T: View>: View {
     let title: Text
     var isCompleted: Bool
-    let content: AnyView
+    let content: () -> T
     @State private var isCollapsed: Bool = false
     
     var body: some View {
@@ -31,7 +31,7 @@ struct Widget: View {
                 .foregroundColor(.secondary)
             }.font(.title)
             if !isCollapsed {
-                content.transition(.opacity)
+                content().transition(.opacity)
             }
         }
         .padding()
@@ -52,6 +52,6 @@ struct Widget: View {
 
 struct Widget_Previews: PreviewProvider {
     static var previews: some View {
-        Widget(title: Text("Fotos"), isCompleted: true, content: Text("Foobar").eraseToAnyView())
+        Widget(title: Text("Fotos"), isCompleted: false) { Text("Foobar") }
     }
 }

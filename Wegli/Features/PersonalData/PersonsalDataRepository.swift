@@ -8,14 +8,10 @@
 
 import Foundation
 
-protocol PersonalDataRepositoryInterface {
-    var user: User { get set }
-}
-
 final class PersonsalDataRepository {
-    var user: User {
+    var contact: Contact {
         get {
-            User(
+            Contact(
                 firstName: firstName,
                 name: name,
                 address: .init(street: street, zipCode: zipCode, town: town),

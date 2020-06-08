@@ -9,18 +9,22 @@
 import SwiftUI
 
 struct PersonalDataWidget: View {
-    let viewModel: PersonalDataViewModel
+    let contact: Contact?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            row(callout: "Name", content: "\(viewModel.firstName) \(viewModel.name)")
-            row(callout: "Straße", content: viewModel.street)
-            row(callout: "Stadt", content: "\(viewModel.zipCode) \(viewModel.town)")
-            row(callout: "Telefon", content: viewModel.phone)
+        guard let contact = contact, contact.isValid else {
+            return Text("Keine Kontaktdaten angegeben")
+                .eraseToAnyView()
+        }
+        return VStack(alignment: .leading, spacing: 10) {
+            row(callout: "Name", content: ("\(contact.firstName) \(contact.name)"))
+            row(callout: "Straße", content: contact.address.street)
+            row(callout: "Stadt", content: "\(contact.address.zipCode) \(contact.address.town)")
+            row(callout: "Telefon", content: contact.phone)
             Text("Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.")
                 .font(.footnote)
                 .foregroundColor(.gray)
-        }
+        }.eraseToAnyView()
     }
     
     private func row(callout: String, content: String) -> some View {
@@ -31,12 +35,13 @@ struct PersonalDataWidget: View {
             Spacer()
             Text(content)
                 .foregroundColor(.gray)
+            
         }
     }
 }
 
 struct PersonalDataWidget_Previews: PreviewProvider {
     static var previews: some View {
-        PersonalDataWidget(viewModel: PersonalDataViewModel())
+        PersonalDataWidget(contact: .init(firstName: "", name: "", address: .init(street: "", zipCode: "", town:   ""), phone: ""))
     }
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct User {
+struct Contact {
     struct Address {
         let street: String
         let zipCode: String
@@ -18,4 +18,12 @@ struct User {
     let name: String
     let address: Address
     let phone: String
+}
+
+extension Contact {
+    var isValid: Bool {
+        [firstName, name, address.street, address.town, address.zipCode, phone]
+            .map { !$0.isEmpty }
+            .reduce(true) { $0 && $1 }
+    }
 }

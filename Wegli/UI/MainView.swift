@@ -11,7 +11,7 @@ import SwiftUI
 struct MainView: View {
     @State private var showReportForm: Bool = false
     @State private var showPersonalData: Bool = false
-    @Environment(\.environment) var environment: EnvironmentContainer
+    @EnvironmentObject private var store: AppStore
     
     var body: some View {
         NavigationView {
@@ -28,21 +28,25 @@ struct MainView: View {
                 }
             }
             .navigationBarTitle("weg-li")
-            .navigationBarItems(trailing:
-                Button(action: {
-                    self.showPersonalData.toggle()
-                }, label: {
-                    Image(systemName: "person.circle.fill")
-                        .iconModifier()
-                })
-            )
+            .navigationBarItems(trailing: contactDataIcon)
             .sheet(isPresented: $showReportForm) {
                 ReportForm()
+                    .environmentObject(self.store)
             }
         }
         .sheet(isPresented: $showPersonalData) {
-            PersonalData(isPresented: self.$showPersonalData, viewModel: PersonalDataViewModel(repository: self.environment.personalDataRepository))
+            PersonalData(isPresented: self.$showPersonalData, viewModel: PersonalDataViewModel(model: self.store.state.contact))
+                .environmentObject(self.store)
         }
+    }
+    
+    private var contactDataIcon: some View {
+        Button(action: {
+            self.showPersonalData.toggle()
+        }, label: {
+            Image(systemName: "person.circle.fill")
+                .iconModifier()
+        })
     }
 }
 

@@ -13,6 +13,8 @@ struct DataRow: View {
     @Binding var text: String
     @Binding var isValid: Bool
     
+    @State private var isPopoverPresented: Bool = false
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -20,9 +22,19 @@ struct DataRow: View {
                     .font(.callout)
                     .foregroundColor(.gray)
                 if !isValid {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundColor(.orange)
-                        .accessibility(hidden: true)
+                    Button(action: {
+                        self.isPopoverPresented.toggle()
+                    }) {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundColor(.orange)
+                            .accessibility(hidden: true)
+                    }
+                    .alert(isPresented: $isPopoverPresented) {
+                        Alert(
+                            title: Text("\(type.label) darf nicht leer sein."),
+                            dismissButton: .default(Text("Ok"))
+                        )
+                    }
                 }
             }
             TextField(type.placeholder, text: $text)
@@ -35,7 +47,12 @@ struct DataRow: View {
 
 struct DataRow_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello World!")
+        VStack {
+            DataRow(type: .zipCode, text: .constant("Hello World!"), isValid: .constant(false))
+            DataRow(type: .firstName, text: .constant("Hello World!"), isValid: .constant(false))
+            DataRow(type: .lastName, text: .constant("Hello World!"), isValid: .constant(false))
+            DataRow(type: .street, text: .constant("Hello World!"), isValid: .constant(false))
+        }
     }
 }
 

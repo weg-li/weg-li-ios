@@ -10,8 +10,6 @@ import Combine
 import Foundation
 
 final class PersonalDataViewModel: ObservableObject {
-    private let repository: PersonsalDataRepository
-    
     @Published var firstName: String
     @Published var name: String
     @Published var street: String
@@ -19,25 +17,24 @@ final class PersonalDataViewModel: ObservableObject {
     @Published var town: String
     @Published var phone: String
     
-    @Published var isFirstNameValid: Bool = false
-    @Published var isNameValid: Bool = false
-    @Published var isStreetValid: Bool = false
-    @Published var isZipCodeValid: Bool = false
-    @Published var isTownValid: Bool = false
-    @Published var isPhoneValid: Bool = false
-    @Published var isFormValid: Bool =  false
+    @Published var isFirstNameValid = false
+    @Published var isNameValid = false
+    @Published var isStreetValid = false
+    @Published var isZipCodeValid = false
+    @Published var isTownValid = false
+    @Published private var isAddressValid =  false
+    @Published var isPhoneValid = false
+    @Published var isFormValid =  false
     
     private var bag = Set<AnyCancellable>()
     
-    init(repository: PersonsalDataRepository = PersonsalDataRepository()) {
-        self.repository = repository
-        
-        self.firstName = repository.user.firstName
-        self.name = repository.user.name
-        self.street = repository.user.address.street
-        self.zipCode = repository.user.address.zipCode
-        self.town = repository.user.address.town
-        self.phone = repository.user.phone
+    init(model: Contact?) {
+       self.firstName = model?.firstName ?? ""
+        self.name = model?.name ?? ""
+        self.street = model?.address.street ?? ""
+        self.zipCode = model?.address.zipCode ?? ""
+        self.town = model?.address.town ?? ""
+        self.phone = model?.phone ?? ""
         
         $firstName
             .removeDuplicates()
@@ -70,26 +67,16 @@ final class PersonalDataViewModel: ObservableObject {
             .assign(to: \.isPhoneValid, on: self)
             .store(in: &bag)
         
-        _ = $isFirstNameValid.merge(with: $isNameValid, $isStreetValid, $isTownValid, $isPhoneValid, $isZipCodeValid)
+        _ = $isZipCodeValid.combineLatest($isStreetValid, $isTownValid)
+            .receive(on: RunLoop.main)
+            .map { $0 && $1 && $2 }
+            .assign(to: \.isAddressValid, on: self)
+            .store(in: &bag)
+        
+        _ = $isAddressValid.combineLatest($isNameValid, $isFirstNameValid, $isPhoneValid)
+            .receive(on: RunLoop.main)
+            .map { $0 && $1 && $2 && $3 }
             .assign(to: \.isFormValid, on: self)
             .store(in: &bag)
-    }
-    
-    func send(event: Event) {
-        switch event {
-        case .storeUser:
-            repository.user = User(
-                firstName: firstName,
-                name: name,
-                address: .init(street: street, zipCode: zipCode, town: town),
-                phone: phone
-            )
-        }
-    }
-}
-
-extension PersonalDataViewModel {
-    enum Event {
-        case storeUser
     }
 }

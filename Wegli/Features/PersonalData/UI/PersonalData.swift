@@ -11,12 +11,23 @@ import SwiftUI
 struct PersonalData: View {
     @Binding var isPresented: Bool
     @ObservedObject var viewModel: PersonalDataViewModel
+    @EnvironmentObject private var appStore: AppStore
     
     var body: some View {
         VStack {
             HStack {
                 Button(action: {
-                    self.viewModel.send(event: .storeUser)
+                    self.appStore.send(.setContact(
+                        Contact(
+                            firstName: self.viewModel.firstName,
+                            name: self.viewModel.name,
+                            address: .init(
+                                street: self.viewModel.street,
+                                zipCode: self.viewModel.zipCode,
+                                town: self.viewModel.town),
+                            phone: self.viewModel.phone)
+                        )
+                    )
                     self.isPresented.toggle()
                 }) {
                     Text("Speichern")
@@ -42,14 +53,11 @@ struct PersonalData: View {
             }
         }
         .navigationBarTitle("Persönliche Daten", displayMode: .inline)
-        .onDisappear {
-            self.viewModel.send(event: .storeUser)
-        }
     }
 }
 
 struct PersonalData_Previews: PreviewProvider {
     static var previews: some View {
-        /*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/
+        PersonalData(isPresented: .constant(true), viewModel: PersonalDataViewModel(model: nil))
     }
 }
