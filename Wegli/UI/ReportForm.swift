@@ -16,7 +16,7 @@ struct ReportForm: View {
             VStack {
                 Widget(
                     title: Text("Fotos"),
-                    isCompleted: true) {
+                    isCompleted: !store.state.report.images.isEmpty) {
                         Images()
                     }
                 Widget(
