@@ -185,9 +185,9 @@
 		9F73E8F524878BB2002E22F4 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				9F73E8FE24878DFB002E22F4 /* View */,
-				9F73E8F924878D91002E22F4 /* ImageDataStore.swift */,
 				9F73E90024878E20002E22F4 /* Components */,
+				9F73E8F924878D91002E22F4 /* ImageDataStore.swift */,
+				9F73E8FE24878DFB002E22F4 /* View */,
 			);
 			path = Images;
 			sourceTree = "<group>";

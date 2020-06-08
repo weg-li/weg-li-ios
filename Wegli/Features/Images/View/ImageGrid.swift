@@ -17,18 +17,26 @@ struct ImageGrid: View {
             HStack {
                 ForEach(images, id: \.self) { image in
                     Image(uiImage: image)
-                        .resizable()
-//                        .scaledToFit()
-                        .background(Color.orange)
-                        .aspectRatio(1, contentMode: .fill)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .gridModifier
                 }
                 // fill empty cells with clear color to make layout work
                 ForEach(0 ..< self.columnCount - images.count) { _ in
-                    Color.clear.scaledToFit()
+                    Image(systemName: "trash")
+                        .gridModifier
+                        .hidden()
                 }
             }
         }
+    }
+}
+
+private extension Image {
+    var gridModifier: some View {
+        self
+            .resizable()
+            .background(Color.orange)
+            .aspectRatio(1, contentMode: .fill)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

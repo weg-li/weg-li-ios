@@ -18,6 +18,9 @@ func appReducer(
     case let .setContact(contact):
         state.contact = contact
         environment.personalDataRepository.contact = contact
+    case let .addImage(image):
+        environment.dataStore.add(image: image)
+        state.report.images = environment.dataStore.images
     }
     return Empty().eraseToAnyPublisher()
 }

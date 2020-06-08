@@ -9,12 +9,14 @@
 import SwiftUI
 
 struct Images: View {
-    @ObservedObject var imageDataStore = ReportImageDataStore()
+    @EnvironmentObject private var appStore: AppStore
     
     var body: some View {
         VStack {
-            ImageGrid(images: imageDataStore.images, columnCount: 3)
-            ImagePickerButtons(imageDataStore: imageDataStore)
+            ImageGrid(images: appStore.state.report.images, columnCount: 3)
+            ImagePickerButtons { (image) in
+                self.appStore.send(.addImage(image))
+            }
         }
     }
 }

@@ -8,10 +8,10 @@
 
 import SwiftUI
 
-struct Widget<T: View>: View {
+struct Widget<Content: View>: View {
     let title: Text
     var isCompleted: Bool
-    let content: () -> T
+    let content: () -> Content
     @State private var isCollapsed: Bool = false
     
     var body: some View {

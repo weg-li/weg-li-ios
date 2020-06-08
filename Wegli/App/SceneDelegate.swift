@@ -25,8 +25,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func generateAppStore() -> AppStore {
-        let environment = EnvironmentContainer()
-        let state = AppState(contact: environment.personalDataRepository.contact)
+        let environment = EnvironmentContainer(
+            personalDataRepository: PersonsalDataRepository(),
+            dataStore: ReportImageDataStore()
+        )
+        let state = AppState(
+            contact: environment.personalDataRepository.contact,
+            report: Report(images: environment.dataStore.images))
         return AppStore(initialState: state, reducer: appReducer, environment: environment)
     }
 }

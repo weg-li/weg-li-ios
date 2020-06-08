@@ -7,7 +7,14 @@
 //
 
 import Foundation
+import UIKit
+
+struct Report {
+    var images: [UIImage] = []
+}
 
 struct AppState {
     var contact: Contact?
+    var report: Report
+    
 }

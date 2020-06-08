@@ -7,7 +7,9 @@
 //
 
 import Foundation
+import UIKit
 
 enum AppAction {
     case setContact(Contact)
+    case addImage(UIImage)
 }

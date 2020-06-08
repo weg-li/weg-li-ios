@@ -10,25 +10,23 @@ import SwiftUI
 import Combine
 
 struct ImagePicker: UIViewControllerRepresentable {
-
     @Binding var isShown: Bool
-    let dataStore: ImageDataStore
+    let imageHandler: (UIImage) -> Void
     let sourceType: UIImagePickerController.SourceType
 
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-
         @Binding var isShown: Bool
-        let dataStore: ImageDataStore
+        let imageHandler: (UIImage) -> Void
 
-        init(isShown: Binding<Bool>, dataStore: ImageDataStore) {
+        init(isShown: Binding<Bool>, imageHandler: @escaping (UIImage) -> Void) {
             _isShown = isShown
-            self.dataStore = dataStore
+            self.imageHandler = imageHandler
         }
 
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             let imagePicked = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
-            dataStore.add(image: imagePicked)
+            imageHandler(imagePicked)
             isShown = false
         }
 
@@ -39,7 +37,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        return Coordinator(isShown: $isShown, dataStore: dataStore)
+        return Coordinator(isShown: $isShown, imageHandler: imageHandler)
     }
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
