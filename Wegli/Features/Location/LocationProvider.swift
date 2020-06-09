@@ -29,9 +29,10 @@ final class LocationProvider: NSObject, ObservableObject {
         super.init()
         locationFetcher.delegate = self
         locationFetcher.desiredAccuracy = kCLLocationAccuracyBest
+        
         locationFetcher.requestWhenInUseAuthorization()
     }
-
+    
     func requestLocation() {
         guard CLLocationManager.authorizationStatus().isAuthorized else {
             locationPublisher.send(completion: .failure(LocationRequestError.unauthorized))
