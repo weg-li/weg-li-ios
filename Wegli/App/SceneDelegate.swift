@@ -6,6 +6,7 @@
 //  Copyright © 2019 Stefan Trauth. All rights reserved.
 //
 
+import CoreLocation
 import UIKit
 import SwiftUI
 
@@ -27,11 +28,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func generateAppStore() -> AppStore {
         let environment = EnvironmentContainer(
             personalDataRepository: PersonsalDataRepository(),
-            dataStore: ReportImageDataStore()
+            dataStore: ReportImageDataStore(),
+            locationProvider: LocationProvider(),
+            geoCoder: GeoCodeProvider(),
+            exifReader: ExifReader()
         )
         let state = AppState(
             contact: environment.personalDataRepository.contact,
-            report: Report(images: environment.dataStore.images))
+            report: Report(images: environment.dataStore.images),
+            location: LocationState.init(location: CLLocationCoordinate2D(), presumedAddress: nil))
         return AppStore(initialState: state, reducer: appReducer, environment: environment)
     }
 }
