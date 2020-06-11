@@ -6,6 +6,7 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
+import Contacts
 import Foundation
 
 struct Contact {
@@ -25,5 +26,17 @@ extension Contact {
         [firstName, name, address.street, address.town, address.zipCode, phone]
             .map { !$0.isEmpty }
             .reduce(true) { $0 && $1 }
+    }
+}
+
+extension CNPostalAddress {
+    var humanReadableAddress: String {
+        return String {
+            if !street.isEmpty {
+                self.street
+            }
+            self.postalCode
+            self.city
+        }
     }
 }

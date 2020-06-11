@@ -12,31 +12,38 @@ struct ReportForm: View {
     @EnvironmentObject private var store: AppStore
     
     var body: some View {
-        ScrollView {
-            VStack {
-                Widget(
-                    title: Text("Fotos"),
-                    isCompleted: !store.state.report.images.isEmpty) {
-                        Images()
+        NavigationView {
+            ScrollView {
+                VStack {
+                    Widget(
+                        title: Text("Fotos"),
+                        isCompleted: !store.state.report.images.isEmpty) {
+                            Images()
                     }
-                Widget(
-                    title: Text("Ort"),
-                    isCompleted: true) {
-                        Location()
+                    Widget(
+                        title: Text("Ort"),
+                        isCompleted: true) {
+                            Location()
                     }
-                Widget(
-                    title: Text("Beschreibung"),
-                    isCompleted: true) {
-                        Description()
+                    Widget(
+                        title: Text("Beschreibung"),
+                        isCompleted: true) {
+                            Description()
                     }
-                Widget(
-                    title: Text("Persönliche Daten"),
-                    isCompleted: store.state.contact?.isValid ?? false) {
-                        PersonalDataWidget(contact: self.store.state.contact)
+                    Widget(
+                        title: Text("Persönliche Daten"),
+                        isCompleted: store.state.contact?.isValid ?? false) {
+                            PersonalDataWidget(contact: self.store.state.contact)
                     }
-                SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
-                DiscardButton() {}
+                    VStack {
+                        SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
+                        DiscardButton() {}
+                    }
+                    .padding(.bottom)
+                }
             }
+            .padding(.bottom)
+            .navigationBarTitle("Formular", displayMode: .inline)
         }
     }
 }

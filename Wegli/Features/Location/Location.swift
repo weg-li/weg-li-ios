@@ -21,12 +21,12 @@ struct Location: View {
     var body: some View {
         VStack(alignment: .leading) {
             Picker(selection: $locationOption.onChange(optionChange), label: Text("")) {
-                ForEach(locationOptions, id: \.self) { option in
-                    option.text
+                ForEach(0..<locationOptions.count) { option in
+                    self.locationOptions[option].text
                 }
             }.pickerStyle(SegmentedPickerStyle())
             ZStack(alignment: .topTrailing) {
-                MapView(center: $currentLocation)
+                MapView(center: store.state.location.location)
                     .frame(height: self.isMapExpanded ? 300 : 150)
                 expandMapButton
                     .padding(4)
@@ -34,13 +34,16 @@ struct Location: View {
             }
             addressView
         }
+        .onAppear {
+            self.store.send(.handleLocationAction(.onLocationAppear))
+        }
     }
     
     private var locationOptions: [LocationOption] {
         if store.state.report.images.isEmpty {
-            return [.currentLocation, .manual]
+            return [.currentLocation(CLLocationCoordinate2D(latitude: 0, longitude: 0)), .manual]
         } else {
-            return LocationOption.allCases
+            return [.fromPhotos, .currentLocation(CLLocationCoordinate2D(latitude: 0, longitude: 0)), .manual]
         }
     }
     
@@ -67,7 +70,10 @@ struct Location: View {
                 self.isMapExpanded.toggle()
             }
         }, label: {
-            Image(systemName: self.isMapExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right" )
+            Image(systemName: self.isMapExpanded
+                ? "arrow.down.right.and.arrow.up.left"
+                : "arrow.up.left.and.arrow.down.right"
+            )
                 .padding()
                 .background(
                     Color.white
@@ -78,24 +84,43 @@ struct Location: View {
     }
     
     private func optionChange(_ option: Int) {
-        store.send(.resolveAddress(LocationOption.init(rawValue: option)!))
+        store.send(.handleLocationAction(.resolveAddress(locationOptions[option])))
     }
 }
 
+import CoreLocation
+
 extension Location {
-    enum LocationOption: Int, CaseIterable {
+    enum LocationOption {
+        init?(index: Int) {
+            switch index {
+            case 0: self = .fromPhotos
+            case 1: self = .currentLocation(.zero)
+            case 2: self = .manual
+            default: return nil
+            }
+        }
+        
         case fromPhotos
-        case currentLocation
+        case currentLocation(CLLocationCoordinate2D)
         case manual
+        
+        var index: Int {
+            switch self {
+            case .fromPhotos: return 0
+            case .currentLocation: return 1
+            case .manual: return 2
+            }
+        }
         
         var text: some View {
             switch self {
             case .fromPhotos:
-                return Text("Aus Fotos").tag(rawValue)
+                return Text("Aus Fotos").tag(index)
             case .currentLocation:
-                return Text("Aktuelle Position").tag(rawValue)
+                return Text("Aktuelle Position").tag(index)
             case .manual:
-                return Text("Manuell").tag(rawValue)
+                return Text("Manuell").tag(index)
             }
         }
     }
@@ -105,4 +130,8 @@ struct Location_Previews: PreviewProvider {
     static var previews: some View {
         Location()
     }
+}
+
+extension CLLocationCoordinate2D {
+    static let zero = CLLocationCoordinate2D(latitude: 0, longitude: 0)
 }

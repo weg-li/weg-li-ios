@@ -11,19 +11,18 @@ import SwiftUI
 import UIKit
 
 struct MapView: UIViewRepresentable {
-//    var initialCoordinate: CLLocationCoordinate2D
-    @Binding var center: CLLocationCoordinate2D
+    var center: CLLocationCoordinate2D
     var annotations: [MKPointAnnotation]
     
-    init(center: Binding<CLLocationCoordinate2D>) {
-        self._center = center
+    init(center: CLLocationCoordinate2D) {
+        self.center = center
         
         let annotation = MKPointAnnotation()
-        annotation.coordinate = center.wrappedValue
+        annotation.coordinate = center
         self.annotations = [annotation]
     }
     
-    func makeUIView(context: Context) -> MKMapView {
+   func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
         return mapView
@@ -32,6 +31,7 @@ struct MapView: UIViewRepresentable {
     func updateUIView(_ view: MKMapView, context: Context) {
         center(view, on: center)
         syncAnnototations(in: view)
+        view.setNeedsLayout()
     }
     
     private func syncAnnototations(in view: MKMapView) {
@@ -57,40 +57,32 @@ struct MapView: UIViewRepresentable {
     
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: MapView
-        
         init(_ parent: MapView) {
             self.parent = parent
         }
-    }
-}
-
-class Coordinator: NSObject, MKMapViewDelegate {
-    var parent: MapView
-    init(_ parent: MapView) {
-        self.parent = parent
-    }
-    
-    func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
-        parent.center = mapView.centerCoordinate
-    }
-    
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let identifier = "PlaceMark"
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-        if annotationView == nil {
-            annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-            annotationView?.canShowCallout = false
-        } else {
-            annotationView?.annotation = annotation
+                
+        func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+            parent.center = mapView.centerCoordinate
         }
-        return annotationView
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            let identifier = "PlaceMark"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+            if annotationView == nil {
+                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                annotationView?.canShowCallout = false
+            } else {
+                annotationView?.annotation = annotation
+            }
+            return annotationView
+        }
     }
 }
 
 #if DEBUG
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
-        MapView(center: .constant(CLLocationCoordinate2D()))
+        MapView(center: .zero)
     }
 }
 #endif

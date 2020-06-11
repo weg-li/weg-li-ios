@@ -33,6 +33,7 @@
 		9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */; };
 		9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750AF2487BEF900193948 /* View+Additions.swift */; };
 		9FD61415248FB69500D6A41B /* ExifReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD61414248FB69500D6A41B /* ExifReader.swift */; };
+		9FDB4633248FD868009E743A /* String+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB4632248FD868009E743A /* String+Builder.swift */; };
 		9FFBAD62248E94CE00F66ADB /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD60248E94CE00F66ADB /* Location.swift */; };
 		9FFBAD63248E94CE00F66ADB /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */; };
 		9FFBAD65248E975700F66ADB /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD64248E975700F66ADB /* MapView.swift */; };
@@ -92,6 +93,7 @@
 		9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UserDefault+PropertyWrapper.swift"; path = "Wegli/UserDefault+PropertyWrapper.swift"; sourceTree = SOURCE_ROOT; };
 		9FB750AF2487BEF900193948 /* View+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Additions.swift"; sourceTree = "<group>"; };
 		9FD61414248FB69500D6A41B /* ExifReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExifReader.swift; sourceTree = "<group>"; };
+		9FDB4632248FD868009E743A /* String+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Builder.swift"; sourceTree = "<group>"; };
 		9FFBAD60248E94CE00F66ADB /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
 		9FFBAD64248E975700F66ADB /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -326,6 +328,7 @@
 			children = (
 				9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */,
 				9FB750AF2487BEF900193948 /* View+Additions.swift */,
+				9FDB4632248FD868009E743A /* String+Builder.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -580,6 +583,7 @@
 				9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
 				9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */,
+				9FDB4633248FD868009E743A /* String+Builder.swift in Sources */,
 				9F9C430B248E24BD00FF514B /* AppState.swift in Sources */,
 				9FB750A22487B09500193948 /* PersonalData.swift in Sources */,
 				9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */,

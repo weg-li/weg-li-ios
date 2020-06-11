@@ -8,7 +8,7 @@ final class LocationProvider: NSObject, ObservableObject {
     private var locationFetcher: CLLocationManager
     private var bag = Set<AnyCancellable>()
 
-    private let locationPublisher = PassthroughSubject<CLLocation?, Error>()
+    private let locationPublisher = CurrentValueSubject<CLLocation?, Error>(nil)
     var location: AnyPublisher<CLLocation, Error> {
         locationPublisher
             .compactMap { $0 }
@@ -29,15 +29,13 @@ final class LocationProvider: NSObject, ObservableObject {
         super.init()
         locationFetcher.delegate = self
         locationFetcher.desiredAccuracy = kCLLocationAccuracyBest
-        
+    }
+    
+    func requestPermission() {
         locationFetcher.requestWhenInUseAuthorization()
     }
     
     func requestLocation() {
-        guard CLLocationManager.authorizationStatus().isAuthorized else {
-            locationPublisher.send(completion: .failure(LocationRequestError.unauthorized))
-            return
-        }
         locationFetcher.requestLocation()
     }
 }

@@ -10,22 +10,24 @@ import Contacts
 import Combine
 import CoreLocation
 
-enum GeoCodeError: Error {
-    case noResults
-}
-
 final class GeoCodeProvider {
-    func getPlacemarks(for location: CLLocation) -> Future<[CNPostalAddress], Error> {
-        Future<[CNPostalAddress], Error> { promise in
-            CLGeocoder().reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "de_DE")) { (placemarks, err) -> Void in
+    func getPlacemarks(for location: CLLocation) -> Future<[CNPostalAddress], Swift.Error> {
+        Future<[CNPostalAddress], Swift.Error> { promise in
+            CLGeocoder().reverseGeocodeLocation(location) { (placemarks, err) -> Void in
                 if let error = err {
                     return promise(.failure(error))
                 }
                 guard let marks = placemarks, !marks.isEmpty else {
-                    return promise(.failure(GeoCodeError.noResults))
+                    return promise(.failure(Error.noResults))
                 }
                 return promise(.success(marks.compactMap { $0.postalAddress }))
             }
         }
+    }
+}
+
+extension GeoCodeProvider {
+    enum Error: Swift.Error {
+        case noResults
     }
 }

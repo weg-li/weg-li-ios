@@ -18,6 +18,8 @@ struct Report {
 }
 
 struct LocationState {
+    var isAuthorized: Bool = false
+    var userDefinedLocation: CLLocationCoordinate2D?
     var location: CLLocationCoordinate2D = CLLocationCoordinate2D()
     var presumedAddress: CNPostalAddress?
 }
@@ -27,34 +29,4 @@ struct AppState {
     var report: Report
     
     var location: LocationState
-}
-
-extension CNPostalAddress {
-    var humanReadableAddress: String {
-        return String {
-            if !street.isEmpty {
-                self.street
-            }
-            self.postalCode
-            self.city
-        }
-    }
-}
-
-@_functionBuilder
-struct HumandReadableAddressBuilder {
-    static func buildBlock(_ strings: String...) -> String {
-        strings.joined(separator: " ")
-    }
-    
-    static func buildIf(_ part: String?) -> String {
-        guard let string = part else { return "" }
-        return string
-    }
-}
-
-extension String {
-    public init(@HumandReadableAddressBuilder _ builder: () -> String) {
-        self.init(builder())
-    }
 }

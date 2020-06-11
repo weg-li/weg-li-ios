@@ -14,12 +14,21 @@ import UIKit
 
 enum AppAction {
     // MARK: Location
-    case resolveAddress(Location.LocationOption)
-    case setLocation(CLLocationCoordinate2D)
-    case setResolvedAddress(CNPostalAddress?)
-    
+    case handleLocationAction(LocationAction)
     case setContact(Contact)
-    
     // MARK: Image
     case addImage(UIImage)
+    case none
+}
+
+extension AppAction {
+    enum LocationAction {
+        case onLocationAppear
+        case requestPermission
+        case requestLocation
+        case resolveAddress(Location.LocationOption)
+        case setUserDefinedLocation(CLLocationCoordinate2D?)
+        case setLocation(CLLocationCoordinate2D)
+        case setResolvedAddress(CNPostalAddress?)
+    }
 }
