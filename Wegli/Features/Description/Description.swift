@@ -14,7 +14,6 @@ final class DescriptionViewModel: ObservableObject {
     @Published var color: String = ""
     @Published var plate: String = ""
     
-    let crimes = ["Stand auf der Radspur", "Core Data", "Core Data", "Core Data"]
     @Published var selectedcrime = 0
     
     let times = ["30 Minuten", "1 Stunde", "2 Stunden"]
@@ -60,8 +59,8 @@ struct Description: View {
                 .font(.body)
                 Section(header: Text("Verstoß")) {
                     Picker(selection: $viewModel.selectedcrime, label: Text("Art des Verstoßes")) {
-                        ForEach(0 ..< viewModel.crimes.count, id: \.self) {
-                            Text(self.viewModel.crimes[$0])
+                        ForEach(0 ..< Report.Crime.crimes.count, id: \.self) {
+                            Text(Report.Crime.crimes[$0])
                         }
                     }
                     Picker(selection: $viewModel.selectedTime, label: Text("Dauer der Verstoßes")) {
@@ -72,7 +71,6 @@ struct Description: View {
                     toggleRow
                 }.pickerStyle(DefaultPickerStyle())
             }
-            .onAppear { print(self.appStore) }
             .navigationBarItems(
                 leading: Button(action: {
                     self.storeDescription()
@@ -91,8 +89,8 @@ struct Description: View {
         appStore.send(.handleDescriptionAction(.setCar(car)))
         
         let crime = Report.Crime(
-            duration: viewModel.times[viewModel.selectedTime],
-            type: viewModel.crimes[viewModel.selectedcrime],
+            selectedDuration: viewModel.selectedTime,
+            selectedType: self.viewModel.selectedcrime,
             blockedOthers: viewModel.isSelected)
         appStore.send(.handleDescriptionAction(.setCrime(crime)))
     }
@@ -109,36 +107,5 @@ struct Description: View {
 struct Description_Previews: PreviewProvider {
     static var previews: some View {
         Description(isPresented: .constant(false), viewModel: .init(model: nil))
-    }
-}
-
-struct ToggleButton: View {
-    @Binding private(set) var isOn: Bool
-    
-    var body: some View {
-        Button(action: {
-            self.isOn.toggle()
-        }, label: {
-            self.content
-        })
-    }
-    
-    private var content: some View {
-        if isOn {
-            return Image(systemName: "checkmark.circle.fill")
-                .resizable()
-                .frame(width: 35, height: 35)
-                .foregroundColor(.green)
-                .eraseToAnyView()
-        } else {
-            return Image(systemName: "checkmark.circle.fill")
-                .hidden()
-                .frame(width: 35, height: 35)
-                .overlay(
-                    Circle()
-                        .strokeBorder(Color.gray, lineWidth: 1)
-            )
-                .eraseToAnyView()
-        }
     }
 }

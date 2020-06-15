@@ -21,8 +21,8 @@ struct DescriptionWidgetView: View {
                 row(title: "Kennzeichen:", content: appStore.state.report.car.licensePlateNumber ?? "")
             }
             VStack(alignment: .leading) {
-                row(title: "Dauer:", content: appStore.state.report.crime.duration ?? "")
-                row(title: "Art des Verstoßes:", content: appStore.state.report.crime.type ?? "")
+                row(title: "Dauer:", content: appStore.state.report.crime.time)
+                row(title: "Art des Verstoßes:", content: appStore.state.report.crime.crime)
                 if appStore.state.report.crime.blockedOthers {
                     HStack {
                         Text("Behinderung anderer Verkehrsteilnehmer")
