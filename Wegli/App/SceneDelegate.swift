@@ -36,7 +36,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let state = AppState(
             contact: environment.personalDataRepository.contact,
             report: Report(images: environment.dataStore.images),
-            location: LocationState.init(location: CLLocationCoordinate2D(), presumedAddress: nil))
+            location: AppState.LocationState.init(location: .zero, presumedAddress: nil))
         return AppStore(initialState: state, reducer: appReducer, environment: environment)
     }
 }
