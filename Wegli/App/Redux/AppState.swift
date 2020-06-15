@@ -25,18 +25,25 @@ struct Report {
     var car = Car()
     
     struct Crime {
-        var duration: String?
-        var type: String?
+        static let crimes = ["Stand auf der Radspur", "Core Data", "Core Data", "Core Data"]
+        static let times = ["30 Minuten", "1 Stunde", "2 Stunden"]
+        
+        var selectedDuration = 0
+        var selectedType = 0
         var blockedOthers = false
+        
+        var crime: String { Crime.crimes[selectedType] }
+        var time: String { Crime.times[selectedDuration] }
     }
     var crime = Crime()
 }
 
 extension Report {
     var isDescriptionValid: Bool {
-        ![car.type, car.color, car.licensePlateNumber, crime.type, crime.duration]
+        [car.type, car.color, car.licensePlateNumber]
             .compactMap { $0 }
-            .isEmpty
+            .map { $0.isEmpty }
+            .reduce(false, { $0 || $1 })
     }
 }
 
