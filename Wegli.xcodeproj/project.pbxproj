@@ -10,7 +10,10 @@
 		3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82097304260C254FE2182F75 /* Pods_Wegli.framework */; };
 		4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */; };
 		4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */; };
+		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
 		9F24263A248ACDF600318989 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F242639248ACDF600318989 /* Contact.swift */; };
+		9F2EB23A24961CEE008B2D4E /* DescriptionWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */; };
+		9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */; };
 		9F6498492488F34800514BD3 /* PersonsalDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */; };
 		9F64984D2488F3EA00514BD3 /* PersonalDataWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */; };
 		9F6498572489460300514BD3 /* DataRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6498562489460300514BD3 /* DataRow.swift */; };
@@ -69,7 +72,10 @@
 		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
 		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
 		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F242639248ACDF600318989 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
+		9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionWidgetView.swift; sourceTree = "<group>"; };
+		9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Additions.swift"; sourceTree = "<group>"; };
 		9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonsalDataRepository.swift; sourceTree = "<group>"; };
 		9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDataWidget.swift; sourceTree = "<group>"; };
 		9F6498562489460300514BD3 /* DataRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataRow.swift; sourceTree = "<group>"; };
@@ -167,6 +173,15 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		9F2EB23824961CD6008B2D4E /* Description */ = {
+			isa = PBXGroup;
+			children = (
+				F889751D234E01770014FCC8 /* Description.swift */,
+				9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */,
+			);
+			path = Description;
+			sourceTree = "<group>";
+		};
 		9F649854248945CC00514BD3 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -188,10 +203,10 @@
 		9F73E8F424878B84002E22F4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				9FFBAD5F248E94CE00F66ADB /* Location */,
-				F889751D234E01770014FCC8 /* Description.swift */,
-				9FB7509A2487B08200193948 /* PersonalData */,
+				9F2EB23824961CD6008B2D4E /* Description */,
 				9F73E8F524878BB2002E22F4 /* Images */,
+				9FFBAD5F248E94CE00F66ADB /* Location */,
+				9FB7509A2487B08200193948 /* PersonalData */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -311,6 +326,7 @@
 				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
 				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
 				9FFBAD66248E979200F66ADB /* ActivityIndicator.swift */,
+				9F0C2707249777F4001B1908 /* EditButtonStyle.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -326,9 +342,10 @@
 		9FB750AE2487BEEC00193948 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */,
 				9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */,
-				9FB750AF2487BEF900193948 /* View+Additions.swift */,
 				9FDB4632248FD868009E743A /* String+Builder.swift */,
+				9FB750AF2487BEF900193948 /* View+Additions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -554,11 +571,13 @@
 				9F73E8FB24878D91002E22F4 /* ImageGrid.swift in Sources */,
 				F8EDCA86234CBCE2001E8D9C /* ReportForm.swift in Sources */,
 				F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */,
+				9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */,
 				9F24263A248ACDF600318989 /* Contact.swift in Sources */,
 				9F98A7BE248EB25400E06AA4 /* GeoCodeProvider.swift in Sources */,
 				9F9C430D248E24DD00FF514B /* AppAction.swift in Sources */,
 				9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */,
 				9FFBAD62248E94CE00F66ADB /* Location.swift in Sources */,
+				9F2EB23A24961CEE008B2D4E /* DescriptionWidgetView.swift in Sources */,
 				9F73E8FA24878D91002E22F4 /* ImagePicker.swift in Sources */,
 				9F9C430F248E250000FF514B /* Store.swift in Sources */,
 				9FFBAD63248E94CE00F66ADB /* LocationProvider.swift in Sources */,
@@ -577,6 +596,7 @@
 				9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */,
 				F889751A234E015E0014FCC8 /* Images.swift in Sources */,
 				F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */,
+				9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */,
 				9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */,
 				9F6498572489460300514BD3 /* DataRow.swift in Sources */,
 				4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */,
