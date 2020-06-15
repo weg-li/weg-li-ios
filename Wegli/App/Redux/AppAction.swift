@@ -19,6 +19,8 @@ enum AppAction {
     // MARK: Image
     case addImage(UIImage)
     case none
+    // MARK: Description
+    case handleDescriptionAction(DescriptionAction)
 }
 
 extension AppAction {
@@ -30,5 +32,12 @@ extension AppAction {
         case setUserDefinedLocation(CLLocationCoordinate2D?)
         case setLocation(CLLocationCoordinate2D)
         case setResolvedAddress(CNPostalAddress?)
+    }
+}
+
+extension AppAction {
+    enum DescriptionAction {
+        case setCar(Report.Car)
+        case setCrime(Report.Crime)
     }
 }
