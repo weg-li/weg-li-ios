@@ -19,9 +19,9 @@ struct DescriptionWidgetView: View {
                 row(title: "Marke:", content: appStore.state.report.car.type ?? "")
                 row(title: "Farbe:", content: appStore.state.report.car.color ?? "")
                 row(title: "Kennzeichen:", content: appStore.state.report.car.licensePlateNumber ?? "")
-                row(title: "Dauer:", content: appStore.state.report.crime.time)
-                row(title: "Art des Verstoßes:", content: appStore.state.report.crime.crime)
-                if appStore.state.report.crime.blockedOthers {
+                row(title: "Dauer:", content: appStore.state.report.charge.time.description)
+                row(title: "Art des Verstoßes:", content: appStore.state.report.charge.crime)
+                if appStore.state.report.charge.blockedOthers {
                     HStack {
                         Text("Behinderung anderer Verkehrsteilnehmer")
                             .bold()

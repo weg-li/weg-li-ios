@@ -71,8 +71,8 @@ func appReducer(
         switch descriptionAction {
         case let .setCar(car):
             state.report.car = car
-        case let .setCrime(crime):
-            state.report.crime = crime
+        case let .setCharge(crime):
+            state.report.charge = crime
         }
     case .none:
         break

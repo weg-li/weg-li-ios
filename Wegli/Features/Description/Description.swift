@@ -14,25 +14,24 @@ final class DescriptionViewModel: ObservableObject {
     @Published var color: String = ""
     @Published var plate: String = ""
     
-    @Published var selectedcrime = 0
-    
-    let times = ["30 Minuten", "1 Stunde", "2 Stunden"]
+    let charges = Report.Charge.charges
+    @Published var selectedCharge = 0
+
+    let times = Times.allCases.map { $0.description }
     @Published var selectedTime = 0
-    
     @Published var isSelected = false
-    
-    @Published var wasEdited: Bool = false
     
     init(model: Report?) {
         guard let report = model else {
             return
         }
-        self.carType = report.car.type ?? ""
+        print(report)
+        carType = report.car.type ?? ""
         color = report.car.color ?? ""
         plate = report.car.licensePlateNumber ?? ""
-        
-        selectedcrime = 0
-        selectedTime = 0
+        selectedCharge = report.charge.selectedType
+        selectedTime = report.charge.selectedDuration
+        isSelected = report.charge.blockedOthers
     }
 }
 
@@ -50,17 +49,17 @@ struct Description: View {
         NavigationView {
             Form {
                 Section(header: Text("Fahrzeug")) {
-                    TextField("Marke", text: $viewModel.carType, onEditingChanged: { _ in self.viewModel.wasEdited = true })
-                    TextField("Farbe", text: $viewModel.color, onEditingChanged: { _ in self.viewModel.wasEdited = true })
-                    TextField("Kennzeichen", text: $viewModel.plate, onEditingChanged: { _ in self.viewModel.wasEdited = true })
+                    TextField("Marke", text: $viewModel.carType)
+                    TextField("Farbe", text: $viewModel.color)
+                    TextField("Kennzeichen", text: $viewModel.plate)
                 }
                 .padding(.top, 4)
                 .textFieldStyle(PlainTextFieldStyle())
                 .font(.body)
                 Section(header: Text("Verstoß")) {
-                    Picker(selection: $viewModel.selectedcrime, label: Text("Art des Verstoßes")) {
-                        ForEach(0 ..< Report.Charge.charges.count, id: \.self) {
-                            Text(Report.Charge.charges[$0])
+                    Picker(selection: $viewModel.selectedCharge, label: Text("Art des Verstoßes")) {
+                        ForEach(0 ..< self.viewModel.charges.count, id: \.self) {
+                            Text(self.viewModel.charges[$0])
                         }
                     }
                     Picker(selection: $viewModel.selectedTime, label: Text("Dauer der Verstoßes")) {
@@ -88,11 +87,11 @@ struct Description: View {
         let car = Report.Car(color: viewModel.color, type: viewModel.carType, licensePlateNumber: viewModel.plate)
         appStore.send(.handleDescriptionAction(.setCar(car)))
         
-        let crime = Report.Charge(
+        let charge = Report.Charge(
             selectedDuration: viewModel.selectedTime,
-            selectedType: self.viewModel.selectedcrime,
+            selectedType: self.viewModel.selectedCharge,
             blockedOthers: viewModel.isSelected)
-        appStore.send(.handleDescriptionAction(.setCrime(crime)))
+        appStore.send(.handleDescriptionAction(.setCharge(charge)))
     }
     
     private var toggleRow: some View {

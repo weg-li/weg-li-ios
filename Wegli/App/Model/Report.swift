@@ -28,9 +28,9 @@ struct Report {
         var blockedOthers = false
         
         var crime: String { Charge.charges[selectedType] }
-        var time: String { Charge.times[selectedDuration] }
+        var time: String { Times.allCases[selectedDuration].description }
     }
-    var crime = Charge()
+    var charge = Charge()
 }
 
 extension Report {
@@ -44,5 +44,5 @@ extension Report {
 
 extension Report.Charge {
     static let charges = Bundle.main.decode([String].self, from: "charges.json")
-    static let times = ["30 Minuten", "1 Stunde", "2 Stunden"]
+    static let times = Times.allCases
 }
