@@ -36,6 +36,7 @@
 		9FA3AA802498B80C002EDC7D /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA3AA7F2498B80C002EDC7D /* Report.swift */; };
 		9FB5B12C2498BECB00830770 /* Bundle+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */; };
 		9FB5B12F2498C2C100830770 /* Time.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B12E2498C2C100830770 /* Time.swift */; };
+		9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B13824994CF300830770 /* CLLocationCoordinate2D+Additions.swift */; };
 		9FB7509424878FDB00193948 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9FB7509324878FDB00193948 /* README.md */; };
 		9FB750A22487B09500193948 /* PersonalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509E2487B09500193948 /* PersonalData.swift */; };
 		9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */; };
@@ -106,6 +107,7 @@
 		9FA3AA7F2498B80C002EDC7D /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Additions.swift"; sourceTree = "<group>"; };
 		9FB5B12E2498C2C100830770 /* Time.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time.swift; sourceTree = "<group>"; };
+		9FB5B13824994CF300830770 /* CLLocationCoordinate2D+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Additions.swift"; sourceTree = "<group>"; };
 		9FB7509324878FDB00193948 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FB7509E2487B09500193948 /* PersonalData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalData.swift; sourceTree = "<group>"; };
 		9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDataViewModel.swift; sourceTree = "<group>"; };
@@ -379,6 +381,7 @@
 		9FB750AE2487BEEC00193948 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9FB5B13824994CF300830770 /* CLLocationCoordinate2D+Additions.swift */,
 				9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */,
 				9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */,
 				9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */,
@@ -649,6 +652,7 @@
 				9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */,
 				9F6498572489460300514BD3 /* DataRow.swift in Sources */,
 				4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */,
+				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,
 				9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
 				9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */,

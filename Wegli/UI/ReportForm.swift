@@ -24,7 +24,7 @@ struct ReportForm: View {
                     }
                     Widget(
                         title: Text("Ort"),
-                        isCompleted: true) {
+                        isCompleted: store.state.location.location != .zero) {
                             Location()
                     }
                     Widget(
