@@ -35,10 +35,10 @@ struct Report {
 
 extension Report {
     var isDescriptionValid: Bool {
-        [car.type, car.color, car.licensePlateNumber]
+        ![car.type, car.color, car.licensePlateNumber]
             .compactMap { $0 }
             .map { $0.isEmpty }
-            .reduce(false, { $0 || $1 })
+            .contains(true)
     }
 }
 
