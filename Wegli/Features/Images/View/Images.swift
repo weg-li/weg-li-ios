@@ -17,6 +17,7 @@ struct Images: View {
             ImagePickerButtons { (image) in
                 self.appStore.send(.addImage(image))
             }
+            .buttonStyle(EditButtonStyle())
         }
     }
 }
@@ -24,13 +25,5 @@ struct Images: View {
 struct Images_Previews: PreviewProvider {
     static var previews: some View {
         Images()
-    }
-}
-
-extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
-        }
     }
 }

@@ -14,45 +14,48 @@ struct PersonalData: View {
     @EnvironmentObject private var appStore: AppStore
     
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    self.appStore.send(.setContact(
-                        Contact(
-                            firstName: self.viewModel.firstName,
-                            name: self.viewModel.name,
-                            address: .init(
-                                street: self.viewModel.street,
-                                zipCode: self.viewModel.zipCode,
-                                town: self.viewModel.town),
-                            phone: self.viewModel.phone)
-                        )
-                    )
-                    self.isPresented.toggle()
-                }) {
-                    Text("Speichern")
-                }.disabled(!viewModel.isFormValid)
-                Spacer()
-                Button(action: {
-                    self.isPresented.toggle()
-                }) {
-                    Text("Abbrechen")
-                }
-            }.padding()
-            Form {
-                Section {
-                    DataRow(type: .firstName, text: $viewModel.firstName, isValid: $viewModel.isFirstNameValid)
-                    DataRow(type: .lastName, text: $viewModel.name, isValid: $viewModel.isNameValid)
-                    DataRow(type: .street, text: $viewModel.street, isValid: $viewModel.isStreetValid)
-                    HStack {
-                        DataRow(type: .zipCode, text: $viewModel.zipCode, isValid: $viewModel.isZipCodeValid)
-                        DataRow(type: .town, text: $viewModel.town, isValid: $viewModel.isTownValid)
+        NavigationView {
+            VStack {
+                Form {
+                    Section {
+                        DataRow(type: .firstName, text: $viewModel.firstName, isValid: $viewModel.isFirstNameValid)
+                        DataRow(type: .lastName, text: $viewModel.name, isValid: $viewModel.isNameValid)
+                        DataRow(type: .street, text: $viewModel.street, isValid: $viewModel.isStreetValid)
+                        HStack {
+                            DataRow(type: .zipCode, text: $viewModel.zipCode, isValid: $viewModel.isZipCodeValid)
+                            DataRow(type: .town, text: $viewModel.town, isValid: $viewModel.isTownValid)
+                        }
+                        DataRow(type: .phone, text: $viewModel.phone, isValid: $viewModel.isPhoneValid)
                     }
-                    DataRow(type: .phone, text: $viewModel.phone, isValid: $viewModel.isPhoneValid)
                 }
             }
+            .navigationBarItems(leading: saveButton, trailing: cancelButton)
+            .navigationBarTitle("Persönliche Daten", displayMode: .inline)
         }
-        .navigationBarTitle("Persönliche Daten", displayMode: .inline)
+    }
+    
+    private var saveButton: some View {
+        Button(action: { self.appStore.send(
+            .setContact(
+                Contact(
+                    firstName: self.viewModel.firstName,
+                    name: self.viewModel.name,
+                    address: .init(
+                        street: self.viewModel.street,
+                        zipCode: self.viewModel.zipCode,
+                        town: self.viewModel.town),
+                    phone: self.viewModel.phone
+            ))
+            )
+            self.isPresented.toggle()
+        }) { Text("Speichern") }
+            .disabled(!viewModel.isFormValid)
+    }
+    
+    private var cancelButton: some View {
+        Button(action: { self.isPresented.toggle() }) {
+            Text("Abbrechen")
+        }
     }
 }
 

@@ -67,6 +67,13 @@ func appReducer(
     case let .addImage(image):
         environment.dataStore.add(image: image)
         state.report.images = environment.dataStore.images
+    case .handleDescriptionAction(let descriptionAction):
+        switch descriptionAction {
+        case let .setCar(car):
+            state.report.car = car
+        case let .setCharge(crime):
+            state.report.charge = crime
+        }
     case .none:
         break
     }

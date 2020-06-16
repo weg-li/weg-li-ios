@@ -11,6 +11,8 @@ import SwiftUI
 struct ReportForm: View {
     @EnvironmentObject private var store: AppStore
     
+    @State private var editDescription = false
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -27,19 +29,16 @@ struct ReportForm: View {
                     }
                     Widget(
                         title: Text("Beschreibung"),
-                        isCompleted: true) {
-                            Description()
+                        isCompleted: store.state.report.isDescriptionValid) {
+                            DescriptionWidgetView().environmentObject(self.store)
                     }
                     Widget(
                         title: Text("Persönliche Daten"),
                         isCompleted: store.state.contact?.isValid ?? false) {
                             PersonalDataWidget(contact: self.store.state.contact)
                     }
-                    VStack {
-                        SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
-                        DiscardButton() {}
-                    }
-                    .padding(.bottom)
+                    MailContentView()
+                        .padding([.top, .bottom], 16)
                 }
             }
             .padding(.bottom)

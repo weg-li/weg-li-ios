@@ -15,28 +15,9 @@ struct ImagePickerButtons: View {
     
     var body: some View {
         HStack {
-            Button(action: {
-                self.imagePickerSourceType = .photoLibrary
-                self.showImagePicker.toggle()
-            }) {
-                Image(systemName: "photo.fill.on.rectangle.fill")
-                Text("Foto importieren")
-            }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            
+            importButton
             if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                Button(action: {
-                    self.imagePickerSourceType = .camera
-                    self.showImagePicker.toggle()
-                }) {
-                    Image(systemName: "camera.fill")
-                    Text("Kamera")
-                }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                cameraButton
             }
         }
         .sheet(isPresented: $showImagePicker, onDismiss: {
@@ -48,12 +29,37 @@ struct ImagePickerButtons: View {
                 sourceType: self.imagePickerSourceType)
         })
     }
+    
+    private var importButton: some View {
+        Button(action: {
+            self.imagePickerSourceType = .photoLibrary
+            self.showImagePicker.toggle()
+        }) {
+            HStack {
+                Image(systemName: "photo.fill.on.rectangle.fill")
+                Text("Foto importieren")
+            }
+        }
+    }
+    
+    private var cameraButton: some View {
+        Button(action: {
+            self.imagePickerSourceType = .camera
+            self.showImagePicker.toggle()
+        }) {
+            HStack {
+                Image(systemName: "camera.fill")
+                Text("Kamera")
+            }
+        }
+
+    }
 }
 
 struct ImagePickerButtons_Previews: PreviewProvider {
     static var previews: some View {
         ImagePickerButtons { (image) in
             print(image)
-        }
+        }.buttonStyle(EditButtonStyle())
     }
 }
