@@ -11,6 +11,12 @@ import SwiftUI
 struct MainView: View {
     @State private var showReportForm: Bool = false
     @State private var showPersonalData: Bool = false
+    
+    @State private var wasReportEdited = false
+    @State private var presentDraftAlert = false
+    
+    @State private var showingSheet = false
+    
     @EnvironmentObject private var store: AppStore
     
     var body: some View {
@@ -25,7 +31,7 @@ struct MainView: View {
                         Text("Neue Anzeige")
                     }
                     .font(.headline)
-                }
+                }.buttonStyle(EditButtonStyle())
             }
             .navigationBarTitle("weg-li")
             .navigationBarItems(trailing: contactDataIcon)

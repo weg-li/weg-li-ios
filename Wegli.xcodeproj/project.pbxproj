@@ -11,6 +11,7 @@
 		4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */; };
 		4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */; };
 		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
+		9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C270924977943001B1908 /* ToggleButton.swift */; };
 		9F24263A248ACDF600318989 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F242639248ACDF600318989 /* Contact.swift */; };
 		9F2EB23A24961CEE008B2D4E /* DescriptionWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */; };
 		9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */; };
@@ -30,6 +31,10 @@
 		9F9C430D248E24DD00FF514B /* AppAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C430C248E24DD00FF514B /* AppAction.swift */; };
 		9F9C430F248E250000FF514B /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C430E248E250000FF514B /* Store.swift */; };
 		9F9C4311248E251F00FF514B /* Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4310248E251F00FF514B /* Reducer.swift */; };
+		9FA3AA7824979ED6002EDC7D /* MailComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA3AA7724979ED6002EDC7D /* MailComposer.swift */; };
+		9FA3AA7A2497A0AD002EDC7D /* MailContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA3AA792497A0AD002EDC7D /* MailContentView.swift */; };
+		9FA3AA802498B80C002EDC7D /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA3AA7F2498B80C002EDC7D /* Report.swift */; };
+		9FB5B12C2498BECB00830770 /* Bundle+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */; };
 		9FB7509424878FDB00193948 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9FB7509324878FDB00193948 /* README.md */; };
 		9FB750A22487B09500193948 /* PersonalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509E2487B09500193948 /* PersonalData.swift */; };
 		9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */; };
@@ -37,6 +42,7 @@
 		9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB750AF2487BEF900193948 /* View+Additions.swift */; };
 		9FD61415248FB69500D6A41B /* ExifReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD61414248FB69500D6A41B /* ExifReader.swift */; };
 		9FDB4633248FD868009E743A /* String+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB4632248FD868009E743A /* String+Builder.swift */; };
+		9FDB5B432498BBC600BE2AEA /* charges.json in Resources */ = {isa = PBXBuildFile; fileRef = 9FDB5B422498BBC600BE2AEA /* charges.json */; };
 		9FFBAD62248E94CE00F66ADB /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD60248E94CE00F66ADB /* Location.swift */; };
 		9FFBAD63248E94CE00F66ADB /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */; };
 		9FFBAD65248E975700F66ADB /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD64248E975700F66ADB /* MapView.swift */; };
@@ -73,6 +79,7 @@
 		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
 		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
+		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		9F242639248ACDF600318989 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionWidgetView.swift; sourceTree = "<group>"; };
 		9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Additions.swift"; sourceTree = "<group>"; };
@@ -93,6 +100,10 @@
 		9F9C430C248E24DD00FF514B /* AppAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAction.swift; sourceTree = "<group>"; };
 		9F9C430E248E250000FF514B /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		9F9C4310248E251F00FF514B /* Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reducer.swift; sourceTree = "<group>"; };
+		9FA3AA7724979ED6002EDC7D /* MailComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailComposer.swift; sourceTree = "<group>"; };
+		9FA3AA792497A0AD002EDC7D /* MailContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailContentView.swift; sourceTree = "<group>"; };
+		9FA3AA7F2498B80C002EDC7D /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Additions.swift"; sourceTree = "<group>"; };
 		9FB7509324878FDB00193948 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FB7509E2487B09500193948 /* PersonalData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalData.swift; sourceTree = "<group>"; };
 		9FB750A42487B0FC00193948 /* PersonalDataViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalDataViewModel.swift; sourceTree = "<group>"; };
@@ -100,6 +111,7 @@
 		9FB750AF2487BEF900193948 /* View+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Additions.swift"; sourceTree = "<group>"; };
 		9FD61414248FB69500D6A41B /* ExifReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExifReader.swift; sourceTree = "<group>"; };
 		9FDB4632248FD868009E743A /* String+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Builder.swift"; sourceTree = "<group>"; };
+		9FDB5B422498BBC600BE2AEA /* charges.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = charges.json; sourceTree = "<group>"; };
 		9FFBAD60248E94CE00F66ADB /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
 		9FFBAD64248E975700F66ADB /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -252,6 +264,8 @@
 		9F9C4306248BAC3D00FF514B /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				9FD61414248FB69500D6A41B /* ExifReader.swift */,
+				9FA3AA7724979ED6002EDC7D /* MailComposer.swift */,
 				9FB750AE2487BEEC00193948 /* Extensions */,
 				9FB750A62487B15B00193948 /* PropertyWrapper */,
 			);
@@ -268,6 +282,14 @@
 				9F9C4310248E251F00FF514B /* Reducer.swift */,
 			);
 			path = Redux;
+			sourceTree = "<group>";
+		};
+		9FB5B12A2498BEAE00830770 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				9FDB5B422498BBC600BE2AEA /* charges.json */,
+			);
+			path = JSON;
 			sourceTree = "<group>";
 		};
 		9FB7509A2487B08200193948 /* PersonalData */ = {
@@ -292,8 +314,9 @@
 		9FB750A92487BCA600193948 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				F834759B234C61CF00244D6F /* Info.plist */,
 				F8347593234C61CF00244D6F /* Assets.xcassets */,
+				F834759B234C61CF00244D6F /* Info.plist */,
+				9FB5B12A2498BEAE00830770 /* JSON */,
 				F8347598234C61CF00244D6F /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
@@ -304,6 +327,7 @@
 			children = (
 				F834758D234C61CE00244D6F /* AppDelegate.swift */,
 				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
+				9FDB5B442498BC0F00BE2AEA /* Model */,
 				9F9C4309248E24B000FF514B /* Redux */,
 			);
 			path = App;
@@ -322,11 +346,13 @@
 		9FB750AC2487BD3B00193948 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				F83853CE234D11A900DF1A9D /* DiscardButton.swift */,
-				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
-				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
 				9FFBAD66248E979200F66ADB /* ActivityIndicator.swift */,
+				F83853CE234D11A900DF1A9D /* DiscardButton.swift */,
 				9F0C2707249777F4001B1908 /* EditButtonStyle.swift */,
+				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
+				9F0C270924977943001B1908 /* ToggleButton.swift */,
+				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
+				9FA3AA792497A0AD002EDC7D /* MailContentView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -344,16 +370,24 @@
 			children = (
 				9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */,
 				9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */,
+				9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */,
 				9FDB4632248FD868009E743A /* String+Builder.swift */,
 				9FB750AF2487BEF900193948 /* View+Additions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		9FDB5B442498BC0F00BE2AEA /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				9FA3AA7F2498B80C002EDC7D /* Report.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		9FFBAD5F248E94CE00F66ADB /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				9FD61414248FB69500D6A41B /* ExifReader.swift */,
 				9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */,
 				9FFBAD60248E94CE00F66ADB /* Location.swift */,
 				9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */,
@@ -508,6 +542,7 @@
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
 				9FB7509424878FDB00193948 /* README.md in Resources */,
 				F8347594234C61CF00244D6F /* Assets.xcassets in Resources */,
+				9FDB5B432498BBC600BE2AEA /* charges.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,9 +611,11 @@
 				9F98A7BE248EB25400E06AA4 /* GeoCodeProvider.swift in Sources */,
 				9F9C430D248E24DD00FF514B /* AppAction.swift in Sources */,
 				9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */,
+				9FA3AA802498B80C002EDC7D /* Report.swift in Sources */,
 				9FFBAD62248E94CE00F66ADB /* Location.swift in Sources */,
 				9F2EB23A24961CEE008B2D4E /* DescriptionWidgetView.swift in Sources */,
 				9F73E8FA24878D91002E22F4 /* ImagePicker.swift in Sources */,
+				9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */,
 				9F9C430F248E250000FF514B /* Store.swift in Sources */,
 				9FFBAD63248E94CE00F66ADB /* LocationProvider.swift in Sources */,
 				9FD61415248FB69500D6A41B /* ExifReader.swift in Sources */,
@@ -595,6 +632,7 @@
 				9F9C4311248E251F00FF514B /* Reducer.swift in Sources */,
 				9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */,
 				F889751A234E015E0014FCC8 /* Images.swift in Sources */,
+				9FB5B12C2498BECB00830770 /* Bundle+Additions.swift in Sources */,
 				F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */,
 				9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */,
 				9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */,
@@ -604,7 +642,9 @@
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
 				9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */,
 				9FDB4633248FD868009E743A /* String+Builder.swift in Sources */,
+				9FA3AA7A2497A0AD002EDC7D /* MailContentView.swift in Sources */,
 				9F9C430B248E24BD00FF514B /* AppState.swift in Sources */,
+				9FA3AA7824979ED6002EDC7D /* MailComposer.swift in Sources */,
 				9FB750A22487B09500193948 /* PersonalData.swift in Sources */,
 				9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */,
 			);

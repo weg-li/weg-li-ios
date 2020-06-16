@@ -38,6 +38,6 @@ extension AppAction {
 extension AppAction {
     enum DescriptionAction {
         case setCar(Report.Car)
-        case setCrime(Report.Crime)
+        case setCrime(Report.Charge)
     }
 }

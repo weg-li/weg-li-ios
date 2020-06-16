@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Widget<Content: View>: View {
+    @Environment(\.colorScheme) private var scheme: ColorScheme
     let title: Text
     var isCompleted: Bool
     let content: () -> Content
@@ -35,12 +36,14 @@ struct Widget<Content: View>: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(
-            color: Color.primary.opacity(0.3),
-            radius: 10, x: 0, y: 0)
+        .background(backgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .shadow(radius: 10)
         .padding()
+    }
+    
+    private var backgroundColor: Color {
+        scheme == .dark ? Color(white: 30 / 255) : Color(.systemBackground)
     }
     
     private func completionIndicator() -> some View {
@@ -54,6 +57,13 @@ struct Widget<Content: View>: View {
 
 struct Widget_Previews: PreviewProvider {
     static var previews: some View {
-        Widget(title: Text("Fotos"), isCompleted: false) { Text("Foobar") }
+        NavigationView {
+            VStack {
+                Widget(title: Text("Fotos"), isCompleted: false) { Text("Foobar") }
+                Widget(title: Text("Fotos"), isCompleted: false) { Text("Foobar") }
+                Widget(title: Text("Fotos"), isCompleted: true) { Text("Turnip greens yarrow ricebean rutabaga endive cauliflower sea lettuce kohlrabi amaranth water spinach avocado daikon napa cabbage asparagus winter purslane kale. Celery potato scallion desert raisin horseradish spinach carrot soko. Lotus root water spinach fennel kombu maize bamboo shoot green bean swiss chard seakale pumpkin onion chickpea gram corn pea. Brussels sprout coriander water chestnut gourd swiss chard wakame kohlrabi beetroot carrot watercress. Corn amaranth salsify bunya nuts nori azuki bean chickweed potato bell pepper artichoke.") }
+            }
+        }
+//        .environment(\.colorScheme, .dark)
     }
 }

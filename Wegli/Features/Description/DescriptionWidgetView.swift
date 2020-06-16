@@ -15,17 +15,17 @@ struct DescriptionWidgetView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 row(title: "Marke:", content: appStore.state.report.car.type ?? "")
                 row(title: "Farbe:", content: appStore.state.report.car.color ?? "")
                 row(title: "Kennzeichen:", content: appStore.state.report.car.licensePlateNumber ?? "")
-            }
-            VStack(alignment: .leading) {
                 row(title: "Dauer:", content: appStore.state.report.crime.time)
                 row(title: "Art des Verstoßes:", content: appStore.state.report.crime.crime)
                 if appStore.state.report.crime.blockedOthers {
                     HStack {
                         Text("Behinderung anderer Verkehrsteilnehmer")
+                            .bold()
+                        Spacer()
                         Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
                     }
                 }
@@ -43,7 +43,6 @@ struct DescriptionWidgetView: View {
                 Spacer()
             }
         }
-        .onAppear { print("🍏", self.appStore.state.report) }
         .sheet(isPresented: $edit) {
             Description(isPresented: self.$edit, viewModel: .init(model: self.appStore.state.report))
                 .environmentObject(self.appStore)
@@ -51,11 +50,10 @@ struct DescriptionWidgetView: View {
     }
     
     private func row(title: String, content: String) -> some View {
-        HStack {
+        VStack(alignment: .leading) {
             Text(title)
-            Spacer()
-            Text(content)
                 .bold()
+            Text(content)
         }
     }
 }

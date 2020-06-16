@@ -59,8 +59,8 @@ struct Description: View {
                 .font(.body)
                 Section(header: Text("Verstoß")) {
                     Picker(selection: $viewModel.selectedcrime, label: Text("Art des Verstoßes")) {
-                        ForEach(0 ..< Report.Crime.crimes.count, id: \.self) {
-                            Text(Report.Crime.crimes[$0])
+                        ForEach(0 ..< Report.Charge.charges.count, id: \.self) {
+                            Text(Report.Charge.charges[$0])
                         }
                     }
                     Picker(selection: $viewModel.selectedTime, label: Text("Dauer der Verstoßes")) {
@@ -88,7 +88,7 @@ struct Description: View {
         let car = Report.Car(color: viewModel.color, type: viewModel.carType, licensePlateNumber: viewModel.plate)
         appStore.send(.handleDescriptionAction(.setCar(car)))
         
-        let crime = Report.Crime(
+        let crime = Report.Charge(
             selectedDuration: viewModel.selectedTime,
             selectedType: self.viewModel.selectedcrime,
             blockedOthers: viewModel.isSelected)

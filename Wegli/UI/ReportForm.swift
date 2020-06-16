@@ -37,11 +37,8 @@ struct ReportForm: View {
                         isCompleted: store.state.contact?.isValid ?? false) {
                             PersonalDataWidget(contact: self.store.state.contact)
                     }
-                    VStack {
-                        SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
-                        DiscardButton() {}
-                    }
-                    .padding(.bottom)
+                    MailContentView()
+                        .padding([.top, .bottom], 16)
                 }
             }
             .padding(.bottom)
