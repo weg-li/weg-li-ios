@@ -20,7 +20,7 @@ struct DescriptionWidgetView: View {
                 row(title: "Farbe:", content: appStore.state.report.car.color ?? "")
                 row(title: "Kennzeichen:", content: appStore.state.report.car.licensePlateNumber ?? "")
                 row(title: "Dauer:", content: appStore.state.report.charge.time.description)
-                row(title: "Art des Verstoßes:", content: appStore.state.report.charge.crime)
+                row(title: "Art des Verstoßes:", content: appStore.state.report.charge.humandReadableCharge)
                 if appStore.state.report.charge.blockedOthers {
                     HStack {
                         Text("Behinderung anderer Verkehrsteilnehmer")

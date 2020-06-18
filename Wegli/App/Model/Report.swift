@@ -15,6 +15,8 @@ struct Report {
     var address: CNPostalAddress?
     var suggestedublicAffairsOffice: Publicaffairsoffice?
     
+    var date: Date = Date()
+    
     // MARK: Description
     struct Car {
         var color: String?
@@ -28,7 +30,7 @@ struct Report {
         var selectedType = 0
         var blockedOthers = false
         
-        var crime: String { Charge.charges[selectedType] }
+        var humandReadableCharge: String { Charge.charges[selectedType] }
         var time: String { Times.allCases[selectedDuration].description }
     }
     var charge = Charge()

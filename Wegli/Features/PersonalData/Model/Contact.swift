@@ -19,6 +19,7 @@ struct Contact {
     let name: String
     let address: Address
     let phone: String
+    let mail: String
 }
 
 extension Contact {
@@ -26,6 +27,18 @@ extension Contact {
         [firstName, name, address.street, address.town, address.zipCode, phone]
             .map { !$0.isEmpty }
             .reduce(true) { $0 && $1 }
+    }
+}
+
+extension Contact.Address {
+    var humanReadableAddress: String {
+        return String {
+            if !street.isEmpty {
+                street
+            }
+            zipCode
+            town
+        }
     }
 }
 

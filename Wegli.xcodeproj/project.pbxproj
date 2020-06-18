@@ -15,6 +15,7 @@
 		9F24263A248ACDF600318989 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F242639248ACDF600318989 /* Contact.swift */; };
 		9F2EB23A24961CEE008B2D4E /* DescriptionWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */; };
 		9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */; };
+		9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4BD316249B653200C6C44D /* DateFormatter+Additions.swift */; };
 		9F6498492488F34800514BD3 /* PersonsalDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */; };
 		9F64984D2488F3EA00514BD3 /* PersonalDataWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */; };
 		9F6498572489460300514BD3 /* DataRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6498562489460300514BD3 /* DataRow.swift */; };
@@ -88,6 +89,7 @@
 		9F242639248ACDF600318989 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		9F2EB23924961CEE008B2D4E /* DescriptionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionWidgetView.swift; sourceTree = "<group>"; };
 		9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Additions.swift"; sourceTree = "<group>"; };
+		9F4BD316249B653200C6C44D /* DateFormatter+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Additions.swift"; sourceTree = "<group>"; };
 		9F6498482488F34800514BD3 /* PersonsalDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonsalDataRepository.swift; sourceTree = "<group>"; };
 		9F64984C2488F3EA00514BD3 /* PersonalDataWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDataWidget.swift; sourceTree = "<group>"; };
 		9F6498562489460300514BD3 /* DataRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataRow.swift; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 		9F73E8F424878B84002E22F4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				9FB5B13C2499DC2900830770 /* Mail */,
 				9F2EB23824961CD6008B2D4E /* Description */,
 				9F73E8F524878BB2002E22F4 /* Images */,
 				9FFBAD5F248E94CE00F66ADB /* Location */,
@@ -276,8 +279,8 @@
 			isa = PBXGroup;
 			children = (
 				9FD61414248FB69500D6A41B /* ExifReader.swift */,
-				9FA3AA7724979ED6002EDC7D /* MailComposer.swift */,
 				9FB750AE2487BEEC00193948 /* Extensions */,
+				9FA3AA7724979ED6002EDC7D /* MailComposer.swift */,
 				9FB750A62487B15B00193948 /* PropertyWrapper */,
 				9FB5B1402499F6BD00830770 /* PublicAffairsOfficeMatcher.swift */,
 			);
@@ -311,6 +314,14 @@
 				9FB5B12E2498C2C100830770 /* Time.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		9FB5B13C2499DC2900830770 /* Mail */ = {
+			isa = PBXGroup;
+			children = (
+				9FB5B13D2499DC3200830770 /* Model */,
+			);
+			path = Mail;
 			sourceTree = "<group>";
 		};
 		9FB5B13D2499DC3200830770 /* Model */ = {
@@ -403,6 +414,7 @@
 				9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */,
 				9FDB4632248FD868009E743A /* String+Builder.swift */,
 				9FB750AF2487BEF900193948 /* View+Additions.swift */,
+				9F4BD316249B653200C6C44D /* DateFormatter+Additions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -657,6 +669,7 @@
 				F8EDCA84234CBC81001E8D9C /* MainView.swift in Sources */,
 				9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */,
 				4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */,
+				9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				9F64984D2488F3EA00514BD3 /* PersonalDataWidget.swift in Sources */,
 				9F6498492488F34800514BD3 /* PersonsalDataRepository.swift in Sources */,
