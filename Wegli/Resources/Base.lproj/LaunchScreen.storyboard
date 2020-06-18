@@ -15,17 +15,28 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="📸 📝 ✊ weg-li" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wK3-0W-PbV">
-                                <rect key="frame" x="120.5" y="433" width="173.5" height="30"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="CAs-3B-ERo">
+                                <rect key="frame" x="159.5" y="416" width="95" height="64"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="📸 📝 ✊" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wK3-0W-PbV">
+                                        <rect key="frame" x="0.0" y="0.0" width="95" height="30"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="weg-li" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hoj-Ca-YzN">
+                                        <rect key="frame" x="11" y="34" width="73.5" height="30"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="wK3-0W-PbV" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="55p-P7-a2r"/>
-                            <constraint firstItem="wK3-0W-PbV" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="cER-we-Ysf"/>
+                            <constraint firstItem="CAs-3B-ERo" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="ALo-bO-sf9"/>
+                            <constraint firstItem="CAs-3B-ERo" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Cep-VE-YIw"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
