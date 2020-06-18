@@ -7,13 +7,12 @@
 //
 
 import Combine
-import Contacts
 import Foundation
 
 final class PublicAffairsOfficeMatcher {
     private let offices = Publicaffairsoffice.offices
     
-    func mapAddressToAffairsOffice(_ address: CNPostalAddress) -> AnyPublisher<Publicaffairsoffice?, Never> {
+    func mapAddressToAffairsOffice(_ address: Address) -> AnyPublisher<Publicaffairsoffice?, Never> {
         let office = offices.first(where: { $0.name == address.city })
         guard office != nil else {
             return Just(nil).eraseToAnyPublisher()

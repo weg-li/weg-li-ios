@@ -15,18 +15,13 @@ import UIKit
 typealias Address = CNPostalAddress
 
 enum AppAction {
-    // MARK: Location
-    case handleLocationAction(LocationAction)
     case setContact(Contact)
-    // MARK: Image
     case addImage(UIImage)
-    case none
-    // MARK: Description
+    case handleLocationAction(LocationAction)
     case handleDescriptionAction(DescriptionAction)
-    case resolvePublicAffairsOffice(Address)
-    case setAffairsOffice(Publicaffairsoffice)
 }
 
+// MARK: Location
 extension AppAction {
     enum LocationAction {
         case onLocationAppear
@@ -35,13 +30,16 @@ extension AppAction {
         case resolveAddress(Location.LocationOption)
         case setUserDefinedLocation(CLLocationCoordinate2D?)
         case setLocation(CLLocationCoordinate2D)
-        case setResolvedAddress(CNPostalAddress?)
+        case setResolvedAddress(Address?)
     }
 }
 
+// MARK: Description
 extension AppAction {
     enum DescriptionAction {
         case setCar(Report.Car)
         case setCharge(Report.Charge)
+        case resolvePublicAffairsOffice(Address)
+        case setAffairsOffice(Publicaffairsoffice)
     }
 }

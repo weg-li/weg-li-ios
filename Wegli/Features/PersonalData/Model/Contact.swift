@@ -6,7 +6,6 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
-import Contacts
 import Foundation
 
 struct Contact {
@@ -42,7 +41,7 @@ extension Contact.Address {
     }
 }
 
-extension CNPostalAddress {
+extension Address {
     var humanReadableAddress: String {
         return String {
             if !street.isEmpty {
