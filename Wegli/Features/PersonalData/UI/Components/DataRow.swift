@@ -57,7 +57,7 @@ struct DataRow_Previews: PreviewProvider {
 }
 
 enum RowType {
-    case firstName, lastName, street, town, zipCode, phone
+    case firstName, lastName, street, town, zipCode, phone, email
     
     var label: String {
         switch self {
@@ -67,6 +67,7 @@ enum RowType {
         case .town: return "Stadt"
         case .zipCode: return "PLZ"
         case .phone: return "Telefon"
+        case .email: return "Email"
         }
     }
     
@@ -78,6 +79,7 @@ enum RowType {
         case .town: return "Mannheim"
         case .zipCode: return "76341"
         case .phone:return "0123 5346435"
+        case .email: return "max@muster.mann"
         }
     }
     

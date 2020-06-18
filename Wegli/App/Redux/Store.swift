@@ -33,7 +33,6 @@ final class Store<State, Action, Environment>: ObservableObject {
             print("\(action)")
             return
         }
-        print(">>> ", action)
         return effect
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: send)
