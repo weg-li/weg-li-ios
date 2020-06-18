@@ -13,6 +13,7 @@ import UIKit
 struct Report {
     var images: [UIImage] = []
     var address: CNPostalAddress?
+    var suggestedublicAffairsOffice: Publicaffairsoffice?
     
     // MARK: Description
     struct Car {

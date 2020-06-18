@@ -12,6 +12,8 @@ import Foundation
 import MapKit
 import UIKit
 
+typealias Address = CNPostalAddress
+
 enum AppAction {
     // MARK: Location
     case handleLocationAction(LocationAction)
@@ -21,6 +23,8 @@ enum AppAction {
     case none
     // MARK: Description
     case handleDescriptionAction(DescriptionAction)
+    case resolvePublicAffairsOffice(Address)
+    case setAffairsOffice(Publicaffairsoffice)
 }
 
 extension AppAction {
