@@ -42,6 +42,6 @@ struct PersonalDataWidget: View {
 
 struct PersonalDataWidget_Previews: PreviewProvider {
     static var previews: some View {
-        PersonalDataWidget(contact: .init(firstName: "", name: "", address: .init(street: "", zipCode: "", town:   ""), phone: ""))
+        PersonalDataWidget(contact: .init(firstName: "", name: "", address: .init(street: "", zipCode: "", town:   ""), phone: "", mail: ""))
     }
 }

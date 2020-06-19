@@ -15,7 +15,8 @@ final class PersonsalDataRepository {
                 firstName: firstName,
                 name: name,
                 address: .init(street: street, zipCode: zipCode, town: town),
-                phone: phone)
+                phone: phone,
+                mail: email)
             }
         set {
             self.firstName = newValue.firstName
@@ -24,8 +25,12 @@ final class PersonsalDataRepository {
             self.zipCode = newValue.address.zipCode
             self.town = newValue.address.town
             self.phone = newValue.phone
+            self.email = newValue.mail
         }
     }
+    
+    @UserDefault(key: "personalData_email", defaultValue: "")
+    private var email: String
     
     @UserDefault(key: "personalData_firstName", defaultValue: "")
     private var firstName: String

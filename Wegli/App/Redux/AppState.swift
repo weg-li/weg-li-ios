@@ -6,7 +6,6 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
-import Contacts
 import Combine
 import Foundation
 import MapKit
@@ -24,12 +23,6 @@ extension AppState {
         var isAuthorized: Bool = false
         var userDefinedLocation: CLLocationCoordinate2D?
         var location: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        var presumedAddress: CNPostalAddress?
-    }
-}
-
-extension AppState {
-    struct ViewRoutingState {
-        
+        var presumedAddress: Address?
     }
 }

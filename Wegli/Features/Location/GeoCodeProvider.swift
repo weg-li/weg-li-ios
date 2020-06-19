@@ -6,13 +6,12 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
-import Contacts
 import Combine
 import CoreLocation
 
 final class GeoCodeProvider {
-    func getPlacemarks(for location: CLLocation) -> Future<[CNPostalAddress], Swift.Error> {
-        Future<[CNPostalAddress], Swift.Error> { promise in
+    func getPlacemarks(for location: CLLocation) -> Future<[Address], Swift.Error> {
+        Future<[Address], Swift.Error> { promise in
             CLGeocoder().reverseGeocodeLocation(location) { (placemarks, err) -> Void in
                 if let error = err {
                     return promise(.failure(error))

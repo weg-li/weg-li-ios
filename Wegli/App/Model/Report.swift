@@ -6,32 +6,35 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
-import Contacts
 import Foundation
 import UIKit
 
 struct Report {
     var images: [UIImage] = []
-    var address: CNPostalAddress?
+    var address: Address?
     var suggestedublicAffairsOffice: Publicaffairsoffice?
     
+    var date: Date = Date()
+    var car = Car()
+    var charge = Charge()
+}
+
+extension Report {
     // MARK: Description
     struct Car {
         var color: String?
         var type: String?
         var licensePlateNumber: String?
     }
-    var car = Car()
     
     struct Charge {
         var selectedDuration = 0
         var selectedType = 0
         var blockedOthers = false
         
-        var crime: String { Charge.charges[selectedType] }
+        var humandReadableCharge: String { Charge.charges[selectedType] }
         var time: String { Times.allCases[selectedDuration].description }
     }
-    var charge = Charge()
 }
 
 extension Report {

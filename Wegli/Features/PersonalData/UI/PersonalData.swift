@@ -26,6 +26,7 @@ struct PersonalData: View {
                             DataRow(type: .town, text: $viewModel.town, isValid: $viewModel.isTownValid)
                         }
                         DataRow(type: .phone, text: $viewModel.phone, isValid: $viewModel.isPhoneValid)
+                        DataRow(type: .email, text: $viewModel.email, isValid: $viewModel.isMailValid)
                     }
                 }
             }
@@ -44,7 +45,8 @@ struct PersonalData: View {
                         street: self.viewModel.street,
                         zipCode: self.viewModel.zipCode,
                         town: self.viewModel.town),
-                    phone: self.viewModel.phone
+                    phone: self.viewModel.phone,
+                    mail: self.viewModel.email
             ))
             )
             self.isPresented.toggle()

@@ -10,15 +10,15 @@ import MessageUI
 import SwiftUI
 
 struct MailContentView: View {
+    @EnvironmentObject private var store: AppStore
     @State private var result: Result<MFMailComposeResult, Error>? = nil
     @State private var isShowingMailView = false
-    
-    @EnvironmentObject private var store: AppStore
 
     var body: some View {
         VStack {
             if MFMailComposeViewController.canSendMail() {
-                SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {
+                SubmitButton(state: .readyToSubmit(ordnungsamt: store.state.report.suggestedublicAffairsOffice?.name ?? "")) {
+                    print(self.store.state.report)
                     self.isShowingMailView.toggle()
                 }
             } else {
@@ -28,10 +28,18 @@ struct MailContentView: View {
             if result != nil {
                 Text("Result: \(String(describing: result))")
                     .lineLimit(nil)
+            } else {
+                
             }
         }
         .sheet(isPresented: $isShowingMailView) {
-            MailView(isShowing: self.$isShowingMailView, result: self.$result)
+            MailView(isShowing: self.$isShowingMailView, result: self.$result, report: self.store.state.report, contact: self.store.state.contact)
         }
+    }
+}
+
+struct MailContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        MailContentView()
     }
 }

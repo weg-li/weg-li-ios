@@ -30,10 +30,8 @@ final class Store<State, Action, Environment>: ObservableObject {
     
     func send(_ action: Action) {
         guard let effect = reducer(&state, action, environment) else {
-            print("\(action)")
             return
         }
-        print(">>> ", action)
         return effect
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: send)

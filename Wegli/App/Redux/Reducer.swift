@@ -16,6 +16,7 @@ func appReducer(
     environment: EnvironmentContainer
 ) -> AnyPublisher<AppAction, Never> {
     switch action {
+    // MARK: Handle location actions
     case let .handleLocationAction(locationAction):
         switch locationAction {
         case .onLocationAppear:
@@ -60,33 +61,32 @@ func appReducer(
             guard state.location.presumedAddress != address else { break }
             state.location.presumedAddress = address
             if let address = address {
-                return Just(AppAction.resolvePublicAffairsOffice(address))
+                return Just(AppAction.handleDescriptionAction(.resolvePublicAffairsOffice(address)))
                     .eraseToAnyPublisher()
             }
         }
-        
     case let .setContact(contact):
         state.contact = contact
         environment.personalDataRepository.contact = contact
     case let .addImage(image):
         environment.dataStore.add(image: image)
         state.report.images = environment.dataStore.images
+    // MARK: Handle description actions
     case .handleDescriptionAction(let descriptionAction):
         switch descriptionAction {
         case let .setCar(car):
             state.report.car = car
-        case let .setCharge(crime):
-            state.report.charge = crime
+        case let .setCharge(charge):
+            state.report.charge = charge
+            state.report.date = Date()
+        case let .resolvePublicAffairsOffice(address):
+            return environment.officeMatcher.mapAddressToAffairsOffice(address)
+                .compactMap { $0 }
+                .map { AppAction.handleDescriptionAction(.setAffairsOffice($0)) }
+                .eraseToAnyPublisher()
+        case let .setAffairsOffice(office):
+            state.report.suggestedublicAffairsOffice = office
         }
-    case let .resolvePublicAffairsOffice(address):
-        return environment.officeMatcher.mapAddressToAffairsOffice(address)
-            .compactMap { $0 }
-            .map { AppAction.setAffairsOffice($0) }
-            .eraseToAnyPublisher()
-    case let .setAffairsOffice(office):
-        state.report.suggestedublicAffairsOffice = office
-    case .none:
-        break
     }
     return Empty().eraseToAnyPublisher()
 }

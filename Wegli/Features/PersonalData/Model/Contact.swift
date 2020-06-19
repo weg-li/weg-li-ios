@@ -6,7 +6,6 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
-import Contacts
 import Foundation
 
 struct Contact {
@@ -19,6 +18,7 @@ struct Contact {
     let name: String
     let address: Address
     let phone: String
+    let mail: String
 }
 
 extension Contact {
@@ -29,7 +29,19 @@ extension Contact {
     }
 }
 
-extension CNPostalAddress {
+extension Contact.Address {
+    var humanReadableAddress: String {
+        return String {
+            if !street.isEmpty {
+                street
+            }
+            zipCode
+            town
+        }
+    }
+}
+
+extension Address {
     var humanReadableAddress: String {
         return String {
             if !street.isEmpty {
