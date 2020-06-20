@@ -39,10 +39,13 @@ extension Report {
 
 extension Report {
     var isDescriptionValid: Bool {
-        ![car.type, car.color, car.licensePlateNumber]
-            .compactMap { $0 }
+        guard let type = car.type, let color = car.color, let plate = car.licensePlateNumber else {
+            return false
+        }
+        let isValid = ![type, color, plate]
             .map { $0.isEmpty }
             .contains(true)
+        return isValid
     }
 }
 
