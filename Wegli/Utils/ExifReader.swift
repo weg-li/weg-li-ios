@@ -28,22 +28,27 @@ final class ExifReader {
     private func readMetaData(from images: [UIImage]) -> [[String: AnyObject?]] {
         var metaData: [CFDictionary] = []
         for image in images {
-            var jpeg: Data? = nil
-            if let image1 = image.jpegData(compressionQuality: 98) {
-                jpeg = Data(image1)
-            }
-            var source: CGImageSource? = nil
-            if let jpeg = jpeg as CFData? {
-                source = CGImageSourceCreateWithData(jpeg, nil)
-            }
-            var imageMetaData: CFDictionary? = nil
-            if let source = source {
-                imageMetaData = CGImageSourceCopyPropertiesAtIndex(source, 0, nil)
-            }
-            if let imageMetaData = imageMetaData {
+            if let imageMetaData = image.getExifData() {
                 metaData.append(imageMetaData)
             }
         }
-        return metaData.compactMap { $0 as? [String: AnyObject?] }
+        return metaData
+            .compactMap { $0 as? [String: AnyObject?] }
+    }
+}
+
+private extension UIImage {
+    func getExifData() -> CFDictionary? {
+        var exifData: CFDictionary? = nil
+        if let data = self.jpegData(compressionQuality: 1.0) {
+            data.withUnsafeBytes {
+                let bytes = $0.baseAddress?.assumingMemoryBound(to: UInt8.self)
+                if let cfData = CFDataCreate(kCFAllocatorDefault, bytes, data.count),
+                    let source = CGImageSourceCreateWithData(cfData, nil) {
+                    exifData = CGImageSourceCopyPropertiesAtIndex(source, 0, nil)
+                }
+            }
+        }
+        return exifData
     }
 }
