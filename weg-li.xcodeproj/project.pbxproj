@@ -69,7 +69,7 @@
 			containerPortal = F8347582234C61CE00244D6F /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F8347589234C61CE00244D6F;
-			remoteInfo = weg-li;
+			remoteInfo = "weg-li";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -457,7 +457,7 @@
 				9F971E93247ABFCB00A68959 /* PBXTargetDependency */,
 			);
 			name = "weg-liTests";
-			productName = weg-liTests;
+			productName = "weg-liTests";
 			productReference = 9F971E8D247ABFCB00A68959 /* weg-liTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -474,7 +474,7 @@
 			dependencies = (
 			);
 			name = "weg-li";
-			productName = weg-li;
+			productName = "weg-li";
 			productReference = F834758A234C61CE00244D6F /* weg-li.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -789,7 +789,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/Preview\\ Content";
 				DEVELOPMENT_TEAM = M3YVS85XC2;
 				ENABLE_BITCODE = NO;
@@ -811,7 +811,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/Preview\\ Content";
 				DEVELOPMENT_TEAM = M3YVS85XC2;
 				ENABLE_BITCODE = NO;

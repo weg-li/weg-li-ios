@@ -30,7 +30,7 @@ struct PersonalData: View {
                     }
                 }
             }
-            .navigationBarItems(leading: saveButton, trailing: cancelButton)
+            .navigationBarItems(leading: cancelButton, trailing: saveButton)
             .navigationBarTitle("Persönliche Daten", displayMode: .inline)
         }
     }
