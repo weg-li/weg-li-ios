@@ -27,7 +27,7 @@ bundle install
 * Install project dependencies
 
 ```shell
-pod install
+bundle exec pod install
 ```
 
 ## 🎨 Designs
