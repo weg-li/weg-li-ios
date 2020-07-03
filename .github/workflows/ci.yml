@@ -19,19 +19,12 @@ jobs:
         key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gem-
-    - uses: actions/cache@v1
-      with:
-        path: Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
     
     # Install dependencies
     - name: Bundle install
       run: |
         gem install bundler
         bundle install
-        pod install
 
     - name: Run tests
       run: bundle exec fastlane test

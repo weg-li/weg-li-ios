@@ -3,13 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82097304260C254FE2182F75 /* Pods_Wegli.framework */; };
-		4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */; };
-		4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */; };
 		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
 		9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C270924977943001B1908 /* ToggleButton.swift */; };
 		9F24263A248ACDF600318989 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F242639248ACDF600318989 /* Contact.swift */; };
@@ -23,7 +20,6 @@
 		9F73E8FB24878D91002E22F4 /* ImageGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F724878D91002E22F4 /* ImageGrid.swift */; };
 		9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F924878D91002E22F4 /* ImageDataStore.swift */; };
 		9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E90124878E2F002E22F4 /* ImagePickerButtons.swift */; };
-		9F971E98247BAF6500A68959 /* NumberPlateServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */; };
 		9F971E99247BAFB700A68959 /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
 		9F98A7BE248EB25400E06AA4 /* GeoCodeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */; };
 		9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */; };
@@ -78,12 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateRecognizerService.swift; sourceTree = "<group>"; };
-		4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlate.swift; sourceTree = "<group>"; };
 		4C9F6DEF238DBA650072A63A /* 32.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 32.jpg; sourceTree = "<group>"; };
-		7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.debug.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.debug.xcconfig"; sourceTree = "<group>"; };
-		8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wegli.release.xcconfig"; path = "Target Support Files/Pods-Wegli/Pods-Wegli.release.xcconfig"; sourceTree = "<group>"; };
-		82097304260C254FE2182F75 /* Pods_Wegli.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wegli.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		9F242639248ACDF600318989 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
@@ -99,7 +90,6 @@
 		9F73E90124878E2F002E22F4 /* ImagePickerButtons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerButtons.swift; sourceTree = "<group>"; };
 		9F971E8D247ABFCB00A68959 /* WegliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WegliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPlateServiceTests.swift; sourceTree = "<group>"; };
 		9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoCodeProvider.swift; sourceTree = "<group>"; };
 		9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Additions.swift"; sourceTree = "<group>"; };
 		9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentContainer.swift; sourceTree = "<group>"; };
@@ -156,37 +146,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DA4E2B5F821942C7929870B /* Pods_Wegli.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */ = {
-			isa = PBXGroup;
-			children = (
-				4C9F6DEA238DB7120072A63A /* NumberPlateRecognizerService.swift */,
-				4C9F6DEC238DB7C30072A63A /* NumberPlate.swift */,
-			);
-			path = NumberPlateRecognizer;
-			sourceTree = "<group>";
-		};
 		4C9F6DEE238DBA570072A63A /* ExampleImages */ = {
 			isa = PBXGroup;
 			children = (
 				4C9F6DEF238DBA650072A63A /* 32.jpg */,
 			);
 			path = ExampleImages;
-			sourceTree = "<group>";
-		};
-		8804C73C854F02D3A18D5A3B /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */,
-				8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		9F242638248ACDF000318989 /* Model */ = {
@@ -271,7 +242,6 @@
 			children = (
 				4C9F6DEE238DBA570072A63A /* ExampleImages */,
 				9F971E91247ABFCB00A68959 /* Info.plist */,
-				9F971E97247BAF6500A68959 /* NumberPlateServiceTests.swift */,
 			);
 			path = WegliTests;
 			sourceTree = "<group>";
@@ -397,14 +367,6 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		9FB750AD2487BD4800193948 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				4C9F6DE9238DB6FE0072A63A /* NumberPlateRecognizer */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
 		9FB750AE2487BEEC00193948 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -438,14 +400,6 @@
 			path = Location;
 			sourceTree = "<group>";
 		};
-		E55709E615D9A26CD12B94C1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				82097304260C254FE2182F75 /* Pods_Wegli.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		F8347581234C61CE00244D6F = {
 			isa = PBXGroup;
 			children = (
@@ -453,8 +407,6 @@
 				F834758C234C61CE00244D6F /* Wegli */,
 				9F971E8E247ABFCB00A68959 /* WegliTests */,
 				F834758B234C61CE00244D6F /* Products */,
-				8804C73C854F02D3A18D5A3B /* Pods */,
-				E55709E615D9A26CD12B94C1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -474,7 +426,6 @@
 				9F73E8F424878B84002E22F4 /* Features */,
 				F8347595234C61CF00244D6F /* Preview Content */,
 				9FB750A92487BCA600193948 /* Resources */,
-				9FB750AD2487BD4800193948 /* Services */,
 				9FB750AB2487BD2D00193948 /* UI */,
 				9F9C4306248BAC3D00FF514B /* Utils */,
 			);
@@ -514,11 +465,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F834759E234C61CF00244D6F /* Build configuration list for PBXNativeTarget "Wegli" */;
 			buildPhases = (
-				513E4CC67A2D739A7460526E /* [CP] Check Pods Manifest.lock */,
 				F8347586234C61CE00244D6F /* Sources */,
 				F8347587234C61CE00244D6F /* Frameworks */,
 				F8347588234C61CE00244D6F /* Resources */,
-				87DF60F775981E5173C1A4EB /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -591,54 +540,11 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		513E4CC67A2D739A7460526E /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Wegli-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		87DF60F775981E5173C1A4EB /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wegli/Pods-Wegli-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		9F971E89247ABFCB00A68959 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F971E98247BAF6500A68959 /* NumberPlateServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -668,7 +574,6 @@
 				9F9C4308248BAC5900FF514B /* EnvironmentContainer.swift in Sources */,
 				F8EDCA84234CBC81001E8D9C /* MainView.swift in Sources */,
 				9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */,
-				4C9F6DEB238DB7120072A63A /* NumberPlateRecognizerService.swift in Sources */,
 				9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				9F64984D2488F3EA00514BD3 /* PersonalDataWidget.swift in Sources */,
@@ -682,7 +587,6 @@
 				9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */,
 				9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */,
 				9F6498572489460300514BD3 /* DataRow.swift in Sources */,
-				4C9F6DED238DB7C30072A63A /* NumberPlate.swift in Sources */,
 				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,
 				9FB750A52487B0FC00193948 /* PersonalDataViewModel.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
@@ -882,7 +786,6 @@
 		};
 		F834759F234C61CF00244D6F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7FA7139CE4B240CB5CB9C8C2 /* Pods-Wegli.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -904,7 +807,6 @@
 		};
 		F83475A0234C61CF00244D6F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8122F80CC0E06A65DDFA3C3B /* Pods-Wegli.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
