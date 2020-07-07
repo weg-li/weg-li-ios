@@ -486,7 +486,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
 				LastUpgradeCheck = 1110;
-				ORGANIZATIONNAME = "Stefan Trauth";
+				ORGANIZATIONNAME = "Martin Wilhelmi";
 				TargetAttributes = {
 					9F971E8C247ABFCB00A68959 = {
 						CreatedOnToolsVersion = 11.4.1;
@@ -789,7 +789,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/Preview\\ Content";
 				DEVELOPMENT_TEAM = M3YVS85XC2;
 				ENABLE_BITCODE = NO;
@@ -811,7 +811,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/Preview\\ Content";
 				DEVELOPMENT_TEAM = M3YVS85XC2;
 				ENABLE_BITCODE = NO;
