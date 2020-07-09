@@ -20,7 +20,7 @@
 		9F73E8FB24878D91002E22F4 /* ImageGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F724878D91002E22F4 /* ImageGrid.swift */; };
 		9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F924878D91002E22F4 /* ImageDataStore.swift */; };
 		9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E90124878E2F002E22F4 /* ImagePickerButtons.swift */; };
-		9F971E99247BAFB700A68959 /* 32.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4C9F6DEF238DBA650072A63A /* 32.jpg */; };
+		9F8575F024B788BA000ABA01 /* PersonalDataViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8575EF24B788BA000ABA01 /* PersonalDataViewModelTests.swift */; };
 		9F98A7BE248EB25400E06AA4 /* GeoCodeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */; };
 		9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */; };
 		9F9C4308248BAC5900FF514B /* EnvironmentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */; };
@@ -74,7 +74,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4C9F6DEF238DBA650072A63A /* 32.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 32.jpg; sourceTree = "<group>"; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		9F242639248ACDF600318989 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
@@ -88,6 +87,8 @@
 		9F73E8F724878D91002E22F4 /* ImageGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImageGrid.swift; path = "weg-li/Features/Images/View/ImageGrid.swift"; sourceTree = SOURCE_ROOT; };
 		9F73E8F924878D91002E22F4 /* ImageDataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImageDataStore.swift; path = "weg-li/ImageDataStore.swift"; sourceTree = SOURCE_ROOT; };
 		9F73E90124878E2F002E22F4 /* ImagePickerButtons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerButtons.swift; sourceTree = "<group>"; };
+		9F8575EE24B788BA000ABA01 /* weg-liTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "weg-liTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		9F8575EF24B788BA000ABA01 /* PersonalDataViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDataViewModelTests.swift; sourceTree = "<group>"; };
 		9F971E8D247ABFCB00A68959 /* weg-liTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "weg-liTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoCodeProvider.swift; sourceTree = "<group>"; };
@@ -152,14 +153,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4C9F6DEE238DBA570072A63A /* ExampleImages */ = {
-			isa = PBXGroup;
-			children = (
-				4C9F6DEF238DBA650072A63A /* 32.jpg */,
-			);
-			path = ExampleImages;
-			sourceTree = "<group>";
-		};
 		9F242638248ACDF000318989 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -240,8 +233,9 @@
 		9F971E8E247ABFCB00A68959 /* weg-liTests */ = {
 			isa = PBXGroup;
 			children = (
-				4C9F6DEE238DBA570072A63A /* ExampleImages */,
 				9F971E91247ABFCB00A68959 /* Info.plist */,
+				9F8575EF24B788BA000ABA01 /* PersonalDataViewModelTests.swift */,
+				9F8575EE24B788BA000ABA01 /* weg-liTests-Bridging-Header.h */,
 			);
 			path = "weg-liTests";
 			sourceTree = "<group>";
@@ -490,6 +484,7 @@
 				TargetAttributes = {
 					9F971E8C247ABFCB00A68959 = {
 						CreatedOnToolsVersion = 11.4.1;
+						LastSwiftMigration = 1140;
 						TestTargetID = F8347589234C61CE00244D6F;
 					};
 					F8347589234C61CE00244D6F = {
@@ -521,7 +516,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F971E99247BAFB700A68959 /* 32.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -545,6 +539,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F8575F024B788BA000ABA01 /* PersonalDataViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,6 +623,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BP8836JVQR;
 				INFOPLIST_FILE = "weg-liTests/Info.plist";
@@ -639,6 +635,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mnin.weg-li.weg-liTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "weg-liTests/weg-liTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/weg-li.app/weg-li";
@@ -649,6 +647,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BP8836JVQR;
 				INFOPLIST_FILE = "weg-liTests/Info.plist";
@@ -660,6 +659,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mnin.weg-li.weg-liTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "weg-liTests/weg-liTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/weg-li.app/weg-li";

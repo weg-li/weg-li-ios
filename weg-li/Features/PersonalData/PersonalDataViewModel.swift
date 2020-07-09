@@ -32,7 +32,7 @@ final class PersonalDataViewModel: ObservableObject {
     private var bag = Set<AnyCancellable>()
     
     init(model: Contact?) {
-       self.firstName = model?.firstName ?? ""
+        self.firstName = model?.firstName ?? ""
         self.name = model?.name ?? ""
         self.street = model?.address.street ?? ""
         self.zipCode = model?.address.zipCode ?? ""
