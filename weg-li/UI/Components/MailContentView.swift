@@ -11,7 +11,7 @@ import SwiftUI
 
 struct MailContentView: View {
     @EnvironmentObject private var store: AppStore
-    @State private var result: Result<MFMailComposeResult, Error>? = nil
+    @State private var result: Result<MFMailComposeResult, Error>?
     @State private var isShowingMailView = false
 
     var body: some View {
@@ -28,9 +28,7 @@ struct MailContentView: View {
             if result != nil {
                 Text("Result: \(String(describing: result))")
                     .lineLimit(nil)
-            } else {
-                
-            }
+            } else {}
         }
         .sheet(isPresented: $isShowingMailView) {
             MailView(isShowing: self.$isShowingMailView, result: self.$result, report: self.store.state.report, contact: self.store.state.contact)

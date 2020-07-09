@@ -14,7 +14,7 @@ struct Images: View {
     var body: some View {
         VStack {
             ImageGrid(images: appStore.state.report.images, columnCount: 3)
-            ImagePickerButtons { (image) in
+            ImagePickerButtons { image in
                 self.appStore.send(.addImage(image))
             }
             .buttonStyle(EditButtonStyle())

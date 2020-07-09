@@ -39,7 +39,7 @@ final class ExifReader {
 
 private extension UIImage {
     func getExifData() -> CFDictionary? {
-        var exifData: CFDictionary? = nil
+        var exifData: CFDictionary?
         if let data = self.jpegData(compressionQuality: 1.0) {
             data.withUnsafeBytes {
                 let bytes = $0.baseAddress?.assumingMemoryBound(to: UInt8.self)

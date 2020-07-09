@@ -50,8 +50,10 @@ struct PersonalData: View {
             ))
             )
             self.isPresented.toggle()
-        }) { Text("Speichern") }
-            .disabled(!viewModel.isFormValid)
+        }) {
+            Text("Speichern")
+        }
+        .disabled(!viewModel.isFormValid)
     }
     
     private var cancelButton: some View {

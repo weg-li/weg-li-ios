@@ -59,6 +59,7 @@ extension Store {
                 withAnimation(transaction.disablesAnimations ? nil : transaction.animation) {
                     self.send(localStateToViewAction(newLocalState))
                 }
-        })
+            }
+        )
     }
 }

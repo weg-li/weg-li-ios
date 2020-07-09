@@ -52,13 +52,12 @@ struct ImagePickerButtons: View {
                 Text("Kamera")
             }
         }
-
     }
 }
 
 struct ImagePickerButtons_Previews: PreviewProvider {
     static var previews: some View {
-        ImagePickerButtons { (image) in
+        ImagePickerButtons { image in
             print(image)
         }.buttonStyle(EditButtonStyle())
     }

@@ -81,7 +81,6 @@ struct SubmitButton: View {
     }
 }
 
-
 struct SubmitButton_Previews: PreviewProvider {
     static var previews: some View {
         VStack {

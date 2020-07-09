@@ -34,7 +34,6 @@ struct PersonalDataWidget: View {
             Spacer()
             Text(content)
                 .foregroundColor(.gray)
-            
         }
     }
 }

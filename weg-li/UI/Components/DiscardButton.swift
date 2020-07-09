@@ -28,6 +28,6 @@ struct DiscardButton: View {
 
 struct DiscardButton_Previews: PreviewProvider {
     static var previews: some View {
-        DiscardButton() {}
+        DiscardButton {}
     }
 }

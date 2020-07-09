@@ -12,7 +12,7 @@ import CoreLocation
 final class GeoCodeProvider {
     func getPlacemarks(for location: CLLocation) -> Future<[Address], Swift.Error> {
         Future<[Address], Swift.Error> { promise in
-            CLGeocoder().reverseGeocodeLocation(location) { (placemarks, err) -> Void in
+            CLGeocoder().reverseGeocodeLocation(location) { placemarks, err -> Void in
                 if let error = err {
                     return promise(.failure(error))
                 }

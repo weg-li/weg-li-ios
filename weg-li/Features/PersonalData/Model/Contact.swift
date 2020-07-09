@@ -24,8 +24,8 @@ struct Contact {
 extension Contact {
     var isValid: Bool {
         [firstName, name, address.street, address.town, address.zipCode, phone]
-            .map { !$0.isEmpty }
-            .reduce(true) { $0 && $1 }
+            .map { return !$0.isEmpty }
+            .allSatisfy { true }
     }
 }
 

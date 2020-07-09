@@ -29,7 +29,7 @@ func appReducer(
             }
             .delay(for: 3.0, scheduler: RunLoop.main)
             .receive(on: RunLoop.main)
-            .map {_ in AppAction.handleLocationAction(.requestLocation) }
+            .map { _ in AppAction.handleLocationAction(.requestLocation) }
             .eraseToAnyPublisher()
         case .requestLocation:
             environment.locationProvider.requestLocation()

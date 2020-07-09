@@ -14,7 +14,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-
         let contentView = MainView()
             .environmentObject(generateAppStore())
         if let windowScene = scene as? UIWindowScene {
@@ -37,8 +36,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let state = AppState(
             contact: environment.personalDataRepository.contact,
             report: Report(images: environment.dataStore.images),
-            location: AppState.LocationState.init(location: .zero, presumedAddress: nil))
+            location: AppState.LocationState(location: .zero, presumedAddress: nil))
         return AppStore(initialState: state, reducer: appReducer, environment: environment)
     }
 }
-
