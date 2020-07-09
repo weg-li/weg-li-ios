@@ -11,10 +11,9 @@ import SwiftUI
 struct PersonalDataWidget: View {
     let contact: Contact?
     
-    var body: some View {
+    @ViewBuilder var body: some View {
         guard let contact = contact, contact.isValid else {
             return Text("Keine Kontaktdaten angegeben")
-                .eraseToAnyView()
         }
         return VStack(alignment: .leading, spacing: 10) {
             row(callout: "Name", content: ("\(contact.firstName) \(contact.name)"))
@@ -24,7 +23,7 @@ struct PersonalDataWidget: View {
             Text("Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.")
                 .font(.footnote)
                 .foregroundColor(.gray)
-        }.eraseToAnyView()
+        }
     }
     
     private func row(callout: String, content: String) -> some View {

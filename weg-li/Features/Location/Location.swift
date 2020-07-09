@@ -41,26 +41,23 @@ struct Location: View {
     
     private var locationOptions: [LocationOption] {
         if store.state.report.images.isEmpty {
-            return [.currentLocation(CLLocationCoordinate2D(latitude: 0, longitude: 0)), .manual]
+            return [.currentLocation(.zero), .manual]
         } else {
-            return [.fromPhotos, .currentLocation(CLLocationCoordinate2D(latitude: 0, longitude: 0)), .manual]
+            return [.fromPhotos, .currentLocation(.zero), .manual]
         }
     }
     
-    private var addressView: some View {
-        Group {
-            if store.state.location.location.latitude.isNaN {
-                ActivityIndicator(style: .medium, animate: $isResolvingAddress)
-                    .eraseToAnyView()
-            } else if store.state.location.presumedAddress != nil {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(store.state.location.presumedAddress!.humanReadableAddress)
-                        .lineLimit(nil)
-                        .fixedSize(horizontal: true, vertical: false)
-                }.eraseToAnyView()
-            } else {
-                EmptyView().eraseToAnyView()
+    @ViewBuilder private var addressView: some View {
+        if store.state.location.location == .zero {
+            ActivityIndicator(style: .medium, animate: $isResolvingAddress)
+        } else if store.state.location.presumedAddress != nil {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(store.state.location.presumedAddress!.humanReadableAddress)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: true, vertical: false)
             }
+        } else {
+            EmptyView()
         }
     }
     

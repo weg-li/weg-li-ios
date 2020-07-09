@@ -19,13 +19,12 @@ struct ToggleButton: View {
         })
     }
     
-    private var content: some View {
+    @ViewBuilder private var content: some View {
         if isOn {
             return Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .frame(width: 35, height: 35)
                 .foregroundColor(.green)
-                .eraseToAnyView()
         } else {
             return Image(systemName: "checkmark.circle.fill")
                 .hidden()
@@ -34,7 +33,6 @@ struct ToggleButton: View {
                     Circle()
                         .strokeBorder(Color.gray, lineWidth: 1)
             )
-                .eraseToAnyView()
         }
     }
 }

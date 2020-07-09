@@ -70,16 +70,13 @@ struct SubmitButton: View {
         case readyToSubmit(ordnungsamt: String)
     }
     
-    var body: some View {
+    @ViewBuilder var body: some View {
         if case .readyToSubmit(let ordnungsamt) = state {
             return Button(action: action) { ReadySubmitButton(ordnungsamt: ordnungsamt) }
-            .eraseToAnyView()
         } else if case .unsupportedLocation = state {
             return Button(action: action) { UnsupportedLocationButton() }
-            .eraseToAnyView()
         } else {
             return Button(action: action) { MissingDataButton() }
-            .eraseToAnyView()
         }
     }
 }
