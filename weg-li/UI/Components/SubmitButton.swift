@@ -70,23 +70,35 @@ struct SubmitButton: View {
         case readyToSubmit(ordnungsamt: String)
     }
     
-    @ViewBuilder var body: some View {
-        if case .readyToSubmit(let ordnungsamt) = state {
-            return Button(action: action) { ReadySubmitButton(ordnungsamt: ordnungsamt) }
-        } else if case .unsupportedLocation = state {
-            return Button(action: action) { UnsupportedLocationButton() }
-        } else {
-            return Button(action: action) { MissingDataButton() }
+     var body: some View {
+        Button(action: action) { () -> AnyView in
+            switch state {
+            case .missingData:
+                return AnyView(MissingDataButton())
+            case .unsupportedLocation:
+                return AnyView(UnsupportedLocationButton())
+            case .readyToSubmit(ordnungsamt: let ordnungsamt):
+                return AnyView(ReadySubmitButton(ordnungsamt: ordnungsamt))
+            }
         }
-    }
+     }
 }
 
 struct SubmitButton_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            SubmitButton(state: .readyToSubmit(ordnungsamt: "München")) {}
-            SubmitButton(state: .unsupportedLocation) {}
-            SubmitButton(state: .missingData) {}
+            UnsupportedLocationButton()
+            MissingDataButton()
+            ReadySubmitButton(ordnungsamt: "Hamburg")
+            SubmitButton(state: .unsupportedLocation) {
+                print("yes")
+            }
+            SubmitButton(state: .missingData) {
+                print("yes")
+            }
+            SubmitButton(state: .readyToSubmit(ordnungsamt: "Hamburg")) {
+                print("yes")
+            }
         }
     }
 }
