@@ -51,7 +51,7 @@ struct MailView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
-        vc.setToRecipients([report.suggestedublicAffairsOffice?.mail ?? ""])
+        vc.setToRecipients([report.district?.mail ?? ""])
         vc.setSubject("Anzeige mit der Bitte um Weiterverfolgung")
         vc.setMessageBody(
             """

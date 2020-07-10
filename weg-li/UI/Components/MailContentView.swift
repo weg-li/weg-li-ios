@@ -17,12 +17,12 @@ struct MailContentView: View {
     var body: some View {
         VStack {
             if MFMailComposeViewController.canSendMail() {
-                SubmitButton(state: .readyToSubmit(ordnungsamt: store.state.report.suggestedublicAffairsOffice?.name ?? "")) {
+                SubmitButton(state: .readyToSubmit(ordnungsamt: store.state.report.district?.name ?? "")) {
                     print(self.store.state.report)
                     self.isShowingMailView.toggle()
                 }
             } else {
-                Text("Can't send emails from this device")
+                Text("Auf diesem Gerät können leider keine E-Mails versendet werden!")
                     .foregroundColor(.red)
             }
             if result != nil {

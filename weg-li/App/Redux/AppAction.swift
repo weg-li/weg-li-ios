@@ -40,6 +40,6 @@ extension AppAction {
         case setCar(Report.Car)
         case setCharge(Report.Charge)
         case resolvePublicAffairsOffice(Address)
-        case setAffairsOffice(Publicaffairsoffice)
+        case setAffairsOffice(District)
     }
 }

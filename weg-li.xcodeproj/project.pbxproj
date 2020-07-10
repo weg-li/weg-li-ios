@@ -34,8 +34,8 @@
 		9FB5B12C2498BECB00830770 /* Bundle+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */; };
 		9FB5B12F2498C2C100830770 /* Time.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B12E2498C2C100830770 /* Time.swift */; };
 		9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B13824994CF300830770 /* CLLocationCoordinate2D+Additions.swift */; };
-		9FB5B13B2499DBE500830770 /* publicaffairsoffice.json in Resources */ = {isa = PBXBuildFile; fileRef = 9FB5B13A2499DBE500830770 /* publicaffairsoffice.json */; };
-		9FB5B13F2499DC4400830770 /* Publicaffairsoffice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B13E2499DC4400830770 /* Publicaffairsoffice.swift */; };
+		9FB5B13B2499DBE500830770 /* districts.json in Resources */ = {isa = PBXBuildFile; fileRef = 9FB5B13A2499DBE500830770 /* districts.json */; };
+		9FB5B13F2499DC4400830770 /* District.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B13E2499DC4400830770 /* District.swift */; };
 		9FB5B1412499F6BD00830770 /* PublicAffairsOfficeMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5B1402499F6BD00830770 /* PublicAffairsOfficeMatcher.swift */; };
 		9FB7509424878FDB00193948 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9FB7509324878FDB00193948 /* README.md */; };
 		9FB750A22487B09500193948 /* PersonalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB7509E2487B09500193948 /* PersonalData.swift */; };
@@ -104,8 +104,8 @@
 		9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Additions.swift"; sourceTree = "<group>"; };
 		9FB5B12E2498C2C100830770 /* Time.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time.swift; sourceTree = "<group>"; };
 		9FB5B13824994CF300830770 /* CLLocationCoordinate2D+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Additions.swift"; sourceTree = "<group>"; };
-		9FB5B13A2499DBE500830770 /* publicaffairsoffice.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = publicaffairsoffice.json; path = Ressources/publicaffairsoffice.json; sourceTree = SOURCE_ROOT; };
-		9FB5B13E2499DC4400830770 /* Publicaffairsoffice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publicaffairsoffice.swift; sourceTree = "<group>"; };
+		9FB5B13A2499DBE500830770 /* districts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = districts.json; path = Ressources/districts.json; sourceTree = SOURCE_ROOT; };
+		9FB5B13E2499DC4400830770 /* District.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = District.swift; sourceTree = "<group>"; };
 		9FB5B1402499F6BD00830770 /* PublicAffairsOfficeMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicAffairsOfficeMatcher.swift; sourceTree = "<group>"; };
 		9FB7509324878FDB00193948 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FB7509E2487B09500193948 /* PersonalData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalData.swift; sourceTree = "<group>"; };
@@ -266,7 +266,7 @@
 		9FB5B12A2498BEAE00830770 /* JSON */ = {
 			isa = PBXGroup;
 			children = (
-				9FB5B13A2499DBE500830770 /* publicaffairsoffice.json */,
+				9FB5B13A2499DBE500830770 /* districts.json */,
 				9FDB5B422498BBC600BE2AEA /* charges.json */,
 			);
 			path = JSON;
@@ -291,7 +291,7 @@
 		9FB5B13D2499DC3200830770 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9FB5B13E2499DC4400830770 /* Publicaffairsoffice.swift */,
+				9FB5B13E2499DC4400830770 /* District.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -524,7 +524,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9FB5B13B2499DBE500830770 /* publicaffairsoffice.json in Resources */,
+				9FB5B13B2499DBE500830770 /* districts.json in Resources */,
 				F834759A234C61CF00244D6F /* LaunchScreen.storyboard in Resources */,
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
 				9FB7509424878FDB00193948 /* README.md in Resources */,
@@ -613,7 +613,7 @@
 				9F9C430B248E24BD00FF514B /* AppState.swift in Sources */,
 				9FA3AA7824979ED6002EDC7D /* MailView.swift in Sources */,
 				9FB5B12F2498C2C100830770 /* Time.swift in Sources */,
-				9FB5B13F2499DC4400830770 /* Publicaffairsoffice.swift in Sources */,
+				9FB5B13F2499DC4400830770 /* District.swift in Sources */,
 				9FB750A22487B09500193948 /* PersonalData.swift in Sources */,
 				9FB750B02487BEFA00193948 /* View+Additions.swift in Sources */,
 			);

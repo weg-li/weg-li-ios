@@ -10,9 +10,9 @@ import Combine
 import Foundation
 
 final class PublicAffairsOfficeMatcher {
-    private let offices = Publicaffairsoffice.offices
+    private let offices = District.offices
     
-    func mapAddressToAffairsOffice(_ address: Address) -> AnyPublisher<Publicaffairsoffice?, Never> {
+    func mapAddressToAffairsOffice(_ address: Address) -> AnyPublisher<District?, Never> {
         let office = offices.first(where: { $0.name == address.city })
         guard office != nil else {
             return Just(nil).eraseToAnyPublisher()

@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct Publicaffairsoffice: Decodable {
+struct District: Decodable {
     let name: String
-    let zipCode: String?
+    let zipCode: String
     let mail: String
     
     enum CodingKeys: String, CodingKey {
@@ -19,7 +19,7 @@ struct Publicaffairsoffice: Decodable {
         case mail = "mail"
     }
     
-    init(name: String, zipCode: String? = nil, mail: String) {
+    init(name: String, zipCode: String, mail: String) {
         self.name = name
         self.zipCode = zipCode
         self.mail = mail
@@ -36,6 +36,6 @@ struct Publicaffairsoffice: Decodable {
     }
 }
 
-extension Publicaffairsoffice {
-    static let offices = Bundle.main.decode([Publicaffairsoffice].self, from: "publicaffairsoffice.json")
+extension District {
+    static let offices = Bundle.main.decode([District].self, from: "districts.json")
 }

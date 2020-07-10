@@ -85,7 +85,7 @@ func appReducer(
                 .map { AppAction.handleDescriptionAction(.setAffairsOffice($0)) }
                 .eraseToAnyPublisher()
         case let .setAffairsOffice(office):
-            state.report.suggestedublicAffairsOffice = office
+            state.report.district = office
         }
     }
     return Empty().eraseToAnyPublisher()
