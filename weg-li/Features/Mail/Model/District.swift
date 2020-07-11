@@ -1,11 +1,11 @@
 //
-//  Publicaffairsoffice.swift
 //  weg-li
 //
 //  Created by Malte Bünz on 17.06.20.
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
+import Combine
 import Foundation
 
 struct District: Decodable {
@@ -37,5 +37,13 @@ struct District: Decodable {
 }
 
 extension District {
-    static let offices = Bundle.main.decode([District].self, from: "districts.json")
+    static let districts = Bundle.main.decode([District].self, from: "districts.json")
+    
+    static func mapAddressToDistrict(_ address: Address) -> AnyPublisher<District?, Never> {
+        let district = districts.first(where: { $0.name == address.city })
+        guard district != nil else {
+            return Just(nil).eraseToAnyPublisher()
+        }
+        return Just(district).eraseToAnyPublisher()
+    }
 }

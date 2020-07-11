@@ -39,7 +39,7 @@ extension AppAction {
     enum DescriptionAction {
         case setCar(Report.Car)
         case setCharge(Report.Charge)
-        case resolvePublicAffairsOffice(Address)
-        case setAffairsOffice(District)
+        case resolveDistrict(Address)
+        case setDistrict(District)
     }
 }

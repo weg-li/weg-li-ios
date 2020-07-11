@@ -6,5 +6,4 @@ struct EnvironmentContainer {
     let locationProvider: LocationProvider
     let geoCoder: GeoCodeProvider
     let exifReader: ExifReader
-    let officeMatcher: PublicAffairsOfficeMatcher
 }
