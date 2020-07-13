@@ -1,16 +1,16 @@
 //
-//  Publicaffairsoffice.swift
 //  weg-li
 //
 //  Created by Malte Bünz on 17.06.20.
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
+import Combine
 import Foundation
 
-struct Publicaffairsoffice: Decodable {
+struct District: Decodable {
     let name: String
-    let zipCode: String?
+    let zipCode: String
     let mail: String
     
     enum CodingKeys: String, CodingKey {
@@ -19,7 +19,7 @@ struct Publicaffairsoffice: Decodable {
         case mail = "mail"
     }
     
-    init(name: String, zipCode: String? = nil, mail: String) {
+    init(name: String, zipCode: String, mail: String) {
         self.name = name
         self.zipCode = zipCode
         self.mail = mail
@@ -36,6 +36,14 @@ struct Publicaffairsoffice: Decodable {
     }
 }
 
-extension Publicaffairsoffice {
-    static let offices = Bundle.main.decode([Publicaffairsoffice].self, from: "publicaffairsoffice.json")
+extension District {
+    static let districts = Bundle.main.decode([District].self, from: "districts.json")
+    
+    static func mapAddressToDistrict(_ address: Address) -> AnyPublisher<District?, Never> {
+        let district = districts.first(where: { $0.name == address.city })
+        guard district != nil else {
+            return Just(nil).eraseToAnyPublisher()
+        }
+        return Just(district).eraseToAnyPublisher()
+    }
 }

@@ -61,7 +61,7 @@ func appReducer(
             guard state.location.presumedAddress != address else { break }
             state.location.presumedAddress = address
             if let address = address {
-                return Just(AppAction.handleDescriptionAction(.resolvePublicAffairsOffice(address)))
+                return Just(AppAction.handleDescriptionAction(.resolveDistrict(address)))
                     .eraseToAnyPublisher()
             }
         }
@@ -79,13 +79,13 @@ func appReducer(
         case let .setCharge(charge):
             state.report.charge = charge
             state.report.date = Date()
-        case let .resolvePublicAffairsOffice(address):
-            return environment.officeMatcher.mapAddressToAffairsOffice(address)
+        case let .resolveDistrict(address):
+            return District.mapAddressToDistrict(address)
                 .compactMap { $0 }
-                .map { AppAction.handleDescriptionAction(.setAffairsOffice($0)) }
+                .map { AppAction.handleDescriptionAction(.setDistrict($0)) }
                 .eraseToAnyPublisher()
-        case let .setAffairsOffice(office):
-            state.report.suggestedublicAffairsOffice = office
+        case let .setDistrict(district):
+            state.report.district = district
         }
     }
     return Empty().eraseToAnyPublisher()

@@ -30,8 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             dataStore: ReportImageDataStore(),
             locationProvider: LocationProvider(),
             geoCoder: GeoCodeProvider(),
-            exifReader: ExifReader(),
-            officeMatcher: PublicAffairsOfficeMatcher()
+            exifReader: ExifReader()
         )
         let state = AppState(
             contact: environment.personalDataRepository.contact,

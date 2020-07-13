@@ -12,7 +12,7 @@ import UIKit
 struct Report {
     var images: [UIImage] = []
     var address: Address?
-    var suggestedublicAffairsOffice: Publicaffairsoffice?
+    var district: District?
     
     var date: Date = Date()
     var car = Car()
