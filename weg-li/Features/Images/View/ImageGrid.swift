@@ -19,13 +19,7 @@ struct ImageGrid: View {
                     Image(uiImage: image)
                         .gridModifier
                 }
-                // fill empty cells with clear color to make layout work
-                ForEach(0 ..< self.columnCount - images.count) { _ in
-                    Image(systemName: "trash")
-                        .gridModifier
-                        .hidden()
-                }
-            }
+            } .frame(height: 200)
         }
     }
 }

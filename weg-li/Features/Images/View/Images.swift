@@ -12,8 +12,10 @@ struct Images: View {
     @EnvironmentObject private var appStore: AppStore
     
     var body: some View {
-        VStack {
-            ImageGrid(images: appStore.state.report.images, columnCount: 3)
+        VStack(alignment: .leading, spacing: 20.0) {
+            ScrollView(.horizontal) {
+                ImageGrid(images: appStore.state.report.images, columnCount: 3)
+            }
             ImagePickerButtons { image in
                 self.appStore.send(.addImage(image))
             }
