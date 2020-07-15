@@ -71,11 +71,8 @@ struct Description: View {
                 }.pickerStyle(DefaultPickerStyle())
             }
             .navigationBarItems(
-                leading: Button(action: {
-                    self.storeDescription()
-                    self.isPresented.toggle()
-                }, label: { Text("Speichern") }),
                 trailing: Button(action: {
+                    self.storeDescription()
                     self.isPresented.toggle()
                 }, label: { Text("Fertig") })
             )
