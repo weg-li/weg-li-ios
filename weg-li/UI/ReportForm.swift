@@ -42,7 +42,7 @@ struct ReportForm: View {
                 }
             }
             .padding(.bottom)
-            .navigationBarTitle("Formular", displayMode: .inline)
+            .navigationBarTitle("Anzeige", displayMode: .inline)
         }
     }
 }
