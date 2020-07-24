@@ -41,6 +41,51 @@ struct DataRow: View {
                 .multilineTextAlignment(.leading)
                 .keyboardType(type.keyboardType)
                 .textFieldStyle(PlainTextFieldStyle())
+                .textContentType(type.textContentType)
+        }
+    }
+}
+
+enum RowType {
+    case firstName, lastName, street, town, zipCode, phone
+    
+    var label: String {
+        switch self {
+        case .firstName: return "Vorname"
+        case .lastName: return "Nachname"
+        case .street: return "Strasse"
+        case .town: return "Stadt"
+        case .zipCode: return "PLZ"
+        case .phone: return "Telefon"
+        }
+    }
+    
+    var placeholder: String {
+        switch self {
+        case .firstName: return "Max"
+        case .lastName: return "Mustermann"
+        case .street: return "Max-Brauer-Allee 23"
+        case .town: return "Hamburg"
+        case .zipCode: return "20095"
+        case .phone:return "+491235346435"
+        }
+    }
+
+    var textContentType: UITextContentType? {
+        switch self {
+        case .firstName: return .givenName
+        case .lastName: return .familyName
+        case .street: return .fullStreetAddress
+        case .town: return .addressCity
+        case .zipCode: return .postalCode
+        case .phone: return .telephoneNumber
+        }
+    }
+    
+    var keyboardType: UIKeyboardType {
+        switch self {
+        case .phone: return .phonePad
+        default: return .default
         }
     }
 }
@@ -52,41 +97,6 @@ struct DataRow_Previews: PreviewProvider {
             DataRow(type: .firstName, text: .constant("Hello World!"), isValid: .constant(false))
             DataRow(type: .lastName, text: .constant("Hello World!"), isValid: .constant(false))
             DataRow(type: .street, text: .constant("Hello World!"), isValid: .constant(false))
-        }
-    }
-}
-
-enum RowType {
-    case firstName, lastName, street, town, zipCode, phone, email
-    
-    var label: String {
-        switch self {
-        case .firstName: return "Vorname"
-        case .lastName: return "Nachname"
-        case .street: return "Strasse"
-        case .town: return "Stadt"
-        case .zipCode: return "PLZ"
-        case .phone: return "Telefon"
-        case .email: return "Email"
-        }
-    }
-    
-    var placeholder: String {
-        switch self {
-        case .firstName: return "Max"
-        case .lastName: return "Mustermann"
-        case .street: return "Siemensallee, 17"
-        case .town: return "Mannheim"
-        case .zipCode: return "76341"
-        case .phone:return "0123 5346435"
-        case .email: return "max@muster.mann"
-        }
-    }
-    
-    var keyboardType: UIKeyboardType {
-        switch self {
-        case .phone: return .numberPad
-        default: return .namePhonePad
         }
     }
 }
