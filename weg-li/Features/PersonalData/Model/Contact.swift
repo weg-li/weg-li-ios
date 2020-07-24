@@ -18,7 +18,6 @@ struct Contact {
     let name: String
     let address: Address
     let phone: String
-    let mail: String
 }
 
 extension Contact {

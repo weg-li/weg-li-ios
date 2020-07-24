@@ -16,7 +16,6 @@ final class PersonalDataViewModel: ObservableObject {
     @Published var zipCode: String
     @Published var town: String
     @Published var phone: String
-    @Published var email: String
     
     @Published var isFirstNameValid = false
     @Published var isNameValid = false
@@ -25,7 +24,6 @@ final class PersonalDataViewModel: ObservableObject {
     @Published var isTownValid = false
     @Published private var isAddressValid =  false
     @Published var isPhoneValid = false
-    @Published var isMailValid = false
     
     @Published var isFormValid =  false
     
@@ -38,7 +36,6 @@ final class PersonalDataViewModel: ObservableObject {
         self.zipCode = model?.address.zipCode ?? ""
         self.town = model?.address.town ?? ""
         self.phone = model?.phone ?? ""
-        self.email = model?.mail ?? ""
         
         $firstName
             .removeDuplicates()
@@ -69,12 +66,6 @@ final class PersonalDataViewModel: ObservableObject {
             .removeDuplicates()
             .map { !$0.isEmpty }
             .assign(to: \.isPhoneValid, on: self)
-            .store(in: &bag)
-        
-        $email
-            .removeDuplicates()
-            .map { !$0.isEmpty }
-            .assign(to: \.isMailValid, on: self)
             .store(in: &bag)
         
         _ = $isZipCodeValid.combineLatest($isStreetValid, $isTownValid)

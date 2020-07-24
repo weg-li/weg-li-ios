@@ -83,9 +83,6 @@ struct MailView: UIViewControllerRepresentable {
 
             Anschrift: \(contact.map { $0.address.humanReadableAddress } ?? "")
 
-            E-Mail: \(contact.map { $0.mail } ?? "")
-            
-
             Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
             Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
             Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
@@ -95,7 +92,7 @@ struct MailView: UIViewControllerRepresentable {
             Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.
 
 
-            Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser E-Mail durch eine Antwort an \(contact.map { $0.mail } ?? "").
+            Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser E-Mail durch eine Antwort.
             Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine E-Mail weiter und setzen mich dabei in CC.
             Dabei dürfen Sie auch meine persönlichen Daten weiterleiten und für die Dauer des Verfahrens speichern.
 
