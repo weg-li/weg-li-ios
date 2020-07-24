@@ -11,13 +11,23 @@ import SwiftUI
 struct ImageGrid: View {
     var images: [UIImage]
     var columnCount: Int
+    let imageHandler: (UIImage) -> Void
     
     var body: some View {
         ForEach(images.chunked(into: columnCount), id: \.self) { images in
             HStack {
                 ForEach(images, id: \.self) { image in
-                    Image(uiImage: image)
-                        .gridModifier
+                    VStack {
+                        Button(action: {
+                            self.imageHandler(image)
+                        }) {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Löschen")
+                            }
+                        }
+                        Image(uiImage: image).gridModifier
+                    }
                 }
             } .frame(height: 200)
         }
@@ -36,6 +46,12 @@ private extension Image {
 
 struct ImageGrid_Previews: PreviewProvider {
     static var previews: some View {
-        ImageGrid(images: [UIImage(systemName: "book")!], columnCount: 3)
+        ImageGrid(images: [
+            UIImage(systemName: "book")!,
+            UIImage(systemName: "book")!,
+            UIImage(systemName: "book")!,
+        ], columnCount: 3) { image in
+            print(image.accessibilityIdentifier)
+        }
     }
 }

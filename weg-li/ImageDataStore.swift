@@ -11,6 +11,7 @@ import Combine
 
 protocol ImageDataStore {
     func add(image: UIImage)
+    func remove(image: UIImage)
     func clear()
     var images: [UIImage] { get }
 }
@@ -21,6 +22,12 @@ final class ReportImageDataStore: ObservableObject, ImageDataStore {
     
     func add(image: UIImage) {
         images.append(image)
+    }
+    
+    func remove(image: UIImage) {
+        if let index = images.firstIndex(of: image) {
+            images.remove(at: index)
+        }
     }
     
     func clear() {

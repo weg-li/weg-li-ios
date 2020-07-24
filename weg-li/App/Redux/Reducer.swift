@@ -71,6 +71,10 @@ func appReducer(
     case let .addImage(image):
         environment.dataStore.add(image: image)
         state.report.images = environment.dataStore.images
+    case let .removeImage(image):
+        environment.dataStore.remove(image: image)
+        state.report.images = environment.dataStore.images
+
     // MARK: Handle description actions
     case .handleDescriptionAction(let descriptionAction):
         switch descriptionAction {

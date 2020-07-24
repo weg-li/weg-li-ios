@@ -14,7 +14,9 @@ struct Images: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20.0) {
             ScrollView(.horizontal) {
-                ImageGrid(images: appStore.state.report.images, columnCount: 3)
+                ImageGrid(images: appStore.state.report.images, columnCount: 3) { image in
+                    self.appStore.send(.removeImage(image))
+                }
             }
             ImagePickerButtons { image in
                 self.appStore.send(.addImage(image))

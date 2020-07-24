@@ -9,16 +9,15 @@
 import SwiftUI
 
 struct ImagePickerButtons: View {
-    @State private var showImagePicker: Bool = false
+    @State private var showingAlert = false
+    @State private var showImagePicker = false
     @State private var imagePickerSourceType = UIImagePickerController.SourceType.photoLibrary
     let imageHandler: (UIImage) -> Void
     
     var body: some View {
         HStack {
             importButton
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                cameraButton
-            }
+            cameraButton
         }
         .sheet(isPresented: $showImagePicker, onDismiss: {
             self.showImagePicker = false
@@ -44,13 +43,20 @@ struct ImagePickerButtons: View {
     
     private var cameraButton: some View {
         Button(action: {
-            self.imagePickerSourceType = .camera
-            self.showImagePicker.toggle()
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                self.imagePickerSourceType = .camera
+                self.showImagePicker.toggle()
+            } else {
+                self.showingAlert = true
+            }
         }) {
             HStack {
                 Image(systemName: "camera.fill")
                 Text("Kamera")
             }
+        }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Keine Kamera gefunden!"), message: Text("Bitte ein Gerät mit Kamera benutzen"), dismissButton: .default(Text("OK")))
         }
     }
 }
