@@ -17,6 +17,7 @@ typealias Address = CNPostalAddress
 enum AppAction {
     case setContact(Contact)
     case addImage(UIImage)
+    case removeImage(UIImage)
     case handleLocationAction(LocationAction)
     case handleDescriptionAction(DescriptionAction)
 }
