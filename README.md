@@ -29,4 +29,4 @@ bundle install
 
 ## 🎨 Designs
 
-* [sketch cloud](https://sketch.cloud/s/Jynbk)
+* [sketch cloud](https://www.sketch.com/s/dfb7001d-366f-4977-b204-34917d9dec71)
