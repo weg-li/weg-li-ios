@@ -11,18 +11,19 @@ import SwiftUI
 struct PersonalDataWidget: View {
     let contact: Contact?
     
-    @ViewBuilder var body: some View {
-        guard let contact = contact, contact.isValid else {
-            return Text("Keine Kontaktdaten angegeben")
-        }
-        return VStack(alignment: .leading, spacing: 10) {
-            row(callout: "Name", content: ("\(contact.firstName) \(contact.name)"))
-            row(callout: "Straße", content: contact.address.street)
-            row(callout: "Stadt", content: "\(contact.address.zipCode) \(contact.address.town)")
-            row(callout: "Telefon", content: contact.phone)
-            Text("Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.")
-                .font(.footnote)
-                .foregroundColor(.gray)
+    var body: some View {
+        if let contact = contact, contact.isValid {
+            VStack(alignment: .leading, spacing: 10) {
+                row(callout: "Name", content: ("\(contact.firstName) \(contact.name)"))
+                row(callout: "Straße", content: contact.address.street)
+                row(callout: "Stadt", content: "\(contact.address.zipCode) \(contact.address.town)")
+                row(callout: "Telefon", content: contact.phone)
+                Text("Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
+        } else {
+            Text("Keine Kontaktdaten angegeben")
         }
     }
     
