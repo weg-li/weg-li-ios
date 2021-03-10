@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 struct Report {
+    let uuid = UUID()
     var images: [UIImage] = []
     var address: Address?
     var district: District?
