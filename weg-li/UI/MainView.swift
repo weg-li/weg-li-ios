@@ -16,42 +16,71 @@ struct MainView: View {
     @State private var presentDraftAlert = false
     
     @State private var showingSheet = false
+    @State private var reports = [Report]() // TODO: Inject
     
     @EnvironmentObject private var store: AppStore
     
     var body: some View {
         NavigationView {
-            VStack {
-                Button(action: {
-                    self.showReportForm.toggle()
-                }) {
-                    VStack {
-                        Image(systemName: "plus.circle.fill")
-                            .iconModifier()
-                        Text("Neue Anzeige")
+            ZStack {
+                List(reports, id: \.uuid) { report in
+                    Text(report.date.humandReadableDate) // TODO: Replace with saved reports
+                }
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        NavigationLink(
+                            destination: ReportForm().environmentObject(store),
+                            isActive: $showReportForm,
+                            label: {
+                                addButton
+                            }
+                        )
+                        
                     }
-                    .font(.headline)
-                }.buttonStyle(EditButtonStyle())
+                }
             }
-            .navigationBarTitle("weg-li")
+            .navigationBarTitle("Reports")
             .navigationBarItems(trailing: contactDataIcon)
-            .sheet(isPresented: $showReportForm) {
-                ReportForm()
-                    .environmentObject(self.store)
-            }
         }
         .sheet(isPresented: $showPersonalData) {
-            PersonalData(isPresented: self.$showPersonalData, viewModel: PersonalDataViewModel(model: self.store.state.contact))
-                .environmentObject(self.store)
+            PersonalData(
+                isPresented: $showPersonalData,
+                viewModel: PersonalDataViewModel(
+                    model: store.state.contact
+                )
+            )
+            .environmentObject(store)
         }
+    }
+    
+    private var addButton: some View {
+        Button(
+            action: { showReportForm.toggle() },
+            label: {
+                VStack {
+                    Text("+")
+                        .font(.system(.largeTitle))
+                        .frame(width: 70, height: 70)
+                        .foregroundColor(.white)
+                }
+            })
+            .accessibility(label: Text("Add Report"))
+            .background(Color.gray)
+            .cornerRadius(35)
+            .padding()
+            .shadow(color: Color.primary.opacity(0.3),
+                    radius: 3,
+                    x: 3,
+                    y: 3)
     }
     
     private var contactDataIcon: some View {
         Button(action: {
-            self.showPersonalData.toggle()
+            showPersonalData.toggle()
         }, label: {
-            Image(systemName: "person.circle.fill")
-                .iconModifier()
+            Text("Contact Data")
         })
     }
 }
@@ -59,5 +88,6 @@ struct MainView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView()
+            .preferredColorScheme(.dark)
     }
 }
