@@ -8,11 +8,17 @@
 
 import Foundation
 
-extension Date {
-    var humandReadableDate: String {
+extension DateFormatter {
+    static let dateFormatterMediumStyles: DateFormatter = {
         let formatter = DateFormatter()
         formatter.timeStyle = .medium
         formatter.dateStyle = .medium
-        return formatter.string(from: self)
+        return formatter
+    }()
+}
+
+extension Date {
+    var humandReadableDate: String {
+        DateFormatter.dateFormatterMediumStyles.string(from: self)
     }
 }
