@@ -81,7 +81,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         .pullback(
             state: \.reportDraft,
             action: /HomeAction.report,
-            environment: { _ in ReportEnvironment(imageDataStore: ReportImageDataStore()) }
+            environment: { _ in ReportEnvironment() }
     ),
     contactReducer.pullback(
         state: \.contact,
@@ -91,10 +91,10 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
     Reducer { state, action, env in
         switch action {
         case let .contact(contact):
-//            state.reportDraft.contact = state.contact
+            state.reportDraft.contact = state.contact
             return .none
         case let .report(reportAction):
-//            state.contact = state.reportDraft.contact
+            state.contact = state.reportDraft.contact
             return .none
         }
     }

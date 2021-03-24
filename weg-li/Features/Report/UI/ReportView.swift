@@ -13,10 +13,12 @@ struct ReportForm: View {
     struct ViewState: Equatable {
         let isPhotosValid: Bool
         let isContactValid: Bool
+        let isDescriptionValid: Bool
         
         init(state: Report) {
             isPhotosValid = !state.storedPhotos.isEmpty
             isContactValid = state.contact.isValid
+            isDescriptionValid = state.isDescriptionValid
         }
     }
     
@@ -35,24 +37,21 @@ struct ReportForm: View {
             VStack {
                 Widget(
                     title: Text("Fotos"), // TODO: Replace with l18n
-                    isCompleted: viewStore.isPhotosValid) {
-                    Images(store: store)
-                }
+                    isCompleted: viewStore.isPhotosValid
+                ) { Images(store: store) }
                 //                Widget(
                 //                    title: Text("Ort"),
                 //                    isCompleted: store.state.location.location != .zero) {
                 //                    Location()
                 //                }
-                //                Widget(
-                //                    title: Text("Beschreibung"),
-                //                    isCompleted: store.state.report.isDescriptionValid) {
-                //                    DescriptionWidgetView().environmentObject(self.store)
-                //                }
+                Widget(
+                    title: Text("Beschreibung"),
+                    isCompleted: viewStore.isDescriptionValid
+                ) { Description(store: store) }
                 Widget(
                     title: Text("Persönliche Daten"),
-                    isCompleted: viewStore.isContactValid) {
-                    ContactWidget(store: store.scope(state: { $0.contact } ))
-                }
+                    isCompleted: viewStore.isContactValid
+                ) { ContactWidget(store: store.scope(state: { $0.contact } )) }
                 MailContentView()
                     .padding([.top, .bottom], 16)
             }

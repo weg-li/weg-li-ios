@@ -53,6 +53,7 @@ struct ContactWidget: View {
                     ),
                     label: {
                         Text("Kontaktdaten bearbeiten") // TODO: l18n
+                            .frame(maxWidth: .infinity)
                     }
                 )
                 .buttonStyle(EditButtonStyle())

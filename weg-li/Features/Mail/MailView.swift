@@ -68,7 +68,7 @@ struct MailView: UIViewControllerRepresentable {
 
             Adresse: \(report.contact.address.humanReadableAddress)
 
-            Verstoß: \(report.charge.humandReadableCharge)
+            Verstoß: \(Report.Charge.charges[report.charge.selectedType])
 
             Tatzeit: \(report.date.humandReadableDate)
 

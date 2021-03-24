@@ -28,7 +28,6 @@ extension Report: Equatable {
 }
 
 extension Report {
-    // MARK: Description
     struct Car: Equatable, Codable {
         var color: String?
         var type: String?
@@ -40,7 +39,6 @@ extension Report {
         var selectedType = 0
         var blockedOthers = false
         
-        var humandReadableCharge: String { Charge.charges[selectedType] }
         var time: String { Times.allCases[selectedDuration].description }
     }
 }
@@ -67,30 +65,87 @@ enum ReportAction: Equatable {
     case addPhoto(UIImage)
     case removePhoto(index: Int)
     case contact(ContactAction)
+    case car(CarAction)
+    case charge(ChargeAction)
     case viewAppeared
 }
 
-struct ReportEnvironment {
-    let imageDataStore: ImageDataStore
+struct ReportEnvironment {}
+
+// MARK: - Car Core
+enum CarAction: Equatable {
+    case type(String)
+    case color(String)
+    case licensePlateNumber(String)
 }
 
-let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>{ state, action, environment in
+struct CarEnvironment {}
+
+/// Reducer resposonsible for updating the car object
+let carReducer = Reducer<Report.Car, CarAction, CarEnvironment> { state, action, _ in
     switch action {
-    case let .addPhoto(photo):
-        state.storedPhotos.append(StorableImage(uiImage: photo)!)
+    case let .type(value):
+        state.type = value
         return .none
-    case let .removePhoto(index):
-        state.storedPhotos.remove(at: index)
+    case let .color(value):
+        state.color = value
         return .none
-    case .contact:
+    case let .licensePlateNumber(value):
+        state.licensePlateNumber = value
         return .none
-    case .viewAppeared:
-        return Effect(value: ReportAction.contact(.isContactValid))
     }
-}.combined(
-    with: contactReducer.pullback(
-        state: \.contact,
-        action: /ReportAction.contact,
-        environment: { _ in ContactEnvironment() }
-    )
+}
+
+// MARK: - Charge Core
+enum ChargeAction: Equatable {
+    case toggleBlockedOthers
+    case selectCharge(Int)
+    case selectDuraration(Int)
+}
+
+struct ChargeEnvironment {}
+
+/// Reducer resposonsible for updating the charge object
+let chargeReducer = Reducer<Report.Charge, ChargeAction, ChargeEnvironment> { state, action, _ in
+    switch action {
+    case .toggleBlockedOthers:
+        state.blockedOthers.toggle()
+        return .none
+    case let .selectCharge(value):
+        state.selectedType = value
+        return .none
+    case let .selectDuraration(value):
+        state.selectedDuration = value
+        return .none
+    }
+}
+
+// MARK: - reportReducer
+
+/// Combined reducer that is used in the ReportView
+let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
+    carReducer.pullback(
+        state: \.car,
+        action: /ReportAction.car,
+        environment: { _ in CarEnvironment() }
+    ),
+    chargeReducer.pullback(
+        state: \.charge,
+        action: /ReportAction.charge,
+        environment: { _ in ChargeEnvironment() }
+    ),
+    Reducer { state, action, environment in
+        switch action {
+        case let .addPhoto(photo):
+            state.storedPhotos.append(StorableImage(uiImage: photo)!)
+            return .none
+        case let .removePhoto(index):
+            state.storedPhotos.remove(at: index)
+            return .none
+        case .contact, .car, .charge:
+            return .none
+        case .viewAppeared:
+            return Effect(value: ReportAction.contact(.isContactValid))
+        }
+    }
 )
