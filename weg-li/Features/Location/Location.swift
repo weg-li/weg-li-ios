@@ -11,7 +11,7 @@ import MapKit
 import UIKit
 
 struct Location: View {
-    @EnvironmentObject private var store: AppStore
+//    @EnvironmentObject private var store: AppStore
     
     @State private var isMapExpanded: Bool = false
     @State private var isResolvingAddress: Bool = false
@@ -26,39 +26,39 @@ struct Location: View {
                 }
             }.pickerStyle(SegmentedPickerStyle())
             ZStack(alignment: .topTrailing) {
-                MapView(center: store.state.location.location)
-                    .frame(height: self.isMapExpanded ? 300 : 150)
-                expandMapButton
-                    .padding(4)
-                    .accessibility(label: Text("expand map"))
+//                MapView(center: store.state.location.location)
+//                    .frame(height: self.isMapExpanded ? 300 : 150)
+//                expandMapButton
+//                    .padding(4)
+//                    .accessibility(label: Text("expand map"))
             }
             addressView
         }
         .onAppear {
-            self.store.send(.handleLocationAction(.onLocationAppear))
+//            self.store.send(.handleLocationAction(.onLocationAppear))
         }
     }
     
     private var locationOptions: [LocationOption] {
-        if store.state.report.images.isEmpty {
-            return [.currentLocation(.zero), .manual]
-        } else {
+//        if store.state.report.images.isEmpty {
+//            return [.currentLocation(.zero), .manual]
+//        } else {
             return [.fromPhotos, .currentLocation(.zero), .manual]
-        }
+//        }
     }
     
     @ViewBuilder private var addressView: some View {
-        if store.state.location.location == .zero {
+//        if store.state.location.location == .zero {
             ActivityIndicator(style: .medium, animate: $isResolvingAddress)
-        } else if store.state.location.presumedAddress != nil {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(store.state.location.presumedAddress!.humanReadableAddress)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-        } else {
-            EmptyView()
-        }
+//        } else if store.state.location.presumedAddress != nil {
+//            VStack(alignment: .leading, spacing: 4) {
+//                Text(store.state.location.presumedAddress!.humanReadableAddress)
+//                    .lineLimit(nil)
+//                    .fixedSize(horizontal: true, vertical: false)
+//            }
+//        } else {
+//            EmptyView()
+//        }
     }
     
     private var expandMapButton: some View {
@@ -81,7 +81,7 @@ struct Location: View {
     }
     
     private func optionChange(_ option: Int) {
-        store.send(.handleLocationAction(.resolveAddress(locationOptions[option])))
+//        store.send(.handleLocationAction(.resolveAddress(locationOptions[option])))
     }
 }
 

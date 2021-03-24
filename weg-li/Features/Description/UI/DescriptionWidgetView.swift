@@ -9,27 +9,27 @@
 import SwiftUI
 
 struct DescriptionWidgetView: View {
-    @EnvironmentObject private var appStore: AppStore
+//    @EnvironmentObject private var appStore: AppStore
     
     @State private var edit = false
     
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading, spacing: 4) {
-                row(title: "Marke:", content: appStore.state.report.car.type ?? "")
-                row(title: "Farbe:", content: appStore.state.report.car.color ?? "")
-                row(title: "Kennzeichen:", content: appStore.state.report.car.licensePlateNumber ?? "")
-                row(title: "Dauer:", content: appStore.state.report.charge.time.description)
-                row(title: "Art des Verstoßes:", content: appStore.state.report.charge.humandReadableCharge)
-                if appStore.state.report.charge.blockedOthers {
-                    HStack {
-                        Text("Behinderung anderer Verkehrsteilnehmer")
-                            .bold()
-                        Spacer()
-                        Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
-                    }
-                }
-            }
+//            VStack(alignment: .leading, spacing: 4) {
+//                row(title: "Marke:", content: appStore.state.report.car.type ?? "")
+//                row(title: "Farbe:", content: appStore.state.report.car.color ?? "")
+//                row(title: "Kennzeichen:", content: appStore.state.report.car.licensePlateNumber ?? "")
+//                row(title: "Dauer:", content: appStore.state.report.charge.time.description)
+//                row(title: "Art des Verstoßes:", content: appStore.state.report.charge.humandReadableCharge)
+//                if appStore.state.report.charge.blockedOthers {
+//                    HStack {
+//                        Text("Behinderung anderer Verkehrsteilnehmer")
+//                            .bold()
+//                        Spacer()
+//                        Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+//                    }
+//                }
+//            }
             HStack {
                 Button(action: {
                     self.edit.toggle()
@@ -44,8 +44,8 @@ struct DescriptionWidgetView: View {
             }
         }
         .sheet(isPresented: $edit) {
-            Description(isPresented: self.$edit, viewModel: .init(model: self.appStore.state.report))
-                .environmentObject(self.appStore)
+//            Description(isPresented: self.$edit, viewModel: .init(model: self.appStore.state.report))
+//                .environmentObject(self.appStore)
         }
     }
     

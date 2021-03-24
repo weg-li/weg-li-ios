@@ -14,14 +14,14 @@ struct MailView: UIViewControllerRepresentable {
     @Binding var result: Result<MFMailComposeResult, Error>?
     
     let report: Report
-    let contact: Contact?
+    let contact: ContactState?
     
     class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         @Binding var isShowing: Bool
         @Binding var result: Result<MFMailComposeResult, Error>?
         
         init(isShowing: Binding<Bool>,
-             result: Binding<Result<MFMailComposeResult, Error>?>, report: Report, contact: Contact?) {
+             result: Binding<Result<MFMailComposeResult, Error>?>, report: Report, contact: ContactState?) {
             _isShowing = isShowing
             _result = result
         }
@@ -66,7 +66,7 @@ struct MailView: UIViewControllerRepresentable {
 
             Farbe: \(report.car.color ?? "")
 
-            Adresse: \(report.address?.humanReadableAddress ?? "")
+            Adresse: \(report.contact.address.humanReadableAddress)
 
             Verstoß: \(report.charge.humandReadableCharge)
 
@@ -101,9 +101,9 @@ struct MailView: UIViewControllerRepresentable {
 
             \(contact.map { $0.firstName + $0.name } ?? "")
             """, isHTML: false)
-        report.images.enumerated().forEach { index, image in
+        report.storedPhotos.enumerated().forEach { index, image in
             vc.addAttachmentData(
-                image.jpegData(compressionQuality: CGFloat(1.0))!,
+                image.image,
                 mimeType: "image/jpeg",
                 fileName: "\(report.car)_\(index)")
         }

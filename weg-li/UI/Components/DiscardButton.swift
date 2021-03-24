@@ -20,7 +20,7 @@ struct DiscardButton: View {
             .font(.subheadline)
             .foregroundColor(.red)
             .padding()
-            .background(Color(.secondarySystemBackground))
+            .background(Color(.tertiarySystemFill))
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
     }

@@ -36,7 +36,7 @@ final class DescriptionViewModel: ObservableObject {
 }
 
 struct Description: View {
-    @EnvironmentObject private var appStore: AppStore
+//    @EnvironmentObject private var appStore: AppStore
     @ObservedObject var viewModel: DescriptionViewModel
     @Binding var isPresented: Bool
     
@@ -82,13 +82,13 @@ struct Description: View {
     
     private func storeDescription() {
         let car = Report.Car(color: viewModel.color, type: viewModel.carType, licensePlateNumber: viewModel.plate)
-        appStore.send(.handleDescriptionAction(.setCar(car)))
+//        appStore.send(.handleDescriptionAction(.setCar(car)))
         
         let charge = Report.Charge(
             selectedDuration: viewModel.selectedTime,
             selectedType: self.viewModel.selectedCharge,
             blockedOthers: viewModel.isSelected)
-        appStore.send(.handleDescriptionAction(.setCharge(charge)))
+//        appStore.send(.handleDescriptionAction(.setCharge(charge)))
     }
     
     private var toggleRow: some View {
