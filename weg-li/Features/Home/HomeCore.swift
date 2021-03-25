@@ -54,7 +54,7 @@ extension HomeState {
 // MARK: - AppAction
 typealias Address = CNPostalAddress
 
-enum HomeAction {
+enum HomeAction: Equatable {
     case contact(ContactAction)
     case report(ReportAction)
 }
