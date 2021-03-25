@@ -30,7 +30,7 @@ struct HomeView: View {
                 }
                 addReport
             }
-            .navigationBarTitle("Reports")
+            .navigationBarTitle("Anzeigen") // TODO: l18n
             .navigationBarItems(trailing: contactData)
         }
     }
@@ -38,9 +38,12 @@ struct HomeView: View {
     private var emptyStateView: some View {
         VStack(spacing: 8) {
             Image(systemName: "doc.richtext")
-                .font(.system(size: 32))
-            Text("Keine Reports")
-                .font(.system(size: 24))
+                .font(.system(.largeTitle))
+                .accessibility(hidden: true)
+            Text("Keine gespeicherten Anzeigen") // TODO: l18n
+                .font(.system(.title))
+                .multilineTextAlignment(.center)
+                .padding([.leading, .trailing])
         }
     }
     
@@ -49,9 +52,9 @@ struct HomeView: View {
             Text("+")
                 .font(.system(.largeTitle))
                 .frame(width: 70, height: 70)
-                .foregroundColor(.white)
+                .foregroundColor(Color(.label))
                 .accessibility(label: Text("Add Report"))
-                .background(Color.gray)
+                .background(Color(.systemGray))
                 .cornerRadius(35)
                 .padding()
                 .shadow(color: Color.black.opacity(0.3), radius: 3, x: 3, y: 3)
@@ -84,7 +87,7 @@ struct HomeView: View {
         return NavigationLink(
             destination: ContactView(store: contactDataStore),
             label: {
-                Text("Contact Data")
+                Text("Kontakt Daten") // TODO: l18n
             }
         )
     }
@@ -92,7 +95,14 @@ struct HomeView: View {
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(store: .init(initialState: .preview, reducer: .empty, environment: ()))
-            .preferredColorScheme(.dark)
+        HomeView(
+            store: .init(
+                initialState: .preview,
+                reducer: .empty,
+                environment: ()
+            )
+        )
+//        .preferredColorScheme(.dark)
+//        .environment(\.sizeCategory, .extraExtraLarge)
     }
 }
