@@ -60,11 +60,11 @@ struct MailView: UIViewControllerRepresentable {
             
             hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
 
-            Kennzeichen: \(report.car.licensePlateNumber ?? "")
+            Kennzeichen: \(report.car.licensePlateNumber)
 
-            Marke: \(report.car.type ?? "")
+            Marke: \(report.car.type)
 
-            Farbe: \(report.car.color ?? "")
+            Farbe: \(report.car.color)
 
             Adresse: \(report.contact.address.humanReadableAddress)
 

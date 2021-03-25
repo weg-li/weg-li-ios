@@ -12,19 +12,10 @@ import SwiftUI
 struct Description: View {
     struct ViewState: Equatable {
         let report: Report
-        let type: String
-        let color: String
-        let license: String
-        let time: String
         let chargeType: String
         
         init(state: Report) {
             report = state
-
-            self.type = state.car.type ?? ""
-            self.color = state.car.color ?? ""
-            self.license = state.car.licensePlateNumber ?? ""
-            self.time = state.charge.time
             self.chargeType = Report.Charge.charges[state.charge.selectedType]
         }
     }
@@ -40,10 +31,10 @@ struct Description: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 8) {
-                row(title: "Marke:", content: viewStore.type)
-                row(title: "Farbe:", content: viewStore.color)
-                row(title: "Kennzeichen:", content: viewStore.license)
-                row(title: "Dauer:", content: viewStore.time)
+                row(title: "Marke:", content: viewStore.report.car.type)
+                row(title: "Farbe:", content: viewStore.report.car.color)
+                row(title: "Kennzeichen:", content: viewStore.report.car.licensePlateNumber)
+                row(title: "Dauer:", content: viewStore.report.charge.time)
                 row(title: "Art des Verstoßes:", content: viewStore.chargeType)
                 if viewStore.report.charge.blockedOthers {
                     HStack {

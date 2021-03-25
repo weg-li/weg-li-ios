@@ -23,15 +23,19 @@ struct Report: Codable {
 
 extension Report: Equatable {
     static func == (lhs: Report, rhs: Report) -> Bool {
-        return lhs.uuid == rhs.uuid
+        return lhs.contact == rhs.contact
+            && lhs.district == rhs.district
+            && lhs.car == rhs.car
+            && lhs.charge == rhs.charge
+        
     }
 }
 
 extension Report {
     struct Car: Equatable, Codable {
-        var color: String?
-        var type: String?
-        var licensePlateNumber: String?
+        var color: String = ""
+        var type: String = ""
+        var licensePlateNumber: String = ""
     }
     
     struct Charge: Equatable, Codable {
@@ -45,10 +49,7 @@ extension Report {
 
 extension Report {
     var isDescriptionValid: Bool {
-        guard let type = car.type, let color = car.color, let plate = car.licensePlateNumber else {
-            return false
-        }
-        let isValid = ![type, color, plate]
+        let isValid = ![car.type, car.color, car.licensePlateNumber]
             .map { $0.isEmpty }
             .contains(true)
         return isValid

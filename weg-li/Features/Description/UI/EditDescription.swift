@@ -21,9 +21,9 @@ struct EditDescription: View {
         
         init(state: Report) {
             self.report = state
-            self.carType = state.car.type ?? "" // TODO: l18n
-            self.carColor = state.car.color ?? "" // TODO: l18n
-            self.licensePlate = state.car.licensePlateNumber ?? "" // TODO: l18n
+            self.carType = state.car.type
+            self.carColor = state.car.color
+            self.licensePlate = state.car.licensePlateNumber
             self.blockedOthers = state.charge.blockedOthers
             self.charge = state.charge
             self.selectedCharge = state.charge.selectedType
