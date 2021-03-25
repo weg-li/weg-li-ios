@@ -48,6 +48,30 @@ extension Report {
 }
 
 extension Report {
+    static var preview: Report {
+        Report(
+            uuid: UUID(),
+            storedPhotos: [],
+            contact: .preview,
+            district: District(
+                name: "Hamburg St. Pauli",
+                zipCode: "20099",
+                mail: "mail@stpauli.de"
+            ),
+            date: Date(),
+            car: Car(
+                color: "Gelb",
+                type: "Kleinbus",
+                licensePlateNumber: "HH-ST-PAULI"
+            ),
+            charge: Charge(
+                selectedDuration: 0,
+                selectedType: 0,
+                blockedOthers: false
+            )
+        )
+    }
+    
     var isDescriptionValid: Bool {
         let isValid = ![car.type, car.color, car.licensePlateNumber]
             .map { $0.isEmpty }

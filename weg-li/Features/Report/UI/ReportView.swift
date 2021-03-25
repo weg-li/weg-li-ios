@@ -65,7 +65,7 @@ struct ReportForm_Previews: PreviewProvider {
     static var previews: some View {
         ReportForm(
             store: .init(
-                initialState: .init(contact: .empty),
+                initialState: .preview,
                 reducer: .empty,
                 environment: ()
             )
