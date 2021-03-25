@@ -57,6 +57,7 @@ struct ContactWidget: View {
                     }
                 )
                 .buttonStyle(EditButtonStyle())
+                .padding(.top)
                 Text("Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.") // TODO: l18n
                     .font(.footnote)
                     .foregroundColor(.gray)

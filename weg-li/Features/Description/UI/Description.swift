@@ -59,6 +59,7 @@ struct Description: View {
                 }
             )
             .buttonStyle(EditButtonStyle())
+            .padding(.top)
         }
     }
     

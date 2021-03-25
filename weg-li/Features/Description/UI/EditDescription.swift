@@ -67,7 +67,6 @@ struct EditDescription: View {
             }
             .padding(.top, 4)
             .textFieldStyle(PlainTextFieldStyle())
-            .font(.body)
             Section(header: Text("Verstoß")) { // TODO: l18n
                 Picker(
                     "Art des Verstoßes", // TODO: l18n
@@ -79,6 +78,7 @@ struct EditDescription: View {
                     ForEach(0 ..< Report.Charge.charges.count, id: \.self) {
                         Text(Report.Charge.charges[$0])
                             .tag($0)
+                            .foregroundColor(Color(.label))
                     }
                 }
                 Picker(
@@ -90,10 +90,11 @@ struct EditDescription: View {
                 ) {
                     ForEach(0 ..< Times.allCases.count, id: \.self) {
                         Text(Times.allCases[$0].description)
+                            .foregroundColor(Color(.label))
                     }
                 }
                 toggleRow
-            }.pickerStyle(DefaultPickerStyle())
+            }
         }
         .navigationBarTitle(Text("Beschreibung"), displayMode: .inline) // TODO: l18n
     }
@@ -121,5 +122,7 @@ struct Description_Previews: PreviewProvider {
                 environment: ()
             )
         )
+//        .preferredColorScheme(.dark)
+        .environment(\.sizeCategory, .extraExtraLarge)
     }
 }

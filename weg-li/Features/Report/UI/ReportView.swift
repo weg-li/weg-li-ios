@@ -49,7 +49,7 @@ struct ReportForm: View {
                     isCompleted: viewStore.isDescriptionValid
                 ) { Description(store: store) }
                 Widget(
-                    title: Text("Persönliche Daten"),
+                    title: Text("Kontaktdaten"),
                     isCompleted: viewStore.isContactValid
                 ) { ContactWidget(store: store.scope(state: { $0.contact } )) }
                 MailContentView()
@@ -58,9 +58,6 @@ struct ReportForm: View {
         }
         .padding(.bottom)
         .navigationBarTitle("Anzeige", displayMode: .inline)
-        .onDisappear {
-            // set nav to false
-        }
     }
 }
 
@@ -73,5 +70,7 @@ struct ReportForm_Previews: PreviewProvider {
                 environment: ()
             )
         )
+//        .preferredColorScheme(.dark)
+//        .environment(\.sizeCategory, .large)
     }
 }

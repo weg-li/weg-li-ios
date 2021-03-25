@@ -87,7 +87,7 @@ struct HomeView: View {
         return NavigationLink(
             destination: ContactView(store: contactDataStore),
             label: {
-                Text("Kontakt Daten") // TODO: l18n
+                Text("Kontaktdaten") // TODO: l18n
             }
         )
     }
