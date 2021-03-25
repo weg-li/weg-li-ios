@@ -48,7 +48,8 @@ class HomeStoreTests: XCTestCase {
             .send(.report(.contact(.firstNameChanged(newContact.firstName)))) {
                 $0.contact.firstName = newContact.firstName
                 $0.reportDraft.contact.firstName = newContact.firstName
-            }
+            },
+            .receive(.report(.contact(.isContactValid)))
         )
     }
 }

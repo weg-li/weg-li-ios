@@ -135,6 +135,11 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         action: /ReportAction.charge,
         environment: { _ in ChargeEnvironment() }
     ),
+    contactReducer.pullback(
+        state: \.contact,
+        action: /ReportAction.contact,
+        environment: { _ in ContactEnvironment() }
+    ),
     Reducer { state, action, environment in
         switch action {
         case let .addPhoto(photo):

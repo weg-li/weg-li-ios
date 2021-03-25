@@ -85,7 +85,7 @@ class ReportStoreTests: XCTestCase {
             initialState: Report(
                 uuid: fixedUUID(),
                 storedPhotos: [StorableImage(uiImage: image)!],
-                contact: .empty,
+                contact: .preview,
                 district: nil,
                 date: fixedDate(),
                 car: .init(
@@ -110,12 +110,17 @@ class ReportStoreTests: XCTestCase {
             .send(.contact(.firstNameChanged(firstName))) {
                 $0.contact.firstName = firstName
             },
+            .receive(.contact(.isContactValid)) {
+                $0.contact.isValid = true
+            },
             .send(.contact(.lastNameChanged(lastName))) {
                 $0.contact.name = lastName
             },
+            .receive(.contact(.isContactValid)),
             .send(.contact(.townChanged(city))) {
                 $0.contact.address.city = city
-            }
+            },
+            .receive(.contact(.isContactValid))
         )
     }
     
