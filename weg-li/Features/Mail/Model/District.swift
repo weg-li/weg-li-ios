@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-struct District: Decodable {
+struct District: Equatable, Codable {
     let name: String
     let zipCode: String
     let mail: String

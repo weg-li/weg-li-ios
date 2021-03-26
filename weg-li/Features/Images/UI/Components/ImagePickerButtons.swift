@@ -15,29 +15,32 @@ struct ImagePickerButtons: View {
     let imageHandler: (UIImage) -> Void
     
     var body: some View {
-        HStack {
+        VStack {
             importButton
             cameraButton
         }
-        .sheet(isPresented: $showImagePicker, onDismiss: {
-            self.showImagePicker = false
-        }, content: {
-            ImagePicker(
-                isShown: self.$showImagePicker,
-                imageHandler: self.imageHandler,
-                sourceType: self.imagePickerSourceType)
-        })
+        .sheet(
+            isPresented: $showImagePicker,
+            onDismiss: { showImagePicker = false },
+            content: {
+                ImagePicker(
+                    isShown: $showImagePicker,
+                    imageHandler: imageHandler,
+                    sourceType: imagePickerSourceType)
+            }
+        )
     }
     
     private var importButton: some View {
         Button(action: {
-            self.imagePickerSourceType = .photoLibrary
-            self.showImagePicker.toggle()
+            imagePickerSourceType = .photoLibrary
+            showImagePicker.toggle()
         }) {
             HStack {
                 Image(systemName: "photo.fill.on.rectangle.fill")
                 Text("Foto importieren")
             }
+            .frame(maxWidth: .infinity)
         }
     }
     
@@ -54,6 +57,7 @@ struct ImagePickerButtons: View {
                 Image(systemName: "camera.fill")
                 Text("Kamera")
             }
+            .frame(maxWidth: .infinity)
         }
         .alert(isPresented: $showingAlert) {
             Alert(title: Text("Keine Kamera gefunden!"), message: Text("Bitte ein Gerät mit Kamera benutzen"), dismissButton: .default(Text("OK")))
@@ -66,5 +70,6 @@ struct ImagePickerButtons_Previews: PreviewProvider {
         ImagePickerButtons { image in
             print(image)
         }.buttonStyle(EditButtonStyle())
+        .preferredColorScheme(.dark)
     }
 }

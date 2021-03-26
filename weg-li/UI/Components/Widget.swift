@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct Widget<Content: View>: View {
-    @Environment(\.colorScheme) private var scheme: ColorScheme
     let title: Text
     var isCompleted: Bool
     let content: () -> Content
@@ -30,20 +29,17 @@ struct Widget<Content: View>: View {
                         .rotationEffect(.degrees(isCollapsed ? 180 : 0))
                 }
                 .foregroundColor(.secondary)
-            }.font(.title)
+            }
+            .font(.title)
+            .padding(.bottom)
             if !isCollapsed {
                 content().transition(.opacity)
             }
         }
         .padding()
-        .background(backgroundColor)
+        .background(Color(.quaternarySystemFill))
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(radius: 10)
         .padding()
-    }
-    
-    private var backgroundColor: Color {
-        scheme == .dark ? Color(white: 30 / 255) : Color(.systemBackground)
     }
     
     private func completionIndicator() -> some View {

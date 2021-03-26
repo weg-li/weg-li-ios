@@ -14,14 +14,14 @@ struct MailView: UIViewControllerRepresentable {
     @Binding var result: Result<MFMailComposeResult, Error>?
     
     let report: Report
-    let contact: Contact?
+    let contact: ContactState?
     
     class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         @Binding var isShowing: Bool
         @Binding var result: Result<MFMailComposeResult, Error>?
         
         init(isShowing: Binding<Bool>,
-             result: Binding<Result<MFMailComposeResult, Error>?>, report: Report, contact: Contact?) {
+             result: Binding<Result<MFMailComposeResult, Error>?>, report: Report, contact: ContactState?) {
             _isShowing = isShowing
             _result = result
         }
@@ -60,15 +60,15 @@ struct MailView: UIViewControllerRepresentable {
             
             hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
 
-            Kennzeichen: \(report.car.licensePlateNumber ?? "")
+            Kennzeichen: \(report.car.licensePlateNumber)
 
-            Marke: \(report.car.type ?? "")
+            Marke: \(report.car.type)
 
-            Farbe: \(report.car.color ?? "")
+            Farbe: \(report.car.color)
 
-            Adresse: \(report.address?.humanReadableAddress ?? "")
+            Adresse: \(report.contact.address.humanReadableAddress)
 
-            Verstoß: \(report.charge.humandReadableCharge)
+            Verstoß: \(Report.Charge.charges[report.charge.selectedType])
 
             Tatzeit: \(report.date.humandReadableDate)
 
@@ -101,9 +101,9 @@ struct MailView: UIViewControllerRepresentable {
 
             \(contact.map { $0.firstName + $0.name } ?? "")
             """, isHTML: false)
-        report.images.enumerated().forEach { index, image in
+        report.storedPhotos.enumerated().forEach { index, image in
             vc.addAttachmentData(
-                image.jpegData(compressionQuality: CGFloat(1.0))!,
+                image.image,
                 mimeType: "image/jpeg",
                 fileName: "\(report.car)_\(index)")
         }
