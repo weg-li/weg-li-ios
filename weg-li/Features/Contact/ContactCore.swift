@@ -66,18 +66,6 @@ extension ContactState.Address {
     }
 }
 
-extension Address {
-    var humanReadableAddress: String {
-        return String {
-            if !street.isEmpty {
-                self.street
-            }
-            self.postalCode
-            self.city
-        }
-    }
-}
-
 // MARK: - Action
 enum ContactAction: Equatable {
     case firstNameChanged(String)
