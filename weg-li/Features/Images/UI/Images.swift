@@ -45,7 +45,10 @@ struct Images_Previews: PreviewProvider {
     static var previews: some View {
         Images(
             store: .init(
-                initialState: .init(contact: ContactState.empty),
+                initialState: .init(
+                    contact: ContactState.empty,
+                    location: LocationViewState()
+                ),
                 reducer: .empty,
                 environment: ()
             )

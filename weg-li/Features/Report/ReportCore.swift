@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import ComposableCoreLocation
 import SwiftUI
 
 // MARK: - Report Core
@@ -19,6 +20,7 @@ struct Report: Codable {
     var date: Date = Date()
     var car = Car()
     var charge = Charge()
+    var location = LocationViewState()
 }
 
 extension Report: Equatable {
@@ -27,7 +29,7 @@ extension Report: Equatable {
             && lhs.district == rhs.district
             && lhs.car == rhs.car
             && lhs.charge == rhs.charge
-        
+            && lhs.location == rhs.location
     }
 }
 
@@ -68,7 +70,8 @@ extension Report {
                 selectedDuration: 0,
                 selectedType: 0,
                 blockedOthers: false
-            )
+            ),
+            location: LocationViewState()
         )
     }
     
@@ -85,17 +88,19 @@ extension Report.Charge {
     static let times = Times.allCases
 }
 
-
 enum ReportAction: Equatable {
     case addPhoto(UIImage)
     case removePhoto(index: Int)
     case contact(ContactAction)
     case car(CarAction)
     case charge(ChargeAction)
+    case location(LocationViewAction)
     case viewAppeared
 }
 
-struct ReportEnvironment {}
+struct ReportEnvironment {
+    var locationManager: LocationManager
+}
 
 // MARK: - Car Core
 enum CarAction: Equatable {
@@ -164,7 +169,18 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         action: /ReportAction.contact,
         environment: { _ in ContactEnvironment() }
     ),
+    locationReducer.pullback(
+        state: \.location,
+        action: /ReportAction.location,
+        environment: {
+            LocationViewEnvironment(
+                locationManager: $0.locationManager,
+                placeService: PlacesServiceImplementation()
+            )
+        }
+    ),
     Reducer { state, action, environment in
+        struct LocationManagerId: Hashable {}
         switch action {
         case let .addPhoto(photo):
             state.storedPhotos.append(StorableImage(uiImage: photo)!)
@@ -176,6 +192,9 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             return .none
         case .viewAppeared:
             return Effect(value: ReportAction.contact(.isContactValid))
+        case .location:
+            return .none
         }
     }
 )
+

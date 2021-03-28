@@ -12,6 +12,7 @@ import Foundation
 import MapKit
 import UIKit
 import ComposableArchitecture
+import ComposableCoreLocation
 
 // MARK: - AppState
 struct HomeState: Equatable {
@@ -39,20 +40,12 @@ struct HomeState: Equatable {
             UserDefaultsConfig.draftReport = newValue
         }
     }
-    var location: LocationState? = LocationState()
-}
-
-extension HomeState {
-    struct LocationState: Equatable {
-        var isAuthorized: Bool = false
-        var userDefinedLocation: CLLocationCoordinate2D?
-        var location: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        var presumedAddress: Address?
-    }
 }
 
 // MARK: - AppAction
 typealias Address = CNPostalAddress
+
+extension Contacts.CNPostalAddress: Equatable {}
 
 enum HomeAction: Equatable {
     case contact(ContactAction)
@@ -81,7 +74,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         .pullback(
             state: \.reportDraft,
             action: /HomeAction.report,
-            environment: { _ in ReportEnvironment() }
+            environment: { _ in ReportEnvironment(locationManager: LocationManager.live) }
     ),
     contactReducer.pullback(
         state: \.contact,
@@ -100,10 +93,6 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
     }
 )
         
-
-
 extension HomeState {
-    static let preview = HomeState(
-        location: LocationState()
-    )
+    static let preview = HomeState()
 }

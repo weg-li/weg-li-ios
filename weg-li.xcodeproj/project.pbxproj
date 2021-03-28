@@ -13,11 +13,14 @@
 		7308C51C260B55C600FE3333 /* ImageGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C51A260B55C600FE3333 /* ImageGrid.swift */; };
 		7308C52D260B563B00FE3333 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C52C260B563B00FE3333 /* HomeView.swift */; };
 		7308C537260B5A1500FE3333 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C536260B5A1500FE3333 /* ReportView.swift */; };
+		734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734EFF0C2610A4D1001406F5 /* LocationView.swift */; };
 		7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388122D260BD2E2008B9956 /* CarStoreTests.swift */; };
 		73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73881236260BD4D5008B9956 /* ChargeStoreTests.swift */; };
 		7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388123A260BD5BD008B9956 /* ReportStoreTests.swift */; };
 		73A715E7260C692800C88BCC /* HomeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715E6260C692800C88BCC /* HomeStoreTests.swift */; };
 		73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */; };
+		73A715F4260CACFF00C88BCC /* ComposableCoreLocation in Frameworks */ = {isa = PBXBuildFile; productRef = 73A715F3260CACFF00C88BCC /* ComposableCoreLocation */; };
+		73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715F7260CB14E00C88BCC /* LocationCore.swift */; };
 		73BA6743260625FD001248EF /* StorableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA6742260625FD001248EF /* StorableImage.swift */; };
 		73FC295C25F959100084BB4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 73FC295B25F959100084BB4E /* ComposableArchitecture */; };
 		73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FC296725F95FAE0084BB4E /* ContactCore.swift */; };
@@ -29,7 +32,7 @@
 		9F64984D2488F3EA00514BD3 /* ContactWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64984C2488F3EA00514BD3 /* ContactWidget.swift */; };
 		9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E8F924878D91002E22F4 /* ImageDataStore.swift */; };
 		9F73E90224878E2F002E22F4 /* ImagePickerButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F73E90124878E2F002E22F4 /* ImagePickerButtons.swift */; };
-		9F98A7BE248EB25400E06AA4 /* GeoCodeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */; };
+		9F98A7BE248EB25400E06AA4 /* PlacesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BD248EB25400E06AA4 /* PlacesService.swift */; };
 		9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */; };
 		9F9C4308248BAC5900FF514B /* EnvironmentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */; };
 		9F9C430B248E24BD00FF514B /* HomeCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C430A248E24BD00FF514B /* HomeCore.swift */; };
@@ -47,8 +50,6 @@
 		9FD61415248FB69500D6A41B /* ExifReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD61414248FB69500D6A41B /* ExifReader.swift */; };
 		9FDB4633248FD868009E743A /* String+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB4632248FD868009E743A /* String+Builder.swift */; };
 		9FDB5B432498BBC600BE2AEA /* charges.json in Resources */ = {isa = PBXBuildFile; fileRef = 9FDB5B422498BBC600BE2AEA /* charges.json */; };
-		9FFBAD62248E94CE00F66ADB /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD60248E94CE00F66ADB /* Location.swift */; };
-		9FFBAD63248E94CE00F66ADB /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */; };
 		9FFBAD65248E975700F66ADB /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD64248E975700F66ADB /* MapView.swift */; };
 		9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFBAD66248E979200F66ADB /* ActivityIndicator.swift */; };
 		F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F834758D234C61CE00244D6F /* AppDelegate.swift */; };
@@ -81,11 +82,13 @@
 		7308C51A260B55C600FE3333 /* ImageGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageGrid.swift; sourceTree = "<group>"; };
 		7308C52C260B563B00FE3333 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7308C536260B5A1500FE3333 /* ReportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
+		734EFF0C2610A4D1001406F5 /* LocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
 		7388122D260BD2E2008B9956 /* CarStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarStoreTests.swift; sourceTree = "<group>"; };
 		73881236260BD4D5008B9956 /* ChargeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeStoreTests.swift; sourceTree = "<group>"; };
 		7388123A260BD5BD008B9956 /* ReportStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportStoreTests.swift; sourceTree = "<group>"; };
 		73A715E6260C692800C88BCC /* HomeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeStoreTests.swift; sourceTree = "<group>"; };
 		73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactStoreTests.swift; sourceTree = "<group>"; };
+		73A715F7260CB14E00C88BCC /* LocationCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCore.swift; sourceTree = "<group>"; };
 		73BA6742260625FD001248EF /* StorableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorableImage.swift; sourceTree = "<group>"; };
 		73FC296725F95FAE0084BB4E /* ContactCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCore.swift; sourceTree = "<group>"; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
@@ -99,7 +102,7 @@
 		9F8575EE24B788BA000ABA01 /* weg-liTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "weg-liTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		9F971E8D247ABFCB00A68959 /* weg-liTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "weg-liTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F971E91247ABFCB00A68959 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoCodeProvider.swift; sourceTree = "<group>"; };
+		9F98A7BD248EB25400E06AA4 /* PlacesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesService.swift; sourceTree = "<group>"; };
 		9F98A7BF248F38F100E06AA4 /* Binding+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Additions.swift"; sourceTree = "<group>"; };
 		9F9C4307248BAC5900FF514B /* EnvironmentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentContainer.swift; sourceTree = "<group>"; };
 		9F9C430A248E24BD00FF514B /* HomeCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCore.swift; sourceTree = "<group>"; };
@@ -117,8 +120,6 @@
 		9FD61414248FB69500D6A41B /* ExifReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExifReader.swift; sourceTree = "<group>"; };
 		9FDB4632248FD868009E743A /* String+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Builder.swift"; sourceTree = "<group>"; };
 		9FDB5B422498BBC600BE2AEA /* charges.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = charges.json; sourceTree = "<group>"; };
-		9FFBAD60248E94CE00F66ADB /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
-		9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
 		9FFBAD64248E975700F66ADB /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		9FFBAD66248E979200F66ADB /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		F834758A234C61CE00244D6F /* weg-li.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "weg-li.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				73FC295C25F959100084BB4E /* ComposableArchitecture in Frameworks */,
+				73A715F4260CACFF00C88BCC /* ComposableCoreLocation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,10 +398,10 @@
 		9FFBAD5F248E94CE00F66ADB /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				9F98A7BD248EB25400E06AA4 /* GeoCodeProvider.swift */,
-				9FFBAD60248E94CE00F66ADB /* Location.swift */,
-				9FFBAD61248E94CE00F66ADB /* LocationProvider.swift */,
+				73A715F7260CB14E00C88BCC /* LocationCore.swift */,
+				734EFF0C2610A4D1001406F5 /* LocationView.swift */,
 				9FFBAD64248E975700F66ADB /* MapView.swift */,
+				9F98A7BD248EB25400E06AA4 /* PlacesService.swift */,
 			);
 			path = Location;
 			sourceTree = "<group>";
@@ -481,6 +483,7 @@
 			name = "weg-li";
 			packageProductDependencies = (
 				73FC295B25F959100084BB4E /* ComposableArchitecture */,
+				73A715F3260CACFF00C88BCC /* ComposableCoreLocation */,
 			);
 			productName = "weg-li";
 			productReference = F834758A234C61CE00244D6F /* weg-li.app */;
@@ -517,6 +520,7 @@
 			mainGroup = F8347581234C61CE00244D6F;
 			packageReferences = (
 				73FC295A25F959100084BB4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				73A715F2260CACFF00C88BCC /* XCRemoteSwiftPackageReference "composable-core-location" */,
 			);
 			productRefGroup = F834758B234C61CE00244D6F /* Products */;
 			projectDirPath = "";
@@ -593,12 +597,10 @@
 				F834758E234C61CE00244D6F /* AppDelegate.swift in Sources */,
 				9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */,
 				7308C51B260B55C600FE3333 /* ImagePicker.swift in Sources */,
-				9F98A7BE248EB25400E06AA4 /* GeoCodeProvider.swift in Sources */,
+				9F98A7BE248EB25400E06AA4 /* PlacesService.swift in Sources */,
 				9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */,
-				9FFBAD62248E94CE00F66ADB /* Location.swift in Sources */,
 				9F2EB23A24961CEE008B2D4E /* Description.swift in Sources */,
 				9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */,
-				9FFBAD63248E94CE00F66ADB /* LocationProvider.swift in Sources */,
 				9FD61415248FB69500D6A41B /* ExifReader.swift in Sources */,
 				9FFBAD65248E975700F66ADB /* MapView.swift in Sources */,
 				F889751E234E01770014FCC8 /* EditDescription.swift in Sources */,
@@ -607,6 +609,7 @@
 				73BA6743260625FD001248EF /* StorableImage.swift in Sources */,
 				9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
+				734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */,
 				9F64984D2488F3EA00514BD3 /* ContactWidget.swift in Sources */,
 				F8EDCA82234CB8B7001E8D9C /* Widget.swift in Sources */,
 				7308C50E260B554800FE3333 /* UserDefaultsConfig.swift in Sources */,
@@ -620,6 +623,7 @@
 				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
 				9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */,
+				73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */,
 				7308C50A260B54BD00FE3333 /* RowType.swift in Sources */,
 				9FDB4633248FD868009E743A /* String+Builder.swift in Sources */,
 				9FA3AA7A2497A0AD002EDC7D /* MailContentView.swift in Sources */,
@@ -899,6 +903,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		73A715F2260CACFF00C88BCC /* XCRemoteSwiftPackageReference "composable-core-location" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/composable-core-location";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
 		73FC295A25F959100084BB4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -910,6 +922,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		73A715F3260CACFF00C88BCC /* ComposableCoreLocation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 73A715F2260CACFF00C88BCC /* XCRemoteSwiftPackageReference "composable-core-location" */;
+			productName = ComposableCoreLocation;
+		};
 		73FC295B25F959100084BB4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 73FC295A25F959100084BB4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
