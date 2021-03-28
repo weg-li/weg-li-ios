@@ -117,7 +117,10 @@ struct Description_Previews: PreviewProvider {
     static var previews: some View {
         EditDescription(
             store: .init(
-                initialState: .init(contact: .preview),
+                initialState: .init(
+                    contact: .preview,
+                    location: LocationViewState()
+                ),
                 reducer: .empty,
                 environment: ()
             )
