@@ -25,7 +25,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>weg-li möchte deine Kamera verwenden um ein Bild des Vorfalles aufzunehmen</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>weg-li will auf deinen Standort zugreifen.</string>
+	<string>weg-li will auf deinen Standort zugreifen um die Adresse deienr Anzeige zu bestimmen.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>weg-li braucht Zugiff auf deinen Fotos, damit du diese in der Anzeige hinzufügen kannst</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
