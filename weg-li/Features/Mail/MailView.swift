@@ -101,7 +101,7 @@ struct MailView: UIViewControllerRepresentable {
 
             \(contact.map { $0.firstName + $0.name } ?? "")
             """, isHTML: false)
-        report.storedPhotos.enumerated().forEach { index, image in
+        report.images.storedPhotos.enumerated().forEach { index, image in
             vc.addAttachmentData(
                 image.image,
                 mimeType: "image/jpeg",
