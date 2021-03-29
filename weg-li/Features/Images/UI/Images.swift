@@ -10,33 +10,58 @@ import ComposableArchitecture
 import SwiftUI
 
 
-struct Images: View {
-    struct ViewState: Equatable {
-        let photos: [UIImage]
-        
-        init(state: Report) {
-            self.photos = state.storedPhotos.compactMap { UIImage(data: $0.image)! }
-        }
-    }
-    
-    @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
+struct Images: View {    
+    @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
     
     init(store: Store<Report, ReportAction>) {
-        viewStore = ViewStore(store.scope(state: ViewState.init))
+        viewStore = ViewStore(
+            store.scope(
+                state: \.images,
+                action: { ReportAction.images($0) }
+            )
+        )
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20.0) {
             ScrollView(.horizontal) {
                 ImageGrid(
-                    images: viewStore.photos) { index in
-                        viewStore.send(.removePhoto(index: index))
+                    images: viewStore.storedPhotos.compactMap { $0.asUIImage }) { index in
+                    viewStore.send(.removePhoto(index: index))
+                }
+            }
+            importButton
+                .buttonStyle(EditButtonStyle())
+        }
+        .sheet(
+            isPresented: viewStore.binding(
+                get: \.showImagePicker,
+                send: { ImagesViewAction.setShowImagePicker($0) }
+            ),
+            content: {
+                ImagePicker(
+                    isPresented: viewStore.binding(
+                        get: \.showImagePicker,
+                        send: { ImagesViewAction.setShowImagePicker($0) }
+                    ),
+                    imagePickerHandler: { image, coordinate in
+                        viewStore.send(.addPhoto(image))
+                        viewStore.send(.setResolvedCoordinate(coordinate))
                     }
+                )
             }
-            ImagePickerButtons { image in
-                viewStore.send(.addPhoto(image))
+        )
+    }
+    
+    private var importButton: some View {
+        Button(action: {
+            viewStore.send(.setShowImagePicker(true))
+        }) {
+            HStack {
+                Image(systemName: "photo.fill.on.rectangle.fill")
+                Text("Foto importieren") // TODO: l18n
             }
-            .buttonStyle(EditButtonStyle())
+            .frame(maxWidth: .infinity)
         }
     }
 }
@@ -46,8 +71,9 @@ struct Images_Previews: PreviewProvider {
         Images(
             store: .init(
                 initialState: .init(
+                    images: .init(),
                     contact: ContactState.empty,
-                    location: LocationViewState()
+                    location: LocationViewState(storedPhotos: [])
                 ),
                 reducer: .empty,
                 environment: ()
