@@ -40,7 +40,7 @@ struct LocationView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 6.0) {
             Picker(
                 selection: viewStore.binding(
                     get: \.locationOption,
@@ -49,7 +49,7 @@ struct LocationView: View {
                 label: Text("")
             ) {
                 ForEach(LocationOption.allCases, id: \.self) { selection in
-                    Text(selection.rawValue).tag(selection)
+                    Text(selection.title).tag(selection)
                 }
             }.pickerStyle(SegmentedPickerStyle())
             ZStack(alignment: .topTrailing) {
@@ -67,9 +67,9 @@ struct LocationView: View {
             }
             addressView
         }
-        .alert(store.scope(
-                state: { $0.location.userLocationState.alert }),
-               dismiss: ReportAction.location(.dismissAlertButtonTapped)
+        .alert(
+            store.scope(state: { $0.location.userLocationState.alert }),
+            dismiss: ReportAction.location(.dismissAlertButtonTapped)
         )
         .onAppear { viewStore.send(.location(.onAppear)) }
     }
@@ -78,10 +78,13 @@ struct LocationView: View {
         if viewStore.showActivityIndicator {
             ActivityIndicator(style: .medium)
         } else {
-            Text("Standort: \(viewStore.address.humanReadableAddress)")
-                .lineLimit(nil)
-                .fixedSize(horizontal: true, vertical: false)
-                .font(.body)
+            HStack(spacing: 4) {
+                Image(systemName: "location.fill")
+                Text(viewStore.address.humanReadableAddress)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .font(.body)
         }
     }
     
@@ -111,10 +114,12 @@ struct Location_Previews: PreviewProvider {
         LocationView(
             store: .init(
                 initialState: .init(
+                    images: .init(),
                     contact: .preview,
                     location: LocationViewState(
-                        locationOption: .fromPhotos,
+                        locationOption: .fromPhotos(nil),
                         isMapExpanded: false,
+                        storedPhotos: [],
                         userLocationState: UserLocationState(
                             alert: nil,
                             isRequestingCurrentLocation: true,

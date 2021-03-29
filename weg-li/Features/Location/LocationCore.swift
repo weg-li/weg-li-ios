@@ -72,10 +72,7 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
     case let .didUpdateLocations(locations):
         state.isRequestingCurrentLocation = false
         guard let location = locations.first else { return .none }
-        state.region = CoordinateRegion(
-            center: location.coordinate,
-            span: MKCoordinateSpan(latitudeDelta: 5, longitudeDelta: 5)
-        )
+        state.region = CoordinateRegion(center: location.coordinate)
         return .none
     case let .didFailWithError(error):
         print(error.localizedDescription)
@@ -89,11 +86,11 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
 // MARK: - Location Core
 
 struct LocationViewState: Equatable, Codable {
-    var locationOption: LocationOption = .fromPhotos
+    var locationOption: LocationOption = .fromPhotos(nil)
     var isMapExpanded = false
-    
     var isResolvingAddress = false
     var resolvedAddress: GeoAddress = .init(address: .init())
+    var storedPhotos: [StorableImage]
     var userLocationState = UserLocationState()
     
     private enum CodingKeys: String, CodingKey {
@@ -101,6 +98,7 @@ struct LocationViewState: Equatable, Codable {
         case isMapExpanded
         case isResolvingAddress
         case resolvedAddress
+        case storedPhotos
     }
 }
 
@@ -112,6 +110,7 @@ enum LocationViewAction: Equatable {
     case setLocationOption(LocationOption)
     case updateRegion(CoordinateRegion?)
     case userLocationAction(LocationManager.Action)
+    case resolveLocation(CLLocationCoordinate2D)
     case resolveAddressFinished(Result<[GeoAddress], PlacesServiceImplementation.Error>)
 }
 
@@ -179,8 +178,6 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             
             switch value {
             case .fromPhotos:
-                // Call EXIF Reader
-                //     |--> Call PlacesService
                 return .none
             case .currentLocation:
                 return Effect(value: .locationRequested)
@@ -193,21 +190,21 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                 guard let region = state.userLocationState.region else {
                     return .none
                 }
-                
-                state.isResolvingAddress = true
-                
-                let clLocation = CLLocation(
-                    latitude: region.center.latitude,
-                    longitude: region.center.longitude
-                )
-                return environment.placeService
-                    .getPlacemarks(for: clLocation)
-                    .catchToEffect()
-                    .map(LocationViewAction.resolveAddressFinished)
-                    .cancellable(id: CancelSearchId(), cancelInFlight: true)
+                return Effect(value: LocationViewAction.resolveLocation(region.center))
             default:
                 return .none
             }
+        case let .resolveLocation(coordinate):
+            state.isResolvingAddress = true
+            let clLocation = CLLocation(
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude
+            )
+            return environment.placeService
+                .getPlacemarks(for: clLocation)
+                .catchToEffect()
+                .map(LocationViewAction.resolveAddressFinished)
+                .cancellable(id: CancelSearchId(), cancelInFlight: true)
         case let .resolveAddressFinished(.success(address)):
             state.isResolvingAddress = false
             state.resolvedAddress = address.first ?? .init(address: .init())
@@ -221,7 +218,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             return .none
         }
     }
-).debug()
+)
 
 // MARK: - Utils
 private extension LocationManager {
@@ -232,42 +229,5 @@ private extension LocationManager {
             distanceFilter: 100.0,
             showsBackgroundLocationIndicator: true
         )
-    }
-}
-
-
-enum LocationOption: String, Hashable, CaseIterable, Codable {
-    case fromPhotos = "Aus Fotos"
-    case currentLocation = "Standort"
-    case manual = "Manuell"
-}
-
-
-struct CoordinateRegion: Equatable {
-    var center: CLLocationCoordinate2D
-    var span: MKCoordinateSpan
-    
-    init(
-        center: CLLocationCoordinate2D,
-        span: MKCoordinateSpan
-    ) {
-        self.center = center
-        self.span = span
-    }
-    
-    init(coordinateRegion: MKCoordinateRegion) {
-        self.center = coordinateRegion.center
-        self.span = coordinateRegion.span
-    }
-    
-    var asMKCoordinateRegion: MKCoordinateRegion {
-        .init(center: self.center, span: self.span)
-    }
-    
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.center.latitude == rhs.center.latitude
-            && lhs.center.longitude == rhs.center.longitude
-            && lhs.span.latitudeDelta == rhs.span.latitudeDelta
-            && lhs.span.longitudeDelta == rhs.span.longitudeDelta
     }
 }
