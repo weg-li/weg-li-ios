@@ -120,8 +120,9 @@ struct Description_Previews: PreviewProvider {
         EditDescription(
             store: .init(
                 initialState: .init(
+                    images: .init(),
                     contact: .preview,
-                    location: LocationViewState()
+                    location: LocationViewState(storedPhotos: [])
                 ),
                 reducer: .empty,
                 environment: ()
