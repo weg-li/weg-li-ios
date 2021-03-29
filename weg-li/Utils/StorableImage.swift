@@ -18,4 +18,8 @@ struct StorableImage: Equatable, Codable {
         }
         image = data
     }
+    
+    var asUIImage: UIImage? {
+        UIImage(data: image)
+    }
 }
