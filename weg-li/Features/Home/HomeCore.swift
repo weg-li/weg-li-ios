@@ -46,8 +46,6 @@ struct HomeState: Equatable {
 // MARK: - AppAction
 typealias Address = CNPostalAddress
 
-extension Contacts.CNPostalAddress: Equatable {}
-
 enum HomeAction: Equatable {
     case contact(ContactAction)
     case report(ReportAction)
