@@ -17,7 +17,7 @@ struct ReportForm: View {
         let isLocationValid: Bool
         
         init(state: Report) {
-            isPhotosValid = !state.storedPhotos.isEmpty
+            isPhotosValid = !state.images.storedPhotos.isEmpty
             isContactValid = state.contact.isValid
             isDescriptionValid = state.isDescriptionValid
             isLocationValid = state.location.resolvedAddress.isValid
