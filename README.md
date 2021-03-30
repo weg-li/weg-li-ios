@@ -1,3 +1,4 @@
+[![CI](https://github.com/weg-li/weg-li-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/weg-li/weg-li-ios/actions/workflows/ci.yml)
 # 🚲 weg-li iOS App
 
 With [weg-li](https://www.weg-li.de) you can easily report wrong parking cars.  
