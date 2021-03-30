@@ -10,11 +10,11 @@ import Combine
 import CoreLocation
 
 protocol PlacesService {
-    func getPlacemarks(for location: CLLocation) -> Future<[GeoAddress], PlacesServiceImplementation.Error>
+    func getPlacemarks(for location: CLLocation) -> AnyPublisher<[GeoAddress], PlacesServiceImplementation.Error>
 }
 
 final class PlacesServiceImplementation: PlacesService {
-    func getPlacemarks(for location: CLLocation) -> Future<[GeoAddress], PlacesServiceImplementation.Error> {
+    func getPlacemarks(for location: CLLocation) -> AnyPublisher<[GeoAddress], PlacesServiceImplementation.Error> {
         Future<[GeoAddress], PlacesServiceImplementation.Error> { promise in
             CLGeocoder().reverseGeocodeLocation(location) { placemarks, error -> Void in
                 if error != nil {
@@ -32,6 +32,7 @@ final class PlacesServiceImplementation: PlacesService {
                 )
             }
         }
+        .eraseToAnyPublisher()
     }
 }
 
