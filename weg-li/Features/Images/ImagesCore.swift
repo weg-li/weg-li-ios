@@ -34,11 +34,11 @@ let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnviron
         state.showImagePicker = value
         return .none
     case let .addPhoto(photo):
-        let scaledImage = environment.imageConverter.scalePreservingAspectRatio(
-            image: photo,
-            targetSize: .init(width: 1000, height: 1000)
-        )
-        state.storedPhotos.append(StorableImage(uiImage: scaledImage)!)
+//        let scaledImage = environment.imageConverter.scalePreservingAspectRatio(
+//            image: photo,
+//            targetSize: .init(width: 1000, height: 1000)
+//        )
+        state.storedPhotos.append(StorableImage(uiImage: photo)!)
         return .none
     case let .removePhoto(index):
         state.storedPhotos.remove(at: index)
