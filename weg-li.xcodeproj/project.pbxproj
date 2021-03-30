@@ -13,6 +13,9 @@
 		7308C51C260B55C600FE3333 /* ImageGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C51A260B55C600FE3333 /* ImageGrid.swift */; };
 		7308C52D260B563B00FE3333 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C52C260B563B00FE3333 /* HomeView.swift */; };
 		7308C537260B5A1500FE3333 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C536260B5A1500FE3333 /* ReportView.swift */; };
+		731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A0B2612FBB40012FAAD /* GeoAddress.swift */; };
+		731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A122612FC160012FAAD /* PlacesServiceMock.swift */; };
+		731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */; };
 		734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734EFF0C2610A4D1001406F5 /* LocationView.swift */; };
 		7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388122D260BD2E2008B9956 /* CarStoreTests.swift */; };
 		73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73881236260BD4D5008B9956 /* ChargeStoreTests.swift */; };
@@ -83,6 +86,9 @@
 		7308C51A260B55C600FE3333 /* ImageGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageGrid.swift; sourceTree = "<group>"; };
 		7308C52C260B563B00FE3333 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7308C536260B5A1500FE3333 /* ReportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
+		731E5A0B2612FBB40012FAAD /* GeoAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAddress.swift; sourceTree = "<group>"; };
+		731E5A122612FC160012FAAD /* PlacesServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesServiceMock.swift; sourceTree = "<group>"; };
+		731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesStoreTests.swift; sourceTree = "<group>"; };
 		734EFF0C2610A4D1001406F5 /* LocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
 		7388122D260BD2E2008B9956 /* CarStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarStoreTests.swift; sourceTree = "<group>"; };
 		73881236260BD4D5008B9956 /* ChargeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeStoreTests.swift; sourceTree = "<group>"; };
@@ -194,6 +200,14 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
+		731E5A112612FC050012FAAD /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				731E5A122612FC160012FAAD /* PlacesServiceMock.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
 		73881231260BD491008B9956 /* Store */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,6 +216,7 @@
 				73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */,
 				73A715E6260C692800C88BCC /* HomeStoreTests.swift */,
 				7388123A260BD5BD008B9956 /* ReportStoreTests.swift */,
+				731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -260,8 +275,9 @@
 		9F971E8E247ABFCB00A68959 /* weg-liTests */ = {
 			isa = PBXGroup;
 			children = (
-				9F971E91247ABFCB00A68959 /* Info.plist */,
 				9F8575EE24B788BA000ABA01 /* weg-liTests-Bridging-Header.h */,
+				9F971E91247ABFCB00A68959 /* Info.plist */,
+				731E5A112612FC050012FAAD /* Mocks */,
 				73881231260BD491008B9956 /* Store */,
 			);
 			path = "weg-liTests";
@@ -327,6 +343,7 @@
 		9FB750A92487BCA600193948 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				F8347595234C61CF00244D6F /* Preview Content */,
 				F8347593234C61CF00244D6F /* Assets.xcassets */,
 				F834759B234C61CF00244D6F /* Info.plist */,
 				9FB5B12A2498BEAE00830770 /* JSON */,
@@ -340,19 +357,12 @@
 			children = (
 				F834758D234C61CE00244D6F /* AppDelegate.swift */,
 				F834758F234C61CE00244D6F /* SceneDelegate.swift */,
+				9FB750A92487BCA600193948 /* Resources */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
 		9FB750AB2487BD2D00193948 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				9FB750AC2487BD3B00193948 /* Components */,
-			);
-			path = UI;
-			sourceTree = "<group>";
-		};
-		9FB750AC2487BD3B00193948 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				9FFBAD66248E979200F66ADB /* ActivityIndicator.swift */,
@@ -363,7 +373,7 @@
 				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
 				9FA3AA792497A0AD002EDC7D /* MailContentView.swift */,
 			);
-			path = Components;
+			path = UI;
 			sourceTree = "<group>";
 		};
 		9FB750AE2487BEEC00193948 /* Extensions */ = {
@@ -389,6 +399,7 @@
 				9F98A7BD248EB25400E06AA4 /* PlacesService.swift */,
 				73D117CC261261C2000D7B82 /* LocationOption.swift */,
 				73D117D0261261DF000D7B82 /* CoordinateRegion.swift */,
+				731E5A0B2612FBB40012FAAD /* GeoAddress.swift */,
 			);
 			path = Location;
 			sourceTree = "<group>";
@@ -417,8 +428,6 @@
 			children = (
 				9FB750AA2487BCE600193948 /* App */,
 				9F73E8F424878B84002E22F4 /* Features */,
-				F8347595234C61CF00244D6F /* Preview Content */,
-				9FB750A92487BCA600193948 /* Resources */,
 				9FB750AB2487BD2D00193948 /* UI */,
 				9F9C4306248BAC3D00FF514B /* Utils */,
 			);
@@ -569,7 +578,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */,
+				731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */,
 				7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */,
+				731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */,
 				7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */,
 				73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */,
 				73A715E7260C692800C88BCC /* HomeStoreTests.swift in Sources */,
@@ -604,6 +615,7 @@
 				F8347590234C61CE00244D6F /* SceneDelegate.swift in Sources */,
 				9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */,
 				9F98A7C0248F38F100E06AA4 /* Binding+Additions.swift in Sources */,
+				731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */,
 				7308C51C260B55C600FE3333 /* ImageGrid.swift in Sources */,
 				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
@@ -657,7 +669,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BP8836JVQR;
 				INFOPLIST_FILE = "weg-liTests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -681,7 +693,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BP8836JVQR;
 				INFOPLIST_FILE = "weg-liTests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -820,11 +832,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 7;
-				DEVELOPMENT_ASSET_PATHS = "weg-li/Preview\\ Content";
+				DEVELOPMENT_ASSET_PATHS = "weg-li/App/Resources/Preview\\ Content";
 				DEVELOPMENT_TEAM = M3YVS85XC2;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "weg-li/Resources/Info.plist";
+				INFOPLIST_FILE = "weg-li/App/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -842,11 +854,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 7;
-				DEVELOPMENT_ASSET_PATHS = "weg-li/Preview\\ Content";
+				DEVELOPMENT_ASSET_PATHS = "weg-li/App/Resources/Preview\\ Content";
 				DEVELOPMENT_TEAM = M3YVS85XC2;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "weg-li/Resources/Info.plist";
+				INFOPLIST_FILE = "weg-li/App/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -46,25 +46,6 @@ struct GeoAddress: Hashable, Codable {
     }
 }
 
-extension GeoAddress {
-    init(address: Address) {
-        self.street = address.street
-        self.city = address.city
-        self.postalCode = address.postalCode
-    }
-    
-    var humanReadableAddress: String {
-        return String {
-            if !street.isEmpty {
-                street
-            }
-            postalCode
-            city
-        }
-    }
-
-}
-
 extension PlacesServiceImplementation {
     struct Error: Swift.Error, Equatable {
         init() {}
