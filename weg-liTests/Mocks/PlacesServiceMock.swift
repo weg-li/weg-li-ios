@@ -11,10 +11,16 @@ import Combine
 import CoreLocation
 
 struct PlacesServiceMock: PlacesService {
+    var subject: PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>
+    
+    init(getPlacesSubject: PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error> = .init()) {
+        self.subject = getPlacesSubject
+    }
+    
     /// Mock implementation that returns an empty array
-    func getPlacemarks(for location: CLLocation) -> Future<[GeoAddress], PlacesServiceImplementation.Error> {
-        return Future { promise in
-            promise(.success([]))
-        }
+    func getPlacemarks(for location: CLLocation) -> AnyPublisher<[GeoAddress], PlacesServiceImplementation.Error> {
+        return subject
+            .print(">>>")
+            .eraseToAnyPublisher()
     }
 }

@@ -16,6 +16,7 @@
 		731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A0B2612FBB40012FAAD /* GeoAddress.swift */; };
 		731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A122612FC160012FAAD /* PlacesServiceMock.swift */; };
 		731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */; };
+		731E5A2126130A130012FAAD /* LocationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A2026130A130012FAAD /* LocationStoreTests.swift */; };
 		734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734EFF0C2610A4D1001406F5 /* LocationView.swift */; };
 		7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388122D260BD2E2008B9956 /* CarStoreTests.swift */; };
 		73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73881236260BD4D5008B9956 /* ChargeStoreTests.swift */; };
@@ -89,6 +90,7 @@
 		731E5A0B2612FBB40012FAAD /* GeoAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAddress.swift; sourceTree = "<group>"; };
 		731E5A122612FC160012FAAD /* PlacesServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesServiceMock.swift; sourceTree = "<group>"; };
 		731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesStoreTests.swift; sourceTree = "<group>"; };
+		731E5A2026130A130012FAAD /* LocationStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStoreTests.swift; sourceTree = "<group>"; };
 		734EFF0C2610A4D1001406F5 /* LocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
 		7388122D260BD2E2008B9956 /* CarStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarStoreTests.swift; sourceTree = "<group>"; };
 		73881236260BD4D5008B9956 /* ChargeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeStoreTests.swift; sourceTree = "<group>"; };
@@ -217,6 +219,7 @@
 				73A715E6260C692800C88BCC /* HomeStoreTests.swift */,
 				7388123A260BD5BD008B9956 /* ReportStoreTests.swift */,
 				731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */,
+				731E5A2026130A130012FAAD /* LocationStoreTests.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -581,6 +584,7 @@
 				731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */,
 				7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */,
 				731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */,
+				731E5A2126130A130012FAAD /* LocationStoreTests.swift in Sources */,
 				7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */,
 				73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */,
 				73A715E7260C692800C88BCC /* HomeStoreTests.swift in Sources */,
