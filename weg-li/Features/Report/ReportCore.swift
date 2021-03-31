@@ -48,36 +48,6 @@ extension Report {
         
         var time: String { Times.allCases[selectedDuration].description }
     }
-}
-
-extension Report {
-    static var preview: Report {
-        Report(
-            uuid: UUID(),
-            images: .init(
-                showImagePicker: false,
-                storedPhotos: []
-            ),
-            contact: .preview,
-            district: District(
-                name: "Hamburg St. Pauli",
-                zipCode: "20099",
-                mail: "mail@stpauli.de"
-            ),
-            date: Date(),
-            car: Car(
-                color: "Gelb",
-                type: "Kleinbus",
-                licensePlateNumber: "HH-ST-PAULI"
-            ),
-            charge: Charge(
-                selectedDuration: 0,
-                selectedType: 0,
-                blockedOthers: false
-            ),
-            location: LocationViewState(storedPhotos: [])
-        )
-    }
     
     var isDescriptionValid: Bool {
         let isValid = ![car.type, car.color, car.licensePlateNumber]
@@ -205,5 +175,35 @@ let chargeReducer = Reducer<Report.Charge, ChargeAction, ChargeEnvironment> { st
     case let .selectDuraration(value):
         state.selectedDuration = value
         return .none
+    }
+}
+
+extension Report {
+    static var preview: Report {
+        Report(
+            uuid: UUID(),
+            images: .init(
+                showImagePicker: false,
+                storedPhotos: []
+            ),
+            contact: .preview,
+            district: District(
+                name: "Hamburg St. Pauli",
+                zipCode: "20099",
+                mail: "mail@stpauli.de"
+            ),
+            date: Date(),
+            car: Car(
+                color: "Gelb",
+                type: "Kleinbus",
+                licensePlateNumber: "HH-ST-PAULI"
+            ),
+            charge: Charge(
+                selectedDuration: 0,
+                selectedType: 0,
+                blockedOthers: false
+            ),
+            location: LocationViewState(storedPhotos: [])
+        )
     }
 }

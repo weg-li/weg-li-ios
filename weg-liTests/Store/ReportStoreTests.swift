@@ -7,8 +7,10 @@
 //
 
 @testable import weg_li
+import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
+import MapKit
 import XCTest
 
 class ReportStoreTests: XCTestCase {
@@ -151,6 +153,67 @@ class ReportStoreTests: XCTestCase {
             .send(.charge(.selectDuraration(duration))) {
                 $0.charge.selectedDuration = duration
             }
+        )
+    }
+    
+    func test_updateImages_shouldTriggerAddressResolve() {
+        let image = UIImage(systemName: "pencil")!
+        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
+        
+        let store = TestStore(
+            initialState: Report(
+                uuid: fixedUUID(),
+                images: ImagesViewState(
+                    showImagePicker: false,
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    resolvedLocation: nil
+                ),
+                contact: .empty,
+                district: nil,
+                date: fixedDate(),
+                car: Report.Car(
+                    color: "",
+                    type: "",
+                    licensePlateNumber: ""
+                ),
+                charge: .init(
+                    selectedDuration: 0,
+                    selectedType: 0,
+                    blockedOthers: false
+                )
+            ),
+            reducer: reportReducer,
+            environment: ReportEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock(
+                    getPlacesSubject: placesSubject
+                )
+            )
+        )
+        
+        let coordinate: CLLocationCoordinate2D = .zero
+        let expectedAddress = GeoAddress(
+            street: ContactState.preview.address.street,
+            city: ContactState.preview.address.city,
+            postalCode: ContactState.preview.address.postalCode
+        )
+        
+        store.assert(
+            .send(.images(.addPhoto(image))) {
+                $0.images.storedPhotos = [StorableImage(uiImage: image)!]
+            },
+            .send(.images(.setResolvedCoordinate(coordinate))) {
+                $0.location.userLocationState.region = CoordinateRegion(center: coordinate)
+            },
+            .receive(.location(.resolveLocation(coordinate))) {
+                $0.location.isResolvingAddress = true
+            },
+            .do { placesSubject.send([expectedAddress]) },
+            .receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+                $0.location.isResolvingAddress = false
+                $0.location.resolvedAddress = expectedAddress
+            },
+            .do { placesSubject.send(completion: .finished) }
         )
     }
 }
