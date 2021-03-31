@@ -15,6 +15,12 @@ struct ReportForm: View {
         let isContactValid: Bool
         let isDescriptionValid: Bool
         let isLocationValid: Bool
+        var allStatesAreValid: Bool {
+            isPhotosValid
+                && isContactValid
+                && isDescriptionValid
+                && isLocationValid
+        }
         
         init(state: Report) {
             isPhotosValid = !state.images.storedPhotos.isEmpty
@@ -57,8 +63,8 @@ struct ReportForm: View {
                     title: Text("Kontaktdaten"), // TODO: Replace with l18n
                     isCompleted: viewStore.isContactValid
                 ) { ContactWidget(store: store.scope(state: { $0.contact } )) }
-                MailContentView()
-                    .padding([.top, .bottom], 16)
+                MailContentView(store: store)
+                    .padding()
             }
         }
         .padding(.bottom)

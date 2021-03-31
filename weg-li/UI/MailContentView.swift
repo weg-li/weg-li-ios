@@ -6,38 +6,87 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
+import ComposableArchitecture
+import ComposableCoreLocation
 import MessageUI
 import SwiftUI
 
 struct MailContentView: View {
-    @State private var result: Result<MFMailComposeResult, Error>?
-    @State private var isShowingMailView = false
-
+    struct ViewState: Equatable {
+        let districtName: String
+        let isSubmitButtonDisabled: Bool
+        let isMailComposerPresented: Bool
+        
+        init(state: Report) {
+            self.districtName = state.district?.name ?? ""
+            self.isSubmitButtonDisabled = state.images.storedPhotos.isEmpty
+                && !state.contact.isValid
+                && !state.isDescriptionValid
+                && !state.location.resolvedAddress.isValid
+                && !MFMailComposeViewController.canSendMail()
+            self.isMailComposerPresented = state.mail.isShowing
+        }
+    }
+    
+    @ObservedObject private var viewStore: ViewStore<ViewState, MailViewAction>
+    let store: Store<Report, ReportAction>
+    
+    init(store: Store<Report, ReportAction>) {
+        self.store = store
+        viewStore = ViewStore(
+            store.scope(
+                state: ViewState.init,
+                action: ReportAction.mail
+            )
+        )
+    }
+    
     var body: some View {
-        EmptyView()
-//        VStack {
-//            if MFMailComposeViewController.canSendMail() {
-//                SubmitButton(state: .readyToSubmit(ordnungsamt: store.state.report.district?.name ?? "")) {
-//                    print(self.store.state.report)
-//                    self.isShowingMailView.toggle()
-//                }
-//            } else {
-//                Text("Auf diesem Gerät können leider keine E-Mails versendet werden!")
-//                    .foregroundColor(.red)
-//            }
-//            if result != nil {
-//                Text("Result: \(String(describing: result))")
-//                    .lineLimit(nil)
-//            } else {}
-//        }
-//        .sheet(isPresented: $isShowingMailView) {
-//            MailView(isShowing: self.$isShowingMailView, result: self.$result, report: self.store.state.report, contact: self.store.state.contact)
-//        }
+        VStack(spacing: 6) {
+            SubmitButton(
+                state: .readyToSubmit(ordnungsamt: viewStore.districtName),
+                disabled: viewStore.isSubmitButtonDisabled
+            ) {
+                viewStore.send(.setIsPresented(true))
+            }
+            .disabled(viewStore.isSubmitButtonDisabled)
+            VStack(spacing: 8) {
+                if !MFMailComposeViewController.canSendMail() {
+                    Text("Auf diesem Gerät können leider keine E-Mails versendet werden!")
+                }
+                if viewStore.isSubmitButtonDisabled {
+                    Text("Gib alle nötigen Daten an um die Anzeige zu versenden")
+                        .fontWeight(.semibold)
+                }
+            }
+            .foregroundColor(.red)
+            .font(.callout)
+            .multilineTextAlignment(.center)
+                
+        }
+        .sheet(isPresented: viewStore.binding(
+            get: \.isMailComposerPresented,
+            send: { MailViewAction.setIsPresented($0) }
+        )) {
+            MailView(store: store)
+        }
     }
 }
 
 struct MailContentView_Previews: PreviewProvider {
     static var previews: some View {
-        MailContentView()
+        MailContentView(
+            store: .init(
+                initialState: .init(
+                    images: .init(),
+                    contact: .preview
+                ),
+                reducer: reportReducer,
+                environment: ReportEnvironment(
+                    locationManager: LocationManager.unimplemented(),
+                    placeService: PlacesServiceImplementation()
+                )
+            )
+        )
     }
 }

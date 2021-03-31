@@ -8,22 +8,19 @@
 import Combine
 import Foundation
 
-struct District: Equatable, Codable {
-    let name: String
-    let zipCode: String
-    let mail: String
-    
+struct District: Equatable {
+    var name: String = ""
+    var zipCode: String = ""
+    var mail: String = ""
+}
+ 
+extension District: Codable {
     enum CodingKeys: String, CodingKey {
         case name = "ordnungsamt"
         case zipCode = "plz"
         case mail = "mail"
     }
     
-    init(name: String, zipCode: String, mail: String) {
-        self.name = name
-        self.zipCode = zipCode
-        self.mail = mail
-    }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
@@ -34,16 +31,23 @@ struct District: Equatable, Codable {
         }
         mail = try container.decode(String.self, forKey: .mail)
     }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(zipCode, forKey: .zipCode)
+        try container.encode(mail, forKey: .mail)
+    }
 }
 
 extension District {
     static let districts = Bundle.main.decode([District].self, from: "districts.json")
     
-    static func mapAddressToDistrict(_ address: Address) -> AnyPublisher<District?, Never> {
+    static func mapAddressToDistrict(_ address: GeoAddress) -> District? {
         let district = districts.first(where: { $0.name == address.city })
         guard district != nil else {
-            return Just(nil).eraseToAnyPublisher()
+            return nil
         }
-        return Just(district).eraseToAnyPublisher()
+        return district
     }
 }
