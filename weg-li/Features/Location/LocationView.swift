@@ -32,19 +32,24 @@ struct LocationView: View {
     }
     
     let store: Store<Report, ReportAction>
-    @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
+    @ObservedObject private var viewStore: ViewStore<ViewState, LocationViewAction>
     
     init(store: Store<Report, ReportAction>) {
         self.store = store
-        self.viewStore = ViewStore(store.scope(state: ViewState.init))
+        self.viewStore = ViewStore(
+            store.scope(
+                state: ViewState.init,
+                action: ReportAction.location
+            )
+        )
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6.0) {
+        VStack(alignment: .leading, spacing: 12.0) {
             Picker(
                 selection: viewStore.binding(
                     get: \.locationOption,
-                    send: { ReportAction.location(.setLocationOption($0)) }
+                    send: LocationViewAction.setLocationOption
                 ).animation(),
                 label: Text("")
             ) {
@@ -52,18 +57,53 @@ struct LocationView: View {
                     Text(selection.title).tag(selection)
                 }
             }.pickerStyle(SegmentedPickerStyle())
-            ZStack(alignment: .topTrailing) {
-                MapView(
-                    region: viewStore.binding(
-                        get: \.region,
-                        send: { ReportAction.location(.updateRegion($0)) }
-                    ),
-                    showsLocation: viewStore.locationOption == .currentLocation
-                )
-                .frame(height: viewStore.isMapExpanded ? 300 : 150)
-                expandMapButton
-                    .padding(4)
-                    .accessibility(label: Text("expand map"))
+            if LocationOption.manual == viewStore.locationOption {
+                VStack(spacing: 8) {
+                    TextField(
+                        "Straße + Hausnummer",
+                        text: viewStore.binding(
+                            get: \.address.street,
+                            send: LocationViewAction.updateGeoAddressStreet
+                        )
+                    )
+                    .keyboardType(RowType.street.keyboardType)
+                    .textContentType(RowType.street.textContentType)
+                    TextField(
+                        "PLZ",
+                        text: viewStore.binding(
+                            get: \.address.postalCode,
+                            send: LocationViewAction.updateGeoAddressPostalCode
+                        )
+                    )
+                    .keyboardType(RowType.zipCode.keyboardType)
+                    .textContentType(RowType.zipCode.textContentType)
+                    TextField(
+                        "Stadt",
+                        text: viewStore.binding(
+                            get: \.address.city,
+                            send: LocationViewAction.updateGeoAddressCity
+                        )
+                    )
+                    .keyboardType(RowType.town.keyboardType)
+                    .textContentType(RowType.town.textContentType)
+                    .disableAutocorrection(true)
+                }
+                .multilineTextAlignment(.leading)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            } else {
+                ZStack(alignment: .topTrailing) {
+                    MapView(
+                        region: viewStore.binding(
+                            get: \.region,
+                            send: LocationViewAction.updateRegion
+                        ),
+                        showsLocation: viewStore.locationOption == .currentLocation
+                    )
+                    .frame(height: viewStore.isMapExpanded ? 300 : 150)
+                    expandMapButton
+                        .padding(4)
+                        .accessibility(label: Text("expand map"))
+                }
             }
             addressView
         }
@@ -71,7 +111,7 @@ struct LocationView: View {
             store.scope(state: { $0.location.userLocationState.alert }),
             dismiss: ReportAction.location(.dismissAlertButtonTapped)
         )
-        .onAppear { viewStore.send(.location(.onAppear)) }
+        .onAppear { viewStore.send(.onAppear) }
     }
         
     @ViewBuilder private var addressView: some View {
@@ -91,7 +131,7 @@ struct LocationView: View {
     private var expandMapButton: some View {
         Button(action: {
             withAnimation {
-                viewStore.send(.location(.toggleMapExpanded))
+                viewStore.send(.toggleMapExpanded)
             }
         }, label: {
             Image(systemName: viewStore.isMapExpanded
@@ -117,7 +157,7 @@ struct Location_Previews: PreviewProvider {
                     images: .init(),
                     contact: .preview,
                     location: LocationViewState(
-                        locationOption: .fromPhotos(nil),
+                        locationOption: .manual,
                         isMapExpanded: false,
                         storedPhotos: [],
                         userLocationState: UserLocationState(

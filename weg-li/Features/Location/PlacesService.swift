@@ -37,9 +37,9 @@ final class PlacesServiceImplementation: PlacesService {
 }
 
 struct GeoAddress: Hashable, Codable {
-    let street: String
-    let city: String
-    let postalCode: String
+    var street: String
+    var city: String
+    var postalCode: String
     
     var isValid: Bool {
         return [street, city, postalCode,]

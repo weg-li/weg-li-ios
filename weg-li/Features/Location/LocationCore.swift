@@ -112,6 +112,9 @@ enum LocationViewAction: Equatable {
     case userLocationAction(LocationManager.Action)
     case resolveLocation(CLLocationCoordinate2D)
     case resolveAddressFinished(Result<[GeoAddress], PlacesServiceImplementation.Error>)
+    case updateGeoAddressStreet(String)
+    case updateGeoAddressCity(String)
+    case updateGeoAddressPostalCode(String)
 }
 
 struct LocationViewEnvironment {
@@ -215,6 +218,16 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             
         case let .updateRegion(region):
             state.userLocationState.region = region
+            return .none
+            
+        case let .updateGeoAddressStreet(street):
+            state.resolvedAddress.street = street
+            return .none
+        case let .updateGeoAddressCity(city):
+            state.resolvedAddress.city = city
+            return .none
+        case let .updateGeoAddressPostalCode(postalCode):
+            state.resolvedAddress.postalCode = postalCode
             return .none
         }
     }

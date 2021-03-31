@@ -196,4 +196,41 @@ class LocationStoreTests: XCTestCase {
             }
         )
     }
+    
+    func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() {
+        let store = TestStore(
+            initialState: LocationViewState(
+                locationOption: .manual,
+                isMapExpanded: false,
+                isResolvingAddress: false,
+                resolvedAddress: .init(address: .init()),
+                storedPhotos: [],
+                userLocationState: .init()
+            ),
+            reducer: locationReducer,
+            environment: LocationViewEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock()
+            )
+        )
+        
+        let newStreet = ContactState.preview.address.street
+        let newPostalCode = ContactState.preview.address.postalCode
+        let newCity = ContactState.preview.address.city
+        
+        store.assert(
+            .send(.updateGeoAddressStreet(newStreet)) {
+                $0.resolvedAddress.street = newStreet
+                XCTAssertFalse($0.resolvedAddress.isValid)
+            },
+            .send(.updateGeoAddressPostalCode(newPostalCode)) {
+                $0.resolvedAddress.postalCode = newPostalCode
+                XCTAssertFalse($0.resolvedAddress.isValid)
+            },
+            .send(.updateGeoAddressCity(newCity)) {
+                $0.resolvedAddress.city = newCity
+                XCTAssertTrue($0.resolvedAddress.isValid)
+            }
+        )
+    }
 }
