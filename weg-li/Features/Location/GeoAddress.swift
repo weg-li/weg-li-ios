@@ -16,13 +16,7 @@ extension GeoAddress {
     }
     
     var humanReadableAddress: String {
-        return String {
-            if !street.isEmpty {
-                street
-            }
-            postalCode
-            city
-        }
+        "\(street), \(postalCode) \(city)"
     }
 
 }
