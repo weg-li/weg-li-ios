@@ -7,18 +7,21 @@
 //
 
 import ComposableArchitecture
+import ComposableCoreLocation
 import SwiftUI
 
 // MARK: - Report Core
 struct Report: Codable {
     var uuid = UUID()
     var storedPhotos: [StorableImage] = []
+    var images: ImagesViewState
     var contact: ContactState
     var district: District?
     
     var date: Date = Date()
     var car = Car()
     var charge = Charge()
+    var location = LocationViewState(storedPhotos: [])
 }
 
 extension Report: Equatable {
@@ -27,7 +30,7 @@ extension Report: Equatable {
             && lhs.district == rhs.district
             && lhs.car == rhs.car
             && lhs.charge == rhs.charge
-        
+            && lhs.location == rhs.location
     }
 }
 
@@ -45,32 +48,6 @@ extension Report {
         
         var time: String { Times.allCases[selectedDuration].description }
     }
-}
-
-extension Report {
-    static var preview: Report {
-        Report(
-            uuid: UUID(),
-            storedPhotos: [],
-            contact: .preview,
-            district: District(
-                name: "Hamburg St. Pauli",
-                zipCode: "20099",
-                mail: "mail@stpauli.de"
-            ),
-            date: Date(),
-            car: Car(
-                color: "Gelb",
-                type: "Kleinbus",
-                licensePlateNumber: "HH-ST-PAULI"
-            ),
-            charge: Charge(
-                selectedDuration: 0,
-                selectedType: 0,
-                blockedOthers: false
-            )
-        )
-    }
     
     var isDescriptionValid: Bool {
         let isValid = ![car.type, car.color, car.licensePlateNumber]
@@ -85,17 +62,73 @@ extension Report.Charge {
     static let times = Times.allCases
 }
 
-
 enum ReportAction: Equatable {
-    case addPhoto(UIImage)
-    case removePhoto(index: Int)
+    case images(ImagesViewAction)
     case contact(ContactAction)
     case car(CarAction)
     case charge(ChargeAction)
+    case location(LocationViewAction)
     case viewAppeared
 }
 
-struct ReportEnvironment {}
+struct ReportEnvironment {
+    var locationManager: LocationManager
+    var placeService: PlacesService
+}
+
+/// Combined reducer that is used in the ReportView
+let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
+    imagesReducer.pullback(
+        state: \.images,
+        action: /ReportAction.images,
+        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }
+    ),
+    carReducer.pullback(
+        state: \.car,
+        action: /ReportAction.car,
+        environment: { _ in CarEnvironment() }
+    ),
+    chargeReducer.pullback(
+        state: \.charge,
+        action: /ReportAction.charge,
+        environment: { _ in ChargeEnvironment() }
+    ),
+    contactReducer.pullback(
+        state: \.contact,
+        action: /ReportAction.contact,
+        environment: { _ in ContactEnvironment() }
+    ),
+    locationReducer.pullback(
+        state: \.location,
+        action: /ReportAction.location,
+        environment: {
+            LocationViewEnvironment(
+                locationManager: $0.locationManager,
+                placeService: $0.placeService
+            )
+        }
+    ),
+    Reducer { state, action, environment in
+        struct LocationManagerId: Hashable {}
+        switch action {
+        case let .images(imageViewAction):
+            switch imageViewAction {
+            case let .setResolvedCoordinate(coordinate):
+                guard let coordinate = coordinate else {
+                    return .none
+                }
+                state.location.userLocationState.region = CoordinateRegion(center: coordinate)
+                return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
+            default:
+                return .none
+            }
+        case .viewAppeared:
+            return Effect(value: ReportAction.contact(.isContactValid))
+        case .contact, .car, .charge, .location:
+            return .none
+        }
+    }
+)
 
 // MARK: - Car Core
 enum CarAction: Equatable {
@@ -145,37 +178,32 @@ let chargeReducer = Reducer<Report.Charge, ChargeAction, ChargeEnvironment> { st
     }
 }
 
-// MARK: - reportReducer
-
-/// Combined reducer that is used in the ReportView
-let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
-    carReducer.pullback(
-        state: \.car,
-        action: /ReportAction.car,
-        environment: { _ in CarEnvironment() }
-    ),
-    chargeReducer.pullback(
-        state: \.charge,
-        action: /ReportAction.charge,
-        environment: { _ in ChargeEnvironment() }
-    ),
-    contactReducer.pullback(
-        state: \.contact,
-        action: /ReportAction.contact,
-        environment: { _ in ContactEnvironment() }
-    ),
-    Reducer { state, action, environment in
-        switch action {
-        case let .addPhoto(photo):
-            state.storedPhotos.append(StorableImage(uiImage: photo)!)
-            return .none
-        case let .removePhoto(index):
-            state.storedPhotos.remove(at: index)
-            return .none
-        case .contact, .car, .charge:
-            return .none
-        case .viewAppeared:
-            return Effect(value: ReportAction.contact(.isContactValid))
-        }
+extension Report {
+    static var preview: Report {
+        Report(
+            uuid: UUID(),
+            images: .init(
+                showImagePicker: false,
+                storedPhotos: []
+            ),
+            contact: .preview,
+            district: District(
+                name: "Hamburg St. Pauli",
+                zipCode: "20099",
+                mail: "mail@stpauli.de"
+            ),
+            date: Date(),
+            car: Car(
+                color: "Gelb",
+                type: "Kleinbus",
+                licensePlateNumber: "HH-ST-PAULI"
+            ),
+            charge: Charge(
+                selectedDuration: 0,
+                selectedType: 0,
+                blockedOthers: false
+            ),
+            location: LocationViewState(storedPhotos: [])
+        )
     }
-)
+}

@@ -14,11 +14,13 @@ struct ReportForm: View {
         let isPhotosValid: Bool
         let isContactValid: Bool
         let isDescriptionValid: Bool
+        let isLocationValid: Bool
         
         init(state: Report) {
-            isPhotosValid = !state.storedPhotos.isEmpty
+            isPhotosValid = !state.images.storedPhotos.isEmpty
             isContactValid = state.contact.isValid
             isDescriptionValid = state.isDescriptionValid
+            isLocationValid = state.location.resolvedAddress.isValid
         }
     }
     
@@ -35,21 +37,24 @@ struct ReportForm: View {
     var body: some View {
         ScrollView {
             VStack {
+                // Fotos
                 Widget(
                     title: Text("Fotos"), // TODO: Replace with l18n
                     isCompleted: viewStore.isPhotosValid
                 ) { Images(store: store) }
-                //                Widget(
-                //                    title: Text("Ort"),
-                //                    isCompleted: store.state.location.location != .zero) {
-                //                    Location()
-                //                }
+                // Ort
                 Widget(
-                    title: Text("Beschreibung"),
+                    title: Text("Ort"), // TODO: Replace with l18n
+                    isCompleted: viewStore.isLocationValid)
+                { LocationView(store: store) }
+                // Beschreibung
+                Widget(
+                    title: Text("Beschreibung"), // TODO: Replace with l18n
                     isCompleted: viewStore.isDescriptionValid
                 ) { Description(store: store) }
+                // Kontaktdaten
                 Widget(
-                    title: Text("Kontaktdaten"),
+                    title: Text("Kontaktdaten"), // TODO: Replace with l18n
                     isCompleted: viewStore.isContactValid
                 ) { ContactWidget(store: store.scope(state: { $0.contact } )) }
                 MailContentView()

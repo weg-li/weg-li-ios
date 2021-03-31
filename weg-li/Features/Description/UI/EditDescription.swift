@@ -17,7 +17,6 @@ struct EditDescription: View {
         let licensePlate: String
         let blockedOthers: Bool
         let charge: Report.Charge
-        let selectedCharge: Int
         
         init(state: Report) {
             self.report = state
@@ -26,10 +25,13 @@ struct EditDescription: View {
             self.licensePlate = state.car.licensePlateNumber
             self.blockedOthers = state.charge.blockedOthers
             self.charge = state.charge
-            self.selectedCharge = state.charge.selectedType
         }
         
-        func hash(into hasher: inout Hasher) {}
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(carType)
+            hasher.combine(carColor)
+            hasher.combine(licensePlate)
+        }
     }
     
     let store: Store<Report, ReportAction>
@@ -105,7 +107,7 @@ struct EditDescription: View {
             Spacer()
             ToggleButton(
                 isOn: viewStore.binding(
-                    get: \.blockedOthers,
+                    get: \.charge.blockedOthers,
                     send: { _ in ReportAction.charge(.toggleBlockedOthers) }
                 )
             ).animation(.easeIn(duration: 0.1))
@@ -117,7 +119,11 @@ struct Description_Previews: PreviewProvider {
     static var previews: some View {
         EditDescription(
             store: .init(
-                initialState: .init(contact: .preview),
+                initialState: .init(
+                    images: .init(),
+                    contact: .preview,
+                    location: LocationViewState(storedPhotos: [])
+                ),
                 reducer: .empty,
                 environment: ()
             )

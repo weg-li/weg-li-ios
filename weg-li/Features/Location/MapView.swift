@@ -11,44 +11,33 @@ import SwiftUI
 import UIKit
 
 struct MapView: UIViewRepresentable {
-    var center: CLLocationCoordinate2D
-    var annotations: [MKPointAnnotation]
+    @Binding var region: CoordinateRegion?
+    private let showsLocation: Bool
     
-    init(center: CLLocationCoordinate2D) {
-        self.center = center
-        
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = center
-        self.annotations = [annotation]
+    init(region: Binding<CoordinateRegion?>, showsLocation: Bool) {
+        self._region = region
+        self.showsLocation = showsLocation
     }
     
    func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
-        mapView.delegate = context.coordinator
+    let mapView = MKMapView(frame: .zero)
+        mapView.showsUserLocation = showsLocation
         return mapView
     }
     
+
     func updateUIView(_ view: MKMapView, context: Context) {
-        center(view, on: center)
-        syncAnnototations(in: view)
-        view.setNeedsLayout()
+        self.updateView(mapView: view, delegate: context.coordinator)
     }
-    
-    private func syncAnnototations(in view: MKMapView) {
-        if annotations.count != view.annotations.count {
-            view.removeAnnotations(view.annotations)
-            view.addAnnotations(annotations)
+        
+    private func updateView(mapView: MKMapView, delegate: MKMapViewDelegate) {
+        mapView.delegate = delegate
+        
+        mapView.showsUserLocation = showsLocation
+        
+        if let region = self.region {
+            mapView.setRegion(region.asMKCoordinateRegion, animated: true)
         }
-    }
-    
-    private func center(_ view: MKMapView, on coordinate: CLLocationCoordinate2D) {
-        let region = MKCoordinateRegion(
-            center: coordinate,
-            latitudinalMeters: 1000,
-            longitudinalMeters: 1000
-        )
-        let adjustedRegion = view.regionThatFits(region)
-        view.setRegion(adjustedRegion, animated: true)
     }
     
     func makeCoordinator() -> Coordinator {
@@ -62,7 +51,10 @@ struct MapView: UIViewRepresentable {
         }
                 
         func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
-            parent.center = mapView.centerCoordinate
+            parent.region = CoordinateRegion(
+                center: mapView.region.center,
+                span: mapView.region.span
+            )
         }
         
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -79,10 +71,8 @@ struct MapView: UIViewRepresentable {
     }
 }
 
-#if DEBUG
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
-        MapView(center: .zero)
+        MapView(region: .constant(nil), showsLocation: true)
     }
 }
-#endif

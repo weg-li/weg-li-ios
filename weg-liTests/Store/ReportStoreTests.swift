@@ -7,76 +7,15 @@
 //
 
 @testable import weg_li
+import Combine
 import ComposableArchitecture
+import ComposableCoreLocation
+import MapKit
 import XCTest
 
 class ReportStoreTests: XCTestCase {
     let fixedUUID = { UUID() }
     let fixedDate = { Date() }
-    
-    func test_addPhoto_shouldUpdateState() {
-        let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                storedPhotos: [],
-                contact: .empty,
-                district: nil,
-                date: fixedDate(),
-                car: .init(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""
-                ),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false
-                )
-            ),
-            reducer: reportReducer,
-            environment: ReportEnvironment()
-        )
-        
-        let image = UIImage(systemName: "pencil")!
-        store.assert(
-            .send(.addPhoto(image)) {
-                $0.storedPhotos = [
-                    StorableImage(uiImage: image)!
-                ]
-            }
-        )
-    }
-    
-    func test_removePhoto_shouldUpdateState() {
-        let image = UIImage(systemName: "pencil")!
-        let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                storedPhotos: [StorableImage(uiImage: image)!],
-                contact: .empty,
-                district: nil,
-                date: fixedDate(),
-                car: .init(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""
-                ),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false
-                )
-            ),
-            reducer: reportReducer,
-            environment: ReportEnvironment()
-        )
-        
-        store.assert(
-            .send(.removePhoto(index: 0)) {
-                $0.storedPhotos = []
-            }
-        )
-    }
     
     // MARK: - Reducer integration tests
     func test_updateContact_shouldUpdateState() {
@@ -84,7 +23,11 @@ class ReportStoreTests: XCTestCase {
         let store = TestStore(
             initialState: Report(
                 uuid: fixedUUID(),
-                storedPhotos: [StorableImage(uiImage: image)!],
+                images: ImagesViewState(
+                    showImagePicker: false,
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    resolvedLocation: nil
+                ),
                 contact: .preview,
                 district: nil,
                 date: fixedDate(),
@@ -100,7 +43,10 @@ class ReportStoreTests: XCTestCase {
                 )
             ),
             reducer: reportReducer,
-            environment: ReportEnvironment()
+            environment: ReportEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock()
+            )
         )
         
         let firstName = "BOB"
@@ -129,7 +75,11 @@ class ReportStoreTests: XCTestCase {
         let store = TestStore(
             initialState: Report(
                 uuid: fixedUUID(),
-                storedPhotos: [StorableImage(uiImage: image)!],
+                images: ImagesViewState(
+                    showImagePicker: false,
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    resolvedLocation: nil
+                ),
                 contact: .empty,
                 district: nil,
                 date: fixedDate(),
@@ -145,7 +95,10 @@ class ReportStoreTests: XCTestCase {
                 )
             ),
             reducer: reportReducer,
-            environment: ReportEnvironment()
+            environment: ReportEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock()
+            )
         )
         
         let color = "Red"
@@ -165,7 +118,11 @@ class ReportStoreTests: XCTestCase {
         let store = TestStore(
             initialState: Report(
                 uuid: fixedUUID(),
-                storedPhotos: [StorableImage(uiImage: image)!],
+                images: ImagesViewState(
+                    showImagePicker: false,
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    resolvedLocation: nil
+                ),
                 contact: .empty,
                 district: nil,
                 date: fixedDate(),
@@ -181,7 +138,10 @@ class ReportStoreTests: XCTestCase {
                 )
             ),
             reducer: reportReducer,
-            environment: ReportEnvironment()
+            environment: ReportEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock()
+            )
         )
         
         let duration = 42
@@ -193,6 +153,67 @@ class ReportStoreTests: XCTestCase {
             .send(.charge(.selectDuraration(duration))) {
                 $0.charge.selectedDuration = duration
             }
+        )
+    }
+    
+    func test_updateImages_shouldTriggerAddressResolve() {
+        let image = UIImage(systemName: "pencil")!
+        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
+        
+        let store = TestStore(
+            initialState: Report(
+                uuid: fixedUUID(),
+                images: ImagesViewState(
+                    showImagePicker: false,
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    resolvedLocation: nil
+                ),
+                contact: .empty,
+                district: nil,
+                date: fixedDate(),
+                car: Report.Car(
+                    color: "",
+                    type: "",
+                    licensePlateNumber: ""
+                ),
+                charge: .init(
+                    selectedDuration: 0,
+                    selectedType: 0,
+                    blockedOthers: false
+                )
+            ),
+            reducer: reportReducer,
+            environment: ReportEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock(
+                    getPlacesSubject: placesSubject
+                )
+            )
+        )
+        
+        let coordinate: CLLocationCoordinate2D = .zero
+        let expectedAddress = GeoAddress(
+            street: ContactState.preview.address.street,
+            city: ContactState.preview.address.city,
+            postalCode: ContactState.preview.address.postalCode
+        )
+        
+        store.assert(
+            .send(.images(.addPhoto(image))) {
+                $0.images.storedPhotos = [StorableImage(uiImage: image)!]
+            },
+            .send(.images(.setResolvedCoordinate(coordinate))) {
+                $0.location.userLocationState.region = CoordinateRegion(center: coordinate)
+            },
+            .receive(.location(.resolveLocation(coordinate))) {
+                $0.location.isResolvingAddress = true
+            },
+            .do { placesSubject.send([expectedAddress]) },
+            .receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+                $0.location.isResolvingAddress = false
+                $0.location.resolvedAddress = expectedAddress
+            },
+            .do { placesSubject.send(completion: .finished) }
         )
     }
 }

@@ -12,14 +12,15 @@ import Foundation
 import MapKit
 import UIKit
 import ComposableArchitecture
+import ComposableCoreLocation
 
 // MARK: - AppState
 struct HomeState: Equatable {
     /// Users contact data. Persistet on the device
-    var storedContact: ContactState = ContactState()
+    private var _storedContact = ContactState()
     var contact: ContactState {
-        get { storedContact }
-        set { storedContact = newValue }
+        get { _storedContact }
+        set { _storedContact = newValue }
     }
     /// Reports a user has sent
     var reports: [Report] {
@@ -28,26 +29,17 @@ struct HomeState: Equatable {
     }
     
     /// Holds a report that has not been stored or sent via mail
+    private var _storedReport: Report?
     var reportDraft: Report {
         get {
-            guard let report = UserDefaultsConfig.draftReport else {
-                return Report(contact: contact)
+            guard let report = _storedReport else {
+                return Report(images: .init(), contact: contact)
             }
             return report
         }
         set {
-            UserDefaultsConfig.draftReport = newValue
+            _storedReport = newValue
         }
-    }
-    var location: LocationState? = LocationState()
-}
-
-extension HomeState {
-    struct LocationState: Equatable {
-        var isAuthorized: Bool = false
-        var userDefinedLocation: CLLocationCoordinate2D?
-        var location: CLLocationCoordinate2D = CLLocationCoordinate2D()
-        var presumedAddress: Address?
     }
 }
 
@@ -81,7 +73,12 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         .pullback(
             state: \.reportDraft,
             action: /HomeAction.report,
-            environment: { _ in ReportEnvironment() }
+            environment: { _ in
+                ReportEnvironment(
+                    locationManager: LocationManager.live,
+                    placeService: PlacesServiceImplementation()
+                )
+            }
     ),
     contactReducer.pullback(
         state: \.contact,
@@ -100,10 +97,6 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
     }
 )
         
-
-
 extension HomeState {
-    static let preview = HomeState(
-        location: LocationState()
-    )
+    static let preview = HomeState()
 }
