@@ -27,8 +27,6 @@ struct ReportForm: View {
     private let store: Store<Report, ReportAction>
     @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
     
-    @State private var editDescription = false
-
     init(store: Store<Report, ReportAction>) {
         self.store = store
         viewStore = ViewStore(store.scope(state: ViewState.init))
@@ -41,24 +39,23 @@ struct ReportForm: View {
                 Widget(
                     title: Text("Fotos"), // TODO: Replace with l18n
                     isCompleted: viewStore.isPhotosValid
-                ) { Images(store: store) }
+                ) { ImagesView(store: store) }
                 // Ort
                 Widget(
                     title: Text("Ort"), // TODO: Replace with l18n
-                    isCompleted: viewStore.isLocationValid)
-                { LocationView(store: store) }
+                    isCompleted: viewStore.isLocationValid) { LocationView(store: store) }
                 // Beschreibung
                 Widget(
                     title: Text("Beschreibung"), // TODO: Replace with l18n
                     isCompleted: viewStore.isDescriptionValid
-                ) { Description(store: store) }
+                ) { DescriptionView(store: store) }
                 // Kontaktdaten
                 Widget(
                     title: Text("Kontaktdaten"), // TODO: Replace with l18n
                     isCompleted: viewStore.isContactValid
-                ) { ContactWidget(store: store.scope(state: { $0.contact } )) }
-                MailContentView()
-                    .padding([.top, .bottom], 16)
+                ) { ContactWidget(store: store.scope(state: { $0.contact })) }
+                MailContentView(store: store)
+                    .padding()
             }
         }
         .padding(.bottom)

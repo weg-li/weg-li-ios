@@ -41,6 +41,8 @@ struct HomeState: Equatable {
             _storedReport = newValue
         }
     }
+    
+    var showReportWizard = false
 }
 
 // MARK: - AppAction
@@ -49,6 +51,7 @@ typealias Address = CNPostalAddress
 enum HomeAction: Equatable {
     case contact(ContactAction)
     case report(ReportAction)
+    case showReportWizard(Bool)
 }
 
 // MARK: Location
@@ -76,7 +79,8 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             environment: { _ in
                 ReportEnvironment(
                     locationManager: LocationManager.live,
-                    placeService: PlacesServiceImplementation()
+                    placeService: PlacesServiceImplementation(),
+                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
                 )
             }
     ),
@@ -85,13 +89,29 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         action: /HomeAction.contact,
         environment: { _ in ContactEnvironment() }
     ),
-    Reducer { state, action, env in
+    Reducer { state, action, _ in
         switch action {
         case let .contact(contact):
             state.reportDraft.contact = state.contact
             return .none
         case let .report(reportAction):
+            if case let ReportAction.mail(.setMailResult(result)) = reportAction {
+                guard let mailComposerResult = result else {
+                    return .none
+                }
+                switch mailComposerResult {
+                case .sent:
+                    state.reports.append(state.reportDraft)
+                    // save draftReport to reports, set draft report nil, navigate back
+                    return Effect(value: HomeAction.showReportWizard(false))
+                default:
+                    return .none
+                }
+            }
             state.contact = state.reportDraft.contact
+            return .none
+        case let .showReportWizard(value):
+            state.showReportWizard = value
             return .none
         }
     }

@@ -16,7 +16,8 @@ extension GeoAddress {
     }
     
     var humanReadableAddress: String {
-        "\(street), \(postalCode) \(city)"
+        let allParameterAreNotEmpty = [street, postalCode, city].allSatisfy { !$0.isEmpty }
+        guard allParameterAreNotEmpty else { return "" }
+        return "\(street), \(postalCode) \(city)"
     }
-
 }

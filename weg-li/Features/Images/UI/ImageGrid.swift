@@ -30,7 +30,6 @@ struct ImageGrid: View {
                             .gridModifier
                             .frame(maxHeight: 200)
                     }
-                    
                 }
             }
         }
@@ -52,7 +51,7 @@ struct ImageGrid_Previews: PreviewProvider {
         ImageGrid(images: [
             UIImage(systemName: "book")!,
             UIImage(systemName: "book")!,
-            UIImage(systemName: "book")!,
+            UIImage(systemName: "book")!
         ], columnCount: 3) { index in
             print(index)
         }

@@ -10,18 +10,21 @@ import SwiftUI
 
 struct SubmitButtonStyle: ViewModifier {
     let color: Color
+    let disabled: Bool
     
     func body(content: Content) -> some View {
         content
             .padding()
             .foregroundColor(.white)
-            .background(color)
+            .frame(maxWidth: .infinity)
+            .background(disabled ? Color(.systemGray2) : color)
             .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
 struct ReadySubmitButton: View {
     let ordnungsamt: String
+    var disabled: Bool = false
     
     var body: some View {
         HStack {
@@ -31,7 +34,7 @@ struct ReadySubmitButton: View {
                 Text("Ordnungsamt \(ordnungsamt)").font(.caption)
             }
         }
-        .modifier(SubmitButtonStyle(color: .green))
+        .modifier(SubmitButtonStyle(color: .green, disabled: disabled))
     }
 }
 
@@ -43,7 +46,7 @@ struct MissingDataButton: View {
                 Text("Bitte gib alle nötigen Daten an").font(.headline)
             }
         }
-        .modifier(SubmitButtonStyle(color: .orange))
+        .modifier(SubmitButtonStyle(color: .orange, disabled: false))
     }
 }
 
@@ -56,12 +59,13 @@ struct UnsupportedLocationButton: View {
                 Text("Du kannst mithelfen auch Anzeigen an diesem Ort zu unterstützen. Bitte nimm Kontakt mit uns auf.").font(.caption)
             }
         }
-        .modifier(SubmitButtonStyle(color: .red))
+        .modifier(SubmitButtonStyle(color: .red, disabled: false))
     }
 }
 
 struct SubmitButton: View {
     let state: Status
+    var disabled: Bool = false
     let action: () -> Void
     
     enum Status {
@@ -78,9 +82,15 @@ struct SubmitButton: View {
             case .unsupportedLocation:
                 return AnyView(UnsupportedLocationButton())
             case .readyToSubmit(ordnungsamt: let ordnungsamt):
-                return AnyView(ReadySubmitButton(ordnungsamt: ordnungsamt))
+                return AnyView(
+                    ReadySubmitButton(
+                        ordnungsamt: ordnungsamt,
+                        disabled: disabled
+                    )
+                )
             }
         }
+        .frame(maxWidth: .infinity)
      }
 }
 
@@ -89,7 +99,8 @@ struct SubmitButton_Previews: PreviewProvider {
         VStack {
             UnsupportedLocationButton()
             MissingDataButton()
-            ReadySubmitButton(ordnungsamt: "Hamburg")
+            ReadySubmitButton(ordnungsamt: "Hamburg", disabled: true)
+            ReadySubmitButton(ordnungsamt: "Hamburg", disabled: false)
             SubmitButton(state: .unsupportedLocation) {
                 print("yes")
             }

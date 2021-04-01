@@ -9,7 +9,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct EditDescription: View {
+struct EditDescriptionView: View {
     struct ViewState: Equatable, Hashable {
         let report: Report
         let carType: String
@@ -49,21 +49,21 @@ struct EditDescription: View {
                     "Marke", // TODO: l18n
                     text: viewStore.binding(
                         get: \.carType,
-                        send:  { ReportAction.car(.type($0)) }
+                        send: { ReportAction.car(.type($0)) }
                     )
                 )
                 TextField(
                     "Farbe", // TODO: l18n
                     text: viewStore.binding(
                         get: \.carColor,
-                        send:  { ReportAction.car(.color($0)) }
+                        send: { ReportAction.car(.color($0)) }
                     )
                 )
                 TextField(
                     "Kennzeichen", // TODO: l18n
                     text: viewStore.binding(
                         get: \.licensePlate,
-                        send:  { ReportAction.car(.licensePlateNumber($0)) }
+                        send: { ReportAction.car(.licensePlateNumber($0)) }
                     )
                 )
             }
@@ -117,7 +117,7 @@ struct EditDescription: View {
 
 struct Description_Previews: PreviewProvider {
     static var previews: some View {
-        EditDescription(
+        EditDescriptionView(
             store: .init(
                 initialState: .init(
                     images: .init(),

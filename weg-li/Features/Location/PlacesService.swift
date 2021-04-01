@@ -27,7 +27,7 @@ final class PlacesServiceImplementation: PlacesService {
                     .success(
                         marks
                             .compactMap { $0.postalAddress }
-                            .map { GeoAddress.init(address: $0) }
+                            .map { GeoAddress(address: $0) }
                     )
                 )
             }
@@ -42,7 +42,7 @@ struct GeoAddress: Hashable, Codable {
     var postalCode: String
     
     var isValid: Bool {
-        return [street, city, postalCode,]
+        return [street, city, postalCode ]
             .allSatisfy { !$0.isEmpty }
     }
 }

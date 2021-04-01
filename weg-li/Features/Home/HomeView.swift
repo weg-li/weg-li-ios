@@ -28,7 +28,7 @@ struct HomeView: View {
                         Text(report.date.humandReadableDate) // TODO: Replace with saved reports
                     }
                 }
-                addReport
+                addReportButton
             }
             .navigationBarTitle("Anzeigen") // TODO: l18n
             .navigationBarItems(trailing: contactData)
@@ -47,19 +47,8 @@ struct HomeView: View {
         }
     }
     
-    private var addReport: some View {
-        var addButton: some View {
-            Text("+")
-                .font(.system(.largeTitle))
-                .frame(width: 70, height: 70)
-                .foregroundColor(Color(.label))
-                .accessibility(label: Text("Add Report"))
-                .background(Color(.systemGray))
-                .cornerRadius(35)
-                .padding()
-                .shadow(color: Color.black.opacity(0.3), radius: 3, x: 3, y: 3)
-        }
-        return VStack {
+    private var addReportButton: some View {
+        VStack {
             Spacer()
             HStack {
                 Spacer()
@@ -70,10 +59,26 @@ struct HomeView: View {
                             action: HomeAction.report
                         )
                     ),
+                    isActive: viewStore.binding(
+                        get: \.showReportWizard,
+                        send: HomeAction.showReportWizard
+                    ),
                     label: {
-                        addButton
+                        Button(
+                            action: { viewStore.send(.showReportWizard(true)) },
+                            label: {
+                                Text("+")
+                                    .font(.system(.largeTitle))
+                                    .frame(width: 70, height: 70)
+                                    .foregroundColor(Color(.label))
+                                    .accessibility(label: Text("Add Report"))
+                                    .background(Color(.systemGray))
+                                    .cornerRadius(35)
+                                    .padding()
+                                    .shadow(color: Color.black.opacity(0.3), radius: 3, x: 3, y: 3)
+                            }
+                        )
                     }
-                    
                 )
             }
         }
@@ -102,7 +107,7 @@ struct MainView_Previews: PreviewProvider {
                 environment: ()
             )
         )
-//        .preferredColorScheme(.dark)
-//        .environment(\.sizeCategory, .extraExtraLarge)
+        //        .preferredColorScheme(.dark)
+        //        .environment(\.sizeCategory, .extraExtraLarge)
     }
 }

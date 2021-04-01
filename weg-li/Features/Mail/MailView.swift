@@ -6,106 +6,76 @@
 //  Copyright © 2020 Stefan Trauth. All rights reserved.
 //
 
+import ComposableArchitecture
 import MessageUI
 import SwiftUI
 
 struct MailView: UIViewControllerRepresentable {
-    @Binding var isShowing: Bool
-    @Binding var result: Result<MFMailComposeResult, Error>?
+    @ObservedObject private var viewStore: ViewStore<MailViewState, MailViewAction>
     
-    let report: Report
-    let contact: ContactState?
+    init(store: Store<Report, ReportAction>) {
+        viewStore = ViewStore(
+            store.scope(
+                state: \.mail,
+                action: ReportAction.mail
+            )
+        )
+    }
     
     class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
-        @Binding var isShowing: Bool
-        @Binding var result: Result<MFMailComposeResult, Error>?
+        @Binding private var isShowing: Bool
+        @Binding private var result: MFMailComposeResult?
+        
+        private let mail: Mail
         
         init(isShowing: Binding<Bool>,
-             result: Binding<Result<MFMailComposeResult, Error>?>, report: Report, contact: ContactState?) {
+             result: Binding<MFMailComposeResult?>,
+             mail: Mail
+        ) {
             _isShowing = isShowing
             _result = result
+            self.mail = mail
         }
         
         func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
-            error: Error?) {
-            defer {
-                isShowing = false
-            }
+            error: Error?
+        ) {
+            defer { isShowing = false }
             guard error == nil else {
-                self.result = .failure(error!)
+                self.result = .failed
                 return
             }
-            self.result = .success(result)
+            self.result = .sent
         }
     }
     
     func makeCoordinator() -> Coordinator {
         Coordinator(
-            isShowing: $isShowing,
-            result: $result,
-            report: report,
-            contact: contact)
+            isShowing: viewStore.binding(
+                get: \.isPresentingMailContent,
+                send: MailViewAction.presentMailContentView
+            ),
+            result: viewStore.binding(
+                get: \.mailComposeResult,
+                send: MailViewAction.setMailResult
+            ),
+            mail: viewStore.mail
+        )
     }
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
-        vc.setToRecipients([report.district?.mail ?? ""])
-        vc.setSubject("Anzeige mit der Bitte um Weiterverfolgung")
-        vc.setMessageBody(
-            """
-            Sehr geehrte Damen und Herren,
-
-            
-            hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
-
-            Kennzeichen: \(report.car.licensePlateNumber)
-
-            Marke: \(report.car.type)
-
-            Farbe: \(report.car.color)
-
-            Adresse: \(report.contact.address.humanReadableAddress)
-
-            Verstoß: \(Report.Charge.charges[report.charge.selectedType])
-
-            Tatzeit: \(report.date.humandReadableDate)
-
-            Zeitraum: 12:25 ~ 15:25 \(report.charge.time)
-
-            Das Fahrzeug war verlassen.
-
-
-            Zeuge:
-
-            Name: \(contact.map { $0.firstName + $0.name } ?? "")
-
-            Anschrift: \(contact.map { $0.address.humanReadableAddress } ?? "")
-
-            Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
-            Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
-            Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
-
-
-            Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
-            Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.
-
-
-            Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser E-Mail durch eine Antwort.
-            Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine E-Mail weiter und setzen mich dabei in CC.
-            Dabei dürfen Sie auch meine persönlichen Daten weiterleiten und für die Dauer des Verfahrens speichern.
-
-
-            Mit freundlichen Grüßen
-
-            \(contact.map { $0.firstName + $0.name } ?? "")
-            """, isHTML: false)
-        report.images.storedPhotos.enumerated().forEach { index, image in
+        vc.setToRecipients([viewStore.mail.address])
+        vc.setSubject(viewStore.mail.subject)
+        vc.setMessageBody(viewStore.mail.body, isHTML: false)
+        viewStore.mail.attachmentData.enumerated().forEach { index, data in
             vc.addAttachmentData(
-                image.image,
+                data,
                 mimeType: "image/jpeg",
-                fileName: "\(report.car)_\(index)")
+                fileName: "Anhang-\(index + 1)"
+            )
         }
         vc.mailComposeDelegate = context.coordinator
         return vc

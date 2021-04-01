@@ -9,7 +9,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct Description: View {
+struct DescriptionView: View {
     struct ViewState: Equatable {
         let report: Report
         let chargeType: String
@@ -49,7 +49,7 @@ struct Description: View {
                 }
             }
             NavigationLink(
-                destination: EditDescription(store: store),
+                destination: EditDescriptionView(store: store),
                 label: {
                     HStack {
                         Image(systemName: "pencil")
@@ -80,7 +80,7 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
         Widget(
             title: Text("Beschreibung"),
             isCompleted: true) {
-            Description(
+            DescriptionView(
                 store: .init(
                     initialState: Report(
                         images: ImagesViewState(),

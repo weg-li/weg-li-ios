@@ -8,12 +8,12 @@
 
 import ComposableArchitecture
 import ComposableCoreLocation
+import MessageUI
 import SwiftUI
 
 // MARK: - Report Core
 struct Report: Codable {
     var uuid = UUID()
-    var storedPhotos: [StorableImage] = []
     var images: ImagesViewState
     var contact: ContactState
     var district: District?
@@ -22,6 +22,7 @@ struct Report: Codable {
     var car = Car()
     var charge = Charge()
     var location = LocationViewState(storedPhotos: [])
+    var mail = MailViewState()
 }
 
 extension Report: Equatable {
@@ -50,10 +51,12 @@ extension Report {
     }
     
     var isDescriptionValid: Bool {
-        let isValid = ![car.type, car.color, car.licensePlateNumber]
-            .map { $0.isEmpty }
-            .contains(true)
-        return isValid
+        return [
+            car.type,
+            car.color,
+            car.licensePlateNumber
+        ]
+        .allSatisfy { !$0.isEmpty }
     }
 }
 
@@ -68,12 +71,14 @@ enum ReportAction: Equatable {
     case car(CarAction)
     case charge(ChargeAction)
     case location(LocationViewAction)
+    case mail(MailViewAction)
     case viewAppeared
 }
 
 struct ReportEnvironment {
     var locationManager: LocationManager
     var placeService: PlacesService
+    var regulatoryOfficeMapper: RegulatoryOfficeMapper
 }
 
 /// Combined reducer that is used in the ReportView
@@ -108,6 +113,11 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             )
         }
     ),
+    mailViewReducer.pullback(
+        state: \.mail,
+        action: /ReportAction.mail,
+        environment: { _ in MailViewEnvironment() }
+    ),
     Reducer { state, action, environment in
         struct LocationManagerId: Hashable {}
         switch action {
@@ -124,6 +134,19 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             }
         case .viewAppeared:
             return Effect(value: ReportAction.contact(.isContactValid))
+        case let .mail(mailAction):
+            if MailViewAction.submitButtonTapped == mailAction {
+                let district = environment
+                    .regulatoryOfficeMapper
+                    .mapAddressToDistrict(state.location.resolvedAddress) ?? District()
+                state.mail.district = district
+                state.mail.mail.address = district.mail
+                state.mail.mail.body = state.createMailBody()
+                state.mail.mail.attachmentData = state.images.storedPhotos.map(\.image)
+                return Effect(value: ReportAction.mail(.presentMailContentView(true)))
+            } else {
+                return .none
+            }
         case .contact, .car, .charge, .location:
             return .none
         }
@@ -179,6 +202,56 @@ let chargeReducer = Reducer<Report.Charge, ChargeAction, ChargeEnvironment> { st
 }
 
 extension Report {
+    func createMailBody() -> String {
+        return """
+        Sehr geehrte Damen und Herren,
+
+
+        hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
+
+        Kennzeichen: \(car.licensePlateNumber)
+
+        Marke: \(car.type)
+
+        Farbe: \(car.color)
+
+        Adresse: \(contact.address.humanReadableAddress)
+
+        Verstoß: \(Report.Charge.charges[charge.selectedType])
+
+        Tatzeit: \(date.humandReadableDate)
+
+        Zeitraum: \(charge.time)
+
+        Das Fahrzeug war verlassen.
+
+
+        Zeuge:
+
+        Name: \(contact.firstName) \(contact.name)
+
+        Anschrift: \(contact.address.humanReadableAddress)
+
+        Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
+        Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
+        Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
+
+
+        Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
+        Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.
+
+
+        Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser E-Mail durch eine Antwort.
+        Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine E-Mail weiter und setzen mich dabei in CC.
+        Dabei dürfen Sie auch meine persönlichen Daten weiterleiten und für die Dauer des Verfahrens speichern.
+
+
+        Mit freundlichen Grüßen
+
+        \(contact.firstName) \(contact.name)
+        """
+    }
+    
     static var preview: Report {
         Report(
             uuid: UUID(),
