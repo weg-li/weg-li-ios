@@ -46,6 +46,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock()
+                , regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
             )
         )
         
@@ -97,7 +98,8 @@ class ReportStoreTests: XCTestCase {
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock()
+                placeService: PlacesServiceMock(),
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
             )
         )
         
@@ -140,7 +142,8 @@ class ReportStoreTests: XCTestCase {
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock()
+                placeService: PlacesServiceMock(),
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
             )
         )
         
@@ -185,9 +188,8 @@ class ReportStoreTests: XCTestCase {
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock(
-                    getPlacesSubject: placesSubject
-                )
+                placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
             )
         )
         
@@ -214,6 +216,60 @@ class ReportStoreTests: XCTestCase {
                 $0.location.resolvedAddress = expectedAddress
             },
             .do { placesSubject.send(completion: .finished) }
+        )
+    }
+    
+    func test_submitButtonTap_createsMail_andPresentsMailView() {
+        let image = UIImage(systemName: "pencil")!
+        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
+        
+        let store = TestStore(
+            initialState: Report(
+                uuid: fixedUUID(),
+                images: ImagesViewState(
+                    showImagePicker: false,
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    resolvedLocation: nil
+                ),
+                contact: .empty,
+                district: nil,
+                date: fixedDate(),
+                car: Report.Car(
+                    color: "",
+                    type: "",
+                    licensePlateNumber: ""
+                ),
+                charge: .init(
+                    selectedDuration: 0,
+                    selectedType: 0,
+                    blockedOthers: false
+                ),
+                location: LocationViewState(
+                    locationOption: .currentLocation,
+                    isMapExpanded: false,
+                    isResolvingAddress: false,
+                    resolvedAddress: .init(
+                        street: Report.preview.contact.address.street,
+                        city: Report.preview.contact.address.city,
+                        postalCode: Report.preview.contact.address.postalCode
+                    ),
+                    storedPhotos: [StorableImage(uiImage: image)!],
+                    userLocationState: .init()
+                )
+            ),
+            reducer: reportReducer,
+            environment: ReportEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+            )
+        )
+        
+        store.assert(
+            .send(ReportAction.mail(.submitButtonTapped)),
+            .receive(ReportAction.mail(.presentMailContentView(true))) {
+                $0.mail.isPresentingMailContent = false
+            }
         )
     }
 }
