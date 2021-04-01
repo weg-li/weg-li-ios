@@ -14,7 +14,6 @@ import SwiftUI
 // MARK: - Report Core
 struct Report: Codable {
     var uuid = UUID()
-    var storedPhotos: [StorableImage] = []
     var images: ImagesViewState
     var contact: ContactState
     var district: District?
@@ -72,12 +71,12 @@ enum ReportAction: Equatable {
     case location(LocationViewAction)
     case mail(MailViewAction)
     case viewAppeared
-    case createMail
 }
 
 struct ReportEnvironment {
     var locationManager: LocationManager
     var placeService: PlacesService
+    var regulatoryOfficeMapper: RegulatoryOfficeMapper
 }
 
 /// Combined reducer that is used in the ReportView
@@ -117,7 +116,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         action: /ReportAction.mail,
         environment: { _ in MailViewEnvironment() }
     ),
-    Reducer { state, action, _ in
+    Reducer { state, action, environment in
         struct LocationManagerId: Hashable {}
         switch action {
         case let .images(imageViewAction):
@@ -133,13 +132,20 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             }
         case .viewAppeared:
             return Effect(value: ReportAction.contact(.isContactValid))
-        case .createMail:
-            let district = District.mapAddressToDistrict(state.location.resolvedAddress) ?? District()
-            state.mail.district = district
-            state.mail.mail.address = district.mail
-            state.mail.mail.body = state.createMailBody()
-            return .none
-        case .contact, .car, .charge, .location, .mail:
+        case let .mail(mailAction):
+            if MailViewAction.submitButtonTapped == mailAction {
+                let district = environment
+                    .regulatoryOfficeMapper
+                    .mapAddressToDistrict(state.location.resolvedAddress) ?? District()
+                state.mail.district = district
+                state.mail.mail.address = district.mail
+                state.mail.mail.body = state.createMailBody()
+                state.mail.mail.attachmentData = state.images.storedPhotos.map(\.image)
+                return Effect(value: ReportAction.mail(.presentMailContentView(true)))
+            } else {
+                return .none
+            }
+        case .contact, .car, .charge, .location:
             return .none
         }
     }
