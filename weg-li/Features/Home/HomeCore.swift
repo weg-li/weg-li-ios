@@ -79,7 +79,8 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             environment: { _ in
                 ReportEnvironment(
                     locationManager: LocationManager.live,
-                    placeService: PlacesServiceImplementation()
+                    placeService: PlacesServiceImplementation(),
+                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
                 )
             }
     ),

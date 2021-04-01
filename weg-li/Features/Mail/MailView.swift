@@ -54,8 +54,8 @@ struct MailView: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(
             isShowing: viewStore.binding(
-                get: \.isShowing,
-                send: MailViewAction.setIsPresented
+                get: \.isPresentingMailContent,
+                send: MailViewAction.presentMailContentView
             ),
             result: viewStore.binding(
                 get: \.mailComposeResult,

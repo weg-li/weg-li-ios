@@ -28,6 +28,10 @@
 		73A715F4260CACFF00C88BCC /* ComposableCoreLocation in Frameworks */ = {isa = PBXBuildFile; productRef = 73A715F3260CACFF00C88BCC /* ComposableCoreLocation */; };
 		73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715F7260CB14E00C88BCC /* LocationCore.swift */; };
 		73BA6743260625FD001248EF /* StorableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA6742260625FD001248EF /* StorableImage.swift */; };
+		73C5440A2616602000A40639 /* RegulatoryOfficeMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */; };
+		73C5440E2616605900A40639 /* DistrictRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C5440D2616605900A40639 /* DistrictRepository.swift */; };
+		73C54414261661AE00A40639 /* DistrictRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C54413261661AE00A40639 /* DistrictRepositoryMock.swift */; };
+		73C544182616627E00A40639 /* MailStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544172616627E00A40639 /* MailStoreTests.swift */; };
 		73D117B92611CC71000D7B82 /* ImageConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117B82611CC71000D7B82 /* ImageConverter.swift */; };
 		73D117C52611DD94000D7B82 /* ImagesCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117C42611DD94000D7B82 /* ImagesCore.swift */; };
 		73D117CD261261C2000D7B82 /* LocationOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117CC261261C2000D7B82 /* LocationOption.swift */; };
@@ -103,6 +107,10 @@
 		73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactStoreTests.swift; sourceTree = "<group>"; };
 		73A715F7260CB14E00C88BCC /* LocationCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCore.swift; sourceTree = "<group>"; };
 		73BA6742260625FD001248EF /* StorableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorableImage.swift; sourceTree = "<group>"; };
+		73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegulatoryOfficeMapper.swift; sourceTree = "<group>"; };
+		73C5440D2616605900A40639 /* DistrictRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictRepository.swift; sourceTree = "<group>"; };
+		73C54413261661AE00A40639 /* DistrictRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictRepositoryMock.swift; sourceTree = "<group>"; };
+		73C544172616627E00A40639 /* MailStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailStoreTests.swift; sourceTree = "<group>"; };
 		73D117B82611CC71000D7B82 /* ImageConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConverter.swift; sourceTree = "<group>"; };
 		73D117C42611DD94000D7B82 /* ImagesCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesCore.swift; sourceTree = "<group>"; };
 		73D117CC261261C2000D7B82 /* LocationOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationOption.swift; sourceTree = "<group>"; };
@@ -193,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				731E5A122612FC160012FAAD /* PlacesServiceMock.swift */,
+				73C54413261661AE00A40639 /* DistrictRepositoryMock.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -207,6 +216,7 @@
 				7388123A260BD5BD008B9956 /* ReportStoreTests.swift */,
 				731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */,
 				731E5A2026130A130012FAAD /* LocationStoreTests.swift */,
+				73C544172616627E00A40639 /* MailStoreTests.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -286,13 +296,15 @@
 		9F9C4306248BAC3D00FF514B /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				9F73E8F924878D91002E22F4 /* ImageDataStore.swift */,
-				9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */,
-				9FB750AE2487BEEC00193948 /* Extensions */,
-				73BA6742260625FD001248EF /* StorableImage.swift */,
-				7308C509260B54BD00FE3333 /* RowType.swift */,
-				7308C50D260B554800FE3333 /* UserDefaultsConfig.swift */,
+				73C5440D2616605900A40639 /* DistrictRepository.swift */,
 				73D117B82611CC71000D7B82 /* ImageConverter.swift */,
+				9F73E8F924878D91002E22F4 /* ImageDataStore.swift */,
+				73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */,
+				7308C509260B54BD00FE3333 /* RowType.swift */,
+				73BA6742260625FD001248EF /* StorableImage.swift */,
+				9FB750A72487B16D00193948 /* UserDefault+PropertyWrapper.swift */,
+				7308C50D260B554800FE3333 /* UserDefaultsConfig.swift */,
+				9FB750AE2487BEEC00193948 /* Extensions */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -319,6 +331,7 @@
 			children = (
 				9FA3AA7724979ED6002EDC7D /* MailView.swift */,
 				7335096C2614A34300D2FEA8 /* MailCore.swift */,
+				9FA3AA792497A0AD002EDC7D /* MailContentView.swift */,
 				9FB5B13D2499DC3200830770 /* Model */,
 			);
 			path = Mail;
@@ -374,7 +387,6 @@
 				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
 				9F0C270924977943001B1908 /* ToggleButton.swift */,
 				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
-				9FA3AA792497A0AD002EDC7D /* MailContentView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -580,6 +592,8 @@
 			files = (
 				73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */,
 				731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */,
+				73C544182616627E00A40639 /* MailStoreTests.swift in Sources */,
+				73C54414261661AE00A40639 /* DistrictRepositoryMock.swift in Sources */,
 				7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */,
 				731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */,
 				731E5A2126130A130012FAAD /* LocationStoreTests.swift in Sources */,
@@ -601,6 +615,7 @@
 				9F73E8FD24878D91002E22F4 /* ImageDataStore.swift in Sources */,
 				9F2EB23A24961CEE008B2D4E /* DescriptionView.swift in Sources */,
 				9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */,
+				73C5440E2616605900A40639 /* DistrictRepository.swift in Sources */,
 				9FFBAD65248E975700F66ADB /* MapView.swift in Sources */,
 				F889751E234E01770014FCC8 /* EditDescriptionView.swift in Sources */,
 				9FB750A82487B16D00193948 /* UserDefault+PropertyWrapper.swift in Sources */,
@@ -631,6 +646,7 @@
 				9FA3AA7A2497A0AD002EDC7D /* MailContentView.swift in Sources */,
 				73D117CD261261C2000D7B82 /* LocationOption.swift in Sources */,
 				9F9C430B248E24BD00FF514B /* HomeCore.swift in Sources */,
+				73C5440A2616602000A40639 /* RegulatoryOfficeMapper.swift in Sources */,
 				9FA3AA7824979ED6002EDC7D /* MailView.swift in Sources */,
 				9FB5B12F2498C2C100830770 /* Time.swift in Sources */,
 				7308C52D260B563B00FE3333 /* HomeView.swift in Sources */,

@@ -24,7 +24,7 @@ struct MailContentView: View {
                 && !state.isDescriptionValid
                 && !state.location.resolvedAddress.isValid
                 && !MFMailComposeViewController.canSendMail()
-            self.isMailComposerPresented = state.mail.isShowing
+            self.isMailComposerPresented = state.mail.isPresentingMailContent
         }
     }
     
@@ -47,7 +47,7 @@ struct MailContentView: View {
                 state: .readyToSubmit(ordnungsamt: viewStore.districtName),
                 disabled: viewStore.isSubmitButtonDisabled
             ) {
-                viewStore.send(.setIsPresented(true))
+                viewStore.send(.submitButtonTapped)
             }
             .disabled(viewStore.isSubmitButtonDisabled)
             VStack(spacing: 8) {
@@ -65,7 +65,7 @@ struct MailContentView: View {
         }
         .sheet(isPresented: viewStore.binding(
             get: \.isMailComposerPresented,
-            send: { MailViewAction.setIsPresented($0) }
+            send: MailViewAction.presentMailContentView
         )) {
             MailView(store: store)
         }
@@ -83,7 +83,8 @@ struct MailContentView_Previews: PreviewProvider {
                 reducer: reportReducer,
                 environment: ReportEnvironment(
                     locationManager: LocationManager.unimplemented(),
-                    placeService: PlacesServiceImplementation()
+                    placeService: PlacesServiceImplementation(),
+                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
                 )
             )
         )

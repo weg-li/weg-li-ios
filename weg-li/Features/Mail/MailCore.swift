@@ -12,8 +12,29 @@ import MessageUI
 struct MailViewState: Equatable {
     var mailComposeResult: MFMailComposeResult?
     var mail: Mail = Mail()
-    var isShowing = false
+    var isPresentingMailContent = false
     var district: District = .init(name: "", zipCode: "", mail: "")
+}
+
+enum MailViewAction: Equatable {
+    case submitButtonTapped
+    case presentMailContentView(Bool)
+    case setMailResult(MFMailComposeResult?)
+}
+
+struct MailViewEnvironment {}
+
+let mailViewReducer = Reducer<MailViewState, MailViewAction, MailViewEnvironment> { state, action, _ in
+    switch action {
+    case .submitButtonTapped:
+        return .none
+    case let .presentMailContentView(value):
+        state.isPresentingMailContent = value
+        return .none
+    case let .setMailResult(value):
+        state.mailComposeResult = value
+        return .none
+    }
 }
 
 extension MailViewState: Codable {
@@ -25,7 +46,7 @@ extension MailViewState: Codable {
         self.init(
             mailComposeResult: MFMailComposeResult(rawValue: mailComposeResult ?? 0)!,
             mail: mail,
-            isShowing: false,
+            isPresentingMailContent: false,
             district: district
         )
     }
@@ -36,23 +57,5 @@ extension MailViewState: Codable {
             try container.encode(result.rawValue)
         }
         try container.encode(mail)
-    }
-}
-
-enum MailViewAction: Equatable {
-    case setIsPresented(Bool)
-    case setMailResult(MFMailComposeResult?)
-}
-
-struct MailViewEnvironment {}
-
-let mailViewReducer = Reducer<MailViewState, MailViewAction, MailViewEnvironment> { state, action, _ in
-    switch action {
-    case let .setIsPresented(value):
-        state.isShowing = value
-        return .none
-    case let .setMailResult(value):
-        state.mailComposeResult = value
-        return .none
     }
 }
