@@ -39,15 +39,3 @@ extension District: Codable {
         try container.encode(mail, forKey: .mail)
     }
 }
-
-extension District {
-    static let districts = Bundle.main.decode([District].self, from: "districts.json")
-    
-    static func mapAddressToDistrict(_ address: GeoAddress) -> District? {
-        let district = districts.first(where: { $0.name == address.city })
-        guard district != nil else {
-            return nil
-        }
-        return district
-    }
-}
