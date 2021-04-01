@@ -39,7 +39,7 @@ struct ReportForm: View {
                 Widget(
                     title: Text("Fotos"), // TODO: Replace with l18n
                     isCompleted: viewStore.isPhotosValid
-                ) { Images(store: store) }
+                ) { ImagesView(store: store) }
                 // Ort
                 Widget(
                     title: Text("Ort"), // TODO: Replace with l18n
@@ -49,7 +49,7 @@ struct ReportForm: View {
                 Widget(
                     title: Text("Beschreibung"), // TODO: Replace with l18n
                     isCompleted: viewStore.isDescriptionValid
-                ) { Description(store: store) }
+                ) { DescriptionView(store: store) }
                 // Kontaktdaten
                 Widget(
                     title: Text("Kontaktdaten"), // TODO: Replace with l18n
