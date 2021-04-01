@@ -49,21 +49,21 @@ struct EditDescriptionView: View {
                     "Marke", // TODO: l18n
                     text: viewStore.binding(
                         get: \.carType,
-                        send:  { ReportAction.car(.type($0)) }
+                        send: { ReportAction.car(.type($0)) }
                     )
                 )
                 TextField(
                     "Farbe", // TODO: l18n
                     text: viewStore.binding(
                         get: \.carColor,
-                        send:  { ReportAction.car(.color($0)) }
+                        send: { ReportAction.car(.color($0)) }
                     )
                 )
                 TextField(
                     "Kennzeichen", // TODO: l18n
                     text: viewStore.binding(
                         get: \.licensePlate,
-                        send:  { ReportAction.car(.licensePlateNumber($0)) }
+                        send: { ReportAction.car(.licensePlateNumber($0)) }
                     )
                 )
             }

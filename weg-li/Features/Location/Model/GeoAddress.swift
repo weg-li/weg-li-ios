@@ -20,5 +20,4 @@ extension GeoAddress {
         guard allParameterAreNotEmpty else { return "" }
         return "\(street), \(postalCode) \(city)"
     }
-
 }

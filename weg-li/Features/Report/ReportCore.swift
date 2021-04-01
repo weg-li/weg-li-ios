@@ -117,7 +117,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         action: /ReportAction.mail,
         environment: { _ in MailViewEnvironment() }
     ),
-    Reducer { state, action, environment in
+    Reducer { state, action, _ in
         struct LocationManagerId: Hashable {}
         switch action {
         case let .images(imageViewAction):

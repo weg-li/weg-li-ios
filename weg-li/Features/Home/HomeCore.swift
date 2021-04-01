@@ -88,7 +88,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         action: /HomeAction.contact,
         environment: { _ in ContactEnvironment() }
     ),
-    Reducer { state, action, env in
+    Reducer { state, action, _ in
         switch action {
         case let .contact(contact):
             state.reportDraft.contact = state.contact

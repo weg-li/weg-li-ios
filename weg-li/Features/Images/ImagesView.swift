@@ -9,7 +9,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-
 struct ImagesView: View {    
     @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
     

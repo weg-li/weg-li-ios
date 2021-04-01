@@ -24,7 +24,6 @@ struct MapView: UIViewRepresentable {
         mapView.showsUserLocation = showsLocation
         return mapView
     }
-    
 
     func updateUIView(_ view: MKMapView, context: Context) {
         self.updateView(mapView: view, delegate: context.coordinator)

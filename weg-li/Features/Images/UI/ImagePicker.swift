@@ -39,7 +39,7 @@ struct ImagePicker: UIViewControllerRepresentable {
                     coordinate = assetResults.firstObject?.location?.coordinate
                 }
                 
-                imageResult.itemProvider.loadObject(ofClass: UIImage.self) { (selectedImage, error) in
+                imageResult.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
                     if let error = error {
                         print(error.localizedDescription)
                     } else {

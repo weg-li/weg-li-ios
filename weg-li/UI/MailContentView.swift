@@ -62,7 +62,6 @@ struct MailContentView: View {
             .foregroundColor(.red)
             .font(.callout)
             .multilineTextAlignment(.center)
-                
         }
         .sheet(isPresented: viewStore.binding(
             get: \.isMailComposerPresented,

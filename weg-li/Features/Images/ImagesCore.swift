@@ -28,7 +28,7 @@ struct ImagesViewEnvironment {
     let imageConverter: ImageConverter
 }
 
-let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnvironment> { state, action, environment in
+let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnvironment> { state, action, _ in
     switch action {
     case let .setShowImagePicker(value):
         state.showImagePicker = value

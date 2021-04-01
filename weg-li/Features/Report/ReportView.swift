@@ -43,8 +43,7 @@ struct ReportForm: View {
                 // Ort
                 Widget(
                     title: Text("Ort"), // TODO: Replace with l18n
-                    isCompleted: viewStore.isLocationValid)
-                { LocationView(store: store) }
+                    isCompleted: viewStore.isLocationValid) { LocationView(store: store) }
                 // Beschreibung
                 Widget(
                     title: Text("Beschreibung"), // TODO: Replace with l18n
@@ -54,7 +53,7 @@ struct ReportForm: View {
                 Widget(
                     title: Text("Kontaktdaten"), // TODO: Replace with l18n
                     isCompleted: viewStore.isContactValid
-                ) { ContactWidget(store: store.scope(state: { $0.contact } )) }
+                ) { ContactWidget(store: store.scope(state: { $0.contact })) }
                 MailContentView(store: store)
                     .padding()
             }
