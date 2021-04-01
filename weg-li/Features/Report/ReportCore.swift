@@ -51,10 +51,12 @@ extension Report {
     }
     
     var isDescriptionValid: Bool {
-        let isValid = ![car.type, car.color, car.licensePlateNumber]
-            .map { $0.isEmpty }
-            .contains(true)
-        return isValid
+        return [
+            car.type,
+            car.color,
+            car.licensePlateNumber
+        ]
+        .allSatisfy { !$0.isEmpty }
     }
 }
 

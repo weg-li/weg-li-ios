@@ -19,11 +19,11 @@ struct MailContentView: View {
         
         init(state: Report) {
             self.districtName = state.district?.name ?? ""
-            self.isSubmitButtonDisabled = state.images.storedPhotos.isEmpty
-                && !state.contact.isValid
-                && !state.isDescriptionValid
-                && !state.location.resolvedAddress.isValid
-                && !MFMailComposeViewController.canSendMail()
+            let isValid = !state.images.storedPhotos.isEmpty
+                && state.contact.isValid
+                && state.isDescriptionValid
+                && state.location.resolvedAddress.isValid
+            self.isSubmitButtonDisabled = !isValid
             self.isMailComposerPresented = state.mail.isPresentingMailContent
         }
     }
