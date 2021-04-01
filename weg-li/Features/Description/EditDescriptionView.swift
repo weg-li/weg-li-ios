@@ -9,7 +9,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct EditDescription: View {
+struct EditDescriptionView: View {
     struct ViewState: Equatable, Hashable {
         let report: Report
         let carType: String
@@ -117,7 +117,7 @@ struct EditDescription: View {
 
 struct Description_Previews: PreviewProvider {
     static var previews: some View {
-        EditDescription(
+        EditDescriptionView(
             store: .init(
                 initialState: .init(
                     images: .init(),

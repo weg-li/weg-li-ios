@@ -10,7 +10,7 @@ import ComposableArchitecture
 import SwiftUI
 
 
-struct Images: View {    
+struct ImagesView: View {    
     @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
     
     init(store: Store<Report, ReportAction>) {
@@ -68,7 +68,7 @@ struct Images: View {
 
 struct Images_Previews: PreviewProvider {
     static var previews: some View {
-        Images(
+        ImagesView(
             store: .init(
                 initialState: .init(
                     images: .init(),

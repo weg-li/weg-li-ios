@@ -15,12 +15,6 @@ struct ReportForm: View {
         let isContactValid: Bool
         let isDescriptionValid: Bool
         let isLocationValid: Bool
-        var allStatesAreValid: Bool {
-            isPhotosValid
-                && isContactValid
-                && isDescriptionValid
-                && isLocationValid
-        }
         
         init(state: Report) {
             isPhotosValid = !state.images.storedPhotos.isEmpty
@@ -33,8 +27,6 @@ struct ReportForm: View {
     private let store: Store<Report, ReportAction>
     @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
     
-    @State private var editDescription = false
-
     init(store: Store<Report, ReportAction>) {
         self.store = store
         viewStore = ViewStore(store.scope(state: ViewState.init))
