@@ -36,7 +36,7 @@ struct HomeView: View {
     }
     
     private var emptyStateView: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             Image(systemName: "doc.richtext")
                 .font(.system(.largeTitle))
                 .accessibility(hidden: true)
@@ -66,18 +66,10 @@ struct HomeView: View {
                     label: {
                         Button(
                             action: { viewStore.send(.showReportWizard(true)) },
-                            label: {
-                                Text("+")
-                                    .font(.system(.largeTitle))
-                                    .frame(width: 70, height: 70)
-                                    .foregroundColor(Color(.label))
-                                    .accessibility(label: Text("Add Report"))
-                                    .background(Color(.systemGray))
-                                    .cornerRadius(35)
-                                    .padding()
-                                    .shadow(color: Color.black.opacity(0.3), radius: 3, x: 3, y: 3)
-                            }
+                            label: { Text("+") }
                         )
+                        .buttonStyle(AddReportButtonStyle())
+                        .padding()
                     }
                 )
             }
@@ -100,14 +92,33 @@ struct HomeView: View {
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(
-            store: .init(
-                initialState: .preview,
-                reducer: .empty,
-                environment: ()
+        Group {
+            HomeView(
+                store: .init(
+                    initialState: HomeState(
+                        reports: [.preview, .preview]
+                    ),
+                    reducer: .empty,
+                    environment: ()
+                )
             )
-        )
+        }
         //        .preferredColorScheme(.dark)
         //        .environment(\.sizeCategory, .extraExtraLarge)
+    }
+}
+
+private struct AddReportButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(.largeTitle))
+            .frame(width: 70, height: 70)
+            .lineLimit(1)
+            .foregroundColor(Color(.label))
+            .background(configuration.isPressed ? Color(.systemGray2) : Color(.systemGray3))
+            .clipShape(RoundedRectangle(cornerRadius: 35))
+            .shadow(color: Color.black.opacity(0.3), radius: 6, x: 3, y: 3)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .accessibility(label: Text("Add Report"))
     }
 }
