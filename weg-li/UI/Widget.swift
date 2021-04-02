@@ -44,8 +44,22 @@ struct Widget<Content: View>: View {
     
     private func completionIndicator() -> some View {
         if isCompleted {
-            return Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+            return CompletionIndicator.completed
         } else {
+            return CompletionIndicator.uncompleted
+        }
+    }
+}
+
+enum CompletionIndicator: View {
+    case completed
+    case uncompleted
+    
+    var body: some View {
+        switch self {
+        case .completed:
+            return Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+        case .uncompleted:
             return Image(systemName: "exclamationmark.circle.fill").foregroundColor(.orange)
         }
     }
