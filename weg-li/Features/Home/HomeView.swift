@@ -17,15 +17,18 @@ struct HomeView: View {
         self.store = store
         self.viewStore = ViewStore(store)
     }
-    
+        
     var body: some View {
         NavigationView {
             ZStack {
                 if viewStore.reports.isEmpty {
                     emptyStateView
                 } else {
-                    List(viewStore.reports, id: \.uuid) { report in
-                        Text(report.date.humandReadableDate) // TODO: Replace with saved reports
+                    ScrollView {
+                        ForEach(viewStore.reports, id: \.uuid) { report in
+                            ReportCellView(report: report)
+                        }
+                        .padding()
                     }
                 }
                 addReportButton
@@ -95,15 +98,13 @@ struct MainView_Previews: PreviewProvider {
         Group {
             HomeView(
                 store: .init(
-                    initialState: HomeState(
-                        reports: [.preview, .preview]
-                    ),
+                    initialState: HomeState(reports: [.preview, .preview, .preview, .preview]),
                     reducer: .empty,
                     environment: ()
                 )
             )
         }
-        //        .preferredColorScheme(.dark)
+//                .preferredColorScheme(.dark)
         //        .environment(\.sizeCategory, .extraExtraLarge)
     }
 }
@@ -120,5 +121,58 @@ private struct AddReportButtonStyle: ButtonStyle {
             .shadow(color: Color.black.opacity(0.3), radius: 6, x: 3, y: 3)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .accessibility(label: Text("Add Report"))
+    }
+}
+
+private struct ReportCellView: View {
+    let report: Report
+    
+    var body: some View {
+        ZStack {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(report.date.humandReadableDate)
+                        .fontWeight(.bold)
+                        .font(.title)
+                        .padding(.bottom, 4)
+                    HStack(spacing: 12) {
+                        Image(systemName: "car")
+                            .font(.title2)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(report.car.type), \(report.car.color)")
+                            Text(report.car.licensePlateNumber)
+                        }
+                        .font(.body)
+                    }
+                    .padding(.bottom, 6)
+                    HStack(spacing: 12) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.title2)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(report.charge.time)
+                            Text(Report.Charge.charges[report.charge.selectedType])
+                        }
+                        .font(.body)
+                    }
+                }
+                .padding()
+                Spacer()
+            }
+            .background(Color(.systemGray6))
+            .padding(.bottom)
+            // Design attempt :D
+            VStack {
+                HStack {
+                    Spacer()
+                    Image(systemName: "exclamationmark.octagon")
+                        .font(.system(size: 140))
+                        .offset(x: 70)
+                        .clipped()
+                        .blendMode(.overlay)
+                }
+                Spacer()
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
