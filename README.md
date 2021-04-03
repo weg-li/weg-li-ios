@@ -7,26 +7,15 @@ With [weg-li](https://www.weg-li.de) you can easily report wrong parking cars.
 
 * Install latest Xcode version via macOS App Store
 
-### Fastlane
+### Dependencies
 
-* Install [Homebrew](https://brew.sh/)
-* Install [Ruby](https://www.ruby-lang.org/) via Homebrew
-
-```shell
-brew install ruby
-```
-
-* Install [Bundler](https://bundler.io) via Ruby
+The project is using some tools like fastlane, swiftlint and others.
+To install them execute 
 
 ```shell
-gem install bundler
+make dependencies
 ```
-
-* Install Ruby dependencies
-
-```shell
-bundle install
-```
+in the root folder.
 
 ## 🎨 Designs
 
