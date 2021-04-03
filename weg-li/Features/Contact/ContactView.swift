@@ -11,83 +11,77 @@ import SwiftUI
 
 struct ContactView: View {
     let store: Store<ContactState, ContactAction>
+    @ObservedObject private var viewStore: ViewStore<ContactState, ContactAction>
+    
+    init(store: Store<ContactState, ContactAction>) {
+        self.store = store
+        self.viewStore = ViewStore(store)
+    }
     
     var body: some View {
-        WithViewStore(store) { viewStore in
-            VStack {
-                Form {
-                    Section {
-                        dataRow(
-                            type: .firstName,
-                            textFieldBinding: viewStore.binding(
-                                get: { $0.firstName },
-                                send: ContactAction.firstNameChanged
-                            ),
-                            store: viewStore
+        VStack {
+            Form {
+                Section {
+                    dataRow(
+                        type: .firstName,
+                        textFieldBinding: viewStore.binding(
+                            get: \.firstName,
+                            send: ContactAction.firstNameChanged
                         )
-                        dataRow(
-                            type: .lastName,
-                            textFieldBinding: viewStore.binding(
-                                get: { $0.name },
-                                send: ContactAction.lastNameChanged
-                            ),
-                            store: viewStore
+                    )
+                    dataRow(
+                        type: .lastName,
+                        textFieldBinding: viewStore.binding(
+                            get: \.name,
+                            send: ContactAction.lastNameChanged
                         )
-                        dataRow(
-                            type: .street,
-                            textFieldBinding: viewStore.binding(
-                                get: { $0.address.street },
-                                send: ContactAction.streetChanged
-                            ),
-                            store: viewStore
+                    )
+                    dataRow(
+                        type: .street,
+                        textFieldBinding: viewStore.binding(
+                            get: \.address.street,
+                            send: ContactAction.streetChanged
                         )
-                        HStack {
-                            dataRow(
-                                type: .zipCode,
-                                textFieldBinding: viewStore.binding(
-                                    get: { $0.address.postalCode },
-                                    send: ContactAction.zipCodeChanged
-                                ),
-                                store: viewStore
+                    )
+                    HStack {
+                        dataRow(
+                            type: .zipCode,
+                            textFieldBinding: viewStore.binding(
+                                get: \.address.postalCode,
+                                send: ContactAction.zipCodeChanged
                             )
-                            dataRow(
-                                type: .town,
-                                textFieldBinding: viewStore.binding(
-                                    get: { $0.address.city },
-                                    send: ContactAction.townChanged
-                                ),
-                                store: viewStore
-                            )
-                        }
+                        )
                         dataRow(
-                            type: .phone,
+                            type: .town,
                             textFieldBinding: viewStore.binding(
-                                get: { $0.phone },
-                                send: ContactAction.phoneChanged
-                            ),
-                            store: viewStore
+                                get: \.address.city,
+                                send: ContactAction.townChanged
+                            )
                         )
                     }
-                    Section {
-                        VStack {
-                            Image(systemName: "lightbulb")
-                                .padding(.bottom, 8)
-                                .foregroundColor(.yellow)
-                            Text("Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.") // TODO: Move text to l18n file
-                                .multilineTextAlignment(.center)
-                        }
+                    dataRow(
+                        type: .phone,
+                        textFieldBinding: viewStore.binding(
+                            get: \.phone,
+                            send: ContactAction.phoneChanged
+                        )
+                    )
+                }
+                Section {
+                    VStack {
+                        Image(systemName: "info.circle")
+                            .padding(.bottom, 4)
+                        Text("Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.") // TODO: Move text to l18n file
+                            .multilineTextAlignment(.center)
+                            .font(.callout)
                     }
                 }
             }
-            .navigationBarTitle("Persönliche Daten", displayMode: .inline)
         }
+        .navigationBarTitle("Persönliche Daten", displayMode: .inline)
     }
     
-    private func dataRow(
-        type: RowType,
-        textFieldBinding: Binding<String>,
-        store: ViewStore<ContactState, ContactAction>
-    ) -> some View {
+    private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {
         VStack(alignment: .leading) {
             HStack {
                 Text(type.label)
