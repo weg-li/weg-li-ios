@@ -14,8 +14,7 @@ ruby:
 	bundle install
 
 format:
-	swift format --in-place --recursive \
-		./weg-li ./weg-liTests
+	swiftformat .
 
 
 .PHONY: dependencies ruby brew
