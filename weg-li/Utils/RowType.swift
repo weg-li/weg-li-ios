@@ -1,17 +1,11 @@
-//
-//  RowType.swift
-//  weg-li
-//
-//  Created by Malte on 24.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Foundation
 import UIKit
 
 enum RowType {
     case firstName, lastName, street, town, zipCode, phone
-    
+
     var label: String {
         switch self {
         case .firstName: return "Vorname"
@@ -22,7 +16,7 @@ enum RowType {
         case .phone: return "Telefon"
         }
     }
-    
+
     var placeholder: String {
         switch self {
         case .firstName: return "Max"
@@ -30,7 +24,7 @@ enum RowType {
         case .street: return "Max-Brauer-Allee 23"
         case .town: return "Hamburg"
         case .zipCode: return "20095"
-        case .phone:return "+491235346435"
+        case .phone: return "+491235346435"
         }
     }
 
@@ -44,7 +38,7 @@ enum RowType {
         case .phone: return .telephoneNumber
         }
     }
-    
+
     var keyboardType: UIKeyboardType {
         switch self {
         case .phone: return .phonePad

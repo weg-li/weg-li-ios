@@ -1,10 +1,4 @@
-//
-//  CLLocationCoordinate2D+Additions.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 16.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import CoreLocation
 
@@ -20,7 +14,7 @@ extension CLLocationCoordinate2D: Codable {
         try container.encode(longitude)
         try container.encode(latitude)
     }
-     
+
     public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         let longitude = try container.decode(CLLocationDegrees.self)

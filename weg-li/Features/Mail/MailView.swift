@@ -1,10 +1,4 @@
-//
-//  MailComposer.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 15.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import MessageUI
@@ -12,36 +6,35 @@ import SwiftUI
 
 struct MailView: UIViewControllerRepresentable {
     @ObservedObject private var viewStore: ViewStore<MailViewState, MailViewAction>
-    
+
     init(store: Store<Report, ReportAction>) {
         viewStore = ViewStore(
             store.scope(
                 state: \.mail,
-                action: ReportAction.mail
-            )
+                action: ReportAction.mail)
         )
     }
-    
+
     class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         @Binding private var isShowing: Bool
         @Binding private var result: MFMailComposeResult?
-        
+
         private let mail: Mail
-        
+
         init(isShowing: Binding<Bool>,
              result: Binding<MFMailComposeResult?>,
-             mail: Mail
-        ) {
+             mail: Mail)
+        {
             _isShowing = isShowing
             _result = result
             self.mail = mail
         }
-        
+
         func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
-            error: Error?
-        ) {
+            error: Error?)
+        {
             defer { isShowing = false }
             guard error == nil else {
                 self.result = .failed
@@ -50,21 +43,18 @@ struct MailView: UIViewControllerRepresentable {
             self.result = .sent
         }
     }
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(
             isShowing: viewStore.binding(
                 get: \.isPresentingMailContent,
-                send: MailViewAction.presentMailContentView
-            ),
+                send: MailViewAction.presentMailContentView),
             result: viewStore.binding(
                 get: \.mailComposeResult,
-                send: MailViewAction.setMailResult
-            ),
-            mail: viewStore.mail
-        )
+                send: MailViewAction.setMailResult),
+            mail: viewStore.mail)
     }
-    
+
     func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
         vc.setToRecipients([viewStore.mail.address])
@@ -74,15 +64,13 @@ struct MailView: UIViewControllerRepresentable {
             vc.addAttachmentData(
                 data,
                 mimeType: "image/jpeg",
-                fileName: "Anhang-\(index + 1)"
-            )
+                fileName: "Anhang-\(index + 1)")
         }
         vc.mailComposeDelegate = context.coordinator
         return vc
     }
-    
+
     func updateUIViewController(
         _ uiViewController: MFMailComposeViewController,
-        context: UIViewControllerRepresentableContext<MailView>
-    ) {}
+        context: UIViewControllerRepresentableContext<MailView>) {}
 }

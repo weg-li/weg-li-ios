@@ -12,4 +12,4 @@
 # Excluded rules
 --exclude weg-li/App/Resources/Generated
 
---header "Created for weg-li on {created}."
+--header "Created for weg-li in {year}."

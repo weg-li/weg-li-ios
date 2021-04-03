@@ -1,10 +1,4 @@
-//
-//  GeoCodeProvider.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 08.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Combine
 import CoreLocation
@@ -40,9 +34,9 @@ struct GeoAddress: Hashable, Codable {
     var street: String
     var city: String
     var postalCode: String
-    
+
     var isValid: Bool {
-        return [street, city, postalCode ]
+        return [street, city, postalCode]
             .allSatisfy { !$0.isEmpty }
     }
 }

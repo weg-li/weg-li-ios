@@ -1,10 +1,4 @@
-//
-//  Reducer.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 08.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Combine
 import CoreLocation
@@ -13,10 +7,11 @@ import Foundation
 func appReducer(
     state: inout AppState,
     action: AppAction,
-    environment: EnvironmentContainer
-) -> AnyPublisher<AppAction, Never> {
+    environment: EnvironmentContainer) -> AnyPublisher<AppAction, Never>
+{
     switch action {
     // MARK: Handle location actions
+
     case let .handleLocationAction(locationAction):
         switch locationAction {
         case .onLocationAppear:
@@ -76,7 +71,8 @@ func appReducer(
         state.report.images = environment.dataStore.images
 
     // MARK: Handle description actions
-    case .handleDescriptionAction(let descriptionAction):
+
+    case let .handleDescriptionAction(descriptionAction):
         switch descriptionAction {
         case let .setCar(car):
             state.report.car = car

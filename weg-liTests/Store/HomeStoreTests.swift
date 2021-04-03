@@ -1,14 +1,8 @@
-//
-//  AppStoreTests.swift
-//  weg-liTests
-//
-//  Created by Malte on 25.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
-@testable import weg_li
 import ComposableArchitecture
 import MessageUI
+@testable import weg_li
 import XCTest
 
 class HomeStoreTests: XCTestCase {
@@ -22,68 +16,60 @@ class HomeStoreTests: XCTestCase {
             reducer: homeReducer,
             environment: HomeEnvironment(
                 mainQueue: scheduler.eraseToAnyScheduler()
-            )
-        )
-        
+            ))
+
         let newContact: ContactState = .preview
-        
+
         store.assert(
             .send(.contact(.firstNameChanged(newContact.firstName))) {
                 $0.contact.firstName = newContact.firstName
                 $0.reportDraft.contact.firstName = newContact.firstName
             },
-            .receive(.contact(.isContactValid))
-        )
+            .receive(.contact(.isContactValid)))
     }
-    
+
     func test_updateReport_ShouldUpdateState() {
         let store = TestStore(
             initialState: HomeState(),
             reducer: homeReducer,
             environment: HomeEnvironment(
                 mainQueue: scheduler.eraseToAnyScheduler()
-            )
-        )
-        
+            ))
+
         let newContact: ContactState = .preview
-        
+
         store.assert(
             .send(.report(.contact(.firstNameChanged(newContact.firstName)))) {
                 $0.contact.firstName = newContact.firstName
                 $0.reportDraft.contact.firstName = newContact.firstName
             },
-            .receive(.report(.contact(.isContactValid)))
-        )
+            .receive(.report(.contact(.isContactValid))))
     }
-    
+
     func test_sentMailResult_shouldAppendDraftReportToReports() {
         let report = Report(
             uuid: fixedUUID(),
             images: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                resolvedLocation: nil
-            ),
+                resolvedLocation: nil),
             contact: ContactState(),
             district: nil,
             date: fixedDate(),
             car: .init(
                 color: "Red",
                 type: "Big Car",
-                licensePlateNumber: "MIT"
-            ),
+                licensePlateNumber: "MIT"),
             charge: .init(),
             location: .init(storedPhotos: []),
-            mail: .init()
-        )
-        
+            mail: .init())
+
         let store = TestStore(
             initialState: HomeState(reportDraft: report),
             reducer: homeReducer,
             environment: HomeEnvironment(mainQueue: scheduler.eraseToAnyScheduler()
-            )
-        )
-        
+            ))
+
         store.assert(
             .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
                 $0.reports = [report]
@@ -94,8 +80,7 @@ class HomeStoreTests: XCTestCase {
             },
             .receive(.reportSaved) {
                 $0.reportDraft = Report(images: .init(), contact: .init())
-            }
-        )
+            })
     }
 }
 

@@ -1,10 +1,4 @@
-//
-//  Time.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 16.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Foundation
 
@@ -18,7 +12,7 @@ enum Times: CaseIterable {
     case fourtyfive
     case sixty
     case hundredEighty
-    
+
     var value: Int {
         switch self {
         case .one: return 1
@@ -32,7 +26,7 @@ enum Times: CaseIterable {
         case .hundredEighty: return 180
         }
     }
-    
+
     var description: String {
         switch self {
         case .one:

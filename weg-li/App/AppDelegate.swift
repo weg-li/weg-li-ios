@@ -1,10 +1,4 @@
-//
-//  AppDelegate.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 08.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import UIKit
 

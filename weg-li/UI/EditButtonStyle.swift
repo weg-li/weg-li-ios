@@ -1,10 +1,4 @@
-//
-//  EditButtonStyle.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 15.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import SwiftUI
 

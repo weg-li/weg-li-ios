@@ -1,10 +1,4 @@
-//
-//  DescriptionWidgetView.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 14.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import SwiftUI
@@ -13,21 +7,21 @@ struct DescriptionView: View {
     struct ViewState: Equatable {
         let report: Report
         let chargeType: String
-        
+
         init(state: Report) {
             report = state
-            self.chargeType = Report.Charge.charges[state.charge.selectedType]
+            chargeType = Report.Charge.charges[state.charge.selectedType]
         }
     }
-    
+
     let store: Store<Report, ReportAction>
     @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
-    
+
     init(store: Store<Report, ReportAction>) {
         self.store = store
         viewStore = ViewStore(store.scope(state: ViewState.init))
     }
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 8) {
@@ -56,13 +50,12 @@ struct DescriptionView: View {
                         Text("Beschreibung bearbeiten") // TODO: l18n
                     }
                     .frame(maxWidth: .infinity)
-                }
-            )
-            .buttonStyle(EditButtonStyle())
-            .padding(.top)
+                })
+                .buttonStyle(EditButtonStyle())
+                .padding(.top)
         }
     }
-    
+
     private func row(title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 2.0) {
             Text(title)
@@ -80,17 +73,15 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
         Widget(
             title: Text("Beschreibung"),
             isCompleted: true) {
-            DescriptionView(
-                store: .init(
-                    initialState: Report(
-                        images: ImagesViewState(),
-                        contact: .preview,
-                        location: LocationViewState(storedPhotos: [])
-                    ),
-                    reducer: .empty,
-                    environment: ()
+                DescriptionView(
+                    store: .init(
+                        initialState: Report(
+                            images: ImagesViewState(),
+                            contact: .preview,
+                            location: LocationViewState(storedPhotos: [])),
+                        reducer: .empty,
+                        environment: ())
                 )
-            )
         }
     }
 }

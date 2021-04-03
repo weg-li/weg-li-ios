@@ -1,17 +1,11 @@
-//
-//  MailCore.swift
-//  weg-li
-//
-//  Created by Malte on 31.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import MessageUI
 
 struct MailViewState: Equatable {
     var mailComposeResult: MFMailComposeResult?
-    var mail: Mail = Mail()
+    var mail = Mail()
     var isPresentingMailContent = false
     var district: District = .init(name: "", zipCode: "", mail: "")
 }
@@ -47,10 +41,9 @@ extension MailViewState: Codable {
             mailComposeResult: MFMailComposeResult(rawValue: mailComposeResult ?? 0)!,
             mail: mail,
             isPresentingMailContent: false,
-            district: district
-        )
+            district: district)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
         if let result = mailComposeResult {

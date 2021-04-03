@@ -1,10 +1,4 @@
-//
-//  ReportForm.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 08.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -12,13 +6,14 @@ import MessageUI
 import SwiftUI
 
 // MARK: - Report Core
+
 struct Report: Codable {
     var uuid = UUID()
     var images: ImagesViewState
     var contact: ContactState
     var district: District?
-    
-    var date: Date = Date()
+
+    var date = Date()
     var car = Car()
     var charge = Charge()
     var location = LocationViewState(storedPhotos: [])
@@ -41,15 +36,15 @@ extension Report {
         var type: String = ""
         var licensePlateNumber: String = ""
     }
-    
+
     struct Charge: Equatable, Codable {
         var selectedDuration = 0
         var selectedType = 0
         var blockedOthers = false
-        
+
         var time: String { Times.allCases[selectedDuration].description }
     }
-    
+
     var isDescriptionValid: Bool {
         return [
             car.type,
@@ -86,38 +81,31 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     imagesReducer.pullback(
         state: \.images,
         action: /ReportAction.images,
-        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }
-    ),
+        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }),
     carReducer.pullback(
         state: \.car,
         action: /ReportAction.car,
-        environment: { _ in CarEnvironment() }
-    ),
+        environment: { _ in CarEnvironment() }),
     chargeReducer.pullback(
         state: \.charge,
         action: /ReportAction.charge,
-        environment: { _ in ChargeEnvironment() }
-    ),
+        environment: { _ in ChargeEnvironment() }),
     contactReducer.pullback(
         state: \.contact,
         action: /ReportAction.contact,
-        environment: { _ in ContactEnvironment() }
-    ),
+        environment: { _ in ContactEnvironment() }),
     locationReducer.pullback(
         state: \.location,
         action: /ReportAction.location,
         environment: {
             LocationViewEnvironment(
                 locationManager: $0.locationManager,
-                placeService: $0.placeService
-            )
-        }
-    ),
+                placeService: $0.placeService)
+        }),
     mailViewReducer.pullback(
         state: \.mail,
         action: /ReportAction.mail,
-        environment: { _ in MailViewEnvironment() }
-    ),
+        environment: { _ in MailViewEnvironment() }),
     Reducer { state, action, environment in
         struct LocationManagerId: Hashable {}
         switch action {
@@ -150,10 +138,10 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         case .contact, .car, .charge, .location:
             return .none
         }
-    }
-)
+    })
 
 // MARK: - Car Core
+
 enum CarAction: Equatable {
     case type(String)
     case color(String)
@@ -178,6 +166,7 @@ let carReducer = Reducer<Report.Car, CarAction, CarEnvironment> { state, action,
 }
 
 // MARK: - Charge Core
+
 enum ChargeAction: Equatable {
     case toggleBlockedOthers
     case selectCharge(Int)
@@ -251,32 +240,27 @@ extension Report {
         \(contact.firstName) \(contact.name)
         """
     }
-    
+
     static var preview: Report {
         Report(
             uuid: UUID(),
             images: .init(
                 showImagePicker: false,
-                storedPhotos: []
-            ),
+                storedPhotos: []),
             contact: .preview,
             district: District(
                 name: "Hamburg St. Pauli",
                 zipCode: "20099",
-                mail: "mail@stpauli.de"
-            ),
+                mail: "mail@stpauli.de"),
             date: Date(),
             car: Car(
                 color: "Gelb",
                 type: "Kleinbus",
-                licensePlateNumber: "HH-ST-PAULI"
-            ),
+                licensePlateNumber: "HH-ST-PAULI"),
             charge: Charge(
                 selectedDuration: 0,
                 selectedType: 0,
-                blockedOthers: false
-            ),
-            location: LocationViewState(storedPhotos: [])
-        )
+                blockedOthers: false),
+            location: LocationViewState(storedPhotos: []))
     }
 }

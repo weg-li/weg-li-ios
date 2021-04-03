@@ -1,17 +1,11 @@
-//
-//  SubmitButton.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 08.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import SwiftUI
 
 struct SubmitButtonStyle: ViewModifier {
     let color: Color
     let disabled: Bool
-    
+
     func body(content: Content) -> some View {
         content
             .padding()
@@ -25,7 +19,7 @@ struct SubmitButtonStyle: ViewModifier {
 struct ReadySubmitButton: View {
     let ordnungsamt: String
     var disabled: Bool = false
-    
+
     var body: some View {
         HStack {
             Image(systemName: "envelope.fill")
@@ -67,31 +61,30 @@ struct SubmitButton: View {
     let state: Status
     var disabled: Bool = false
     let action: () -> Void
-    
+
     enum Status {
         case unsupportedLocation
         case missingData
         case readyToSubmit(ordnungsamt: String)
     }
-    
-     var body: some View {
+
+    var body: some View {
         Button(action: action) { () -> AnyView in
             switch state {
             case .missingData:
                 return AnyView(MissingDataButton())
             case .unsupportedLocation:
                 return AnyView(UnsupportedLocationButton())
-            case .readyToSubmit(ordnungsamt: let ordnungsamt):
+            case let .readyToSubmit(ordnungsamt: ordnungsamt):
                 return AnyView(
                     ReadySubmitButton(
                         ordnungsamt: ordnungsamt,
-                        disabled: disabled
-                    )
+                        disabled: disabled)
                 )
             }
         }
         .frame(maxWidth: .infinity)
-     }
+    }
 }
 
 struct SubmitButton_Previews: PreviewProvider {
