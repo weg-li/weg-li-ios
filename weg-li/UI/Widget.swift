@@ -1,10 +1,4 @@
-//
-//  Widget.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 08.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import SwiftUI
 
@@ -13,7 +7,7 @@ struct Widget<Content: View>: View {
     var isCompleted: Bool
     let content: () -> Content
     @State private var isCollapsed: Bool = false
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -25,8 +19,8 @@ struct Widget<Content: View>: View {
                         self.isCollapsed.toggle()
                     }
                 }) {
-                    Image(systemName: "chevron.up.circle")
-                        .rotationEffect(.degrees(isCollapsed ? 180 : 0))
+                        Image(systemName: "chevron.up.circle")
+                            .rotationEffect(.degrees(isCollapsed ? 180 : 0))
                 }
                 .accessibility(label: Text("Toggle widget collapse"))
                 .foregroundColor(.secondary)
@@ -47,7 +41,7 @@ struct Widget<Content: View>: View {
 enum CompletionIndicator: View {
     case completed
     case uncompleted
-    
+
     init(isValid: Bool) {
         if isValid {
             self = .completed
@@ -55,7 +49,7 @@ enum CompletionIndicator: View {
             self = .uncompleted
         }
     }
-    
+
     var body: some View {
         switch self {
         case .completed:

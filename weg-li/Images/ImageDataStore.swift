@@ -1,17 +1,11 @@
-//
-//  ImageDataStore.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 15.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
-import SwiftUI
 import Combine
+import SwiftUI
 
 final class ImageDataStore: ObservableObject {
     let didChange = PassthroughSubject<Void, Never>()
-    
+
     @Published
     var images = [UIImage]()
 }

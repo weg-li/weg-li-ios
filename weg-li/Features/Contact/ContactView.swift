@@ -1,10 +1,4 @@
-//
-//  PersonalData.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 09.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import SwiftUI
@@ -12,12 +6,12 @@ import SwiftUI
 struct ContactView: View {
     let store: Store<ContactState, ContactAction>
     @ObservedObject private var viewStore: ViewStore<ContactState, ContactAction>
-    
+
     init(store: Store<ContactState, ContactAction>) {
         self.store = store
-        self.viewStore = ViewStore(store)
+        viewStore = ViewStore(store)
     }
-    
+
     var body: some View {
         VStack {
             Form {
@@ -26,46 +20,34 @@ struct ContactView: View {
                         type: .firstName,
                         textFieldBinding: viewStore.binding(
                             get: \.firstName,
-                            send: ContactAction.firstNameChanged
-                        )
-                    )
+                            send: ContactAction.firstNameChanged))
                     dataRow(
                         type: .lastName,
                         textFieldBinding: viewStore.binding(
                             get: \.name,
-                            send: ContactAction.lastNameChanged
-                        )
-                    )
+                            send: ContactAction.lastNameChanged))
                     dataRow(
                         type: .street,
                         textFieldBinding: viewStore.binding(
                             get: \.address.street,
-                            send: ContactAction.streetChanged
-                        )
-                    )
+                            send: ContactAction.streetChanged))
                     HStack {
                         dataRow(
                             type: .zipCode,
                             textFieldBinding: viewStore.binding(
                                 get: \.address.postalCode,
-                                send: ContactAction.zipCodeChanged
-                            )
-                        )
+                                send: ContactAction.zipCodeChanged))
                         dataRow(
                             type: .town,
                             textFieldBinding: viewStore.binding(
                                 get: \.address.city,
-                                send: ContactAction.townChanged
-                            )
-                        )
+                                send: ContactAction.townChanged))
                     }
                     dataRow(
                         type: .phone,
                         textFieldBinding: viewStore.binding(
                             get: \.phone,
-                            send: ContactAction.phoneChanged
-                        )
-                    )
+                            send: ContactAction.phoneChanged))
                 }
                 Section {
                     VStack {
@@ -80,7 +62,7 @@ struct ContactView: View {
         }
         .navigationBarTitle("Persönliche Daten", displayMode: .inline)
     }
-    
+
     private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {
         VStack(alignment: .leading) {
             HStack {
@@ -103,8 +85,7 @@ struct PersonalData_Previews: PreviewProvider {
             store: .init(
                 initialState: .empty,
                 reducer: .empty,
-                environment: ()
-            )
+                environment: ())
         )
     }
 }

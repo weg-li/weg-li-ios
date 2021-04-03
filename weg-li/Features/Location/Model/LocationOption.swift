@@ -1,20 +1,14 @@
-//
-//  LocationOption.swift
-//  weg-li
-//
-//  Created by Malte on 29.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Foundation
 
 enum LocationOption: Hashable, CaseIterable {
     static var allCases: [LocationOption] = [.fromPhotos(nil), .currentLocation, .manual]
-    
+
     case fromPhotos([StorableImage]?)
     case currentLocation
     case manual
-    
+
     var title: String {
         switch self {
         case .fromPhotos: return "Aus Fotos"
@@ -22,9 +16,9 @@ enum LocationOption: Hashable, CaseIterable {
         case .manual: return "Manuell"
         }
     }
-    
+
     func hash(into hasher: inout Hasher) {
-        hasher.combine(self.title)
+        hasher.combine(title)
     }
 }
 
@@ -32,20 +26,20 @@ extension LocationOption: Codable {
     private enum CodingKeys: String, CodingKey {
         case base, detailParams
     }
-    
+
     private enum Base: String, Codable {
         case fromPhotos, currentLocation, manuel
     }
-    
+
     private struct DetailParams: Codable {
         let images: [StorableImage]?
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        
+
         switch self {
-        case .fromPhotos(let images):
+        case let .fromPhotos(images):
             try container.encode(Base.fromPhotos, forKey: .base)
             try container.encode(DetailParams(images: images), forKey: .detailParams)
         case .currentLocation:
@@ -54,11 +48,11 @@ extension LocationOption: Codable {
             try container.encode(Base.manuel, forKey: .base)
         }
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let base = try container.decode(Base.self, forKey: .base)
-        
+
         switch base {
         case .fromPhotos:
             let detailParams = try container.decode(DetailParams.self, forKey: .detailParams)

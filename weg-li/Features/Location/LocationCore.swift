@@ -1,10 +1,4 @@
-//
-//  LocationCore.swift
-//  weg-li
-//
-//  Created by Malte on 25.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -18,21 +12,22 @@ enum UserLocationError: Error {
 }
 
 // MARK: - UserLocationState
+
 struct UserLocationState: Equatable {
     var alert: AlertState<ReportAction>?
     var isRequestingCurrentLocation = false
     var region: CoordinateRegion?
-    
+
     init(
         alert: AlertState<ReportAction>? = nil,
         isRequestingCurrentLocation: Bool = false,
-        region: CoordinateRegion? = nil
-    ) {
+        region: CoordinateRegion? = nil)
+    {
         self.alert = alert
         self.isRequestingCurrentLocation = isRequestingCurrentLocation
         self.region = region
     }
-    
+
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.isRequestingCurrentLocation == rhs.isRequestingCurrentLocation
             && lhs.region?.center.latitude == rhs.region?.center.latitude
@@ -59,7 +54,7 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
                 .fireAndForget()
         }
         return .none
-        
+
     case .didChangeAuthorization(.denied):
         if state.isRequestingCurrentLocation {
             state.alert = .init(
@@ -68,7 +63,7 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
             state.isRequestingCurrentLocation = false
         }
         return .none
-        
+
     case let .didUpdateLocations(locations):
         state.isRequestingCurrentLocation = false
         guard let location = locations.first else { return .none }
@@ -77,7 +72,7 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
     case let .didFailWithError(error):
         print(error.localizedDescription)
         return .none
-        
+
     default:
         return .none
     }
@@ -92,7 +87,7 @@ struct LocationViewState: Equatable, Codable {
     var resolvedAddress: GeoAddress = .init(address: .init())
     var storedPhotos: [StorableImage]
     var userLocationState = UserLocationState()
-    
+
     private enum CodingKeys: String, CodingKey {
         case locationOption
         case isMapExpanded
@@ -126,8 +121,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
     locationManagerReducer.pullback(
         state: \.userLocationState,
         action: /LocationViewAction.userLocationAction,
-        environment: { UserLocationEnvironment(locationManager: $0.locationManager) }
-    ),
+        environment: { UserLocationEnvironment(locationManager: $0.locationManager) }),
     Reducer { state, action, environment in
         switch action {
         case .onAppear:
@@ -137,9 +131,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                     .map(LocationViewAction.userLocationAction),
                 environment.locationManager
                     .setup(id: LocationManagerId())
-                    .fireAndForget()
-            )
-            
+                    .fireAndForget())
+
         case .locationRequested:
             guard environment.locationManager.locationServicesEnabled() else {
                 state.userLocationState.alert = .init(title: TextState("Location services are turned off.")) // l18n
@@ -148,37 +141,37 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             switch environment.locationManager.authorizationStatus() {
             case .notDetermined:
                 state.userLocationState.isRequestingCurrentLocation = true
-                
+
                 return environment.locationManager
                     .requestWhenInUseAuthorization(id: LocationManagerId())
                     .fireAndForget()
-                
+
             case .restricted:
                 state.userLocationState.alert = .init(title: TextState("Please give us access to your location in settings.")) // l18n
                 return .none
-                
+
             case .denied:
                 state.userLocationState.alert = .init(title: TextState("Please give us access to your location in settings.")) // l18n
                 return .none
-                
+
             case .authorizedAlways, .authorizedWhenInUse:
                 return environment.locationManager
                     .requestLocation(id: LocationManagerId())
                     .fireAndForget()
-                
+
             @unknown default:
                 return .none
             }
         case .dismissAlertButtonTapped:
             state.userLocationState.alert = nil
             return .none
-            
+
         case .toggleMapExpanded:
             state.isMapExpanded.toggle()
             return .none
         case let .setLocationOption(value):
             state.locationOption = value
-            
+
             switch value {
             case .fromPhotos:
                 return .none
@@ -201,8 +194,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             state.isResolvingAddress = true
             let clLocation = CLLocation(
                 latitude: coordinate.latitude,
-                longitude: coordinate.longitude
-            )
+                longitude: coordinate.longitude)
             return environment.placeService
                 .getPlacemarks(for: clLocation)
                 .catchToEffect()
@@ -215,11 +207,11 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
         case let .resolveAddressFinished(.failure(error)):
             state.isResolvingAddress = false
             return .none
-            
+
         case let .updateRegion(region):
             state.userLocationState.region = region
             return .none
-            
+
         case let .updateGeoAddressStreet(street):
             state.resolvedAddress.street = street
             return .none
@@ -230,17 +222,16 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             state.resolvedAddress.postalCode = postalCode
             return .none
         }
-    }
-)
+    })
 
 // MARK: - Utils
+
 private extension LocationManager {
     func setup(id: AnyHashable) -> Effect<Never, Never> {
         set(id: id,
             activityType: .other,
             desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
             distanceFilter: 100.0,
-            showsBackgroundLocationIndicator: true
-        )
+            showsBackgroundLocationIndicator: true)
     }
 }

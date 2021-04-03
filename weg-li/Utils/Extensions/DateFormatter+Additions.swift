@@ -1,10 +1,4 @@
-//
-//  DateFormatter+Additions.swift
-//  weg-li
-//
-//  Created by Malte Bünz on 18.06.20.
-//  Copyright © 2020 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Foundation
 

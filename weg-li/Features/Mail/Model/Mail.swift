@@ -1,10 +1,4 @@
-//
-//  Mail.swift
-//  weg-li
-//
-//  Created by Malte on 31.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Foundation
 

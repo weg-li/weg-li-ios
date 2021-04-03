@@ -1,10 +1,4 @@
-//
-//  ImageGrid.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 15.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import SwiftUI
 
@@ -12,7 +6,7 @@ struct ImageGrid: View {
     let images: [UIImage]
     var columnCount: Int = 3
     let imageHandler: (Int) -> Void
-    
+
     var body: some View {
         ForEach(images.chunked(into: columnCount), id: \.self) { images in
             HStack {
@@ -21,10 +15,10 @@ struct ImageGrid: View {
                         Button(action: {
                             self.imageHandler(index)
                         }) {
-                            HStack {
-                                Image(systemName: "trash")
-                                Text("Löschen")
-                            }
+                                HStack {
+                                    Image(systemName: "trash")
+                                    Text("Löschen")
+                                }
                         }
                         Image(uiImage: images[index])
                             .gridModifier
@@ -53,7 +47,7 @@ struct ImageGrid_Previews: PreviewProvider {
             UIImage(systemName: "book")!,
             UIImage(systemName: "book")!
         ], columnCount: 3) { index in
-            print(index)
+                print(index)
         }
     }
 }

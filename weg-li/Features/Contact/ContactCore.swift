@@ -1,10 +1,4 @@
-//
-//  ContactCore.swift
-//  weg-li
-//
-//  Created by Malte on 10.03.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import Contacts
@@ -16,11 +10,12 @@ struct ContactState: Equatable, Codable {
         var postalCode: String = ""
         var city: String = ""
     }
+
     var firstName: String = ""
     var name: String = ""
     var address: Address = .init()
     var phone: String = ""
-    
+
     var isValid = false
 }
 
@@ -30,10 +25,9 @@ extension ContactState {
             firstName: "",
             name: "",
             address: .init(),
-            phone: ""
-        )
+            phone: "")
     }
-    
+
     static var preview: ContactState {
         ContactState(
             firstName: RowType.firstName.placeholder,
@@ -41,10 +35,8 @@ extension ContactState {
             address: .init(
                 street: RowType.street.placeholder,
                 postalCode: RowType.zipCode.placeholder,
-                city: RowType.town.placeholder
-            ),
-            phone: RowType.phone.placeholder
-        )
+                city: RowType.town.placeholder),
+            phone: RowType.phone.placeholder)
     }
 }
 
@@ -54,7 +46,7 @@ extension ContactState.Address {
         postalCode = address.postalCode
         city = address.city
     }
-    
+
     var humanReadableAddress: String {
         return String {
             if !street.isEmpty {
@@ -67,6 +59,7 @@ extension ContactState.Address {
 }
 
 // MARK: - Action
+
 enum ContactAction: Equatable {
     case firstNameChanged(String)
     case lastNameChanged(String)
@@ -78,6 +71,7 @@ enum ContactAction: Equatable {
 }
 
 // MARK: - Environment
+
 struct ContactEnvironment {}
 
 let contactReducer =

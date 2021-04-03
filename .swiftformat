@@ -1,0 +1,15 @@
+# Disabled rules
+--disable unusedArguments
+--disable braces
+--disable specifiers
+--disable trailingCommas
+--disable redundantFileprivate
+
+# Custom rules
+--closingparen same-line
+--nospaceoperators ..<, ...
+
+# Excluded rules
+--exclude weg-li/App/Resources/Generated
+
+--header "Created for weg-li in {year}."

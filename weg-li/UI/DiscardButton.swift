@@ -1,16 +1,10 @@
-//
-//  DiscardButton.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 08.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import SwiftUI
 
 struct DiscardButton: View {
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack {

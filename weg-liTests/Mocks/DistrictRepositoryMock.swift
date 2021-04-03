@@ -1,14 +1,8 @@
-//
-//  DistrictRepositoryMock.swift
-//  weg-liTests
-//
-//  Created by Malte on 01.04.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
-@testable import weg_li
 import Combine
 import CoreLocation
+@testable import weg_li
 
 struct DistrictRepositoryMock: DistrictRepo {
     let districts: [District] = [.init(name: "Hamburg", zipCode: "20099", mail: "hh@hh.hh")]

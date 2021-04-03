@@ -1,10 +1,4 @@
-//
-//  MainView.swift
-//  weg-li
-//
-//  Created by Stefan Trauth on 08.10.19.
-//  Copyright © 2019 Stefan Trauth. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import SwiftUI
@@ -12,12 +6,12 @@ import SwiftUI
 struct HomeView: View {
     private let store: Store<HomeState, HomeAction>
     @ObservedObject private var viewStore: ViewStore<HomeState, HomeAction>
-    
+
     init(store: Store<HomeState, HomeAction>) {
         self.store = store
-        self.viewStore = ViewStore(store)
+        viewStore = ViewStore(store)
     }
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -37,7 +31,7 @@ struct HomeView: View {
             .navigationBarItems(trailing: contactData)
         }
     }
-    
+
     private var emptyStateView: some View {
         VStack(spacing: 12) {
             Image(systemName: "doc.richtext")
@@ -49,7 +43,7 @@ struct HomeView: View {
                 .padding()
         }
     }
-    
+
     private var addReportButton: some View {
         VStack {
             Spacer()
@@ -59,39 +53,33 @@ struct HomeView: View {
                     destination: ReportForm(
                         store: store.scope(
                             state: \.reportDraft,
-                            action: HomeAction.report
-                        )
+                            action: HomeAction.report)
                     ),
                     isActive: viewStore.binding(
                         get: \.showReportWizard,
-                        send: HomeAction.showReportWizard
-                    ),
+                        send: HomeAction.showReportWizard),
                     label: {
                         Button(
                             action: { viewStore.send(.showReportWizard(true)) },
-                            label: { Text("+") }
-                        )
-                        .buttonStyle(AddReportButtonStyle())
-                        .padding(24)
-                    }
-                )
+                            label: { Text("+") })
+                            .buttonStyle(AddReportButtonStyle())
+                            .padding(24)
+                    })
             }
         }
     }
-    
+
     private var contactData: some View {
         NavigationLink(
             destination: ContactView(
                 store: store.scope(
                     state: \.contact,
-                    action: HomeAction.contact
-                )
+                    action: HomeAction.contact)
             ),
             label: {
                 Image(systemName: "gear")
                     .font(Font.system(.title2).bold())
-            }
-        )
+            })
     }
 }
 
@@ -102,8 +90,7 @@ struct MainView_Previews: PreviewProvider {
                 store: .init(
                     initialState: HomeState(reports: [.preview, .preview, .preview, .preview]),
                     reducer: .empty,
-                    environment: ()
-                )
+                    environment: ())
             )
         }
 //                .preferredColorScheme(.dark)
@@ -128,7 +115,7 @@ private struct AddReportButtonStyle: ButtonStyle {
 
 private struct ReportCellView: View {
     let report: Report
-    
+
     var body: some View {
         ZStack {
             HStack {
