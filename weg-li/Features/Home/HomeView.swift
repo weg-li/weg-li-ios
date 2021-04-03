@@ -17,7 +17,7 @@ struct HomeView: View {
         self.store = store
         self.viewStore = ViewStore(store)
     }
-        
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -33,7 +33,7 @@ struct HomeView: View {
                 }
                 addReportButton
             }
-            .navigationBarTitle("Anzeigen") // TODO: l18n
+            .navigationBarTitle("Anzeigen")
             .navigationBarItems(trailing: contactData)
         }
     }
@@ -41,12 +41,12 @@ struct HomeView: View {
     private var emptyStateView: some View {
         VStack(spacing: 12) {
             Image(systemName: "doc.richtext")
-                .font(.system(.largeTitle))
+                .font(Font.system(.largeTitle))
                 .accessibility(hidden: true)
             Text("Keine gespeicherten Anzeigen") // TODO: l18n
                 .font(.system(.title))
                 .multilineTextAlignment(.center)
-                .padding([.leading, .trailing])
+                .padding()
         }
     }
     
@@ -72,7 +72,7 @@ struct HomeView: View {
                             label: { Text("+") }
                         )
                         .buttonStyle(AddReportButtonStyle())
-                        .padding()
+                        .padding(24)
                     }
                 )
             }
@@ -80,14 +80,16 @@ struct HomeView: View {
     }
     
     private var contactData: some View {
-        let contactDataStore = store.scope(
-            state: \.contact,
-            action: HomeAction.contact
-        )
-        return NavigationLink(
-            destination: ContactView(store: contactDataStore),
+        NavigationLink(
+            destination: ContactView(
+                store: store.scope(
+                    state: \.contact,
+                    action: HomeAction.contact
+                )
+            ),
             label: {
-                Text("Kontaktdaten") // TODO: l18n
+                Image(systemName: "gear")
+                    .font(Font.system(.title2).bold())
             }
         )
     }
