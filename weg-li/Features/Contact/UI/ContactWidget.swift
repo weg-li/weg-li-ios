@@ -11,7 +11,6 @@ import SwiftUI
 
 struct ContactWidget: View {
     struct ViewState: Equatable {
-        let isValid: Bool
         let firstName: String
         let name: String
         let street: String
@@ -26,7 +25,6 @@ struct ContactWidget: View {
             self.postalCode = state.address.postalCode
             self.city = state.address.city
             self.phone = state.phone
-            self.isValid = false // state.isValid
         }
     }
     let store: Store<ContactState, ReportAction>

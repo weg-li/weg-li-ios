@@ -17,7 +17,7 @@ struct Widget<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                completionIndicator()
+                CompletionIndicator(isValid: isCompleted)
                 title.fontWeight(.bold)
                 Spacer()
                 Button(action: {
@@ -28,6 +28,7 @@ struct Widget<Content: View>: View {
                     Image(systemName: "chevron.up.circle")
                         .rotationEffect(.degrees(isCollapsed ? 180 : 0))
                 }
+                .accessibility(label: Text("Toggle widget collapse"))
                 .foregroundColor(.secondary)
             }
             .font(.title)
@@ -37,16 +38,34 @@ struct Widget<Content: View>: View {
             }
         }
         .padding()
-        .background(Color(.quaternarySystemFill))
+        .background(Color(.secondarySystemFill))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .padding()
     }
+}
+
+enum CompletionIndicator: View {
+    case completed
+    case uncompleted
     
-    private func completionIndicator() -> some View {
-        if isCompleted {
-            return Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+    init(isValid: Bool) {
+        if isValid {
+            self = .completed
         } else {
-            return Image(systemName: "exclamationmark.circle.fill").foregroundColor(.orange)
+            self = .uncompleted
+        }
+    }
+    
+    var body: some View {
+        switch self {
+        case .completed:
+            return Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+                .accessibility(label: Text("is valid"))
+        case .uncompleted:
+            return Image(systemName: "exclamationmark.circle.fill")
+                .foregroundColor(.orange)
+                .accessibility(label: Text("is not valid"))
         }
     }
 }

@@ -88,8 +88,12 @@ class HomeStoreTests: XCTestCase {
             .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
                 $0.reports = [report]
             },
+            .do { self.scheduler.advance(by: 1) },
             .receive(.showReportWizard(false)) {
                 $0.showReportWizard = false
+            },
+            .receive(.reportSaved) {
+                $0.reportDraft = Report(images: .init(), contact: .init())
             }
         )
     }

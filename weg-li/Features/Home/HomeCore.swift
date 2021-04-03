@@ -52,6 +52,7 @@ enum HomeAction: Equatable {
     case contact(ContactAction)
     case report(ReportAction)
     case showReportWizard(Bool)
+    case reportSaved
 }
 
 // MARK: Location
@@ -89,7 +90,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         action: /HomeAction.contact,
         environment: { _ in ContactEnvironment() }
     ),
-    Reducer { state, action, _ in
+    Reducer { state, action, environment in
         switch action {
         case let .contact(contact):
             state.reportDraft.contact = state.contact
@@ -102,8 +103,12 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                 switch mailComposerResult {
                 case .sent:
                     state.reports.append(state.reportDraft)
-                    // save draftReport to reports, set draft report nil, navigate back
-                    return Effect(value: HomeAction.showReportWizard(false))
+                    return Effect.concatenate(
+                        Effect(value: HomeAction.showReportWizard(false))
+                            .delay(for: 0.5, scheduler: environment.mainQueue)
+                            .eraseToEffect(),
+                        Effect(value: HomeAction.reportSaved)
+                    )
                 default:
                     return .none
                 }
@@ -113,10 +118,20 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         case let .showReportWizard(value):
             state.showReportWizard = value
             return .none
+        case .reportSaved:
+            state.reportDraft = Report(images: .init(), contact: state.contact)
+            return .none
         }
     }
 )
         
 extension HomeState {
     static let preview = HomeState()
+    
+    init(reports: [Report]) {
+        self.init()
+        self.reports = reports
+    }
 }
+
+struct NavigationError: Error {}
