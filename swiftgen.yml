@@ -1,0 +1,6 @@
+strings:
+ inputs: 
+  - weg-li/App/Resources/de.lproj/Localizable.strings
+ outputs:
+   - templateName: structured-swift4
+     output: weg-li/App/Resources/Generated/Strings.swift
