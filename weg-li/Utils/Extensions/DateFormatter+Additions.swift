@@ -11,7 +11,7 @@ import Foundation
 extension DateFormatter {
     static let dateFormatterMediumStyles: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.timeStyle = .medium
+        formatter.timeStyle = .none
         formatter.dateStyle = .medium
         return formatter
     }()
