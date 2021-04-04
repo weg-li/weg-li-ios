@@ -38,28 +38,28 @@ struct EditDescriptionView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Fahrzeug")) { // TODO: l18n
+            Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
                 TextField(
-                    "Marke", // TODO: l18n
+                    L10n.Description.Row.carType,
                     text: viewStore.binding(
                         get: \.carType,
                         send: { ReportAction.car(.type($0)) }))
                 TextField(
-                    "Farbe", // TODO: l18n
+                    L10n.Description.Row.carColor,
                     text: viewStore.binding(
                         get: \.carColor,
                         send: { ReportAction.car(.color($0)) }))
                 TextField(
-                    "Kennzeichen", // TODO: l18n
+                    L10n.Description.Row.licensplateNumber,
                     text: viewStore.binding(
                         get: \.licensePlate,
                         send: { ReportAction.car(.licensePlateNumber($0)) }))
             }
             .padding(.top, 4)
             .textFieldStyle(PlainTextFieldStyle())
-            Section(header: Text("Verstoß")) { // TODO: l18n
+            Section(header: Text(L10n.Description.Section.Violation.copy)) {
                 Picker(
-                    "Art des Verstoßes", // TODO: l18n
+                    L10n.Description.Row.chargeType,
                     selection: viewStore.binding(
                         get: \.charge.selectedType,
                         send: { ReportAction.charge(.selectCharge($0)) })) {
@@ -70,7 +70,7 @@ struct EditDescriptionView: View {
                         }
                 }
                 Picker(
-                    "Dauer der Verstoßes", // TODO: l18n
+                    L10n.Description.Row.length,
                     selection: viewStore.binding(
                         get: \.charge.selectedDuration,
                         send: { ReportAction.charge(.selectDuraration($0)) })) {
@@ -82,12 +82,12 @@ struct EditDescriptionView: View {
                 toggleRow
             }
         }
-        .navigationBarTitle(Text("Beschreibung"), displayMode: .inline) // TODO: l18n
+        .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
     }
 
     private var toggleRow: some View {
         HStack {
-            Text("Behinderung anderer Verkehrsteilnehmer") // TODO: l18n
+            Text(L10n.Description.Row.didBlockOthers)
             Spacer()
             ToggleButton(
                 isOn: viewStore.binding(

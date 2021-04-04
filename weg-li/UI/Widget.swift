@@ -22,7 +22,7 @@ struct Widget<Content: View>: View {
                         Image(systemName: "chevron.up.circle")
                             .rotationEffect(.degrees(isCollapsed ? 180 : 0))
                 }
-                .accessibility(label: Text("Toggle widget collapse"))
+                .accessibility(label: Text(L10n.Widget.A11y.toggleCollapseButtonLabel))
                 .foregroundColor(.secondary)
             }
             .font(.title)
@@ -55,11 +55,11 @@ enum CompletionIndicator: View {
         case .completed:
             return Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
-                .accessibility(label: Text("is valid"))
+                .accessibility(label: Text(L10n.Widget.A11y.CompletionIndicatorLabel.isValid))
         case .uncompleted:
             return Image(systemName: "exclamationmark.circle.fill")
                 .foregroundColor(.orange)
-                .accessibility(label: Text("is not valid"))
+                .accessibility(label: Text(L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid))
         }
     }
 }

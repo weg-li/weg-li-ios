@@ -27,7 +27,7 @@ struct HomeView: View {
                 }
                 addReportButton
             }
-            .navigationBarTitle("Anzeigen")
+            .navigationBarTitle(L10n.Home.navigationBarTitle)
             .navigationBarItems(trailing: contactData)
         }
     }
@@ -37,7 +37,7 @@ struct HomeView: View {
             Image(systemName: "doc.richtext")
                 .font(Font.system(.largeTitle))
                 .accessibility(hidden: true)
-            Text("Keine gespeicherten Anzeigen") // TODO: l18n
+            Text(L10n.Home.emptyStateCopy)
                 .font(.system(.title))
                 .multilineTextAlignment(.center)
                 .padding()
@@ -64,6 +64,7 @@ struct HomeView: View {
                             label: { Text("+") })
                             .buttonStyle(AddReportButtonStyle())
                             .padding(24)
+                            .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
                     })
             }
         }
@@ -109,7 +110,6 @@ private struct AddReportButtonStyle: ButtonStyle {
             .clipShape(RoundedRectangle(cornerRadius: 35))
             .shadow(color: Color.black.opacity(0.3), radius: 6, x: 3, y: 3)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
-            .accessibility(label: Text("Add Report"))
     }
 }
 
@@ -161,6 +161,7 @@ private struct ReportCellView: View {
                 }
                 Spacer()
             }
+            .accessibility(hidden: true)
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }

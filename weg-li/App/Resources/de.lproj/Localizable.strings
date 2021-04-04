@@ -1,7 +1,100 @@
-/* 
+/*
   Localizable.strings
   weg-li
 
   Created by Malte on 03.04.21.
   Copyright © 2021 Martin Wilhelmi. All rights reserved.
 */
+
+// HOME
+"home.navigationBarTitle" = "Anzeigen";
+
+"home.emptyStateCopy" = "Keine gespeicherten Anzeigen";
+
+"home.a11y.addReportButtonLabel" = "Anzeige erstellen";
+
+
+// Report
+"report.navigationBarTitle" = "Anzeige";
+
+"report.contact.widgetTitle" = "Kontaktdaten";
+
+"report.place.widgetTitle" = "Ort";
+
+
+// Photos
+"photos.widgetTitle" = "Fotos";
+
+"photos.importButton.copy" = "Fotos importieren";
+
+
+// Description
+"description.widgetTitle" = "Beschreibung";
+
+"description.row.carType" = "Marke";
+
+"description.row.carColor" = "Farbe";
+
+"description.row.licensplateNumber" = "Kennzeichen";
+
+"description.row.length" = "Dauer";
+
+"description.row.chargeType" = "Art des Verstoßes";
+
+"description.row.didBlockOthers" = "Behinderung anderer Verkehrsteilnehmer";
+
+"description.editButton.copy" = "Beschreibung bearbeiten";
+
+"description.section.violation.copy" = "Verstoß";
+
+"description.section.vehicle.copy" = "Fahrzeug";
+
+
+// Location
+"location.widgetTitle" = "Ort";
+
+"location.placeholder.street" = "Straße + Hausnummer";
+
+"location.placeholder.postalCode" = "PLZ";
+
+"location.placeholder.city" = "Stadt";
+
+"location.a11y.expandButtonLabel" = "Karteansicht erweitern";
+
+"location.pickerCopy.fromPhotos" = "Aus Fotos";
+
+"location.pickerCopy.currentLocation" = "Standort";
+
+"location.pickerCopy.manual" = "Manuell";
+
+
+// Contact
+"contact.widgetTitle" = "Kontaktdaten";
+
+"contact.row.nameCopy" = "Name";
+
+"contact.row.streetCopy" = "Straße";
+
+"contact.row.cityCopy" = "Stadt";
+
+"contact.row.phoneCopy" = "Telefon";
+
+"contact.editButtonCopy" =  "Kontaktdaten bearbeiten";
+
+"contact.reportHintCopy" = "Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
+
+"contact.isSavedInAppHintCopy" = "Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.";
+
+
+// Mail
+"mail.deviceErrorCopy" = "Auf diesem Gerät können leider keine E-Mails versendet werden!";
+
+"mail.readyToSubmitErrorCopy" = "Gib alle nötigen Daten an um die Anzeige zu versenden";
+
+
+// Widget
+"widget.a11y.toggleCollapseButtonLabel" = "erweitern";
+
+"widget.a11y.completionIndicatorLabel.isValid" = "ist gültig";
+
+"widget.a11y.completionIndicatorLabel.isNotValid" = "ist nicht gültig";

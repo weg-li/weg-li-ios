@@ -29,28 +29,28 @@ struct ReportForm: View {
     var body: some View {
         ScrollView {
             VStack {
-                // Fotos
+                // Photos
                 Widget(
-                    title: Text("Fotos"), // TODO: Replace with l18n
+                    title: Text(L10n.Photos.widgetTitle),
                     isCompleted: viewStore.isPhotosValid) { ImagesView(store: store) }
-                // Ort
+                // Location
                 Widget(
-                    title: Text("Ort"), // TODO: Replace with l18n
+                    title: Text(L10n.Location.widgetTitle),
                     isCompleted: viewStore.isLocationValid) { LocationView(store: store) }
-                // Beschreibung
+                // Description
                 Widget(
-                    title: Text("Beschreibung"), // TODO: Replace with l18n
+                    title: Text(L10n.Description.widgetTitle),
                     isCompleted: viewStore.isDescriptionValid) { DescriptionView(store: store) }
-                // Kontaktdaten
+                // Contact
                 Widget(
-                    title: Text("Kontaktdaten"), // TODO: Replace with l18n
+                    title: Text(L10n.Report.Contact.widgetTitle),
                     isCompleted: viewStore.isContactValid) { ContactWidget(store: store.scope(state: { $0.contact })) }
                 MailContentView(store: store)
                     .padding()
             }
         }
         .padding(.bottom)
-        .navigationBarTitle("Anzeige", displayMode: .inline)
+        .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
     }
 }
 

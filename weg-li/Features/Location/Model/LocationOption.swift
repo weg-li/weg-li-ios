@@ -11,9 +11,9 @@ enum LocationOption: Hashable, CaseIterable {
 
     var title: String {
         switch self {
-        case .fromPhotos: return "Aus Fotos"
-        case .currentLocation: return "Standort"
-        case .manual: return "Manuell"
+        case .fromPhotos: return L10n.Location.PickerCopy.fromPhotos
+        case .currentLocation: return L10n.Location.PickerCopy.currentLocation
+        case .manual: return L10n.Location.PickerCopy.manual
         }
     }
 

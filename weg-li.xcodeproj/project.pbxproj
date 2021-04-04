@@ -21,8 +21,8 @@
 		733509712614F86A00D2FEA8 /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733509702614F86A00D2FEA8 /* Mail.swift */; };
 		734BED412618EE5A00CCA2ED /* districts.json in Resources */ = {isa = PBXBuildFile; fileRef = 734BED402618EE5A00CCA2ED /* districts.json */; };
 		734BED492618F12600CCA2ED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 734BED4B2618F12600CCA2ED /* Localizable.strings */; };
-		734BED502618F29000CCA2ED /* Generated in Resources */ = {isa = PBXBuildFile; fileRef = 734BED4F2618F29000CCA2ED /* Generated */; };
 		734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734EFF0C2610A4D1001406F5 /* LocationView.swift */; };
+		735FD84B2619BC3500218A6C /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FD84A2619BC3500218A6C /* Strings.swift */; };
 		7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388122D260BD2E2008B9956 /* CarStoreTests.swift */; };
 		73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73881236260BD4D5008B9956 /* ChargeStoreTests.swift */; };
 		7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388123A260BD5BD008B9956 /* ReportStoreTests.swift */; };
@@ -105,8 +105,8 @@
 		734BED442618F0AD00CCA2ED /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		734BED4A2618F12600CCA2ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		734BED4E2618F12A00CCA2ED /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		734BED4F2618F29000CCA2ED /* Generated */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Generated; sourceTree = "<group>"; };
 		734EFF0C2610A4D1001406F5 /* LocationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
+		735FD84A2619BC3500218A6C /* Strings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Strings.swift; path = Generated/Strings.swift; sourceTree = "<group>"; };
 		7388122D260BD2E2008B9956 /* CarStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarStoreTests.swift; sourceTree = "<group>"; };
 		73881236260BD4D5008B9956 /* ChargeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeStoreTests.swift; sourceTree = "<group>"; };
 		7388123A260BD5BD008B9956 /* ReportStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportStoreTests.swift; sourceTree = "<group>"; };
@@ -365,7 +365,7 @@
 		9FB750A92487BCA600193948 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				734BED4F2618F29000CCA2ED /* Generated */,
+				735FD84A2619BC3500218A6C /* Strings.swift */,
 				F8347595234C61CF00244D6F /* Preview Content */,
 				F8347593234C61CF00244D6F /* Assets.xcassets */,
 				F834759B234C61CF00244D6F /* Info.plist */,
@@ -532,8 +532,8 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
 				de,
+				Base,
 			);
 			mainGroup = F8347581234C61CE00244D6F;
 			packageReferences = (
@@ -562,7 +562,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				734BED502618F29000CCA2ED /* Generated in Resources */,
 				F834759A234C61CF00244D6F /* LaunchScreen.storyboard in Resources */,
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
 				9FB7509424878FDB00193948 /* README.md in Resources */,
@@ -650,6 +649,7 @@
 				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,
 				F83853CF234D11A900DF1A9D /* DiscardButton.swift in Sources */,
 				73D117D1261261DF000D7B82 /* CoordinateRegion.swift in Sources */,
+				735FD84B2619BC3500218A6C /* Strings.swift in Sources */,
 				9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */,
 				73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */,
 				7308C50A260B54BD00FE3333 /* RowType.swift in Sources */,

@@ -51,21 +51,21 @@ struct LocationView: View {
             if LocationOption.manual == viewStore.locationOption {
                 VStack(spacing: 8) {
                     TextField(
-                        "Straße + Hausnummer",
+                        L10n.Location.Placeholder.street,
                         text: viewStore.binding(
                             get: \.address.street,
                             send: LocationViewAction.updateGeoAddressStreet))
                         .keyboardType(RowType.street.keyboardType)
                         .textContentType(RowType.street.textContentType)
                     TextField(
-                        "PLZ",
+                        L10n.Location.Placeholder.postalCode,
                         text: viewStore.binding(
                             get: \.address.postalCode,
                             send: LocationViewAction.updateGeoAddressPostalCode))
                         .keyboardType(RowType.zipCode.keyboardType)
                         .textContentType(RowType.zipCode.textContentType)
                     TextField(
-                        "Stadt",
+                        L10n.Location.Placeholder.city,
                         text: viewStore.binding(
                             get: \.address.city,
                             send: LocationViewAction.updateGeoAddressCity))
@@ -85,7 +85,7 @@ struct LocationView: View {
                         .frame(height: viewStore.isMapExpanded ? 300 : 150)
                     expandMapButton
                         .padding(4)
-                        .accessibility(label: Text("expand map"))
+                        .accessibility(label: Text(L10n.Location.A11y.expandButtonLabel))
                 }
             }
             addressView
@@ -97,17 +97,18 @@ struct LocationView: View {
     }
 
     @ViewBuilder private var addressView: some View {
-        if viewStore.showActivityIndicator {
-            ActivityIndicator(style: .medium)
-        } else {
-            HStack(spacing: 4) {
-                Image(systemName: "location.fill")
+        HStack(spacing: 4) {
+            Image(systemName: "location.fill")
+                .accessibility(hidden: true)
+            if viewStore.showActivityIndicator {
+                ActivityIndicator(style: .medium)
+            } else {
                 Text(viewStore.address.humanReadableAddress)
                     .lineLimit(nil)
                     .fixedSize(horizontal: true, vertical: false)
             }
-            .font(.body)
         }
+        .font(.body)
     }
 
     private var expandMapButton: some View {
@@ -162,11 +163,11 @@ extension LocationOption {
     var text: some View {
         switch self {
         case .fromPhotos:
-            return Text("Aus Fotos")
+            return Text(L10n.Location.PickerCopy.fromPhotos)
         case .currentLocation:
-            return Text("Aktuelle Position")
+            return Text(L10n.Location.PickerCopy.currentLocation)
         case .manual:
-            return Text("Manuell")
+            return Text(L10n.Location.PickerCopy.fromPhotos)
         }
     }
 }
