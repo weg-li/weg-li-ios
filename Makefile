@@ -16,5 +16,8 @@ ruby:
 format:
 	swiftformat .
 
+swiftgen:
+	swiftgen
+
 
 .PHONY: dependencies ruby brew

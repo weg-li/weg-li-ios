@@ -44,10 +44,10 @@ struct MailContentView: View {
             .disabled(viewStore.isSubmitButtonDisabled)
             VStack(spacing: 8) {
                 if !MFMailComposeViewController.canSendMail() {
-                    Text("Auf diesem Gerät können leider keine E-Mails versendet werden!")
+                    Text(L10n.Mail.deviceErrorCopy)
                 }
                 if viewStore.isSubmitButtonDisabled {
-                    Text("Gib alle nötigen Daten an um die Anzeige zu versenden")
+                    Text(L10n.Mail.readyToSubmitErrorCopy)
                         .fontWeight(.semibold)
                 }
             }

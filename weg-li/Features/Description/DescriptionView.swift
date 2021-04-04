@@ -25,14 +25,14 @@ struct DescriptionView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 8) {
-                row(title: "Marke:", content: viewStore.report.car.type)
-                row(title: "Farbe:", content: viewStore.report.car.color)
-                row(title: "Kennzeichen:", content: viewStore.report.car.licensePlateNumber)
-                row(title: "Dauer:", content: viewStore.report.charge.time)
-                row(title: "Art des Verstoßes:", content: viewStore.chargeType)
+                row(title: L10n.Description.Row.carType, content: viewStore.report.car.type)
+                row(title: L10n.Description.Row.carColor, content: viewStore.report.car.color)
+                row(title: L10n.Description.Row.licensplateNumber, content: viewStore.report.car.licensePlateNumber)
+                row(title: L10n.Description.Row.length, content: viewStore.report.charge.time)
+                row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)
                 if viewStore.report.charge.blockedOthers {
                     HStack {
-                        Text("Behinderung anderer Verkehrsteilnehmer") // TODO: l18n
+                        Text(L10n.Description.Row.didBlockOthers)
                             .foregroundColor(Color(.secondaryLabel))
                             .font(.callout)
                             .fontWeight(.bold)
@@ -47,7 +47,7 @@ struct DescriptionView: View {
                 label: {
                     HStack {
                         Image(systemName: "pencil")
-                        Text("Beschreibung bearbeiten") // TODO: l18n
+                        Text(L10n.Description.EditButton.copy)
                     }
                     .frame(maxWidth: .infinity)
                 })

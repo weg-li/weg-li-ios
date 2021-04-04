@@ -53,14 +53,14 @@ struct ContactView: View {
                     VStack {
                         Image(systemName: "info.circle")
                             .padding(.bottom, 4)
-                        Text("Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.") // TODO: Move text to l18n file
+                        Text(L10n.Contact.isSavedInAppHintCopy)
                             .multilineTextAlignment(.center)
                             .font(.callout)
                     }
                 }
             }
         }
-        .navigationBarTitle("Persönliche Daten", displayMode: .inline)
+        .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
     }
 
     private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {

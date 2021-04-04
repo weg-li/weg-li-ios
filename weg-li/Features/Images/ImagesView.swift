@@ -47,7 +47,7 @@ struct ImagesView: View {
         }) {
                 HStack {
                     Image(systemName: "photo.fill.on.rectangle.fill")
-                    Text("Foto importieren") // TODO: l18n
+                    Text(L10n.Photos.ImportButton.copy)
                 }
                 .frame(maxWidth: .infinity)
         }

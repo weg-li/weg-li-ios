@@ -32,10 +32,10 @@ struct ContactWidget: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            row(callout: "Name", content: "\(viewStore.firstName) \(viewStore.name)")
-            row(callout: "Straße", content: viewStore.street)
-            row(callout: "Stadt", content: "\(viewStore.postalCode) \(viewStore.city)")
-            row(callout: "Telefon", content: viewStore.phone)
+            row(callout: L10n.Contact.Row.nameCopy, content: "\(viewStore.firstName) \(viewStore.name)")
+            row(callout: L10n.Contact.Row.streetCopy, content: viewStore.street)
+            row(callout: L10n.Contact.Row.cityCopy, content: "\(viewStore.postalCode) \(viewStore.city)")
+            row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.phone)
             VStack(spacing: 8.0) {
                 NavigationLink(
                     destination: ContactView(
@@ -44,12 +44,12 @@ struct ContactWidget: View {
                             action: ReportAction.contact)
                     ),
                     label: {
-                        Text("Kontaktdaten bearbeiten") // TODO: l18n
+                        Text(L10n.Contact.editButtonCopy)
                             .frame(maxWidth: .infinity)
                     })
                     .buttonStyle(EditButtonStyle())
                     .padding(.top)
-                Text("Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.") // TODO: l18n
+                Text(L10n.Contact.reportHintCopy)
                     .font(.footnote)
                     .foregroundColor(.gray)
             }
