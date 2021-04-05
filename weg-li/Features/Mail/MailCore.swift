@@ -32,11 +32,17 @@ let mailViewReducer = Reducer<MailViewState, MailViewAction, MailViewEnvironment
 }
 
 extension MailViewState: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case mailComposeResult
+        case mail
+        case district
+    }
+    
     init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        let mailComposeResult = try container.decodeIfPresent(Int.self)
-        let mail = try container.decode(Mail.self)
-        let district = try container.decode(District.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let mailComposeResult = try container.decodeIfPresent(Int.self, forKey: .mailComposeResult)
+        let mail = try container.decode(Mail.self, forKey: .mail)
+        let district = try container.decode(District.self, forKey: .district)
         self.init(
             mailComposeResult: MFMailComposeResult(rawValue: mailComposeResult ?? 0)!,
             mail: mail,
@@ -45,10 +51,14 @@ extension MailViewState: Codable {
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.unkeyedContainer()
-        if let result = mailComposeResult {
-            try container.encode(result.rawValue)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch mailComposeResult {
+        case .none:
+            try container.encodeNil(forKey: .mailComposeResult)
+        case .some(let value):
+            try container.encode(value.rawValue, forKey: .mailComposeResult)
         }
-        try container.encode(mail)
+        try container.encode(mail, forKey: .mail)
+        try container.encode(district, forKey: .district)
     }
 }

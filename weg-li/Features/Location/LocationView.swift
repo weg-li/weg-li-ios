@@ -139,6 +139,7 @@ struct Location_Previews: PreviewProvider {
                 initialState: .init(
                     images: .init(),
                     contact: .preview,
+                    date: Date.init,
                     location: LocationViewState(
                         locationOption: .manual,
                         isMapExpanded: false,
