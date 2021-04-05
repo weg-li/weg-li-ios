@@ -98,12 +98,8 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             switch contactAction {
             case .onDisappear:
                 state.reportDraft.contact = state.contact
-                return Effect.concatenate(
-                    environment.userDefaultsClient.setContact(state.contact)
-                        .fireAndForget(),
-                    environment.userDefaultsClient.setReports([.preview])
-                        .fireAndForget()
-                )
+                return environment.userDefaultsClient.setContact(state.contact)
+                    .fireAndForget()
             default:
                 return .none
             }
