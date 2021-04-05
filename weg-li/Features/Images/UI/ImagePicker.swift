@@ -17,9 +17,10 @@ struct ImagePicker: UIViewControllerRepresentable {
         init(_ parent: ImagePicker) {
             self.parent = parent
         }
-
+        
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             guard !results.isEmpty else {
+                self.parent.isPresented = false
                 return
             }
 
@@ -49,10 +50,6 @@ struct ImagePicker: UIViewControllerRepresentable {
 
             parent.isPresented = false
         }
-
-        func imagePickerControllerDidCancel(_ picker: PHPickerViewController) {
-            parent.isPresented = false
-        }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -70,5 +67,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func updateUIViewController(
         _ uiViewController: PHPickerViewController,
-        context: UIViewControllerRepresentableContext<ImagePicker>) {}
+        context: UIViewControllerRepresentableContext<ImagePicker>) {
+        uiViewController.navigationItem.leftBarButtonItem?.tintColor = .purple
+    }
 }
