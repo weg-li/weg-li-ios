@@ -27,8 +27,22 @@ internal enum L10n {
       internal static let nameCopy = L10n.tr("Localizable", "contact.row.nameCopy")
       /// Telefon
       internal static let phoneCopy = L10n.tr("Localizable", "contact.row.phoneCopy")
-      /// Straße
+      /// Strasse
       internal static let streetCopy = L10n.tr("Localizable", "contact.row.streetCopy")
+    }
+    internal enum RowType {
+      /// Stadt
+      internal static let city = L10n.tr("Localizable", "contact.rowType.city")
+      /// Vorname
+      internal static let firstName = L10n.tr("Localizable", "contact.rowType.firstName")
+      /// Nachname
+      internal static let lastName = L10n.tr("Localizable", "contact.rowType.lastName")
+      /// Telefon
+      internal static let phone = L10n.tr("Localizable", "contact.rowType.phone")
+      /// Strasse
+      internal static let street = L10n.tr("Localizable", "contact.rowType.street")
+      /// PLZ
+      internal static let zipCode = L10n.tr("Localizable", "contact.rowType.zipCode")
     }
   }
 
