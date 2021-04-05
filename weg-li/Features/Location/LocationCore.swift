@@ -21,8 +21,7 @@ struct UserLocationState: Equatable {
     init(
         alert: AlertState<ReportAction>? = nil,
         isRequestingCurrentLocation: Bool = false,
-        region: CoordinateRegion? = nil)
-    {
+        region: CoordinateRegion? = nil) {
         self.alert = alert
         self.isRequestingCurrentLocation = isRequestingCurrentLocation
         self.region = region
