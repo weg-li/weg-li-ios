@@ -2,10 +2,6 @@
 
 import SwiftUI
 
-extension View {
-    func eraseToAnyView() -> AnyView { AnyView(self) }
-}
-
 extension Image {
     func iconModifier() -> some View {
         renderingMode(.template)
