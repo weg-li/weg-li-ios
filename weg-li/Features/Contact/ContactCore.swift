@@ -62,6 +62,7 @@ enum ContactAction: Equatable {
     case zipCodeChanged(String)
     case townChanged(String)
     case isContactValid
+    case onDisappear
 }
 
 // MARK: - Environment
@@ -98,6 +99,8 @@ let contactReducer =
                 state.address.postalCode,
                 state.phone
             ].allSatisfy { !$0.isEmpty }
+            return .none
+        case .onDisappear:
             return .none
         }
     }

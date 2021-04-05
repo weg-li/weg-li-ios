@@ -91,6 +91,19 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         case let .contact(contact):
             state.reportDraft.contact = state.contact
             return .none
+        case let .contact(contactAction):
+            switch contactAction {
+            case .onDisappear:
+                state.reportDraft.contact = state.contact
+                return Effect.concatenate(
+                    environment.userDefaultsClient.setContact(state.contact)
+                        .fireAndForget(),
+                    environment.userDefaultsClient.setReports([.preview])
+                        .fireAndForget()
+                )
+            default:
+                return .none
+            }
         case let .report(reportAction):
             if case let ReportAction.mail(.setMailResult(result)) = reportAction {
                 guard let mailComposerResult = result else {
