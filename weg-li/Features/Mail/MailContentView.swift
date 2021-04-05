@@ -69,10 +69,11 @@ struct MailContentView_Previews: PreviewProvider {
             store: .init(
                 initialState: .init(
                     images: .init(),
-                    contact: .preview),
+                    contact: .preview,
+                    date: Date.init),
                 reducer: reportReducer,
                 environment: ReportEnvironment(
-                    locationManager: LocationManager.live,
+                    locationManager: .live,
                     placeService: PlacesServiceImplementation(),
                     regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())))
         )
