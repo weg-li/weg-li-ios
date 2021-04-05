@@ -72,7 +72,7 @@ struct MailContentView_Previews: PreviewProvider {
                     contact: .preview),
                 reducer: reportReducer,
                 environment: ReportEnvironment(
-                    locationManager: LocationManager.unimplemented(),
+                    locationManager: LocationManager.live,
                     placeService: PlacesServiceImplementation(),
                     regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())))
         )
