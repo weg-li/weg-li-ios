@@ -11,7 +11,7 @@ import UIKit
 // MARK: - AppState
 
 struct HomeState: Equatable {
-    /// Users contact data. Persistet on the device
+    /// Users contact data
     private var _storedContact = ContactState()
     var contact: ContactState {
         get { _storedContact }
@@ -19,17 +19,14 @@ struct HomeState: Equatable {
     }
 
     /// Reports a user has sent
-    var reports: [Report] {
-        get { UserDefaultsConfig.reports }
-        set { UserDefaultsConfig.reports = newValue }
-    }
+    var reports: [Report] = []
 
     /// Holds a report that has not been stored or sent via mail
     private var _storedReport: Report?
     var reportDraft: Report {
         get {
             guard let report = _storedReport else {
-                return Report(images: .init(), contact: contact)
+                return Report(images: .init(), contact: contact, date: Date.init)
             }
             return report
         }
@@ -50,6 +47,7 @@ enum HomeAction: Equatable {
     case report(ReportAction)
     case showReportWizard(Bool)
     case reportSaved
+    case onAppear
 }
 
 // MARK: Location
@@ -69,6 +67,7 @@ extension HomeAction {
 
 struct HomeEnvironment {
     var mainQueue: AnySchedulerOf<DispatchQueue>
+    var userDefaultsClient: UserDefaultsClient
 }
 
 let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
@@ -88,9 +87,22 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         environment: { _ in ContactEnvironment() }),
     Reducer { state, action, environment in
         switch action {
-        case let .contact(contact):
-            state.reportDraft.contact = state.contact
+        // restore state from userdefaults
+        case .onAppear:
+            if let contact = environment.userDefaultsClient.contact {
+                state.contact = contact
+            }
+            state.reports = environment.userDefaultsClient.reports
             return .none
+        case let .contact(contactAction):
+            switch contactAction {
+            case .onDisappear:
+                state.reportDraft.contact = state.contact
+                return environment.userDefaultsClient.setContact(state.contact)
+                    .fireAndForget()
+            default:
+                return .none
+            }
         case let .report(reportAction):
             if case let ReportAction.mail(.setMailResult(result)) = reportAction {
                 guard let mailComposerResult = result else {
@@ -99,7 +111,10 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                 switch mailComposerResult {
                 case .sent:
                     state.reports.append(state.reportDraft)
+                    
                     return Effect.concatenate(
+                        environment.userDefaultsClient.setReports(state.reports)
+                            .fireAndForget(),
                         Effect(value: HomeAction.showReportWizard(false))
                             .delay(for: 0.5, scheduler: environment.mainQueue)
                             .eraseToEffect(),
@@ -108,13 +123,14 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                     return .none
                 }
             }
+            // sync contact with draftReport contact
             state.contact = state.reportDraft.contact
             return .none
         case let .showReportWizard(value):
             state.showReportWizard = value
             return .none
         case .reportSaved:
-            state.reportDraft = Report(images: .init(), contact: state.contact)
+            state.reportDraft = Report(images: .init(), contact: state.contact, date: Date.init)
             return .none
         }
     })
@@ -122,10 +138,9 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
 extension HomeState {
     static let preview = HomeState()
 
+    // init for previews
     init(reports: [Report]) {
         self.init()
         self.reports = reports
     }
 }
-
-struct NavigationError: Error {}

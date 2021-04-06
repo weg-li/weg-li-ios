@@ -61,7 +61,9 @@ struct Images_Previews: PreviewProvider {
                 initialState: .init(
                     images: .init(),
                     contact: ContactState.empty,
-                    location: LocationViewState(storedPhotos: [])),
+                    date: Date.init,
+                    location: LocationViewState(storedPhotos: [])
+                ),
                 reducer: .empty,
                 environment: ())
         )

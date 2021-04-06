@@ -61,6 +61,7 @@ struct ContactView: View {
             }
         }
         .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
+        .onDisappear { viewStore.send(.onDisappear) }
     }
 
     private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {

@@ -8,36 +8,45 @@ import XCTest
 class HomeStoreTests: XCTestCase {
     let fixedUUID = { UUID() }
     let fixedDate = { Date() }
-    let scheduler = DispatchQueue.testScheduler
-
+    let scheduler = DispatchQueue.test
+    private var userDefaults: UserDefaults!
+    
+    override func setUp() {
+        super.setUp()
+        
+        userDefaults = UserDefaults(suiteName: #file)
+        userDefaults.removePersistentDomain(forName: #file)
+    }
+    
     func test_updateContact_ShouldUpdateState() {
         let store = TestStore(
             initialState: HomeState(),
             reducer: homeReducer,
             environment: HomeEnvironment(
-                mainQueue: scheduler.eraseToAnyScheduler()
+                mainQueue: scheduler.eraseToAnyScheduler(),
+                userDefaultsClient: .noop
             ))
-
+        
         let newContact: ContactState = .preview
-
+        
         store.assert(
             .send(.contact(.firstNameChanged(newContact.firstName))) {
                 $0.contact.firstName = newContact.firstName
-                $0.reportDraft.contact.firstName = newContact.firstName
             },
             .receive(.contact(.isContactValid)))
     }
-
+    
     func test_updateReport_ShouldUpdateState() {
         let store = TestStore(
             initialState: HomeState(),
             reducer: homeReducer,
             environment: HomeEnvironment(
-                mainQueue: scheduler.eraseToAnyScheduler()
+                mainQueue: scheduler.eraseToAnyScheduler(),
+                userDefaultsClient: .noop
             ))
-
+        
         let newContact: ContactState = .preview
-
+        
         store.assert(
             .send(.report(.contact(.firstNameChanged(newContact.firstName)))) {
                 $0.contact.firstName = newContact.firstName
@@ -45,7 +54,7 @@ class HomeStoreTests: XCTestCase {
             },
             .receive(.report(.contact(.isContactValid))))
     }
-
+    
     func test_sentMailResult_shouldAppendDraftReportToReports() {
         let report = Report(
             uuid: fixedUUID(),
@@ -55,7 +64,7 @@ class HomeStoreTests: XCTestCase {
                 resolvedLocation: nil),
             contact: ContactState(),
             district: nil,
-            date: fixedDate(),
+            date: fixedDate,
             car: .init(
                 color: "Red",
                 type: "Big Car",
@@ -63,13 +72,15 @@ class HomeStoreTests: XCTestCase {
             charge: .init(),
             location: .init(storedPhotos: []),
             mail: .init())
-
+        
         let store = TestStore(
             initialState: HomeState(reportDraft: report),
             reducer: homeReducer,
-            environment: HomeEnvironment(mainQueue: scheduler.eraseToAnyScheduler()
+            environment: HomeEnvironment(
+                mainQueue: scheduler.eraseToAnyScheduler(),
+                userDefaultsClient: .noop
             ))
-
+        
         store.assert(
             .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
                 $0.reports = [report]
@@ -81,6 +92,47 @@ class HomeStoreTests: XCTestCase {
             .receive(.reportSaved) {
                 $0.reportDraft = Report(images: .init(), contact: .init())
             })
+    }
+    
+    func test_contactStateShouldBeSaved_onContactViewDisappearAction() {
+        let report = Report(
+            uuid: fixedUUID(),
+            images: ImagesViewState(
+                showImagePicker: false,
+                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
+                resolvedLocation: nil),
+            contact: .preview,
+            district: nil,
+            date: fixedDate,
+            car: .init(
+                color: "Red",
+                type: "Big Car",
+                licensePlateNumber: "MIT"),
+            charge: .init(),
+            location: .init(storedPhotos: []),
+            mail: .init())
+        
+        let store = TestStore(
+            initialState: HomeState(reportDraft: report),
+            reducer: homeReducer,
+            environment: HomeEnvironment(
+                mainQueue: scheduler.eraseToAnyScheduler(),
+                userDefaultsClient: .live(userDefaults: userDefaults)
+            ))
+        
+        store.assert(
+            .send(.contact(.firstNameChanged("Bob"))) {
+                $0.contact.firstName = "Bob"
+            },
+            .receive(.contact(.isContactValid)) {
+                $0.contact.isValid = false
+            },
+            .send(.contact(.onDisappear)) {
+                $0.reportDraft.contact = $0.contact
+                // check if contact has been saved to defaults
+                XCTAssertEqual(store.environment.userDefaultsClient.contact, $0.contact)
+            }
+        )
     }
 }
 

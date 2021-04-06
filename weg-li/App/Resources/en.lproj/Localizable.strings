@@ -67,13 +67,19 @@
 
 "location.pickerCopy.manual" = "Manuell";
 
+"location.alert.provideAuth" = "Die Standortnutzung macht diese App besser. Bitte geben Sie uns Zugang.";
+
+"location.alert.serviceIsOff" = "Ortungsdienste sind deaktiviert.";
+
+"location.alert.provideAccessToLocationService" = "Bitte geben Sie uns in den Einstellungen Zugriff auf Ihren Standort.";
+
 
 // Contact
 "contact.widgetTitle" = "Kontaktdaten";
 
 "contact.row.nameCopy" = "Name";
 
-"contact.row.streetCopy" = "Straße";
+"contact.row.streetCopy" = "Strasse";
 
 "contact.row.cityCopy" = "Stadt";
 
@@ -84,6 +90,18 @@
 "contact.reportHintCopy" = "Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
 
 "contact.isSavedInAppHintCopy" = "Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.";
+
+"contact.rowType.firstName" = "Vorname";
+
+"contact.rowType.lastName" = "Nachname";
+
+"contact.rowType.street" = "Strasse";
+
+"contact.rowType.city" = "Stadt";
+
+"contact.rowType.zipCode" = "PLZ";
+
+"contact.rowType.phone" = "Telefon";
 
 
 // Mail

@@ -19,7 +19,7 @@ struct HomeView: View {
                     emptyStateView
                 } else {
                     ScrollView {
-                        ForEach(viewStore.reports, id: \.uuid) { report in
+                        ForEach(viewStore.reports, id: \.id) { report in
                             ReportCellView(report: report)
                         }
                         .padding()
@@ -29,6 +29,7 @@ struct HomeView: View {
             }
             .navigationBarTitle(L10n.Home.navigationBarTitle)
             .navigationBarItems(trailing: contactData)
+            .onAppear { viewStore.send(.onAppear) }
         }
     }
 

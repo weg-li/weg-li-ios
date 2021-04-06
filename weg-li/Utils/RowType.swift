@@ -8,12 +8,12 @@ enum RowType {
 
     var label: String {
         switch self {
-        case .firstName: return "Vorname"
-        case .lastName: return "Nachname"
-        case .street: return "Strasse"
-        case .town: return "Stadt"
-        case .zipCode: return "PLZ"
-        case .phone: return "Telefon"
+        case .firstName: return L10n.Contact.RowType.firstName
+        case .lastName: return L10n.Contact.RowType.lastName
+        case .street: return L10n.Contact.RowType.street
+        case .town: return L10n.Contact.RowType.city
+        case .zipCode: return L10n.Contact.RowType.zipCode
+        case .phone: return L10n.Contact.RowType.phone
         }
     }
 

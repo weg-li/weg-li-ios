@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "8B00AAF1-2E21-4B40-8FB5-1364D51153D6",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:weg-li.xcodeproj",
+        "identifier" : "9F971E8C247ABFCB00A68959",
+        "name" : "weg-liTests"
+      }
+    }
+  ],
+  "version" : 1
+}

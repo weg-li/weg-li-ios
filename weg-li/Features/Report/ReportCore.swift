@@ -8,16 +8,38 @@ import SwiftUI
 // MARK: - Report Core
 
 struct Report: Codable {
-    var uuid = UUID()
+    var id: String
     var images: ImagesViewState
     var contact: ContactState
     var district: District?
 
-    var date = Date()
-    var car = Car()
-    var charge = Charge()
-    var location = LocationViewState(storedPhotos: [])
-    var mail = MailViewState()
+    var date: Date
+    var car: Car
+    var charge: Charge
+    var location: LocationViewState
+    var mail: MailViewState
+    
+    init(
+        uuid: UUID = UUID(),
+        images: ImagesViewState,
+        contact: ContactState,
+        district: District? = nil,
+        date: () -> Date = Date.init,
+        car: Report.Car = Car(),
+        charge: Report.Charge = Charge(),
+        location: LocationViewState = LocationViewState(storedPhotos: []),
+        mail: MailViewState = MailViewState()
+    ) {
+        self.id = uuid.uuidString
+        self.images = images
+        self.contact = contact
+        self.district = district
+        self.date = date()
+        self.car = car
+        self.charge = charge
+        self.location = location
+        self.mail = mail
+    }
 }
 
 extension Report: Equatable {
@@ -246,13 +268,13 @@ extension Report {
             uuid: UUID(),
             images: .init(
                 showImagePicker: false,
-                storedPhotos: []),
+                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!]),
             contact: .preview,
             district: District(
                 name: "Hamburg St. Pauli",
                 zipCode: "20099",
                 mail: "mail@stpauli.de"),
-            date: Date(),
+            date: Date.init,
             car: Car(
                 color: "Gelb",
                 type: "Kleinbus",

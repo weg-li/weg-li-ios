@@ -23,8 +23,7 @@ struct MailView: UIViewControllerRepresentable {
 
         init(isShowing: Binding<Bool>,
              result: Binding<MFMailComposeResult?>,
-             mail: Mail)
-        {
+             mail: Mail) {
             _isShowing = isShowing
             _result = result
             self.mail = mail
@@ -33,8 +32,7 @@ struct MailView: UIViewControllerRepresentable {
         func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
-            error: Error?)
-        {
+            error: Error?) {
             defer { isShowing = false }
             guard error == nil else {
                 self.result = .failed

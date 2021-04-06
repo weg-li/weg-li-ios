@@ -21,8 +21,7 @@ struct UserLocationState: Equatable {
     init(
         alert: AlertState<ReportAction>? = nil,
         isRequestingCurrentLocation: Bool = false,
-        region: CoordinateRegion? = nil)
-    {
+        region: CoordinateRegion? = nil) {
         self.alert = alert
         self.isRequestingCurrentLocation = isRequestingCurrentLocation
         self.region = region
@@ -58,7 +57,7 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
     case .didChangeAuthorization(.denied):
         if state.isRequestingCurrentLocation {
             state.alert = .init(
-                title: TextState("Location makes this app better. Please consider giving us access.") // l18n
+                title: TextState(L10n.Location.Alert.provideAuth)
             )
             state.isRequestingCurrentLocation = false
         }
@@ -135,7 +134,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
 
         case .locationRequested:
             guard environment.locationManager.locationServicesEnabled() else {
-                state.userLocationState.alert = .init(title: TextState("Location services are turned off.")) // l18n
+                state.userLocationState.alert = .init(title: TextState(L10n.Location.Alert.serviceIsOff))
                 return .none
             }
             switch environment.locationManager.authorizationStatus() {
@@ -147,11 +146,11 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                     .fireAndForget()
 
             case .restricted:
-                state.userLocationState.alert = .init(title: TextState("Please give us access to your location in settings.")) // l18n
+                state.userLocationState.alert = .init(title: TextState(L10n.Location.Alert.provideAccessToLocationService))
                 return .none
 
             case .denied:
-                state.userLocationState.alert = .init(title: TextState("Please give us access to your location in settings.")) // l18n
+                state.userLocationState.alert = .init(title: TextState(L10n.Location.Alert.provideAccessToLocationService))
                 return .none
 
             case .authorizedAlways, .authorizedWhenInUse:
