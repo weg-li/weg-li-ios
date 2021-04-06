@@ -67,6 +67,12 @@
 
 "location.pickerCopy.manual" = "Manuell";
 
+"location.alert.provideAuth" = "Die Standortnutzung macht diese App besser. Bitte geben Sie uns Zugang.";
+
+"location.alert.serviceIsOff" = "Ortungsdienste sind deaktiviert.";
+
+"location.alert.provideAccessToLocationService" = "Bitte geben Sie uns in den Einstellungen Zugriff auf Ihren Standort.";
+
 
 // Contact
 "contact.widgetTitle" = "Kontaktdaten";

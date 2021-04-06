@@ -97,6 +97,14 @@ internal enum L10n {
       /// Karteansicht erweitern
       internal static let expandButtonLabel = L10n.tr("Localizable", "location.a11y.expandButtonLabel")
     }
+    internal enum Alert {
+      /// Bitte geben Sie uns in den Einstellungen Zugriff auf Ihren Standort.
+      internal static let provideAccessToLocationService = L10n.tr("Localizable", "location.alert.provideAccessToLocationService")
+      /// Die Standortnutzung macht diese App besser. Bitte geben Sie uns Zugang.
+      internal static let provideAuth = L10n.tr("Localizable", "location.alert.provideAuth")
+      /// Ortungsdienste sind deaktiviert.
+      internal static let serviceIsOff = L10n.tr("Localizable", "location.alert.serviceIsOff")
+    }
     internal enum PickerCopy {
       /// Standort
       internal static let currentLocation = L10n.tr("Localizable", "location.pickerCopy.currentLocation")
