@@ -33,18 +33,6 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9F971E8C247ABFCB00A68959"
-               BuildableName = "weg-liTests.xctest"
-               BlueprintName = "weg-liTests"
-               ReferencedContainer = "container:weg-li.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
