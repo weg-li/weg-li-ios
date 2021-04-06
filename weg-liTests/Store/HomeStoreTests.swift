@@ -64,7 +64,7 @@ class HomeStoreTests: XCTestCase {
                 resolvedLocation: nil),
             contact: ContactState(),
             district: nil,
-            date: fixedDate(),
+            date: fixedDate,
             car: .init(
                 color: "Red",
                 type: "Big Car",
@@ -82,7 +82,9 @@ class HomeStoreTests: XCTestCase {
             ))
         
         store.assert(
-            .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))),
+            .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
+                $0.reports = [report]
+            },
             .do { self.scheduler.advance(by: 1) },
             .receive(.showReportWizard(false)) {
                 $0.showReportWizard = false
@@ -101,7 +103,7 @@ class HomeStoreTests: XCTestCase {
                 resolvedLocation: nil),
             contact: .preview,
             district: nil,
-            date: fixedDate(),
+            date: fixedDate,
             car: .init(
                 color: "Red",
                 type: "Big Car",

@@ -24,7 +24,7 @@ class ReportStoreTests: XCTestCase {
                     resolvedLocation: nil),
                 contact: .preview,
                 district: nil,
-                date: fixedDate(),
+                date: fixedDate,
                 car: .init(
                     color: "",
                     type: "",
@@ -70,7 +70,7 @@ class ReportStoreTests: XCTestCase {
                     resolvedLocation: nil),
                 contact: .empty,
                 district: nil,
-                date: fixedDate(),
+                date: fixedDate,
                 car: Report.Car(
                     color: "",
                     type: "",
@@ -107,7 +107,7 @@ class ReportStoreTests: XCTestCase {
                     resolvedLocation: nil),
                 contact: .empty,
                 district: nil,
-                date: fixedDate(),
+                date: fixedDate,
                 car: Report.Car(
                     color: "",
                     type: "",
@@ -146,7 +146,7 @@ class ReportStoreTests: XCTestCase {
                     resolvedLocation: nil),
                 contact: .empty,
                 district: nil,
-                date: fixedDate(),
+                date: fixedDate,
                 car: Report.Car(
                     color: "",
                     type: "",
@@ -198,7 +198,7 @@ class ReportStoreTests: XCTestCase {
                     resolvedLocation: nil),
                 contact: .empty,
                 district: nil,
-                date: fixedDate(),
+                date: fixedDate,
                 car: Report.Car(
                     color: "",
                     type: "",
