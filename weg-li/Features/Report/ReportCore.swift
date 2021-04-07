@@ -14,8 +14,7 @@ struct Report: Codable {
     var district: District?
 
     var date: Date
-    var car: Car
-    var charge: Charge
+    var description: DescriptionState
     var location: LocationViewState
     var mail: MailViewState
     
@@ -25,8 +24,7 @@ struct Report: Codable {
         contact: ContactState,
         district: District? = nil,
         date: () -> Date = Date.init,
-        car: Report.Car = Car(),
-        charge: Report.Charge = Charge(),
+        description: DescriptionState = DescriptionState(),
         location: LocationViewState = LocationViewState(storedPhotos: []),
         mail: MailViewState = MailViewState()
     ) {
@@ -35,8 +33,7 @@ struct Report: Codable {
         self.contact = contact
         self.district = district
         self.date = date()
-        self.car = car
-        self.charge = charge
+        self.description = description
         self.location = location
         self.mail = mail
     }
@@ -46,47 +43,15 @@ extension Report: Equatable {
     static func == (lhs: Report, rhs: Report) -> Bool {
         return lhs.contact == rhs.contact
             && lhs.district == rhs.district
-            && lhs.car == rhs.car
-            && lhs.charge == rhs.charge
+            && lhs.description == rhs.description
             && lhs.location == rhs.location
     }
-}
-
-extension Report {
-    struct Car: Equatable, Codable {
-        var color: String = ""
-        var type: String = ""
-        var licensePlateNumber: String = ""
-    }
-
-    struct Charge: Equatable, Codable {
-        var selectedDuration = 0
-        var selectedType = 0
-        var blockedOthers = false
-
-        var time: String { Times.allCases[selectedDuration].description }
-    }
-
-    var isDescriptionValid: Bool {
-        return [
-            car.type,
-            car.color,
-            car.licensePlateNumber
-        ]
-        .allSatisfy { !$0.isEmpty }
-    }
-}
-
-extension Report.Charge {
-    static let charges = Bundle.main.decode([String].self, from: "charges.json")
-    static let times = Times.allCases
 }
 
 enum ReportAction: Equatable {
     case images(ImagesViewAction)
     case contact(ContactAction)
-    case car(CarAction)
-    case charge(ChargeAction)
+    case description(DescriptionAction)
     case location(LocationViewAction)
     case mail(MailViewAction)
     case viewAppeared
@@ -104,14 +69,10 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         state: \.images,
         action: /ReportAction.images,
         environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }),
-    carReducer.pullback(
-        state: \.car,
-        action: /ReportAction.car,
-        environment: { _ in CarEnvironment() }),
-    chargeReducer.pullback(
-        state: \.charge,
-        action: /ReportAction.charge,
-        environment: { _ in ChargeEnvironment() }),
+    descriptionReducer.pullback(
+        state: \.description,
+        action: /ReportAction.description,
+        environment: { _ in DescriptionEnvironment() }),
     contactReducer.pullback(
         state: \.contact,
         action: /ReportAction.contact,
@@ -159,60 +120,10 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             } else {
                 return .none
             }
-        case .contact, .car, .charge, .location:
+        case .contact, .description, .location:
             return .none
         }
     })
-
-// MARK: - Car Core
-
-enum CarAction: Equatable {
-    case type(String)
-    case color(String)
-    case licensePlateNumber(String)
-}
-
-struct CarEnvironment {}
-
-/// Reducer resposonsible for updating the car object
-let carReducer = Reducer<Report.Car, CarAction, CarEnvironment> { state, action, _ in
-    switch action {
-    case let .type(value):
-        state.type = value
-        return .none
-    case let .color(value):
-        state.color = value
-        return .none
-    case let .licensePlateNumber(value):
-        state.licensePlateNumber = value
-        return .none
-    }
-}
-
-// MARK: - Charge Core
-
-enum ChargeAction: Equatable {
-    case toggleBlockedOthers
-    case selectCharge(Int)
-    case selectDuraration(Int)
-}
-
-struct ChargeEnvironment {}
-
-/// Reducer resposonsible for updating the charge object
-let chargeReducer = Reducer<Report.Charge, ChargeAction, ChargeEnvironment> { state, action, _ in
-    switch action {
-    case .toggleBlockedOthers:
-        state.blockedOthers.toggle()
-        return .none
-    case let .selectCharge(value):
-        state.selectedType = value
-        return .none
-    case let .selectDuraration(value):
-        state.selectedDuration = value
-        return .none
-    }
-}
 
 extension Report {
     func createMailBody() -> String {
@@ -222,19 +133,19 @@ extension Report {
 
         hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
 
-        Kennzeichen: \(car.licensePlateNumber)
+        Kennzeichen: \(description.licensePlateNumber)
 
-        Marke: \(car.type)
+        Marke: \(description.type)
 
-        Farbe: \(car.color)
+        Farbe: \(description.color)
 
         Adresse: \(contact.address.humanReadableAddress)
 
-        Verstoß: \(Report.Charge.charges[charge.selectedType])
+        Verstoß: \(DescriptionState.charges[description.selectedType])
 
         Tatzeit: \(date.humandReadableDate)
 
-        Zeitraum: \(charge.time)
+        Zeitraum: \(description.time)
 
         Das Fahrzeug war verlassen.
 
@@ -277,14 +188,14 @@ extension Report {
                 zipCode: "20099",
                 mail: "mail@stpauli.de"),
             date: Date.init,
-            car: Car(
+            description: .init(
                 color: "Gelb",
                 type: "Kleinbus",
-                licensePlateNumber: "HH-ST-PAULI"),
-            charge: Charge(
+                licensePlateNumber: "HH-ST-PAULI",
                 selectedDuration: 0,
                 selectedType: 0,
-                blockedOthers: false),
+                blockedOthers: false
+            ),
             location: LocationViewState(storedPhotos: []))
     }
 }

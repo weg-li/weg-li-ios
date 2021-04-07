@@ -25,14 +25,7 @@ class ReportStoreTests: XCTestCase {
                 contact: .preview,
                 district: nil,
                 date: fixedDate,
-                car: .init(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false)),
+                description: .init()),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
@@ -71,14 +64,7 @@ class ReportStoreTests: XCTestCase {
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                car: Report.Car(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false)),
+                description: .init()),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
@@ -88,11 +74,11 @@ class ReportStoreTests: XCTestCase {
         let color = "Red"
         let type = "Plymouth Valiant"
         store.assert(
-            .send(.car(.color(color))) {
-                $0.car.color = color
+            .send(.description(.setColor(color))) {
+                $0.description.color = color
             },
-            .send(.car(.type(type))) {
-                $0.car.type = type
+            .send(.description(.setType(type))) {
+                $0.description.type = type
             })
     }
 
@@ -108,14 +94,7 @@ class ReportStoreTests: XCTestCase {
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                car: Report.Car(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false)),
+                description: .init()),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
@@ -125,11 +104,11 @@ class ReportStoreTests: XCTestCase {
         let duration = 42
         let type = 23
         store.assert(
-            .send(.charge(.selectCharge(type))) {
-                $0.charge.selectedType = type
+            .send(.description(.setCharge(type))) {
+                $0.description.selectedType = type
             },
-            .send(.charge(.selectDuraration(duration))) {
-                $0.charge.selectedDuration = duration
+            .send(.description(.setDuraration(duration))) {
+                $0.description.selectedDuration = duration
             })
     }
 
@@ -147,14 +126,7 @@ class ReportStoreTests: XCTestCase {
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                car: Report.Car(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false)),
+                description: .init()),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
@@ -199,14 +171,7 @@ class ReportStoreTests: XCTestCase {
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                car: Report.Car(
-                    color: "",
-                    type: "",
-                    licensePlateNumber: ""),
-                charge: .init(
-                    selectedDuration: 0,
-                    selectedType: 0,
-                    blockedOthers: false),
+                description: .init(),
                 location: LocationViewState(
                     locationOption: .currentLocation,
                     isMapExpanded: false,

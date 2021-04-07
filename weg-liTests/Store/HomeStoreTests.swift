@@ -65,11 +65,7 @@ class HomeStoreTests: XCTestCase {
             contact: ContactState(),
             district: nil,
             date: fixedDate,
-            car: .init(
-                color: "Red",
-                type: "Big Car",
-                licensePlateNumber: "MIT"),
-            charge: .init(),
+            description: .init(),
             location: .init(storedPhotos: []),
             mail: .init())
         
@@ -104,11 +100,7 @@ class HomeStoreTests: XCTestCase {
             contact: .preview,
             district: nil,
             date: fixedDate,
-            car: .init(
-                color: "Red",
-                type: "Big Car",
-                licensePlateNumber: "MIT"),
-            charge: .init(),
+            description: .init(),
             location: .init(storedPhotos: []),
             mail: .init())
         

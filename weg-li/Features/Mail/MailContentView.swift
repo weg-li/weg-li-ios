@@ -15,7 +15,7 @@ struct MailContentView: View {
             districtName = state.district?.name ?? ""
             let isValid = !state.images.storedPhotos.isEmpty
                 && state.contact.isValid
-                && state.isDescriptionValid
+                && state.description.isValid
                 && state.location.resolvedAddress.isValid
             isSubmitButtonDisabled = !isValid
             isMailComposerPresented = state.mail.isPresentingMailContent
