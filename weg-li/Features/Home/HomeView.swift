@@ -129,8 +129,8 @@ private struct ReportCellView: View {
                         Image(systemName: "car")
                             .font(.title2)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("\(report.car.type), \(report.car.color)")
-                            Text(report.car.licensePlateNumber)
+                            Text("\(report.description.type), \(report.description.color)")
+                            Text(verbatim: report.description.licensePlateNumber)
                         }
                         .font(.body)
                     }
@@ -139,8 +139,8 @@ private struct ReportCellView: View {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.title2)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(report.charge.time)
-                            Text(Report.Charge.charges[report.charge.selectedType])
+                            Text(report.description.time)
+                            Text(DescriptionState.charges[report.description.selectedType])
                         }
                         .font(.body)
                     }

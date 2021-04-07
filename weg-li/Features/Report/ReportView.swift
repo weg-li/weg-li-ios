@@ -13,7 +13,7 @@ struct ReportForm: View {
         init(state: Report) {
             isPhotosValid = !state.images.storedPhotos.isEmpty
             isContactValid = state.contact.isValid
-            isDescriptionValid = state.isDescriptionValid
+            isDescriptionValid = state.description.isValid
             isLocationValid = state.location.resolvedAddress.isValid
         }
     }

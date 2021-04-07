@@ -5,12 +5,12 @@ import SwiftUI
 
 struct DescriptionView: View {
     struct ViewState: Equatable {
-        let report: Report
+        let description: DescriptionState
         let chargeType: String
 
         init(state: Report) {
-            report = state
-            chargeType = Report.Charge.charges[state.charge.selectedType]
+            description = state.description
+            chargeType = DescriptionState.charges[state.description.selectedType]
         }
     }
 
@@ -25,12 +25,12 @@ struct DescriptionView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 8) {
-                row(title: L10n.Description.Row.carType, content: viewStore.report.car.type)
-                row(title: L10n.Description.Row.carColor, content: viewStore.report.car.color)
-                row(title: L10n.Description.Row.licensplateNumber, content: viewStore.report.car.licensePlateNumber)
-                row(title: L10n.Description.Row.length, content: viewStore.report.charge.time)
+                row(title: L10n.Description.Row.carType, content: viewStore.description.type)
+                row(title: L10n.Description.Row.carColor, content: viewStore.description.color)
+                row(title: L10n.Description.Row.licensplateNumber, content: viewStore.description.licensePlateNumber)
+                row(title: L10n.Description.Row.length, content: viewStore.description.time)
                 row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)
-                if viewStore.report.charge.blockedOthers {
+                if viewStore.description.blockedOthers {
                     HStack {
                         Text(L10n.Description.Row.didBlockOthers)
                             .foregroundColor(Color(.secondaryLabel))

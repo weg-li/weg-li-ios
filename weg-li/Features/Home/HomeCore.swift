@@ -39,28 +39,12 @@ struct HomeState: Equatable {
 }
 
 // MARK: - AppAction
-
-typealias Address = CNPostalAddress
-
 enum HomeAction: Equatable {
     case contact(ContactAction)
     case report(ReportAction)
     case showReportWizard(Bool)
     case reportSaved
     case onAppear
-}
-
-// MARK: Location
-
-// MARK: Description
-
-extension HomeAction {
-    enum DescriptionAction {
-        case setCar(Report.Car)
-        case setCharge(Report.Charge)
-        case resolveDistrict(Address)
-        case setDistrict(District)
-    }
 }
 
 // MARK: - Environment
@@ -144,3 +128,5 @@ extension HomeState {
         self.reports = reports
     }
 }
+
+typealias Address = CNPostalAddress
