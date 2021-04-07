@@ -61,7 +61,7 @@ class HomeStoreTests: XCTestCase {
             images: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                resolvedLocation: nil),
+                resolvedLocation: .zero),
             contact: ContactState(),
             district: nil,
             date: fixedDate,
@@ -100,7 +100,7 @@ class HomeStoreTests: XCTestCase {
             images: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                resolvedLocation: nil),
+                resolvedLocation: .zero),
             contact: .preview,
             district: nil,
             date: fixedDate,

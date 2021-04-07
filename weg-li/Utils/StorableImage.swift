@@ -3,17 +3,30 @@
 import Foundation
 import UIKit
 
-struct StorableImage: Equatable, Codable {
+struct StorableImage: Hashable, Identifiable {
+    // default is uuidString
+    let id: UUID
     let image: Data
-
-    init?(uiImage: UIImage) {
-        guard let data = uiImage.pngData() else {
-            return nil
-        }
-        image = data
+    
+    internal init(id: UUID = UUID(), image: Data) {
+        self.id = id
+        self.image = image
     }
-
+    
     var asUIImage: UIImage? {
         UIImage(data: image)
     }
 }
+
+extension StorableImage {
+    init?(id: UUID = UUID(), uiImage: UIImage) {
+        guard let data = uiImage.pngData() else {
+            return nil
+        }
+        image = data
+        self.id = id
+    }
+
+}
+
+extension StorableImage: Codable {}

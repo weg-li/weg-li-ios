@@ -5,11 +5,10 @@ import CoreLocation
 import PhotosUI
 import SwiftUI
 
-typealias ImagePickerHander = (UIImage, CLLocationCoordinate2D?) -> Void
-
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
-    let imagePickerHandler: ImagePickerHander
+    @Binding var pickerResult: [StorableImage?]
+    @Binding var coordinate: CLLocationCoordinate2D
 
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
         private let parent: ImagePicker
@@ -24,30 +23,26 @@ struct ImagePicker: UIViewControllerRepresentable {
                 return
             }
 
-            let imageResult = results[0]
-
-            var coordinate: CLLocationCoordinate2D?
-            if imageResult.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                var image: UIImage?
-                if let assetId = imageResult.assetIdentifier {
-                    let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-                    coordinate = assetResults.firstObject?.location?.coordinate
-                }
-
-                imageResult.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
-                    if let error = error {
-                        print(error.localizedDescription)
-                    } else {
-                        image = selectedImage as? UIImage
-                        DispatchQueue.main.async {
-                            self.parent.imagePickerHandler(
-                                image!,
-                                coordinate)
+            for result in results {
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    if let assetId = result.assetIdentifier {
+                        let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
+                        self.parent.coordinate = assetResults.firstObject?.location?.coordinate ?? .zero
+                    }
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
+                        if let error = error {
+                            debugPrint(error.localizedDescription)
+                        } else if let image = selectedImage as? UIImage {
+                            DispatchQueue.main.async {
+                                self.parent.pickerResult.append(StorableImage(uiImage: image))
+                            }
+                        } else {
+                            debugPrint("Can not load asset")
                         }
                     }
+
                 }
             }
-
             parent.isPresented = false
         }
     }
@@ -59,7 +54,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> PHPickerViewController {
         var config = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
         config.filter = .images
-        config.selectionLimit = 1
+        config.selectionLimit = 0
         let controller = PHPickerViewController(configuration: config)
         controller.delegate = context.coordinator
         return controller

@@ -1,43 +1,54 @@
 // Created for weg-li in 2021.
 
+import CoreLocation
 import ComposableArchitecture
 import SwiftUI
 
 struct ImagesView: View {
+    let store: Store<Report, ReportAction>
     @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
 
     init(store: Store<Report, ReportAction>) {
+        self.store = store
         viewStore = ViewStore(
             store.scope(
                 state: \.images,
-                action: { ReportAction.images($0) })
+                action: ReportAction.images
+            )
         )
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20.0) {
-            ScrollView(.horizontal) {
-                ImageGrid(
-                    images: viewStore.storedPhotos.compactMap { $0.asUIImage }) { index in
-                        viewStore.send(.removePhoto(index: index))
-                }
-            }
+            ImageGrid(
+                store: store.scope(
+                    state: \.images,
+                    action: ReportAction.images
+                )
+            )
             importButton
                 .buttonStyle(EditButtonStyle())
         }
         .sheet(
             isPresented: viewStore.binding(
                 get: \.showImagePicker,
-                send: { ImagesViewAction.setShowImagePicker($0) }),
+                send: ImagesViewAction.setShowImagePicker
+            ),
             content: {
                 ImagePicker(
                     isPresented: viewStore.binding(
                         get: \.showImagePicker,
-                        send: { ImagesViewAction.setShowImagePicker($0) }),
-                    imagePickerHandler: { image, coordinate in
-                        viewStore.send(.addPhoto(image))
-                        viewStore.send(.setResolvedCoordinate(coordinate))
-                    })
+                        send: ImagesViewAction.setShowImagePicker
+                    ),
+                    pickerResult: viewStore.binding(
+                        get: \.storedPhotos,
+                        send: ImagesViewAction.addPhotos
+                    ),
+                    coordinate: viewStore.binding(
+                        get: \.resolvedLocation,
+                        send: ImagesViewAction.setResolvedCoordinate
+                    )
+                )
             })
     }
 

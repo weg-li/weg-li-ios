@@ -25,6 +25,8 @@
 		73719B38261A3FFB005E09A3 /* UserDefaultsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73719B37261A3FFB005E09A3 /* UserDefaultsClient.swift */; };
 		73719B40261AD1CE005E09A3 /* Codable+Sugar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73719B3F261AD1CE005E09A3 /* Codable+Sugar.swift */; };
 		73719B5F261B8A09005E09A3 /* WegliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73719B5E261B8A09005E09A3 /* WegliApp.swift */; };
+		73719B6D261C7B75005E09A3 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73719B6C261C7B75005E09A3 /* ImageView.swift */; };
+		73719B71261DB2E5005E09A3 /* ImageCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73719B70261DB2E5005E09A3 /* ImageCore.swift */; };
 		7388122E260BD2E2008B9956 /* CarStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388122D260BD2E2008B9956 /* CarStoreTests.swift */; };
 		73881237260BD4D5008B9956 /* ChargeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73881236260BD4D5008B9956 /* ChargeStoreTests.swift */; };
 		7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7388123A260BD5BD008B9956 /* ReportStoreTests.swift */; };
@@ -106,6 +108,8 @@
 		73719B3F261AD1CE005E09A3 /* Codable+Sugar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+Sugar.swift"; sourceTree = "<group>"; };
 		73719B45261B2249005E09A3 /* UnitTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTests.xctestplan; sourceTree = "<group>"; };
 		73719B5E261B8A09005E09A3 /* WegliApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WegliApp.swift; sourceTree = "<group>"; };
+		73719B6C261C7B75005E09A3 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
+		73719B70261DB2E5005E09A3 /* ImageCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCore.swift; sourceTree = "<group>"; };
 		7388122D260BD2E2008B9956 /* CarStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarStoreTests.swift; sourceTree = "<group>"; };
 		73881236260BD4D5008B9956 /* ChargeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeStoreTests.swift; sourceTree = "<group>"; };
 		7388123A260BD5BD008B9956 /* ReportStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportStoreTests.swift; sourceTree = "<group>"; };
@@ -280,6 +284,8 @@
 				73D117C42611DD94000D7B82 /* ImagesCore.swift */,
 				F8897519234E015E0014FCC8 /* ImagesView.swift */,
 				9F73E8FE24878DFB002E22F4 /* UI */,
+				73719B6C261C7B75005E09A3 /* ImageView.swift */,
+				73719B70261DB2E5005E09A3 /* ImageCore.swift */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -621,6 +627,7 @@
 				73719B40261AD1CE005E09A3 /* Codable+Sugar.swift in Sources */,
 				9F98A7BE248EB25400E06AA4 /* PlacesService.swift in Sources */,
 				9F2EB23A24961CEE008B2D4E /* DescriptionView.swift in Sources */,
+				73719B71261DB2E5005E09A3 /* ImageCore.swift in Sources */,
 				9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */,
 				73C5440E2616605900A40639 /* DistrictRepository.swift in Sources */,
 				9FFBAD65248E975700F66ADB /* MapView.swift in Sources */,
@@ -657,6 +664,7 @@
 				9FB5B13F2499DC4400830770 /* District.swift in Sources */,
 				73719B38261A3FFB005E09A3 /* UserDefaultsClient.swift in Sources */,
 				73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */,
+				73719B6D261C7B75005E09A3 /* ImageView.swift in Sources */,
 				73D117B92611CC71000D7B82 /* ImageConverter.swift in Sources */,
 				7308C537260B5A1500FE3333 /* ReportView.swift in Sources */,
 				9FB750A22487B09500193948 /* ContactView.swift in Sources */,

@@ -134,7 +134,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         case let .images(imageViewAction):
             switch imageViewAction {
             case let .setResolvedCoordinate(coordinate):
-                guard let coordinate = coordinate else {
+                guard coordinate != state.location.userLocationState.region?.center else {
                     return .none
                 }
                 state.location.userLocationState.region = CoordinateRegion(center: coordinate)
@@ -152,7 +152,9 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 state.mail.district = district
                 state.mail.mail.address = district.mail
                 state.mail.mail.body = state.createMailBody()
-                state.mail.mail.attachmentData = state.images.storedPhotos.map(\.image)
+                state.mail.mail.attachmentData = state.images.storedPhotos
+                    .compactMap{ $0 }
+                    .map(\.image)
                 return Effect(value: ReportAction.mail(.presentMailContentView(true)))
             } else {
                 return .none
