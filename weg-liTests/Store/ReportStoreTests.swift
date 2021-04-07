@@ -21,7 +21,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: nil),
+                    resolvedLocation: .zero),
                 contact: .preview,
                 district: nil,
                 date: fixedDate,
@@ -67,7 +67,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: nil),
+                    resolvedLocation: .zero),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
@@ -104,7 +104,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: nil),
+                    resolvedLocation: .zero),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
@@ -143,7 +143,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: nil),
+                    resolvedLocation: .zero),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
@@ -161,14 +161,14 @@ class ReportStoreTests: XCTestCase {
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
                 regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())))
 
-        let coordinate: CLLocationCoordinate2D = .zero
+        let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
         let expectedAddress = GeoAddress(
             street: ContactState.preview.address.street,
             city: ContactState.preview.address.city,
             postalCode: ContactState.preview.address.postalCode)
 
         store.assert(
-            .send(.images(.addPhoto(image))) {
+            .send(.images(.addPhotos([StorableImage(uiImage: image)]))) {
                 $0.images.storedPhotos = [StorableImage(uiImage: image)!]
             },
             .send(.images(.setResolvedCoordinate(coordinate))) {
@@ -195,7 +195,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: nil),
+                    resolvedLocation: .zero),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
