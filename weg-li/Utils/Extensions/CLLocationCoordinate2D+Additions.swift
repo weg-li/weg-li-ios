@@ -22,3 +22,9 @@ extension CLLocationCoordinate2D: Codable {
         self.init(latitude: latitude, longitude: longitude)
     }
 }
+
+extension CLLocation {
+    convenience init(from coordinate: CLLocationCoordinate2D) {
+        self.init(latitude: coordinate.latitude, longitude: coordinate.longitude)
+    }
+}
