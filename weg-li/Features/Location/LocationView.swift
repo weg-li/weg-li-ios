@@ -133,14 +133,8 @@ struct LocationView: View {
                 ? "arrow.down.right.and.arrow.up.left"
                 : "arrow.up.left.and.arrow.down.right"
             )
-            .padding()
-            .foregroundColor(Color(.label))
-            .background(
-                Color(.systemFill)
-                    .clipShape(Circle())
-            )
-            .accessibility(hidden: true)
         })
+        .buttonStyle(OnWidgetInteractionButtonStyle())
     }
 }
 
@@ -153,7 +147,7 @@ struct Location_Previews: PreviewProvider {
                     contact: .preview,
                     date: Date.init,
                     location: LocationViewState(
-                        locationOption: .manual,
+                        locationOption: .currentLocation,
                         isMapExpanded: false,
                         storedPhotos: [],
                         userLocationState: UserLocationState(

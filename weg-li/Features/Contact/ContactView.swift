@@ -88,6 +88,7 @@ struct ContactView: View {
                 .keyboardType(type.keyboardType)
                 .textFieldStyle(PlainTextFieldStyle())
                 .textContentType(type.textContentType)
+                .disableAutocorrection(true)
         }
     }
 }

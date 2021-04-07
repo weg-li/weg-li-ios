@@ -27,6 +27,7 @@ struct HomeView: View {
                 }
                 addReportButton
             }
+            .navigationViewStyle(StackNavigationViewStyle())
             .navigationBarTitle(L10n.Home.navigationBarTitle)
             .navigationBarItems(trailing: contactData)
             .onAppear { viewStore.send(.onAppear) }
@@ -109,14 +110,20 @@ struct MainView_Previews: PreviewProvider {
 }
 
 private struct AddReportButtonStyle: ButtonStyle {
+    let diameter: CGFloat = 70
+    
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(.largeTitle))
-            .frame(width: 70, height: 70)
+            .frame(width: diameter, height: diameter)
             .lineLimit(1)
-            .foregroundColor(Color(.label))
-            .background(configuration.isPressed ? Color(.systemGray2) : Color(.systemGray3))
-            .clipShape(RoundedRectangle(cornerRadius: 35))
+            .foregroundColor(.white)
+            .background(Color.wegliBlue)
+            .clipShape(RoundedRectangle(cornerRadius: diameter / 2))
+            .overlay(
+                    RoundedRectangle(cornerRadius: diameter / 2)
+                        .stroke(Color.white, lineWidth: 1)
+                )
             .shadow(color: Color.black.opacity(0.3), radius: 6, x: 3, y: 3)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
     }
