@@ -24,16 +24,16 @@ struct ImageView: View {
             action: { viewStore.send(.removePhoto) },
             label: { Image(systemName: "trash") }
         )
-        .buttonStyle(DeleteButtonStyle())
+        .foregroundColor(.red)
+        .buttonStyle(OnWidgetInteractionButtonStyle())
         .padding(4)
     }
 }
 
-struct DeleteButtonStyle: ButtonStyle {
+struct OnWidgetInteractionButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .padding(20)
-            .foregroundColor(.red)
             .background(configuration.isPressed ? Color(.systemGray6).opacity(0.3) : Color(.systemGray3).opacity(0.7))
             .animation(.easeOut)
             .clipShape(Circle())

@@ -12,6 +12,8 @@
 		7308C51C260B55C600FE3333 /* ImageGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C51A260B55C600FE3333 /* ImageGrid.swift */; };
 		7308C52D260B563B00FE3333 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C52C260B563B00FE3333 /* HomeView.swift */; };
 		7308C537260B5A1500FE3333 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C536260B5A1500FE3333 /* ReportView.swift */; };
+		73137644261F898500C5C9B7 /* Color+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73137643261F898400C5C9B7 /* Color+Additions.swift */; };
+		7313764A261F89AE00C5C9B7 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73137649261F89AE00C5C9B7 /* Colors.xcassets */; };
 		731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A0B2612FBB40012FAAD /* GeoAddress.swift */; };
 		731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A122612FC160012FAAD /* PlacesServiceMock.swift */; };
 		731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */; };
@@ -97,6 +99,8 @@
 		7308C51A260B55C600FE3333 /* ImageGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageGrid.swift; sourceTree = "<group>"; };
 		7308C52C260B563B00FE3333 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7308C536260B5A1500FE3333 /* ReportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
+		73137643261F898400C5C9B7 /* Color+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+Additions.swift"; sourceTree = "<group>"; };
+		73137649261F89AE00C5C9B7 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		731E5A0B2612FBB40012FAAD /* GeoAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAddress.swift; sourceTree = "<group>"; };
 		731E5A122612FC160012FAAD /* PlacesServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesServiceMock.swift; sourceTree = "<group>"; };
 		731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesStoreTests.swift; sourceTree = "<group>"; };
@@ -395,6 +399,7 @@
 				735FD84A2619BC3500218A6C /* Strings.swift */,
 				F8347595234C61CF00244D6F /* Preview Content */,
 				F8347593234C61CF00244D6F /* Assets.xcassets */,
+				73137649261F89AE00C5C9B7 /* Colors.xcassets */,
 				F834759B234C61CF00244D6F /* Info.plist */,
 				9FB5B12A2498BEAE00830770 /* JSON */,
 				F8347598234C61CF00244D6F /* LaunchScreen.storyboard */,
@@ -432,9 +437,10 @@
 				9F2EB23B2496A03E008B2D4E /* Array+Additions.swift */,
 				9FB5B12B2498BECB00830770 /* Bundle+Additions.swift */,
 				9FB5B13824994CF300830770 /* CLLocationCoordinate2D+Additions.swift */,
+				73719B3F261AD1CE005E09A3 /* Codable+Sugar.swift */,
+				73137643261F898400C5C9B7 /* Color+Additions.swift */,
 				9F4BD316249B653200C6C44D /* DateFormatter+Additions.swift */,
 				9FB750AF2487BEF900193948 /* View+Additions.swift */,
-				73719B3F261AD1CE005E09A3 /* Codable+Sugar.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -589,6 +595,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7313764A261F89AE00C5C9B7 /* Colors.xcassets in Resources */,
 				73719BA6261F137D005E09A3 /* Settings.bundle in Resources */,
 				F834759A234C61CF00244D6F /* LaunchScreen.storyboard in Resources */,
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
@@ -692,6 +699,7 @@
 				9FB5B13F2499DC4400830770 /* District.swift in Sources */,
 				73719B38261A3FFB005E09A3 /* UserDefaultsClient.swift in Sources */,
 				73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */,
+				73137644261F898500C5C9B7 /* Color+Additions.swift in Sources */,
 				73719B6D261C7B75005E09A3 /* ImageView.swift in Sources */,
 				73D117B92611CC71000D7B82 /* ImageConverter.swift in Sources */,
 				7308C537260B5A1500FE3333 /* ReportView.swift in Sources */,

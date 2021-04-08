@@ -28,7 +28,7 @@ struct ReadySubmitButton: View {
                 Text("Ordnungsamt \(ordnungsamt)").font(.caption)
             }
         }
-        .modifier(SubmitButtonStyle(color: .green, disabled: disabled))
+        .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: disabled))
     }
 }
 

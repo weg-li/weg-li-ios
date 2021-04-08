@@ -53,7 +53,6 @@ struct ReportForm: View {
                     .padding()
             }
         }
-        .padding(.bottom)
         .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
     }
 }

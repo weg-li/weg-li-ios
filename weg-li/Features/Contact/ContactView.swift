@@ -81,13 +81,14 @@ struct ContactView: View {
             HStack {
                 Text(type.label)
                     .font(.callout)
-                    .foregroundColor(Color(.label))
+                    .foregroundColor(Color(.secondaryLabel))
             }
             TextField(type.placeholder, text: textFieldBinding)
                 .multilineTextAlignment(.leading)
                 .keyboardType(type.keyboardType)
                 .textFieldStyle(PlainTextFieldStyle())
                 .textContentType(type.textContentType)
+                .disableAutocorrection(true)
         }
     }
 }
@@ -96,7 +97,7 @@ struct PersonalData_Previews: PreviewProvider {
     static var previews: some View {
         ContactView(
             store: .init(
-                initialState: .empty,
+                initialState: .preview,
                 reducer: .empty,
                 environment: ()
             )
