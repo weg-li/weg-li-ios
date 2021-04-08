@@ -116,3 +116,15 @@
 "widget.a11y.completionIndicatorLabel.isValid" = "ist gültig";
 
 "widget.a11y.completionIndicatorLabel.isNotValid" = "ist nicht gültig";
+
+
+// Settings
+"settings.title" = "Einstellungen";
+
+"settings.section.projectTitle" = "Projekt";
+
+"settings.row.imprint" = "Impressum";
+
+"settings.row.licenses" = "Lizenzen";
+
+"settings.row.contribute" = "Beitragen";
