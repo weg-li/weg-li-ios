@@ -19,5 +19,9 @@ format:
 swiftgen:
 	swiftgen
 
+licenses:
+	./tools/license-plist --output-path Settings.bundle --force --suppress-opening-directory --add-version-numbers --package-path weg-li.xcodeproj/project.xcworkspace/swiftpm/Package.resolved
+
+
 
 .PHONY: dependencies ruby brew
