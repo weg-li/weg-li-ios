@@ -18,10 +18,13 @@ extension RegulatoryOfficeMapper {
     static let live = Self(
         mapAddressToDistrict: { geoAddress in
             .result {
-                guard let district = districts.first(where: { $0.name == geoAddress.city }) else {
+                if let districtMAtchedByPostalCode = districts.first(where: { $0.zipCode == geoAddress.postalCode }) {
+                    return .success(districtMAtchedByPostalCode)
+                } else if let districtMatchedByName = districts.first(where: { $0.name == geoAddress.city }) {
+                    return .success(districtMatchedByName)
+                } else {
                     return .failure(RegularityOfficeMapError())
                 }
-                return .success(district)
             }
         }
     )
