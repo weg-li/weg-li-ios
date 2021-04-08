@@ -1,15 +1,32 @@
 // Created for weg-li in 2021.
 
+import Combine
+import ComposableArchitecture
 import Foundation
 
-struct RegulatoryOfficeMapper {
-    let districtsRepo: DistrictRepo
+struct RegularityOfficeMapError: Error, Equatable {
+    var message: String = ""
+}
 
-    func mapAddressToDistrict(_ address: GeoAddress) -> District? {
-        let district = districtsRepo.districts.first(where: { $0.name == address.city })
-        guard district != nil else {
-            return nil
+struct RegulatoryOfficeMapper {
+    static let districts = Bundle.main.decode([District].self, from: "districts.json")
+    
+    var mapAddressToDistrict: (GeoAddress) -> Effect<District, RegularityOfficeMapError>
+}
+
+extension RegulatoryOfficeMapper {
+    static let live = Self(
+        mapAddressToDistrict: { geoAddress in
+            .result {
+                guard let district = districts.first(where: { $0.name == geoAddress.city }) else {
+                    return .failure(RegularityOfficeMapError())
+                }
+                return .success(district)
+            }
         }
-        return district
-    }
+    )
+    
+    static let noop = Self(
+        mapAddressToDistrict: { _ in return .none }
+    )
 }

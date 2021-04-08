@@ -43,8 +43,6 @@
 		73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715F7260CB14E00C88BCC /* LocationCore.swift */; };
 		73BA6743260625FD001248EF /* StorableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA6742260625FD001248EF /* StorableImage.swift */; };
 		73C5440A2616602000A40639 /* RegulatoryOfficeMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */; };
-		73C5440E2616605900A40639 /* DistrictRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C5440D2616605900A40639 /* DistrictRepository.swift */; };
-		73C54414261661AE00A40639 /* DistrictRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C54413261661AE00A40639 /* DistrictRepositoryMock.swift */; };
 		73C544182616627E00A40639 /* MailStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544172616627E00A40639 /* MailStoreTests.swift */; };
 		73D117B92611CC71000D7B82 /* ImageConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117B82611CC71000D7B82 /* ImageConverter.swift */; };
 		73D117C52611DD94000D7B82 /* ImagesCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117C42611DD94000D7B82 /* ImagesCore.swift */; };
@@ -132,8 +130,6 @@
 		73A715F7260CB14E00C88BCC /* LocationCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCore.swift; sourceTree = "<group>"; };
 		73BA6742260625FD001248EF /* StorableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorableImage.swift; sourceTree = "<group>"; };
 		73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegulatoryOfficeMapper.swift; sourceTree = "<group>"; };
-		73C5440D2616605900A40639 /* DistrictRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictRepository.swift; sourceTree = "<group>"; };
-		73C54413261661AE00A40639 /* DistrictRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistrictRepositoryMock.swift; sourceTree = "<group>"; };
 		73C544172616627E00A40639 /* MailStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailStoreTests.swift; sourceTree = "<group>"; };
 		73D117B82611CC71000D7B82 /* ImageConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConverter.swift; sourceTree = "<group>"; };
 		73D117C42611DD94000D7B82 /* ImagesCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesCore.swift; sourceTree = "<group>"; };
@@ -218,7 +214,6 @@
 			isa = PBXGroup;
 			children = (
 				731E5A122612FC160012FAAD /* PlacesServiceMock.swift */,
-				73C54413261661AE00A40639 /* DistrictRepositoryMock.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -226,7 +221,6 @@
 		735FD877261A304700218A6C /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				73C5440D2616605900A40639 /* DistrictRepository.swift */,
 				73D117B82611CC71000D7B82 /* ImageConverter.swift */,
 				9F98A7BD248EB25400E06AA4 /* PlacesService.swift */,
 				73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */,
@@ -639,7 +633,6 @@
 				73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */,
 				731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */,
 				73C544182616627E00A40639 /* MailStoreTests.swift in Sources */,
-				73C54414261661AE00A40639 /* DistrictRepositoryMock.swift in Sources */,
 				7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */,
 				731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */,
 				731E5A2126130A130012FAAD /* LocationStoreTests.swift in Sources */,
@@ -660,7 +653,6 @@
 				9F2EB23A24961CEE008B2D4E /* DescriptionView.swift in Sources */,
 				73719B71261DB2E5005E09A3 /* ImageCore.swift in Sources */,
 				9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */,
-				73C5440E2616605900A40639 /* DistrictRepository.swift in Sources */,
 				73719BB6261F18B1005E09A3 /* UIApplicationClient.swift in Sources */,
 				9FFBAD65248E975700F66ADB /* MapView.swift in Sources */,
 				F889751E234E01770014FCC8 /* EditDescriptionView.swift in Sources */,
