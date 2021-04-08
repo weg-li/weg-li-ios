@@ -54,34 +54,41 @@ struct HomeView: View {
                     destination: ReportForm(
                         store: store.scope(
                             state: \.reportDraft,
-                            action: HomeAction.report)
+                            action: HomeAction.report
+                        )
                     ),
                     isActive: viewStore.binding(
                         get: \.showReportWizard,
-                        send: HomeAction.showReportWizard),
+                        send: HomeAction.showReportWizard
+                    ),
                     label: {
                         Button(
                             action: { viewStore.send(.showReportWizard(true)) },
-                            label: { Text("+") })
-                            .buttonStyle(AddReportButtonStyle())
-                            .padding(24)
-                            .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
-                    })
+                            label: { Text("+") }
+                        )
+                        .buttonStyle(AddReportButtonStyle())
+                        .padding(24)
+                        .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
+                    }
+                )
             }
         }
     }
 
     private var contactData: some View {
         NavigationLink(
-            destination: ContactView(
+            destination: SettingsView(
                 store: store.scope(
-                    state: \.contact,
-                    action: HomeAction.contact)
+                    state: \.settings,
+                    action: HomeAction.settings
+                )
             ),
             label: {
                 Image(systemName: "gear")
                     .font(Font.system(.title2).bold())
-            })
+            }
+        )
+        .accessibility(label: Text(L10n.Settings.title))
     }
 }
 
@@ -92,7 +99,8 @@ struct MainView_Previews: PreviewProvider {
                 store: .init(
                     initialState: HomeState(reports: [.preview, .preview, .preview, .preview]),
                     reducer: .empty,
-                    environment: ())
+                    environment: ()
+                )
             )
         }
 //                .preferredColorScheme(.dark)

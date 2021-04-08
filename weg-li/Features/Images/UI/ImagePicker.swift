@@ -16,10 +16,10 @@ struct ImagePicker: UIViewControllerRepresentable {
         init(_ parent: ImagePicker) {
             self.parent = parent
         }
-        
+
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             guard !results.isEmpty else {
-                self.parent.isPresented = false
+                parent.isPresented = false
                 return
             }
 
@@ -27,7 +27,7 @@ struct ImagePicker: UIViewControllerRepresentable {
                 if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
                     if let assetId = result.assetIdentifier {
                         let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-                        self.parent.coordinate = assetResults.firstObject?.location?.coordinate ?? .zero
+                        parent.coordinate = assetResults.firstObject?.location?.coordinate ?? .zero
                     }
                     result.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
                         if let error = error {
@@ -40,7 +40,6 @@ struct ImagePicker: UIViewControllerRepresentable {
                             debugPrint("Can not load asset")
                         }
                     }
-
                 }
             }
             parent.isPresented = false
@@ -62,7 +61,9 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func updateUIViewController(
         _ uiViewController: PHPickerViewController,
-        context: UIViewControllerRepresentableContext<ImagePicker>) {
+        context: UIViewControllerRepresentableContext<ImagePicker>
+    )
+    {
         uiViewController.navigationItem.leftBarButtonItem?.tintColor = .purple
     }
 }

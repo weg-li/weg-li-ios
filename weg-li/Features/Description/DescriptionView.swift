@@ -50,9 +50,10 @@ struct DescriptionView: View {
                         Text(L10n.Description.EditButton.copy)
                     }
                     .frame(maxWidth: .infinity)
-                })
-                .buttonStyle(EditButtonStyle())
-                .padding(.top)
+                }
+            )
+            .buttonStyle(EditButtonStyle())
+            .padding(.top)
         }
     }
 
@@ -72,17 +73,20 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
     static var previews: some View {
         Widget(
             title: Text("Beschreibung"),
-            isCompleted: true) {
-                DescriptionView(
-                    store: .init(
-                        initialState: Report(
-                            images: ImagesViewState(),
-                            contact: .preview,
-                            date: Date.init,
-                            location: LocationViewState(storedPhotos: [])),
-                        reducer: .empty,
-                        environment: ())
+            isCompleted: true
+        ) {
+            DescriptionView(
+                store: .init(
+                    initialState: Report(
+                        images: ImagesViewState(),
+                        contact: .preview,
+                        date: Date.init,
+                        location: LocationViewState(storedPhotos: [])
+                    ),
+                    reducer: .empty,
+                    environment: ()
                 )
+            )
         }
     }
 }

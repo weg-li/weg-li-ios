@@ -27,17 +27,23 @@ struct EditDescriptionView: View {
                     L10n.Description.Row.carType,
                     text: viewStore.binding(
                         get: \.description.type,
-                        send: { ReportAction.description(.setType($0)) }))
+                        send: { ReportAction.description(.setType($0)) }
+                    )
+                )
                 TextField(
                     L10n.Description.Row.carColor,
                     text: viewStore.binding(
                         get: \.description.color,
-                        send: { ReportAction.description(.setColor($0)) }))
+                        send: { ReportAction.description(.setColor($0)) }
+                    )
+                )
                 TextField(
                     L10n.Description.Row.licensplateNumber,
                     text: viewStore.binding(
                         get: \.description.licensePlateNumber,
-                        send: { ReportAction.description(.setLicensePlateNumber($0)) }))
+                        send: { ReportAction.description(.setLicensePlateNumber($0)) }
+                    )
+                )
             }
             .padding(.top, 4)
             .textFieldStyle(PlainTextFieldStyle())
@@ -46,22 +52,26 @@ struct EditDescriptionView: View {
                     L10n.Description.Row.chargeType,
                     selection: viewStore.binding(
                         get: \.description.selectedType,
-                        send: { ReportAction.description(.setCharge($0)) })) {
-                        ForEach(0..<DescriptionState.charges.count, id: \.self) {
-                            Text(DescriptionState.charges[$0])
-                                .tag($0)
-                                .foregroundColor(Color(.label))
-                        }
+                        send: { ReportAction.description(.setCharge($0)) }
+                    )
+                ) {
+                    ForEach(0..<DescriptionState.charges.count, id: \.self) {
+                        Text(DescriptionState.charges[$0])
+                            .tag($0)
+                            .foregroundColor(Color(.label))
+                    }
                 }
                 Picker(
                     L10n.Description.Row.length,
                     selection: viewStore.binding(
                         get: \.description.selectedDuration,
-                        send: { ReportAction.description(.setDuraration($0)) })) {
-                        ForEach(0..<Times.allCases.count, id: \.self) {
-                            Text(Times.allCases[$0].description)
-                                .foregroundColor(Color(.label))
-                        }
+                        send: { ReportAction.description(.setDuraration($0)) }
+                    )
+                ) {
+                    ForEach(0..<Times.allCases.count, id: \.self) {
+                        Text(Times.allCases[$0].description)
+                            .foregroundColor(Color(.label))
+                    }
                 }
                 toggleRow
             }
@@ -76,7 +86,8 @@ struct EditDescriptionView: View {
             ToggleButton(
                 isOn: viewStore.binding(
                     get: \.description.blockedOthers,
-                    send: { _ in ReportAction.description(.toggleBlockedOthers) })
+                    send: { _ in ReportAction.description(.toggleBlockedOthers) }
+                )
             ).animation(.easeIn(duration: 0.1))
         }
     }
@@ -90,9 +101,11 @@ struct Description_Previews: PreviewProvider {
                     images: .init(),
                     contact: .preview,
                     date: Date.init,
-                    location: LocationViewState(storedPhotos: [])),
+                    location: LocationViewState(storedPhotos: [])
+                ),
                 reducer: .empty,
-                environment: ())
+                environment: ()
+            )
         )
 //        .preferredColorScheme(.dark)
         .environment(\.sizeCategory, .extraExtraLarge)

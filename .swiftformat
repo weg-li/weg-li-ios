@@ -6,7 +6,7 @@
 --disable redundantFileprivate
 
 # Custom rules
---closingparen same-line
+--closingparen balanced
 --nospaceoperators ..<, ...
 
 # Excluded rules

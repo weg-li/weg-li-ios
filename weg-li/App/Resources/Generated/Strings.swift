@@ -152,6 +152,23 @@ internal enum L10n {
     }
   }
 
+  internal enum Settings {
+    /// Einstellungen
+    internal static let title = L10n.tr("Localizable", "settings.title")
+    internal enum Row {
+      /// Beitragen
+      internal static let contribute = L10n.tr("Localizable", "settings.row.contribute")
+      /// Impressum
+      internal static let imprint = L10n.tr("Localizable", "settings.row.imprint")
+      /// Lizenzen
+      internal static let licenses = L10n.tr("Localizable", "settings.row.licenses")
+    }
+    internal enum Section {
+      /// Projekt
+      internal static let projectTitle = L10n.tr("Localizable", "settings.section.projectTitle")
+    }
+  }
+
   internal enum Widget {
     internal enum A11y {
       /// erweitern

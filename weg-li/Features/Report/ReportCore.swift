@@ -17,7 +17,7 @@ struct Report: Codable {
     var description: DescriptionState
     var location: LocationViewState
     var mail: MailViewState
-    
+
     init(
         uuid: UUID = UUID(),
         images: ImagesViewState,
@@ -27,8 +27,9 @@ struct Report: Codable {
         description: DescriptionState = DescriptionState(),
         location: LocationViewState = LocationViewState(storedPhotos: []),
         mail: MailViewState = MailViewState()
-    ) {
-        self.id = uuid.uuidString
+    )
+    {
+        id = uuid.uuidString
         self.images = images
         self.contact = contact
         self.district = district
@@ -68,27 +69,33 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     imagesReducer.pullback(
         state: \.images,
         action: /ReportAction.images,
-        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }),
+        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }
+    ),
     descriptionReducer.pullback(
         state: \.description,
         action: /ReportAction.description,
-        environment: { _ in DescriptionEnvironment() }),
+        environment: { _ in DescriptionEnvironment() }
+    ),
     contactReducer.pullback(
         state: \.contact,
         action: /ReportAction.contact,
-        environment: { _ in ContactEnvironment() }),
+        environment: { _ in ContactEnvironment() }
+    ),
     locationReducer.pullback(
         state: \.location,
         action: /ReportAction.location,
         environment: {
             LocationViewEnvironment(
                 locationManager: $0.locationManager,
-                placeService: $0.placeService)
-        }),
+                placeService: $0.placeService
+            )
+        }
+    ),
     mailViewReducer.pullback(
         state: \.mail,
         action: /ReportAction.mail,
-        environment: { _ in MailViewEnvironment() }),
+        environment: { _ in MailViewEnvironment() }
+    ),
     Reducer { state, action, environment in
         struct LocationManagerId: Hashable {}
         switch action {
@@ -114,7 +121,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 state.mail.mail.address = district.mail
                 state.mail.mail.body = state.createMailBody()
                 state.mail.mail.attachmentData = state.images.storedPhotos
-                    .compactMap{ $0 }
+                    .compactMap { $0 }
                     .map(\.image)
                 return Effect(value: ReportAction.mail(.presentMailContentView(true)))
             } else {
@@ -123,7 +130,8 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         case .contact, .description, .location:
             return .none
         }
-    })
+    }
+)
 
 extension Report {
     func createMailBody() -> String {
@@ -181,12 +189,14 @@ extension Report {
             uuid: UUID(),
             images: .init(
                 showImagePicker: false,
-                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!]),
+                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!]
+            ),
             contact: .preview,
             district: District(
                 name: "Hamburg St. Pauli",
                 zipCode: "20099",
-                mail: "mail@stpauli.de"),
+                mail: "mail@stpauli.de"
+            ),
             date: Date.init,
             description: .init(
                 color: "Gelb",
@@ -196,6 +206,7 @@ extension Report {
                 selectedType: 0,
                 blockedOthers: false
             ),
-            location: LocationViewState(storedPhotos: []))
+            location: LocationViewState(storedPhotos: [])
+        )
     }
 }

@@ -30,7 +30,8 @@ struct MailContentView: View {
         viewStore = ViewStore(
             store.scope(
                 state: ViewState.init,
-                action: ReportAction.mail)
+                action: ReportAction.mail
+            )
         )
     }
 
@@ -38,8 +39,9 @@ struct MailContentView: View {
         VStack(spacing: 6) {
             SubmitButton(
                 state: .readyToSubmit(ordnungsamt: viewStore.districtName),
-                disabled: viewStore.isSubmitButtonDisabled) {
-                    viewStore.send(.submitButtonTapped)
+                disabled: viewStore.isSubmitButtonDisabled
+            ) {
+                viewStore.send(.submitButtonTapped)
             }
             .disabled(viewStore.isSubmitButtonDisabled)
             VStack(spacing: 8) {
@@ -57,8 +59,9 @@ struct MailContentView: View {
         }
         .sheet(isPresented: viewStore.binding(
             get: \.isMailComposerPresented,
-            send: MailViewAction.presentMailContentView)) {
-                MailView(store: store)
+            send: MailViewAction.presentMailContentView
+        )) {
+            MailView(store: store)
         }
     }
 }
@@ -70,12 +73,15 @@ struct MailContentView_Previews: PreviewProvider {
                 initialState: .init(
                     images: .init(),
                     contact: .preview,
-                    date: Date.init),
+                    date: Date.init
+                ),
                 reducer: reportReducer,
                 environment: ReportEnvironment(
                     locationManager: .live,
                     placeService: PlacesServiceImplementation(),
-                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())))
+                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
+                )
+            )
         )
     }
 }

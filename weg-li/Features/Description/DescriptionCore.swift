@@ -1,10 +1,4 @@
-//
-//  DescriptionCore.swift
-//  weg-li
-//
-//  Created by Malte on 07.04.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import Foundation
@@ -30,6 +24,7 @@ enum DescriptionAction: Equatable {
 struct DescriptionEnvironment {}
 
 // MARK: Reducer
+
 let descriptionReducer = Reducer<DescriptionState, DescriptionAction, DescriptionEnvironment> { state, action, _ in
     switch action {
     case let .setType(value):
@@ -69,6 +64,6 @@ extension DescriptionState {
 extension DescriptionState {
     static let charges = Bundle.main.decode([String].self, from: "charges.json")
     static let times = Times.allCases
-    
+
     var time: String { Times.allCases[selectedDuration].description }
 }

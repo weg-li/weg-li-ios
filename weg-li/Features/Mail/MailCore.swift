@@ -37,7 +37,7 @@ extension MailViewState: Codable {
         case mail
         case district
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let mailComposeResult = try container.decodeIfPresent(Int.self, forKey: .mailComposeResult)
@@ -47,7 +47,8 @@ extension MailViewState: Codable {
             mailComposeResult: MFMailComposeResult(rawValue: mailComposeResult ?? 0)!,
             mail: mail,
             isPresentingMailContent: false,
-            district: district)
+            district: district
+        )
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -55,7 +56,7 @@ extension MailViewState: Codable {
         switch mailComposeResult {
         case .none:
             try container.encodeNil(forKey: .mailComposeResult)
-        case .some(let value):
+        case let .some(value):
             try container.encode(value.rawValue, forKey: .mailComposeResult)
         }
         try container.encode(mail, forKey: .mail)

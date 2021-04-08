@@ -16,7 +16,8 @@ struct WegliApp: App {
                     environment: HomeEnvironment(
                         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
                         userDefaultsClient: .live()
-                    ))
+                    )
+                )
             )
         }
     }

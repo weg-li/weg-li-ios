@@ -7,12 +7,12 @@ struct StorableImage: Hashable, Identifiable {
     // default is uuidString
     let id: UUID
     let image: Data
-    
+
     internal init(id: UUID = UUID(), image: Data) {
         self.id = id
         self.image = image
     }
-    
+
     var asUIImage: UIImage? {
         UIImage(data: image)
     }
@@ -26,7 +26,6 @@ extension StorableImage {
         image = data
         self.id = id
     }
-
 }
 
 extension StorableImage: Codable {}

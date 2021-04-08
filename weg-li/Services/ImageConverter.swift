@@ -17,7 +17,8 @@ struct ImageConverterImplementation: ImageConverter {
         // Compute the new image size that preserves aspect ratio
         let scaledImageSize = CGSize(
             width: image.size.width * scaleFactor,
-            height: image.size.height * scaleFactor)
+            height: image.size.height * scaleFactor
+        )
 
         // Draw and return the resized UIImage
         let renderer = UIGraphicsImageRenderer(
@@ -28,7 +29,8 @@ struct ImageConverterImplementation: ImageConverter {
             image.draw(
                 in: CGRect(
                     origin: .zero,
-                    size: scaledImageSize)
+                    size: scaledImageSize
+                )
             )
         }
 

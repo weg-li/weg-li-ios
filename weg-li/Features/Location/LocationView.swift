@@ -33,7 +33,8 @@ struct LocationView: View {
         viewStore = ViewStore(
             store.scope(
                 state: ViewState.init,
-                action: ReportAction.location)
+                action: ReportAction.location
+            )
         )
     }
 
@@ -42,11 +43,13 @@ struct LocationView: View {
             Picker(
                 selection: viewStore.binding(
                     get: \.locationOption,
-                    send: LocationViewAction.setLocationOption).animation(),
-                label: Text("")) {
-                    ForEach(LocationOption.allCases, id: \.self) { selection in
-                        Text(selection.title).tag(selection)
-                    }
+                    send: LocationViewAction.setLocationOption
+                ).animation(),
+                label: Text("")
+            ) {
+                ForEach(LocationOption.allCases, id: \.self) { selection in
+                    Text(selection.title).tag(selection)
+                }
             }.pickerStyle(SegmentedPickerStyle())
             if LocationOption.manual == viewStore.locationOption {
                 VStack(spacing: 8) {
@@ -54,24 +57,30 @@ struct LocationView: View {
                         L10n.Location.Placeholder.street,
                         text: viewStore.binding(
                             get: \.address.street,
-                            send: LocationViewAction.updateGeoAddressStreet))
-                        .keyboardType(RowType.street.keyboardType)
-                        .textContentType(RowType.street.textContentType)
+                            send: LocationViewAction.updateGeoAddressStreet
+                        )
+                    )
+                    .keyboardType(RowType.street.keyboardType)
+                    .textContentType(RowType.street.textContentType)
                     TextField(
                         L10n.Location.Placeholder.postalCode,
                         text: viewStore.binding(
                             get: \.address.postalCode,
-                            send: LocationViewAction.updateGeoAddressPostalCode))
-                        .keyboardType(RowType.zipCode.keyboardType)
-                        .textContentType(RowType.zipCode.textContentType)
+                            send: LocationViewAction.updateGeoAddressPostalCode
+                        )
+                    )
+                    .keyboardType(RowType.zipCode.keyboardType)
+                    .textContentType(RowType.zipCode.textContentType)
                     TextField(
                         L10n.Location.Placeholder.city,
                         text: viewStore.binding(
                             get: \.address.city,
-                            send: LocationViewAction.updateGeoAddressCity))
-                        .keyboardType(RowType.town.keyboardType)
-                        .textContentType(RowType.town.textContentType)
-                        .disableAutocorrection(true)
+                            send: LocationViewAction.updateGeoAddressCity
+                        )
+                    )
+                    .keyboardType(RowType.town.keyboardType)
+                    .textContentType(RowType.town.textContentType)
+                    .disableAutocorrection(true)
                 }
                 .multilineTextAlignment(.leading)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -80,9 +89,11 @@ struct LocationView: View {
                     MapView(
                         region: viewStore.binding(
                             get: \.region,
-                            send: LocationViewAction.updateRegion),
-                        showsLocation: viewStore.locationOption == .currentLocation)
-                        .frame(height: viewStore.isMapExpanded ? 300 : 150)
+                            send: LocationViewAction.updateRegion
+                        ),
+                        showsLocation: viewStore.locationOption == .currentLocation
+                    )
+                    .frame(height: viewStore.isMapExpanded ? 300 : 150)
                     expandMapButton
                         .padding(4)
                         .accessibility(label: Text(L10n.Location.A11y.expandButtonLabel))
@@ -92,7 +103,8 @@ struct LocationView: View {
         }
         .alert(
             store.scope(state: { $0.location.userLocationState.alert }),
-            dismiss: ReportAction.location(.dismissAlertButtonTapped))
+            dismiss: ReportAction.location(.dismissAlertButtonTapped)
+        )
         .onAppear { viewStore.send(.onAppear) }
     }
 
@@ -147,9 +159,13 @@ struct Location_Previews: PreviewProvider {
                         userLocationState: UserLocationState(
                             alert: nil,
                             isRequestingCurrentLocation: true,
-                            region: nil))),
+                            region: nil
+                        )
+                    )
+                ),
                 reducer: .empty,
-                environment: ())
+                environment: ()
+            )
         )
 //        .preferredColorScheme(.dark)
 //        .environment(\.sizeCategory, .large)

@@ -9,7 +9,8 @@ class DescriptionStoreTests: XCTestCase {
         let store = TestStore(
             initialState: DescriptionState(),
             reducer: descriptionReducer,
-            environment: DescriptionEnvironment())
+            environment: DescriptionEnvironment()
+        )
 
         store.assert(
             .send(.setColor("Rot")) { state in
@@ -22,7 +23,8 @@ class DescriptionStoreTests: XCTestCase {
         let store = TestStore(
             initialState: DescriptionState(color: "Rot"),
             reducer: descriptionReducer,
-            environment: DescriptionEnvironment())
+            environment: DescriptionEnvironment()
+        )
 
         store.assert(
             .send(.setType("VW")) { state in
@@ -35,7 +37,8 @@ class DescriptionStoreTests: XCTestCase {
         let store = TestStore(
             initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
             reducer: descriptionReducer,
-            environment: DescriptionEnvironment())
+            environment: DescriptionEnvironment()
+        )
 
         store.assert(
             .send(.setLicensePlateNumber("WEG-LI-101")) { state in
@@ -43,12 +46,13 @@ class DescriptionStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_selectCharge_shouldUpdateState() {
         let store = TestStore(
             initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
             reducer: descriptionReducer,
-            environment: DescriptionEnvironment())
+            environment: DescriptionEnvironment()
+        )
 
         store.assert(
             .send(.setCharge(1)) { state in
@@ -61,7 +65,8 @@ class DescriptionStoreTests: XCTestCase {
         let store = TestStore(
             initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
             reducer: descriptionReducer,
-            environment: DescriptionEnvironment())
+            environment: DescriptionEnvironment()
+        )
 
         store.assert(
             .send(.setDuraration(1)) { state in
@@ -74,7 +79,8 @@ class DescriptionStoreTests: XCTestCase {
         let store = TestStore(
             initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
             reducer: descriptionReducer,
-            environment: DescriptionEnvironment())
+            environment: DescriptionEnvironment()
+        )
 
         store.assert(
             .send(.toggleBlockedOthers) { state in
@@ -82,6 +88,7 @@ class DescriptionStoreTests: XCTestCase {
             },
             .send(.toggleBlockedOthers) { state in
                 state.blockedOthers = false
-            })
+            }
+        )
     }
 }

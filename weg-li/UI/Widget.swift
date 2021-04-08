@@ -19,8 +19,8 @@ struct Widget<Content: View>: View {
                         self.isCollapsed.toggle()
                     }
                 }) {
-                        Image(systemName: "chevron.up.circle")
-                            .rotationEffect(.degrees(isCollapsed ? 180 : 0))
+                    Image(systemName: "chevron.up.circle")
+                        .rotationEffect(.degrees(isCollapsed ? 180 : 0))
                 }
                 .accessibility(label: Text(L10n.Widget.A11y.toggleCollapseButtonLabel))
                 .foregroundColor(.secondary)

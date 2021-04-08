@@ -21,16 +21,20 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero),
+                    resolvedLocation: .zero
+                ),
                 contact: .preview,
                 district: nil,
                 date: fixedDate,
-                description: .init()),
+                description: .init()
+            ),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())))
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
+            )
+        )
 
         let firstName = "BOB"
         let lastName = "ROSS"
@@ -49,7 +53,8 @@ class ReportStoreTests: XCTestCase {
             .send(.contact(.townChanged(city))) {
                 $0.contact.address.city = city
             },
-            .receive(.contact(.isContactValid)))
+            .receive(.contact(.isContactValid))
+        )
     }
 
     func test_updateCar_shouldUpdateState() {
@@ -60,16 +65,20 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero),
+                    resolvedLocation: .zero
+                ),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                description: .init()),
+                description: .init()
+            ),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())))
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+            )
+        )
 
         let color = "Red"
         let type = "Plymouth Valiant"
@@ -79,7 +88,8 @@ class ReportStoreTests: XCTestCase {
             },
             .send(.description(.setType(type))) {
                 $0.description.type = type
-            })
+            }
+        )
     }
 
     func test_updateCharge_shouldUpdateState() {
@@ -90,16 +100,20 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero),
+                    resolvedLocation: .zero
+                ),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                description: .init()),
+                description: .init()
+            ),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())))
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+            )
+        )
 
         let duration = 42
         let type = 23
@@ -109,7 +123,8 @@ class ReportStoreTests: XCTestCase {
             },
             .send(.description(.setDuraration(duration))) {
                 $0.description.selectedDuration = duration
-            })
+            }
+        )
     }
 
     func test_updateImages_shouldTriggerAddressResolve() {
@@ -122,22 +137,27 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero),
+                    resolvedLocation: .zero
+                ),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
-                description: .init()),
+                description: .init()
+            ),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())))
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+            )
+        )
 
         let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
         let expectedAddress = GeoAddress(
             street: ContactState.preview.address.street,
             city: ContactState.preview.address.city,
-            postalCode: ContactState.preview.address.postalCode)
+            postalCode: ContactState.preview.address.postalCode
+        )
 
         store.assert(
             .send(.images(.addPhotos([StorableImage(uiImage: image)]))) {
@@ -154,7 +174,8 @@ class ReportStoreTests: XCTestCase {
                 $0.location.isResolvingAddress = false
                 $0.location.resolvedAddress = expectedAddress
             },
-            .do { placesSubject.send(completion: .finished) })
+            .do { placesSubject.send(completion: .finished) }
+        )
     }
 
     func test_submitButtonTap_createsMail_andPresentsMailView() {
@@ -167,7 +188,8 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero),
+                    resolvedLocation: .zero
+                ),
                 contact: .empty,
                 district: nil,
                 date: fixedDate,
@@ -179,19 +201,25 @@ class ReportStoreTests: XCTestCase {
                     resolvedAddress: .init(
                         street: Report.preview.contact.address.street,
                         city: Report.preview.contact.address.city,
-                        postalCode: Report.preview.contact.address.postalCode),
+                        postalCode: Report.preview.contact.address.postalCode
+                    ),
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    userLocationState: .init())),
+                    userLocationState: .init()
+                )
+            ),
             reducer: reportReducer,
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())))
+                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+            )
+        )
 
         store.assert(
             .send(ReportAction.mail(.submitButtonTapped)),
             .receive(ReportAction.mail(.presentMailContentView(true))) {
                 $0.mail.isPresentingMailContent = false
-            })
+            }
+        )
     }
 }

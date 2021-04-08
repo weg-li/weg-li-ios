@@ -11,19 +11,19 @@ struct UserDefaultsClient {
     var setBool: (Bool, String) -> Effect<Never, Never>
     var setData: (Data?, String) -> Effect<Never, Never>
     var setDouble: (Double, String) -> Effect<Never, Never>
-    
+
     var contact: ContactState? {
-        let contact: ContactState? = (try? self.dataForKey(contactKey)?.decoded())
+        let contact: ContactState? = (try? dataForKey(contactKey)?.decoded())
         return contact
     }
-    
+
     func setContact(_ contact: ContactState) -> Effect<Never, Never> {
         let data = try? contact.encoded()
-        return self.setData(data, contactKey)
+        return setData(data, contactKey)
     }
-    
+
     var reports: [Report] {
-        guard let data = self.dataForKey(reportsKey) else {
+        guard let data = dataForKey(reportsKey) else {
             return []
         }
         do {
@@ -35,12 +35,12 @@ struct UserDefaultsClient {
             return []
         }
     }
-    
+
     func setReports(_ reports: [Report]) -> Effect<Never, Never> {
         do {
             let encoder = JSONEncoder()
             let data = try encoder.encode(reports)
-            return self.setData(data, reportsKey)
+            return setData(data, reportsKey)
         } catch {
             print(error.localizedDescription)
             return .none

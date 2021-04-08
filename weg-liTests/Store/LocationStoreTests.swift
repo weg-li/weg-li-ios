@@ -20,7 +20,8 @@ class LocationStoreTests: XCTestCase {
         let expectedAddress = GeoAddress(
             street: ContactState.preview.address.street,
             city: ContactState.preview.address.city,
-            postalCode: ContactState.preview.address.postalCode)
+            postalCode: ContactState.preview.address.postalCode
+        )
         let env = LocationViewEnvironment(
             locationManager: .unimplemented(
                 authorizationStatus: { .notDetermined },
@@ -30,12 +31,15 @@ class LocationStoreTests: XCTestCase {
                 requestWhenInUseAuthorization: { _ in
                     .fireAndForget { didRequestInUseAuthorization = true }
                 },
-                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }),
-            placeService: PlacesServiceMock(getPlacesSubject: placesSubject))
+                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
+            ),
+            placeService: PlacesServiceMock(getPlacesSubject: placesSubject)
+        )
         let store = TestStore(
             initialState: LocationViewState(storedPhotos: []),
             reducer: locationReducer,
-            environment: env)
+            environment: env
+        )
 
         let currentLocation = Location(
             altitude: 0,
@@ -44,7 +48,8 @@ class LocationStoreTests: XCTestCase {
             horizontalAccuracy: 0,
             speed: 0,
             timestamp: Date(timeIntervalSince1970: 1_234_567_890),
-            verticalAccuracy: 0)
+            verticalAccuracy: 0
+        )
 
         store.assert(
             .send(.onAppear),
@@ -70,7 +75,8 @@ class LocationStoreTests: XCTestCase {
                 $0.userLocationState.isRequestingCurrentLocation = false
                 $0.userLocationState.region = CoordinateRegion(
                     center: CLLocationCoordinate2D(latitude: 10, longitude: 20),
-                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                )
             },
             .receive(.resolveLocation(CLLocationCoordinate2D(latitude: 10, longitude: 20))) {
                 $0.isResolvingAddress = true
@@ -86,7 +92,8 @@ class LocationStoreTests: XCTestCase {
                 setSubject.send(completion: .finished)
                 placesSubject.send(completion: .finished)
                 locationManagerSubject.send(completion: .finished)
-            })
+            }
+        )
     }
 
     /// if locationServices disabled, test that alert state is set
@@ -100,12 +107,15 @@ class LocationStoreTests: XCTestCase {
                 authorizationStatus: { .denied },
                 create: { _ in locationManagerSubject.eraseToEffect() },
                 locationServicesEnabled: { false },
-                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }),
-            placeService: PlacesServiceMock(getPlacesSubject: placesSubject))
+                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
+            ),
+            placeService: PlacesServiceMock(getPlacesSubject: placesSubject)
+        )
         let store = TestStore(
             initialState: LocationViewState(storedPhotos: []),
             reducer: locationReducer,
-            environment: env)
+            environment: env
+        )
 
         store.assert(
             .send(.onAppear),
@@ -123,7 +133,8 @@ class LocationStoreTests: XCTestCase {
                 setSubject.send(completion: .finished)
                 placesSubject.send(completion: .finished)
                 locationManagerSubject.send(completion: .finished)
-            })
+            }
+        )
     }
 
     /// if locationServices disabled, test that alert state is set
@@ -141,12 +152,15 @@ class LocationStoreTests: XCTestCase {
                 requestWhenInUseAuthorization: { _ in
                     .fireAndForget { didRequestInUseAuthorization = true }
                 },
-                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }),
-            placeService: PlacesServiceMock(getPlacesSubject: placesSubject))
+                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
+            ),
+            placeService: PlacesServiceMock(getPlacesSubject: placesSubject)
+        )
         let store = TestStore(
             initialState: LocationViewState(storedPhotos: []),
             reducer: locationReducer,
-            environment: env)
+            environment: env
+        )
 
         store.assert(
             .send(.onAppear),
@@ -172,7 +186,8 @@ class LocationStoreTests: XCTestCase {
                 setSubject.send(completion: .finished)
                 placesSubject.send(completion: .finished)
                 locationManagerSubject.send(completion: .finished)
-            })
+            }
+        )
     }
 
     func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() {
@@ -183,11 +198,14 @@ class LocationStoreTests: XCTestCase {
                 isResolvingAddress: false,
                 resolvedAddress: .init(address: .init()),
                 storedPhotos: [],
-                userLocationState: .init()),
+                userLocationState: .init()
+            ),
             reducer: locationReducer,
             environment: LocationViewEnvironment(
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock()))
+                placeService: PlacesServiceMock()
+            )
+        )
 
         let newStreet = ContactState.preview.address.street
         let newPostalCode = ContactState.preview.address.postalCode
@@ -205,6 +223,7 @@ class LocationStoreTests: XCTestCase {
             .send(.updateGeoAddressCity(newCity)) {
                 $0.resolvedAddress.city = newCity
                 XCTAssertTrue($0.resolvedAddress.isValid)
-            })
+            }
+        )
     }
 }

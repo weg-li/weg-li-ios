@@ -79,7 +79,8 @@ struct SubmitButton: View {
                 return AnyView(
                     ReadySubmitButton(
                         ordnungsamt: ordnungsamt,
-                        disabled: disabled)
+                        disabled: disabled
+                    )
                 )
             }
         }

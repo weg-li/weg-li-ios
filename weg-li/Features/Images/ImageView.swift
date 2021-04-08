@@ -1,10 +1,4 @@
-//
-//  ImageView.swift
-//  weg-li
-//
-//  Created by Malte on 06.04.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import ComposableArchitecture
 import SwiftUI
@@ -12,19 +6,19 @@ import SwiftUI
 struct ImageView: View {
     let store: Store<ImageState, ImageAction>
     @ObservedObject private var viewStore: ViewStore<ImageState, ImageAction>
-    
+
     init(store: Store<ImageState, ImageAction>) {
         self.store = store
         viewStore = ViewStore(store)
     }
-    
+
     var body: some View {
         Image(uiImage: viewStore.image.asUIImage!)
             .gridModifier
             .padding(4)
             .overlay(deleteButton, alignment: .center)
     }
-    
+
     private var deleteButton: some View {
         Button(
             action: { viewStore.send(.removePhoto) },
@@ -53,7 +47,7 @@ private extension Image {
             .aspectRatio(contentMode: .fill)
             .frame(
                 minWidth: 50,
-                maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+                maxWidth: .infinity/*@END_MENU_TOKEN@*/,
                 minHeight: 100,
                 maxHeight: 100
             )
@@ -67,7 +61,8 @@ struct ImageView_Previews: PreviewProvider {
             store: Store<ImageState, ImageAction>(
                 initialState: .init(
                     id: .init(),
-                    image: StorableImage.init(uiImage: UIImage(systemName: "pencil")!)!),
+                    image: StorableImage(uiImage: UIImage(systemName: "pencil")!)!
+                ),
                 reducer: .empty,
                 environment: ImageEnvironment()
             )
