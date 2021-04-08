@@ -60,7 +60,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                 ReportEnvironment(
                     locationManager: LocationManager.live,
                     placeService: PlacesServiceImplementation(),
-                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
+                    regulatoryOfficeMapper: .live
                 )
             }
         ),

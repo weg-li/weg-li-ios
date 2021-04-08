@@ -56,6 +56,7 @@ enum ReportAction: Equatable {
     case location(LocationViewAction)
     case mail(MailViewAction)
     case viewAppeared
+    case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
 }
 
 struct ReportEnvironment {
@@ -112,11 +113,18 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             }
         case .viewAppeared:
             return Effect(value: ReportAction.contact(.isContactValid))
+        case let .mapDistrictFinished(.success(district)):
+            state.district = district
+            return .none
+        case let .mapDistrictFinished(.failure(error)):
+            // present alert
+            debugPrint(error.message)
+            return .none
         case let .mail(mailAction):
             if MailViewAction.submitButtonTapped == mailAction {
-                let district = environment
-                    .regulatoryOfficeMapper
-                    .mapAddressToDistrict(state.location.resolvedAddress) ?? District()
+                guard let district = state.district else {
+                    return .none
+                }
                 state.mail.district = district
                 state.mail.mail.address = district.mail
                 state.mail.mail.body = state.createMailBody()
@@ -127,7 +135,22 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             } else {
                 return .none
             }
-        case .contact, .description, .location:
+        case let .location(locationAction):
+            switch locationAction {
+            case let .resolveAddressFinished(addressResult):
+                guard let address = try? addressResult.get().first else {
+                    return .none
+                }
+                return environment
+                    .regulatoryOfficeMapper
+                    .mapAddressToDistrict(address)
+                    .catchToEffect()
+                    .map(ReportAction.mapDistrictFinished)
+                    .eraseToEffect()
+            default:
+                return .none
+            }
+        case .contact, .description:
             return .none
         }
     }

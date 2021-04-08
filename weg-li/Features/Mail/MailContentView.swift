@@ -12,7 +12,7 @@ struct MailContentView: View {
         let isMailComposerPresented: Bool
 
         init(state: Report) {
-            districtName = state.district?.name ?? ""
+            districtName = state.district?.name ?? "📸 📝 ✊"
             let isValid = !state.images.storedPhotos.isEmpty
                 && state.contact.isValid
                 && state.description.isValid
@@ -79,7 +79,7 @@ struct MailContentView_Previews: PreviewProvider {
                 environment: ReportEnvironment(
                     locationManager: .live,
                     placeService: PlacesServiceImplementation(),
-                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
+                    regulatoryOfficeMapper: .live
                 )
             )
         )

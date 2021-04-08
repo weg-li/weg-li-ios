@@ -32,7 +32,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
+                regulatoryOfficeMapper: .noop
             )
         )
 
@@ -76,7 +76,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+                regulatoryOfficeMapper: .noop
             )
         )
 
@@ -111,7 +111,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+                regulatoryOfficeMapper: .noop
             )
         )
 
@@ -148,7 +148,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+                regulatoryOfficeMapper: .noop
             )
         )
 
@@ -191,7 +191,7 @@ class ReportStoreTests: XCTestCase {
                     resolvedLocation: .zero
                 ),
                 contact: .empty,
-                district: nil,
+                district: District(name: "Berlin", zipCode: "12437", mail: "amt@berlin.da"),
                 date: fixedDate,
                 description: .init(),
                 location: LocationViewState(
@@ -211,7 +211,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
-                regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepositoryMock())
+                regulatoryOfficeMapper: .noop
             )
         )
 
