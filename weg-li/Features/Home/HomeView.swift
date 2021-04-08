@@ -73,10 +73,10 @@ struct HomeView: View {
 
     private var contactData: some View {
         NavigationLink(
-            destination: ContactView(
+            destination: SettingsView(
                 store: store.scope(
-                    state: \.contact,
-                    action: HomeAction.contact)
+                    state: \.settings,
+                    action: HomeAction.settings)
             ),
             label: {
                 Image(systemName: "gear")
