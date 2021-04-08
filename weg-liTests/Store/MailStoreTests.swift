@@ -12,9 +12,11 @@ class MailStoreTests: XCTestCase {
                 mailComposeResult: nil,
                 mail: .init(),
                 isPresentingMailContent: false,
-                district: .init()),
+                district: .init()
+            ),
             reducer: mailViewReducer,
-            environment: MailViewEnvironment())
+            environment: MailViewEnvironment()
+        )
 
         store.assert(
             .send(.presentMailContentView(true)) {
@@ -29,9 +31,11 @@ class MailStoreTests: XCTestCase {
                 mailComposeResult: nil,
                 mail: .init(),
                 isPresentingMailContent: false,
-                district: .init()),
+                district: .init()
+            ),
             reducer: mailViewReducer,
-            environment: MailViewEnvironment())
+            environment: MailViewEnvironment()
+        )
 
         let result = MFMailComposeResult(rawValue: 2)!
         store.assert(

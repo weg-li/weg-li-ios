@@ -41,14 +41,16 @@ struct ContactWidget: View {
                     destination: ContactView(
                         store: store.scope(
                             state: { $0 },
-                            action: ReportAction.contact)
+                            action: ReportAction.contact
+                        )
                     ),
                     label: {
                         Text(L10n.Contact.editButtonCopy)
                             .frame(maxWidth: .infinity)
-                    })
-                    .buttonStyle(EditButtonStyle())
-                    .padding(.top)
+                    }
+                )
+                .buttonStyle(EditButtonStyle())
+                .padding(.top)
                 Text(L10n.Contact.reportHintCopy)
                     .font(.footnote)
                     .foregroundColor(.gray)
@@ -79,7 +81,8 @@ struct PersonalDataWidget_Previews: PreviewProvider {
             store: .init(
                 initialState: .preview,
                 reducer: .empty,
-                environment: ())
+                environment: ()
+            )
         )
     }
 }

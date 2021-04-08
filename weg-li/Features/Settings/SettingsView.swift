@@ -21,14 +21,16 @@ struct SettingsView: View {
                     destination: ContactView(
                         store: store.scope(
                             state: \.contact,
-                            action: SettingsAction.contact)
+                            action: SettingsAction.contact
+                        )
                     ),
                     label: {
                         HStack {
                             Text(L10n.Contact.widgetTitle)
                             Spacer()
                         }
-                    })
+                    }
+                )
             }
             Section {
                 Button(
@@ -39,7 +41,8 @@ struct SettingsView: View {
                             Spacer()
                             linkIcon
                         }
-                    })
+                    }
+                )
             }
             Section(header: Text(L10n.Settings.Section.projectTitle)) {
                 Button(
@@ -50,7 +53,8 @@ struct SettingsView: View {
                             Spacer()
                             linkIcon
                         }
-                    })
+                    }
+                )
                 Button(
                     action: { viewStore.send(.openGitHubProjectTapped) },
                     label: {
@@ -60,7 +64,8 @@ struct SettingsView: View {
                             Spacer()
                             linkIcon
                         }
-                    })
+                    }
+                )
             }
         }
         .foregroundColor(Color(.label))
@@ -91,7 +96,8 @@ struct SettingsView_Previews: PreviewProvider {
                 store: .init(
                     initialState: .init(contact: .preview),
                     reducer: .empty,
-                    environment: SettingsEnvironment(uiApplicationClient: .live))
+                    environment: SettingsEnvironment(uiApplicationClient: .live)
+                )
             )
         }
 //        .preferredColorScheme(.dark)

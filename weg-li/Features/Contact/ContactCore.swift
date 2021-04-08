@@ -25,7 +25,8 @@ extension ContactState {
             firstName: "",
             name: "",
             address: .init(),
-            phone: "")
+            phone: ""
+        )
     }
 
     static var preview: ContactState {
@@ -35,8 +36,10 @@ extension ContactState {
             address: .init(
                 street: RowType.street.placeholder,
                 postalCode: RowType.zipCode.placeholder,
-                city: RowType.town.placeholder),
-            phone: RowType.phone.placeholder)
+                city: RowType.town.placeholder
+            ),
+            phone: RowType.phone.placeholder
+        )
     }
 }
 

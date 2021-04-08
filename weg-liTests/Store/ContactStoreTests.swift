@@ -9,7 +9,8 @@ class ContactStoreTests: XCTestCase {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         let newFirstName = "Bob"
         store.assert(
@@ -18,14 +19,16 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = true
-            })
+            }
+        )
     }
 
     func test_changeName_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         let newName = "Ross"
         store.assert(
@@ -41,14 +44,16 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = false
-            })
+            }
+        )
     }
 
     func test_changePhone_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         let newPhone = "0301234"
         store.assert(
@@ -57,14 +62,16 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = true
-            })
+            }
+        )
     }
 
     func test_changeStreet_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         let newStreet = "Bob's street"
         store.assert(
@@ -73,14 +80,16 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = true
-            })
+            }
+        )
     }
 
     func test_changeCity_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         let newCity = "Bob's city"
         store.assert(
@@ -89,14 +98,16 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = true
-            })
+            }
+        )
     }
 
     func test_changePostalCode_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         let newPostalCode = "55500"
         store.assert(
@@ -105,14 +116,16 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = true
-            })
+            }
+        )
     }
 
     func test_setEmptyValues_shouldInvalidContact() {
         let store = TestStore(
             initialState: ContactState.preview,
             reducer: contactReducer,
-            environment: ContactEnvironment())
+            environment: ContactEnvironment()
+        )
 
         store.assert(
             .send(.zipCodeChanged("")) {
@@ -126,6 +139,7 @@ class ContactStoreTests: XCTestCase {
             },
             .receive(.isContactValid) {
                 $0.isValid = false
-            })
+            }
+        )
     }
 }

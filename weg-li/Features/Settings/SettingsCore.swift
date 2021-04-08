@@ -25,7 +25,8 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment
     contactReducer.pullback(
         state: \.contact,
         action: /SettingsAction.contact,
-        environment: { _ in ContactEnvironment() }),
+        environment: { _ in ContactEnvironment() }
+    ),
     Reducer { _, action, env in
         switch action {
         case .openLicensesRowTapped:
@@ -46,4 +47,5 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment
         case .contact:
             return .none
         }
-    })
+    }
+)

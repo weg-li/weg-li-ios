@@ -1,7 +1,7 @@
 // Created for weg-li in 2021.
 
-import CoreLocation
 import ComposableArchitecture
+import CoreLocation
 import SwiftUI
 
 struct ImagesView: View {
@@ -49,18 +49,19 @@ struct ImagesView: View {
                         send: ImagesViewAction.setResolvedCoordinate
                     )
                 )
-            })
+            }
+        )
     }
 
     private var importButton: some View {
         Button(action: {
             viewStore.send(.setShowImagePicker(true))
         }) {
-                HStack {
-                    Image(systemName: "photo.fill.on.rectangle.fill")
-                    Text(L10n.Photos.ImportButton.copy)
-                }
-                .frame(maxWidth: .infinity)
+            HStack {
+                Image(systemName: "photo.fill.on.rectangle.fill")
+                Text(L10n.Photos.ImportButton.copy)
+            }
+            .frame(maxWidth: .infinity)
         }
     }
 }
@@ -76,7 +77,8 @@ struct Images_Previews: PreviewProvider {
                     location: LocationViewState(storedPhotos: [])
                 ),
                 reducer: .empty,
-                environment: ())
+                environment: ()
+            )
         )
     }
 }

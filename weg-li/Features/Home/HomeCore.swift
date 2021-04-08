@@ -60,12 +60,15 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                 ReportEnvironment(
                     locationManager: LocationManager.live,
                     placeService: PlacesServiceImplementation(),
-                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository()))
-            }),
+                    regulatoryOfficeMapper: RegulatoryOfficeMapper(districtsRepo: DistrictRepository())
+                )
+            }
+        ),
     settingsReducer.pullback(
         state: \.settings,
         action: /HomeAction.settings,
-        environment: { _ in SettingsEnvironment(uiApplicationClient: .live) }),
+        environment: { _ in SettingsEnvironment(uiApplicationClient: .live) }
+    ),
     Reducer { state, action, environment in
         switch action {
         // restore state from userdefaults
@@ -99,7 +102,8 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                         Effect(value: HomeAction.showReportWizard(false))
                             .delay(for: 0.5, scheduler: environment.mainQueue)
                             .eraseToEffect(),
-                        Effect(value: HomeAction.reportSaved))
+                        Effect(value: HomeAction.reportSaved)
+                    )
                 default:
                     return .none
                 }
@@ -114,7 +118,8 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             state.reportDraft = Report(images: .init(), contact: state.settings.contact, date: Date.init)
             return .none
         }
-    })
+    }
+)
 
 extension HomeState {
     static let preview = HomeState()

@@ -11,11 +11,13 @@ class ImagesStoreTests: XCTestCase {
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [],
-                resolvedLocation: .zero),
+                resolvedLocation: .zero
+            ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
                 imageConverter: ImageConverterImplementation()
-            ))
+            )
+        )
 
         let pencilImage = StorableImage(uiImage: UIImage(systemName: "pencil")!)!
         let trashImage = StorableImage(uiImage: UIImage(systemName: "trash")!)!
@@ -38,16 +40,17 @@ class ImagesStoreTests: XCTestCase {
         let id2 = UUID()
         let storableImage2 = StorableImage(id: id2, uiImage: image2)
 
-        
         let store = TestStore(
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [storableImage1, storableImage2],
-                resolvedLocation: .zero),
+                resolvedLocation: .zero
+            ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
                 imageConverter: ImageConverterImplementation()
-            ))
+            )
+        )
 
         store.assert(
             .send(.image(id: id1, action: .removePhoto)) {
@@ -55,24 +58,26 @@ class ImagesStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_selectMultiplePhotos_shouldAddPhotosAndSetCoordinate() {
         let store = TestStore(
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [],
-                resolvedLocation: .zero),
+                resolvedLocation: .zero
+            ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
                 imageConverter: ImageConverterImplementation()
-            ))
+            )
+        )
 
         let pencil = UIImage(systemName: "pencil")!
         let trash = UIImage(systemName: "trash")!
-        
+
         let pencilImage = StorableImage(uiImage: pencil)!
         let trashImage = StorableImage(uiImage: trash)!
-        
+
         store.assert(
             .send(.addPhotos([pencilImage, trashImage])) {
                 $0.storedPhotos = [pencilImage, trashImage]
@@ -82,24 +87,26 @@ class ImagesStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_selectMultiplePhotos_withSmallCoordinateUpdateShouldOnlySetCoordinateOnce() {
         let store = TestStore(
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [],
-                resolvedLocation: .zero),
+                resolvedLocation: .zero
+            ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
                 imageConverter: ImageConverterImplementation()
-            ))
+            )
+        )
 
         let pencil = UIImage(systemName: "pencil")!
         let trash = UIImage(systemName: "trash")!
-        
+
         let pencilImage = StorableImage(uiImage: pencil)!
         let trashImage = StorableImage(uiImage: trash)!
-        
+
         store.assert(
             .send(.addPhotos([pencilImage, trashImage])) {
                 $0.storedPhotos = [pencilImage, trashImage]

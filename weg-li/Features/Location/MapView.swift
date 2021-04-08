@@ -46,7 +46,8 @@ struct MapView: UIViewRepresentable {
         func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
             parent.region = CoordinateRegion(
                 center: mapView.region.center,
-                span: mapView.region.span)
+                span: mapView.region.span
+            )
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {

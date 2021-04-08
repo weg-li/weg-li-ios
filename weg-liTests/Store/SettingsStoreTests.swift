@@ -1,33 +1,79 @@
-//
-//  SettingsStoreTests.swift
-//  weg-liTests
-//
-//  Created by Malte on 08.04.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
+import ComposableArchitecture
+@testable import weg_li
 import XCTest
 
 class SettingsStoreTests: XCTestCase {
+    var defaultEnvironment = SettingsEnvironment(
+        uiApplicationClient: .init(
+            open: { _, _ in .none },
+            openSettingsURLString: { "" }
+        )
+    )
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
+    func test_setOpenLicensesRow_shouldCallURL() {
+        var openedUrl: URL!
+        let settingsURL = "settings:weg-li//weg-li/settings"
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+        var env = defaultEnvironment
+        env.uiApplicationClient.openSettingsURLString = { settingsURL }
+        env.uiApplicationClient.open = { url, _ in
+            openedUrl = url
+            return .init(value: true)
         }
+
+        let store = TestStore(
+            initialState: SettingsState(contact: .preview),
+            reducer: settingsReducer,
+            environment: env
+        )
+
+        store.assert(
+            .send(.openLicensesRowTapped)
+        )
+        XCTAssertEqual(openedUrl, URL(string: settingsURL))
     }
 
+    func test_setOpenImprintRow_shouldCallURL() {
+        var openedUrl: URL!
+
+        var env = defaultEnvironment
+        env.uiApplicationClient.open = { url, _ in
+            openedUrl = url
+            return .init(value: true)
+        }
+
+        let store = TestStore(
+            initialState: SettingsState(contact: .preview),
+            reducer: settingsReducer,
+            environment: env
+        )
+
+        store.assert(
+            .send(.openImprintTapped)
+        )
+        XCTAssertEqual(openedUrl, env.imprintLink)
+    }
+
+    func test_setOpenGitHubRow_shouldCallURL() {
+        var openedUrl: URL!
+
+        var env = defaultEnvironment
+        env.uiApplicationClient.open = { url, _ in
+            openedUrl = url
+            return .init(value: true)
+        }
+
+        let store = TestStore(
+            initialState: SettingsState(contact: .preview),
+            reducer: settingsReducer,
+            environment: env
+        )
+
+        store.assert(
+            .send(.openGitHubProjectTapped)
+        )
+        XCTAssertEqual(openedUrl, env.gitHubProjectLink)
+    }
 }

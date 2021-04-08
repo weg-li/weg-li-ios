@@ -1,10 +1,4 @@
-//
-//  Codable+Sugar.swift
-//  weg-li
-//
-//  Created by Malte on 05.04.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import Foundation
 

@@ -21,7 +21,9 @@ struct UserLocationState: Equatable {
     init(
         alert: AlertState<ReportAction>? = nil,
         isRequestingCurrentLocation: Bool = false,
-        region: CoordinateRegion? = nil) {
+        region: CoordinateRegion? = nil
+    )
+    {
         self.alert = alert
         self.isRequestingCurrentLocation = isRequestingCurrentLocation
         self.region = region
@@ -120,7 +122,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
     locationManagerReducer.pullback(
         state: \.userLocationState,
         action: /LocationViewAction.userLocationAction,
-        environment: { UserLocationEnvironment(locationManager: $0.locationManager) }),
+        environment: { UserLocationEnvironment(locationManager: $0.locationManager) }
+    ),
     Reducer { state, action, environment in
         switch action {
         case .onAppear:
@@ -130,7 +133,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                     .map(LocationViewAction.userLocationAction),
                 environment.locationManager
                     .setup(id: LocationManagerId())
-                    .fireAndForget())
+                    .fireAndForget()
+            )
 
         case .locationRequested:
             guard environment.locationManager.locationServicesEnabled() else {
@@ -193,7 +197,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             state.isResolvingAddress = true
             let clLocation = CLLocation(
                 latitude: coordinate.latitude,
-                longitude: coordinate.longitude)
+                longitude: coordinate.longitude
+            )
             return environment.placeService
                 .getPlacemarks(for: clLocation)
                 .catchToEffect()
@@ -221,7 +226,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             state.resolvedAddress.postalCode = postalCode
             return .none
         }
-    })
+    }
+)
 
 // MARK: - Utils
 

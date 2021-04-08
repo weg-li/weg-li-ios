@@ -9,7 +9,7 @@ struct ImagesViewState: Equatable, Codable {
     var showImagePicker: Bool = false
     var storedPhotos: [StorableImage?] = []
     var resolvedLocation: CLLocationCoordinate2D = .zero
-    
+
     var imageStates: IdentifiedArrayOf<ImageState> {
         IdentifiedArray(
             storedPhotos
@@ -33,11 +33,11 @@ struct ImagesViewEnvironment {
 
 let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnvironment> { state, action, env in
     switch action {
-    case .image(let id, let imageAction):
+    case let .image(id, imageAction):
         switch imageAction {
         case .removePhoto:
             let photos = state.storedPhotos
-                .compactMap{ $0 }
+                .compactMap { $0 }
                 .filter { $0.id != id }
             state.storedPhotos = photos
             return .none
@@ -51,11 +51,11 @@ let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnviron
     case let .setResolvedCoordinate(coordinate):
         let resolved = CLLocation(from: state.resolvedLocation)
         let location = CLLocation(from: coordinate)
-        
+
         if resolved.distance(from: location) < env.distanceFilter {
             return .none
         }
-        
+
         state.resolvedLocation = coordinate
         return .none
     }

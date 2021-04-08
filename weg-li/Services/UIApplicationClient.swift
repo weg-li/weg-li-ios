@@ -17,5 +17,6 @@ extension UIApplicationClient {
                 }
             }
         },
-        openSettingsURLString: { UIApplication.openSettingsURLString })
+        openSettingsURLString: { UIApplication.openSettingsURLString }
+    )
 }

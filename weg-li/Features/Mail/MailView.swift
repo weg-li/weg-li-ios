@@ -11,7 +11,8 @@ struct MailView: UIViewControllerRepresentable {
         viewStore = ViewStore(
             store.scope(
                 state: \.mail,
-                action: ReportAction.mail)
+                action: ReportAction.mail
+            )
         )
     }
 
@@ -23,7 +24,8 @@ struct MailView: UIViewControllerRepresentable {
 
         init(isShowing: Binding<Bool>,
              result: Binding<MFMailComposeResult?>,
-             mail: Mail) {
+             mail: Mail)
+        {
             _isShowing = isShowing
             _result = result
             self.mail = mail
@@ -32,7 +34,9 @@ struct MailView: UIViewControllerRepresentable {
         func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
-            error: Error?) {
+            error: Error?
+        )
+        {
             defer { isShowing = false }
             guard error == nil else {
                 self.result = .failed
@@ -46,11 +50,14 @@ struct MailView: UIViewControllerRepresentable {
         Coordinator(
             isShowing: viewStore.binding(
                 get: \.isPresentingMailContent,
-                send: MailViewAction.presentMailContentView),
+                send: MailViewAction.presentMailContentView
+            ),
             result: viewStore.binding(
                 get: \.mailComposeResult,
-                send: MailViewAction.setMailResult),
-            mail: viewStore.mail)
+                send: MailViewAction.setMailResult
+            ),
+            mail: viewStore.mail
+        )
     }
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
@@ -62,7 +69,8 @@ struct MailView: UIViewControllerRepresentable {
             vc.addAttachmentData(
                 data,
                 mimeType: "image/jpeg",
-                fileName: "Anhang-\(index + 1)")
+                fileName: "Anhang-\(index + 1)"
+            )
         }
         vc.mailComposeDelegate = context.coordinator
         return vc
@@ -70,5 +78,6 @@ struct MailView: UIViewControllerRepresentable {
 
     func updateUIViewController(
         _ uiViewController: MFMailComposeViewController,
-        context: UIViewControllerRepresentableContext<MailView>) {}
+        context: UIViewControllerRepresentableContext<MailView>
+    ) {}
 }

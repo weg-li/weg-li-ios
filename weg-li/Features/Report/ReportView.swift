@@ -32,19 +32,23 @@ struct ReportForm: View {
                 // Photos
                 Widget(
                     title: Text(L10n.Photos.widgetTitle),
-                    isCompleted: viewStore.isPhotosValid) { ImagesView(store: store) }
+                    isCompleted: viewStore.isPhotosValid
+                ) { ImagesView(store: store) }
                 // Location
                 Widget(
                     title: Text(L10n.Location.widgetTitle),
-                    isCompleted: viewStore.isLocationValid) { LocationView(store: store) }
+                    isCompleted: viewStore.isLocationValid
+                ) { LocationView(store: store) }
                 // Description
                 Widget(
                     title: Text(L10n.Description.widgetTitle),
-                    isCompleted: viewStore.isDescriptionValid) { DescriptionView(store: store) }
+                    isCompleted: viewStore.isDescriptionValid
+                ) { DescriptionView(store: store) }
                 // Contact
                 Widget(
                     title: Text(L10n.Report.Contact.widgetTitle),
-                    isCompleted: viewStore.isContactValid) { ContactWidget(store: store.scope(state: { $0.contact })) }
+                    isCompleted: viewStore.isContactValid
+                ) { ContactWidget(store: store.scope(state: { $0.contact })) }
                 MailContentView(store: store)
                     .padding()
             }
@@ -60,7 +64,8 @@ struct ReportForm_Previews: PreviewProvider {
             store: .init(
                 initialState: .preview,
                 reducer: .empty,
-                environment: ())
+                environment: ()
+            )
         )
 //        .preferredColorScheme(.dark)
 //        .environment(\.sizeCategory, .large)
