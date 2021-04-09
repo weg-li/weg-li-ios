@@ -134,7 +134,7 @@ struct LocationView: View {
                 : "arrow.up.left.and.arrow.down.right"
             )
         })
-        .buttonStyle(OnWidgetInteractionButtonStyle())
+            .buttonStyle(OnWidgetInteractionButtonStyle())
     }
 }
 

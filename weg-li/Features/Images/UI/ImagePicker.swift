@@ -62,8 +62,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     func updateUIViewController(
         _ uiViewController: PHPickerViewController,
         context: UIViewControllerRepresentableContext<ImagePicker>
-    )
-    {
+    ) {
         uiViewController.navigationItem.leftBarButtonItem?.tintColor = .purple
     }
 }

@@ -85,7 +85,7 @@ struct HomeView: View {
                 )
             ),
             label: {
-                Image(systemName: "gear")
+                Image(systemName: "gearshape")
                     .font(Font.system(.title2).bold())
             }
         )
@@ -111,7 +111,7 @@ struct MainView_Previews: PreviewProvider {
 
 private struct AddReportButtonStyle: ButtonStyle {
     let diameter: CGFloat = 70
-    
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(.largeTitle))
@@ -121,9 +121,9 @@ private struct AddReportButtonStyle: ButtonStyle {
             .background(Color.wegliBlue)
             .clipShape(RoundedRectangle(cornerRadius: diameter / 2))
             .overlay(
-                    RoundedRectangle(cornerRadius: diameter / 2)
-                        .stroke(Color.white, lineWidth: 1)
-                )
+                RoundedRectangle(cornerRadius: diameter / 2)
+                    .stroke(Color.white, lineWidth: 1)
+            )
             .shadow(color: Color.black.opacity(0.3), radius: 6, x: 3, y: 3)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
     }
