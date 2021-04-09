@@ -56,8 +56,9 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
         .pullback(
             state: \.reportDraft,
             action: /HomeAction.report,
-            environment: { _ in
+            environment: { environment in
                 ReportEnvironment(
+                    mainQueue: environment.mainQueue,
                     locationManager: LocationManager.live,
                     placeService: PlacesServiceImplementation(),
                     regulatoryOfficeMapper: .live
@@ -71,8 +72,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
     ),
     Reducer { state, action, environment in
         switch action {
-        // restore state from userdefaults
-        case .onAppear:
+        case .onAppear: // restore state from userdefaults
             if let contact = environment.userDefaultsClient.contact {
                 state.settings = SettingsState(contact: contact)
             }
@@ -99,9 +99,6 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                     return Effect.concatenate(
                         environment.userDefaultsClient.setReports(state.reports)
                             .fireAndForget(),
-                        Effect(value: HomeAction.showReportWizard(false))
-                            .delay(for: 0.5, scheduler: environment.mainQueue)
-                            .eraseToEffect(),
                         Effect(value: HomeAction.reportSaved)
                     )
                 default:

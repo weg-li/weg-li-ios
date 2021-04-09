@@ -52,7 +52,7 @@ extension DescriptionState: Codable {}
 
 extension DescriptionState {
     var isValid: Bool {
-        return [
+        [
             type,
             color,
             licensePlateNumber

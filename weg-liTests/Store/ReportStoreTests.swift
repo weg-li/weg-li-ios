@@ -30,6 +30,7 @@ class ReportStoreTests: XCTestCase {
             ),
             reducer: reportReducer,
             environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
                 regulatoryOfficeMapper: .noop
@@ -43,17 +44,12 @@ class ReportStoreTests: XCTestCase {
             .send(.contact(.firstNameChanged(firstName))) {
                 $0.contact.firstName = firstName
             },
-            .receive(.contact(.isContactValid)) {
-                $0.contact.isValid = true
-            },
             .send(.contact(.lastNameChanged(lastName))) {
                 $0.contact.name = lastName
             },
-            .receive(.contact(.isContactValid)),
             .send(.contact(.townChanged(city))) {
                 $0.contact.address.city = city
-            },
-            .receive(.contact(.isContactValid))
+            }
         )
     }
 
@@ -74,6 +70,7 @@ class ReportStoreTests: XCTestCase {
             ),
             reducer: reportReducer,
             environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
                 regulatoryOfficeMapper: .noop
@@ -109,6 +106,7 @@ class ReportStoreTests: XCTestCase {
             ),
             reducer: reportReducer,
             environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(),
                 regulatoryOfficeMapper: .noop
@@ -146,6 +144,7 @@ class ReportStoreTests: XCTestCase {
             ),
             reducer: reportReducer,
             environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
                 regulatoryOfficeMapper: .noop
@@ -174,6 +173,7 @@ class ReportStoreTests: XCTestCase {
                 $0.location.isResolvingAddress = false
                 $0.location.resolvedAddress = expectedAddress
             },
+            .receive(.mapGeoAddressToDistrict(expectedAddress)),
             .do { placesSubject.send(completion: .finished) }
         )
     }
@@ -209,6 +209,7 @@ class ReportStoreTests: XCTestCase {
             ),
             reducer: reportReducer,
             environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
                 placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
                 regulatoryOfficeMapper: .noop

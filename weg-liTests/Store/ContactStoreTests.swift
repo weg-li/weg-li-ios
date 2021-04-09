@@ -16,9 +16,6 @@ class ContactStoreTests: XCTestCase {
         store.assert(
             .send(.firstNameChanged(newFirstName)) {
                 $0.firstName = newFirstName
-            },
-            .receive(.isContactValid) {
-                $0.isValid = true
             }
         )
     }
@@ -35,15 +32,9 @@ class ContactStoreTests: XCTestCase {
             .send(.lastNameChanged(newName)) {
                 $0.name = newName
             },
-            .receive(.isContactValid) {
-                $0.isValid = true
-            },
             // set empty name
             .send(.lastNameChanged("")) {
                 $0.name = ""
-            },
-            .receive(.isContactValid) {
-                $0.isValid = false
             }
         )
     }
@@ -59,9 +50,6 @@ class ContactStoreTests: XCTestCase {
         store.assert(
             .send(.phoneChanged(newPhone)) {
                 $0.phone = newPhone
-            },
-            .receive(.isContactValid) {
-                $0.isValid = true
             }
         )
     }
@@ -77,9 +65,6 @@ class ContactStoreTests: XCTestCase {
         store.assert(
             .send(.streetChanged(newStreet)) {
                 $0.address.street = newStreet
-            },
-            .receive(.isContactValid) {
-                $0.isValid = true
             }
         )
     }
@@ -95,9 +80,6 @@ class ContactStoreTests: XCTestCase {
         store.assert(
             .send(.townChanged(newCity)) {
                 $0.address.city = newCity
-            },
-            .receive(.isContactValid) {
-                $0.isValid = true
             }
         )
     }
@@ -113,9 +95,6 @@ class ContactStoreTests: XCTestCase {
         store.assert(
             .send(.zipCodeChanged(newPostalCode)) {
                 $0.address.postalCode = newPostalCode
-            },
-            .receive(.isContactValid) {
-                $0.isValid = true
             }
         )
     }
@@ -131,14 +110,10 @@ class ContactStoreTests: XCTestCase {
             .send(.zipCodeChanged("")) {
                 $0.address.postalCode = ""
             },
-            .receive(.isContactValid) {
-                $0.isValid = false
-            },
             .send(.lastNameChanged("")) {
                 $0.name = ""
-            },
-            .receive(.isContactValid) {
-                $0.isValid = false
+
+                XCTAssertFalse($0.isValid)
             }
         )
     }

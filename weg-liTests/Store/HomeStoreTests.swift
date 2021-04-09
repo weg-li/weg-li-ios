@@ -8,7 +8,7 @@ import XCTest
 class HomeStoreTests: XCTestCase {
     let fixedUUID = { UUID() }
     let fixedDate = { Date() }
-    let scheduler = DispatchQueue.test
+    let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
     private var userDefaults: UserDefaults!
 
     override func setUp() {
@@ -33,8 +33,7 @@ class HomeStoreTests: XCTestCase {
         store.assert(
             .send(.settings(.contact(.firstNameChanged(newContact.firstName)))) {
                 $0.settings.contact.firstName = newContact.firstName
-            },
-            .receive(.settings(.contact(.isContactValid)))
+            }
         )
     }
 
@@ -54,8 +53,7 @@ class HomeStoreTests: XCTestCase {
             .send(.report(.contact(.firstNameChanged(newContact.firstName)))) {
                 $0.settings.contact.firstName = newContact.firstName
                 $0.reportDraft.contact.firstName = newContact.firstName
-            },
-            .receive(.report(.contact(.isContactValid)))
+            }
         )
     }
 
@@ -87,10 +85,6 @@ class HomeStoreTests: XCTestCase {
         store.assert(
             .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
                 $0.reports = [report]
-            },
-            .do { self.scheduler.advance(by: 1) },
-            .receive(.showReportWizard(false)) {
-                $0.showReportWizard = false
             },
             .receive(.reportSaved) {
                 $0.reportDraft = Report(images: .init(), contact: .init())
@@ -126,9 +120,6 @@ class HomeStoreTests: XCTestCase {
         store.assert(
             .send(.settings(.contact(.firstNameChanged("Bob")))) {
                 $0.settings.contact.firstName = "Bob"
-            },
-            .receive(.settings(.contact(.isContactValid))) {
-                $0.settings.contact.isValid = false
             },
             .send(.settings(.contact(.onDisappear))) {
                 $0.reportDraft.contact = $0.settings.contact

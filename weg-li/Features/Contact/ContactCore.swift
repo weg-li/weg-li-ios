@@ -16,7 +16,17 @@ struct ContactState: Equatable, Codable {
     var address: Address = .init()
     var phone: String = ""
 
-    var isValid = false
+    var isValid: Bool {
+        [
+            firstName,
+            name,
+            phone,
+            address.street,
+            address.city
+        ].allSatisfy { !$0.isEmpty }
+            && address.postalCode.isNumeric
+            && address.postalCode.count == 5
+    }
 }
 
 extension ContactState {
@@ -64,7 +74,6 @@ enum ContactAction: Equatable {
     case streetChanged(String)
     case zipCodeChanged(String)
     case townChanged(String)
-    case isContactValid
     case onDisappear
 }
 
@@ -77,31 +86,21 @@ let contactReducer =
         switch action {
         case let .firstNameChanged(firstName):
             state.firstName = firstName
-            return Effect(value: .isContactValid)
+            return .none
         case let .lastNameChanged(lastName):
             state.name = lastName
-            return Effect(value: .isContactValid)
+            return .none
         case let .phoneChanged(phone):
             state.phone = phone
-            return Effect(value: .isContactValid)
+            return .none
         case let .streetChanged(street):
             state.address.street = street
-            return Effect(value: .isContactValid)
+            return .none
         case let .townChanged(town):
             state.address.city = town
-            return Effect(value: .isContactValid)
+            return .none
         case let .zipCodeChanged(zipCode):
             state.address.postalCode = zipCode
-            return Effect(value: .isContactValid)
-        case .isContactValid:
-            state.isValid = [
-                state.firstName,
-                state.name,
-                state.address.street,
-                state.address.city,
-                state.address.postalCode,
-                state.phone
-            ].allSatisfy { !$0.isEmpty }
             return .none
         case .onDisappear:
             return .none
