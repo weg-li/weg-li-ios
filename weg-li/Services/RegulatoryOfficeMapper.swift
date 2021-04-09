@@ -8,19 +8,27 @@ struct RegularityOfficeMapError: Error, Equatable {
     var message: String = ""
 }
 
+struct OfficeMapperInput {
+    let geoAddress: GeoAddress
+    let districts: [District]
+
+    init(_ geoAddress: GeoAddress, _ districts: [District] = .all) {
+        self.geoAddress = geoAddress
+        self.districts = districts
+    }
+}
+
 struct RegulatoryOfficeMapper {
-    static let districts = Bundle.main.decode([District].self, from: "districts.json")
-    
-    var mapAddressToDistrict: (GeoAddress) -> Effect<District, RegularityOfficeMapError>
+    var mapAddressToDistrict: (OfficeMapperInput) -> Effect<District, RegularityOfficeMapError>
 }
 
 extension RegulatoryOfficeMapper {
     static let live = Self(
-        mapAddressToDistrict: { geoAddress in
+        mapAddressToDistrict: { input in
             .result {
-                if let districtMAtchedByPostalCode = districts.first(where: { $0.zipCode == geoAddress.postalCode }) {
+                if let districtMAtchedByPostalCode = input.districts.first(where: { $0.zipCode == input.geoAddress.postalCode }) {
                     return .success(districtMAtchedByPostalCode)
-                } else if let districtMatchedByName = districts.first(where: { $0.name == geoAddress.city }) {
+                } else if let districtMatchedByName = input.districts.first(where: { $0.name == input.geoAddress.city }) {
                     return .success(districtMatchedByName)
                 } else {
                     return .failure(RegularityOfficeMapError())
@@ -28,8 +36,8 @@ extension RegulatoryOfficeMapper {
             }
         }
     )
-    
+
     static let noop = Self(
-        mapAddressToDistrict: { _ in return .none }
+        mapAddressToDistrict: { _ in .none }
     )
 }

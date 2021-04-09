@@ -27,8 +27,7 @@ struct Report: Codable {
         description: DescriptionState = DescriptionState(),
         location: LocationViewState = LocationViewState(storedPhotos: []),
         mail: MailViewState = MailViewState()
-    )
-    {
+    ) {
         id = uuid.uuidString
         self.images = images
         self.contact = contact
@@ -56,13 +55,18 @@ enum ReportAction: Equatable {
     case location(LocationViewAction)
     case mail(MailViewAction)
     case viewAppeared
+    case mapGeoAddressToDistrict(GeoAddress)
     case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
 }
 
 struct ReportEnvironment {
+    var mainQueue: AnySchedulerOf<DispatchQueue>
     var locationManager: LocationManager
     var placeService: PlacesService
     var regulatoryOfficeMapper: RegulatoryOfficeMapper
+
+    let debounce = 1
+    let postalCodeMinumimCharacters = 5
 }
 
 /// Combined reducer that is used in the ReportView
@@ -99,7 +103,32 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     ),
     Reducer { state, action, environment in
         struct LocationManagerId: Hashable {}
+        struct DebounceID: Hashable {}
+
         switch action {
+        case .viewAppeared:
+            return .none
+        case let .mapGeoAddressToDistrict(geoAddress):
+            return environment
+                .regulatoryOfficeMapper
+                .mapAddressToDistrict(OfficeMapperInput(geoAddress))
+                .catchToEffect()
+                .map(ReportAction.mapDistrictFinished)
+                .eraseToEffect()
+                .debounce(
+                    id: DebounceID(),
+                    for: .seconds(environment.debounce),
+                    scheduler: environment.mainQueue
+                )
+
+        case let .mapDistrictFinished(.success(district)):
+            state.district = district
+            return .none
+        case let .mapDistrictFinished(.failure(error)):
+            // present alert
+            debugPrint(error.message)
+            return .none
+
         case let .images(imageViewAction):
             switch imageViewAction {
             case let .setResolvedCoordinate(coordinate):
@@ -111,15 +140,24 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             default:
                 return .none
             }
-        case .viewAppeared:
-            return Effect(value: ReportAction.contact(.isContactValid))
-        case let .mapDistrictFinished(.success(district)):
-            state.district = district
-            return .none
-        case let .mapDistrictFinished(.failure(error)):
-            // present alert
-            debugPrint(error.message)
-            return .none
+        case let .location(locationAction):
+            switch locationAction {
+            case let .resolveAddressFinished(addressResult):
+                guard let address = try? addressResult.get().first else {
+                    return .none
+                }
+                return Effect(value: ReportAction.mapGeoAddressToDistrict(address))
+
+            case let .updateGeoAddressPostalCode(postalCode):
+                guard postalCode.count == environment.postalCodeMinumimCharacters, postalCode.isNumeric else {
+                    return .none
+                }
+                return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
+            case let .updateGeoAddressCity(city):
+                return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
+            default:
+                return .none
+            }
         case let .mail(mailAction):
             if MailViewAction.submitButtonTapped == mailAction {
                 guard let district = state.district else {
@@ -133,21 +171,6 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                     .map(\.image)
                 return Effect(value: ReportAction.mail(.presentMailContentView(true)))
             } else {
-                return .none
-            }
-        case let .location(locationAction):
-            switch locationAction {
-            case let .resolveAddressFinished(addressResult):
-                guard let address = try? addressResult.get().first else {
-                    return .none
-                }
-                return environment
-                    .regulatoryOfficeMapper
-                    .mapAddressToDistrict(address)
-                    .catchToEffect()
-                    .map(ReportAction.mapDistrictFinished)
-                    .eraseToEffect()
-            default:
                 return .none
             }
         case .contact, .description:
