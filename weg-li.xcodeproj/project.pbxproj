@@ -14,6 +14,7 @@
 		7308C537260B5A1500FE3333 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308C536260B5A1500FE3333 /* ReportView.swift */; };
 		73137644261F898500C5C9B7 /* Color+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73137643261F898400C5C9B7 /* Color+Additions.swift */; };
 		7313764A261F89AE00C5C9B7 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73137649261F89AE00C5C9B7 /* Colors.xcassets */; };
+		7313765E2620746900C5C9B7 /* String+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7313765D2620746900C5C9B7 /* String+Additions.swift */; };
 		731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A0B2612FBB40012FAAD /* GeoAddress.swift */; };
 		731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A122612FC160012FAAD /* PlacesServiceMock.swift */; };
 		731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */; };
@@ -99,6 +100,7 @@
 		7308C536260B5A1500FE3333 /* ReportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
 		73137643261F898400C5C9B7 /* Color+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+Additions.swift"; sourceTree = "<group>"; };
 		73137649261F89AE00C5C9B7 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		7313765D2620746900C5C9B7 /* String+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Additions.swift"; sourceTree = "<group>"; };
 		731E5A0B2612FBB40012FAAD /* GeoAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAddress.swift; sourceTree = "<group>"; };
 		731E5A122612FC160012FAAD /* PlacesServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesServiceMock.swift; sourceTree = "<group>"; };
 		731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesStoreTests.swift; sourceTree = "<group>"; };
@@ -434,6 +436,7 @@
 				73719B3F261AD1CE005E09A3 /* Codable+Sugar.swift */,
 				73137643261F898400C5C9B7 /* Color+Additions.swift */,
 				9F4BD316249B653200C6C44D /* DateFormatter+Additions.swift */,
+				7313765D2620746900C5C9B7 /* String+Additions.swift */,
 				9FB750AF2487BEF900193948 /* View+Additions.swift */,
 			);
 			path = Extensions;
@@ -679,6 +682,7 @@
 				9FFBAD67248E979200F66ADB /* ActivityIndicator.swift in Sources */,
 				73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */,
 				73719BAA261F14C5005E09A3 /* SettingsCore.swift in Sources */,
+				7313765E2620746900C5C9B7 /* String+Additions.swift in Sources */,
 				7308C50A260B54BD00FE3333 /* RowType.swift in Sources */,
 				9FA3AA7A2497A0AD002EDC7D /* MailContentView.swift in Sources */,
 				73D117CD261261C2000D7B82 /* LocationOption.swift in Sources */,
