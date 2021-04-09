@@ -7,12 +7,12 @@ import SwiftUI
 
 struct MailContentView: View {
     struct ViewState: Equatable {
-        let districtName: String
+        let districtName: String?
         let isSubmitButtonDisabled: Bool
         let isMailComposerPresented: Bool
 
         init(state: Report) {
-            districtName = state.district?.name ?? "📸 📝 ✊"
+            districtName = state.district?.name
             let isValid = !state.images.storedPhotos.isEmpty
                 && state.contact.isValid
                 && state.description.isValid
@@ -77,6 +77,7 @@ struct MailContentView_Previews: PreviewProvider {
                 ),
                 reducer: reportReducer,
                 environment: ReportEnvironment(
+                    mainQueue: .failing,
                     locationManager: .live,
                     placeService: PlacesServiceImplementation(),
                     regulatoryOfficeMapper: .live

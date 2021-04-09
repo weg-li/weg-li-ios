@@ -17,7 +17,7 @@ struct SubmitButtonStyle: ViewModifier {
 }
 
 struct ReadySubmitButton: View {
-    let ordnungsamt: String
+    let ordnungsamt: String?
     var disabled: Bool = false
 
     var body: some View {
@@ -25,7 +25,9 @@ struct ReadySubmitButton: View {
             Image(systemName: "envelope.fill")
             VStack(alignment: .leading) {
                 Text("Anzeige aufgeben").font(.headline)
-                Text("Ordnungsamt \(ordnungsamt)").font(.caption)
+                if let amt = ordnungsamt {
+                    Text("Ordnungsamt \(amt)").font(.caption)
+                }
             }
         }
         .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: disabled))
@@ -65,7 +67,7 @@ struct SubmitButton: View {
     enum Status {
         case unsupportedLocation
         case missingData
-        case readyToSubmit(ordnungsamt: String)
+        case readyToSubmit(ordnungsamt: String?)
     }
 
     var body: some View {
