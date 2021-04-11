@@ -13,6 +13,7 @@ struct LocationView: View {
         let isMapExpanded: Bool
         let address: GeoAddress
         let showActivityIndicator: Bool
+        let resolvedLocationFromPhoto: CLLocationCoordinate2D?
 
         init(state: Report) {
             location = state.location
@@ -22,6 +23,7 @@ struct LocationView: View {
             address = state.location.resolvedAddress
             showActivityIndicator = state.location.userLocationState.isRequestingCurrentLocation
                 || state.location.isResolvingAddress
+            resolvedLocationFromPhoto = state.images.coordinateFromImagePicker
         }
     }
 
@@ -91,7 +93,11 @@ struct LocationView: View {
                             get: \.region,
                             send: LocationViewAction.updateRegion
                         ),
-                        showsLocation: viewStore.locationOption == .currentLocation
+                        showsLocation: viewStore.locationOption == .currentLocation,
+                        photoCoordinate: viewStore.binding(
+                            get: \.resolvedLocationFromPhoto,
+                            send: LocationViewAction.setResolvedLocation
+                        )
                     )
                     .frame(height: viewStore.isMapExpanded ? 300 : 150)
                     expandMapButton

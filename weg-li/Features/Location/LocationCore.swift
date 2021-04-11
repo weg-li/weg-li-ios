@@ -98,6 +98,7 @@ enum LocationViewAction: Equatable {
     case updateGeoAddressStreet(String)
     case updateGeoAddressCity(String)
     case updateGeoAddressPostalCode(String)
+    case setResolvedLocation(CLLocationCoordinate2D?) //
 }
 
 struct LocationViewEnvironment {
@@ -105,6 +106,7 @@ struct LocationViewEnvironment {
     let placeService: PlacesServiceClient
 }
 
+/// LocationReducer responsible handling location permission and location widget actions.
 let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationViewEnvironment>.combine(
     locationManagerReducer.pullback(
         state: \.userLocationState,
@@ -180,14 +182,14 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             default:
                 return .none
             }
-        case let .resolveLocation(coordinate):
+        case let .resolveLocation(coordinate): // reverse geo code coordinate to address
             state.isResolvingAddress = true
             let clLocation = CLLocation(
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude
             )
             return environment.placeService
-                .getPlacemarks(for: clLocation)
+                .getPlacemarks(clLocation)
                 .catchToEffect()
                 .map(LocationViewAction.resolveAddressFinished)
                 .cancellable(id: CancelSearchId(), cancelInFlight: true)
