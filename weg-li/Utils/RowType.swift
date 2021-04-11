@@ -42,6 +42,7 @@ enum RowType {
     var keyboardType: UIKeyboardType {
         switch self {
         case .phone: return .phonePad
+        case .zipCode: return .numberPad
         default: return .default
         }
     }

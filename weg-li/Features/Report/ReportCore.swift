@@ -105,12 +105,10 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         struct DebounceID: Hashable {}
 
         switch action {
-        case .viewAppeared:
-            return .none
-        case let .mapGeoAddressToDistrict(geoAddress):
+        case let .mapGeoAddressToDistrict(input):
             return environment
                 .regulatoryOfficeMapper
-                .mapAddressToDistrict(OfficeMapperInput(geoAddress))
+                .mapAddressToDistrict(input)
                 .catchToEffect()
                 .map(ReportAction.mapDistrictFinished)
                 .eraseToEffect()
