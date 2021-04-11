@@ -83,7 +83,7 @@ class ImagesStoreTests: XCTestCase {
                 $0.storedPhotos = [pencilImage, trashImage]
             },
             .send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {
-                $0.resolvedLocation = .init(latitude: 23.32, longitude: 13.31)
+                $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
             }
         )
     }
@@ -93,7 +93,7 @@ class ImagesStoreTests: XCTestCase {
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [],
-                resolvedLocation: .zero
+                coordinateFromImagePicker: .zero
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
@@ -112,10 +112,10 @@ class ImagesStoreTests: XCTestCase {
                 $0.storedPhotos = [pencilImage, trashImage]
             },
             .send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {
-                $0.resolvedLocation = .init(latitude: 23.32, longitude: 13.31)
+                $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
             },
             .send(.setResolvedCoordinate(.init(latitude: 23.3200000001, longitude: 13.3100000001))) {
-                $0.resolvedLocation = .init(latitude: 23.32, longitude: 13.31)
+                $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
             }
         )
     }

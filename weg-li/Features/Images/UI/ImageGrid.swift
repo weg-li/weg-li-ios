@@ -42,7 +42,7 @@ struct ImageGrid_Previews: PreviewProvider {
                         StorableImage(uiImage: UIImage(systemName: "book")!)!,
                         StorableImage(uiImage: UIImage(systemName: "book")!)!
                     ],
-                    resolvedLocation: .zero
+                    coordinateFromImagePicker: .zero
                 ),
                 reducer: .empty,
                 environment: ImageEnvironment()

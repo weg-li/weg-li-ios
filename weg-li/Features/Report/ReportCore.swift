@@ -25,7 +25,7 @@ struct Report: Codable {
         district: District? = nil,
         date: () -> Date = Date.init,
         description: DescriptionState = DescriptionState(),
-        location: LocationViewState = LocationViewState(storedPhotos: []),
+        location: LocationViewState = LocationViewState(),
         mail: MailViewState = MailViewState()
     ) {
         id = uuid.uuidString
@@ -54,7 +54,6 @@ enum ReportAction: Equatable {
     case description(DescriptionAction)
     case location(LocationViewAction)
     case mail(MailViewAction)
-    case viewAppeared
     case mapGeoAddressToDistrict(GeoAddress)
     case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
 }
@@ -163,9 +162,8 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 guard let district = state.district else {
                     return .none
                 }
-                state.mail.district = district
                 state.mail.mail.address = district.mail
-                state.mail.mail.body = state.createMailBody()
+                state.mail.mail.body = Mail.createMailBody(from: state)
                 state.mail.mail.attachmentData = state.images.storedPhotos
                     .compactMap { $0 }
                     .map(\.image)
@@ -180,56 +178,6 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
 )
 
 extension Report {
-    func createMailBody() -> String {
-        return """
-        Sehr geehrte Damen und Herren,
-
-
-        hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
-
-        Kennzeichen: \(description.licensePlateNumber)
-
-        Marke: \(description.type)
-
-        Farbe: \(description.color)
-
-        Adresse: \(contact.address.humanReadableAddress)
-
-        Verstoß: \(DescriptionState.charges[description.selectedType])
-
-        Tatzeit: \(date.humandReadableDate)
-
-        Zeitraum: \(description.time)
-
-        Das Fahrzeug war verlassen.
-
-
-        Zeuge:
-
-        Name: \(contact.firstName) \(contact.name)
-
-        Anschrift: \(contact.address.humanReadableAddress)
-
-        Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
-        Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
-        Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
-
-
-        Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
-        Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.
-
-
-        Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser E-Mail durch eine Antwort.
-        Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine E-Mail weiter und setzen mich dabei in CC.
-        Dabei dürfen Sie auch meine persönlichen Daten weiterleiten und für die Dauer des Verfahrens speichern.
-
-
-        Mit freundlichen Grüßen
-
-        \(contact.firstName) \(contact.name)
-        """
-    }
-
     static var preview: Report {
         Report(
             uuid: UUID(),
@@ -252,7 +200,7 @@ extension Report {
                 selectedType: 0,
                 blockedOthers: false
             ),
-            location: LocationViewState(storedPhotos: [])
+            location: LocationViewState()
         )
     }
 }

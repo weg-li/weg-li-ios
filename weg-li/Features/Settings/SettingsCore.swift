@@ -33,8 +33,6 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment
             return URL(string: env.uiApplicationClient.openSettingsURLString())
                 .map {
                     env.uiApplicationClient.open($0, [:])
-                        .ignoreOutput()
-                        .eraseToEffect()
                         .fireAndForget()
                 }
                 ?? .none

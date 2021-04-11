@@ -8,7 +8,7 @@ import SwiftUI
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     @Binding var pickerResult: [StorableImage?]
-    @Binding var coordinate: CLLocationCoordinate2D
+    @Binding var coordinate: CLLocationCoordinate2D?
 
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
         private let parent: ImagePicker

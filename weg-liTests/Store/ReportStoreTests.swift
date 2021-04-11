@@ -21,7 +21,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero
+                    coordinateFromImagePicker: .zero
                 ),
                 contact: .preview,
                 district: nil,
@@ -61,7 +61,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero
+                    coordinateFromImagePicker: .zero
                 ),
                 contact: .empty,
                 district: nil,
@@ -97,7 +97,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero
+                    coordinateFromImagePicker: .zero
                 ),
                 contact: .empty,
                 district: nil,
@@ -135,7 +135,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero
+                    coordinateFromImagePicker: .zero
                 ),
                 contact: .empty,
                 district: nil,
@@ -188,7 +188,7 @@ class ReportStoreTests: XCTestCase {
                 images: ImagesViewState(
                     showImagePicker: false,
                     storedPhotos: [StorableImage(uiImage: image)!],
-                    resolvedLocation: .zero
+                    coordinateFromImagePicker: .zero
                 ),
                 contact: .empty,
                 district: District(name: "Berlin", zipCode: "12437", mail: "amt@berlin.da"),

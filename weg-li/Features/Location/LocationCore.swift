@@ -18,16 +18,6 @@ struct UserLocationState: Equatable {
     var isRequestingCurrentLocation = false
     var region: CoordinateRegion?
 
-    init(
-        alert: AlertState<ReportAction>? = nil,
-        isRequestingCurrentLocation: Bool = false,
-        region: CoordinateRegion? = nil
-    ) {
-        self.alert = alert
-        self.isRequestingCurrentLocation = isRequestingCurrentLocation
-        self.region = region
-    }
-
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.isRequestingCurrentLocation == rhs.isRequestingCurrentLocation
             && lhs.region?.center.latitude == rhs.region?.center.latitude
@@ -81,11 +71,10 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
 // MARK: - Location Core
 
 struct LocationViewState: Equatable, Codable {
-    var locationOption: LocationOption = .fromPhotos(nil)
+    var locationOption: LocationOption = .fromPhotos
     var isMapExpanded = false
     var isResolvingAddress = false
-    var resolvedAddress: GeoAddress = .init(address: .init())
-    var storedPhotos: [StorableImage]
+    var resolvedAddress: GeoAddress = .empty
     var userLocationState = UserLocationState()
 
     private enum CodingKeys: String, CodingKey {
@@ -93,7 +82,6 @@ struct LocationViewState: Equatable, Codable {
         case isMapExpanded
         case isResolvingAddress
         case resolvedAddress
-        case storedPhotos
     }
 }
 
@@ -208,6 +196,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             state.resolvedAddress = address.first ?? .init(address: .init())
             return .none
         case let .resolveAddressFinished(.failure(error)):
+            debugPrint(error)
             state.isResolvingAddress = false
             return .none
 
@@ -223,6 +212,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             return .none
         case let .updateGeoAddressPostalCode(postalCode):
             state.resolvedAddress.postalCode = postalCode
+            return .none
+        case .setResolvedLocation:
             return .none
         }
     }

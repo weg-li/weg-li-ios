@@ -149,7 +149,6 @@ struct Location_Previews: PreviewProvider {
                     location: LocationViewState(
                         locationOption: .currentLocation,
                         isMapExpanded: false,
-                        storedPhotos: [],
                         userLocationState: UserLocationState(
                             alert: nil,
                             isRequestingCurrentLocation: true,

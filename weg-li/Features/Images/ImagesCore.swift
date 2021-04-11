@@ -8,7 +8,7 @@ import UIKit
 struct ImagesViewState: Equatable, Codable {
     var showImagePicker: Bool = false
     var storedPhotos: [StorableImage?] = []
-    var resolvedLocation: CLLocationCoordinate2D = .zero
+    var coordinateFromImagePicker: CLLocationCoordinate2D?
 
     var imageStates: IdentifiedArrayOf<ImageState> {
         IdentifiedArray(
@@ -22,7 +22,7 @@ struct ImagesViewState: Equatable, Codable {
 enum ImagesViewAction: Equatable {
     case addPhotos([StorableImage?])
     case setShowImagePicker(Bool)
-    case setResolvedCoordinate(CLLocationCoordinate2D)
+    case setResolvedCoordinate(CLLocationCoordinate2D?)
     case image(id: UUID, action: ImageAction)
 }
 
@@ -56,7 +56,7 @@ let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnviron
             return .none
         }
 
-        state.resolvedLocation = coordinate
+        state.coordinateFromImagePicker = coordinate
         return .none
     }
 }
