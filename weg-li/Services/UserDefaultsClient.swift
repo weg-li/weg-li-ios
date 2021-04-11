@@ -12,9 +12,7 @@ struct UserDefaultsClient {
     var setData: (Data?, String) -> Effect<Never, Never>
     var setDouble: (Double, String) -> Effect<Never, Never>
 
-    var contact: ContactState? {
-        let contact: ContactState? = (try? dataForKey(contactKey)?.decoded())
-        return contact
+    var contact: ContactState? { (try? dataForKey(contactKey)?.decoded())
     }
 
     func setContact(_ contact: ContactState) -> Effect<Never, Never> {
@@ -23,28 +21,12 @@ struct UserDefaultsClient {
     }
 
     var reports: [Report] {
-        guard let data = dataForKey(reportsKey) else {
-            return []
-        }
-        do {
-            let decoder = JSONDecoder()
-            let reports = try decoder.decode([Report].self, from: data)
-            return reports
-        } catch {
-            print(error)
-            return []
-        }
+        (try? dataForKey(reportsKey)?.decoded()) ?? []
     }
 
     func setReports(_ reports: [Report]) -> Effect<Never, Never> {
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(reports)
-            return setData(data, reportsKey)
-        } catch {
-            print(error.localizedDescription)
-            return .none
-        }
+        let data = try? reports.encoded()
+        return setData(data, reportsKey)
     }
 }
 
@@ -52,9 +34,7 @@ private let reportsKey = "reportsKey"
 private let contactKey = "contactKey"
 
 extension UserDefaultsClient {
-    static func live(
-        userDefaults: UserDefaults = UserDefaults(suiteName: "group.weg-li")!
-    ) -> Self {
+    static func live(userDefaults: UserDefaults = UserDefaults(suiteName: "group.weg-li")!) -> Self {
         Self(
             boolForKey: userDefaults.bool(forKey:),
             dataForKey: { userDefaults.object(forKey: $0) as? Data },

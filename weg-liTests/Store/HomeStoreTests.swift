@@ -24,7 +24,8 @@ class HomeStoreTests: XCTestCase {
             reducer: homeReducer,
             environment: HomeEnvironment(
                 mainQueue: scheduler.eraseToAnyScheduler(),
-                userDefaultsClient: .noop
+                userDefaultsClient: .noop,
+                imageConverter: .noop
             )
         )
 
@@ -43,7 +44,8 @@ class HomeStoreTests: XCTestCase {
             reducer: homeReducer,
             environment: HomeEnvironment(
                 mainQueue: scheduler.eraseToAnyScheduler(),
-                userDefaultsClient: .noop
+                userDefaultsClient: .noop,
+                imageConverter: .noop
             )
         )
 
@@ -63,13 +65,13 @@ class HomeStoreTests: XCTestCase {
             images: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                resolvedLocation: .zero
+                coordinateFromImagePicker: .zero
             ),
             contact: ContactState(),
             district: nil,
             date: fixedDate,
             description: .init(),
-            location: .init(storedPhotos: []),
+            location: .init(),
             mail: .init()
         )
 
@@ -78,7 +80,8 @@ class HomeStoreTests: XCTestCase {
             reducer: homeReducer,
             environment: HomeEnvironment(
                 mainQueue: scheduler.eraseToAnyScheduler(),
-                userDefaultsClient: .noop
+                userDefaultsClient: .noop,
+                imageConverter: .noop
             )
         )
 
@@ -98,13 +101,13 @@ class HomeStoreTests: XCTestCase {
             images: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                resolvedLocation: .zero
+                coordinateFromImagePicker: .zero
             ),
             contact: .preview,
             district: nil,
             date: fixedDate,
             description: .init(),
-            location: .init(storedPhotos: []),
+            location: .init(),
             mail: .init()
         )
 
@@ -113,7 +116,8 @@ class HomeStoreTests: XCTestCase {
             reducer: homeReducer,
             environment: HomeEnvironment(
                 mainQueue: scheduler.eraseToAnyScheduler(),
-                userDefaultsClient: .live(userDefaults: userDefaults)
+                userDefaultsClient: .live(userDefaults: userDefaults),
+                imageConverter: .noop
             )
         )
 

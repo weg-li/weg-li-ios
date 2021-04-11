@@ -49,6 +49,7 @@ enum HomeAction: Equatable {
 struct HomeEnvironment {
     var mainQueue: AnySchedulerOf<DispatchQueue>
     var userDefaultsClient: UserDefaultsClient
+    var imageConverter: ImageConverter
 }
 
 let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
@@ -59,9 +60,9 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             environment: { environment in
                 ReportEnvironment(
                     mainQueue: environment.mainQueue,
-                    locationManager: LocationManager.live,
-                    placeService: PlacesServiceImplementation(),
-                    regulatoryOfficeMapper: .live
+                    locationManager: .live,
+                    placeService: .live,
+                    regulatoryOfficeMapper: .live()
                 )
             }
         ),

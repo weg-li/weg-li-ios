@@ -32,7 +32,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock(),
+                placeService: .noop,
                 regulatoryOfficeMapper: .noop
             )
         )
@@ -72,7 +72,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock(),
+                placeService: .noop,
                 regulatoryOfficeMapper: .noop
             )
         )
@@ -108,7 +108,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock(),
+                placeService: .noop,
                 regulatoryOfficeMapper: .noop
             )
         )
@@ -127,7 +127,12 @@ class ReportStoreTests: XCTestCase {
 
     func test_updateImages_shouldTriggerAddressResolve() {
         let image = UIImage(systemName: "pencil")!
-        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
+        let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
+        let expectedAddress = GeoAddress(
+            street: ContactState.preview.address.street,
+            city: ContactState.preview.address.city,
+            postalCode: ContactState.preview.address.postalCode
+        )
 
         let store = TestStore(
             initialState: Report(
@@ -146,16 +151,11 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
+                placeService: PlacesServiceClient(
+                    getPlacemarks: { _ in Effect(value: [expectedAddress]) }
+                ),
                 regulatoryOfficeMapper: .noop
             )
-        )
-
-        let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
-        let expectedAddress = GeoAddress(
-            street: ContactState.preview.address.street,
-            city: ContactState.preview.address.city,
-            postalCode: ContactState.preview.address.postalCode
         )
 
         store.assert(
@@ -168,19 +168,16 @@ class ReportStoreTests: XCTestCase {
             .receive(.location(.resolveLocation(coordinate))) {
                 $0.location.isResolvingAddress = true
             },
-            .do { placesSubject.send([expectedAddress]) },
             .receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
                 $0.location.isResolvingAddress = false
                 $0.location.resolvedAddress = expectedAddress
             },
-            .receive(.mapGeoAddressToDistrict(expectedAddress)),
-            .do { placesSubject.send(completion: .finished) }
+            .receive(.mapGeoAddressToDistrict(expectedAddress))
         )
     }
 
     func test_submitButtonTap_createsMail_andPresentsMailView() {
         let image = UIImage(systemName: "pencil")!
-        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
 
         let store = TestStore(
             initialState: Report(
@@ -191,7 +188,11 @@ class ReportStoreTests: XCTestCase {
                     coordinateFromImagePicker: .zero
                 ),
                 contact: .empty,
-                district: District(name: "Berlin", zipCode: "12437", mail: "amt@berlin.da"),
+                district: District(
+                    name: "Berlin",
+                    zipCode: "12437",
+                    mail: "amt@berlin.da"
+                ),
                 date: fixedDate,
                 description: .init(),
                 location: LocationViewState(
@@ -203,7 +204,6 @@ class ReportStoreTests: XCTestCase {
                         city: Report.preview.contact.address.city,
                         postalCode: Report.preview.contact.address.postalCode
                     ),
-                    storedPhotos: [StorableImage(uiImage: image)!],
                     userLocationState: .init()
                 )
             ),
@@ -211,7 +211,7 @@ class ReportStoreTests: XCTestCase {
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock(getPlacesSubject: placesSubject),
+                placeService: .noop,
                 regulatoryOfficeMapper: .noop
             )
         )

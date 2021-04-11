@@ -94,7 +94,7 @@ enum LocationViewAction: Equatable {
     case updateRegion(CoordinateRegion?)
     case userLocationAction(LocationManager.Action)
     case resolveLocation(CLLocationCoordinate2D)
-    case resolveAddressFinished(Result<[GeoAddress], PlacesServiceImplementation.Error>)
+    case resolveAddressFinished(Result<[GeoAddress], PlacesServiceError>)
     case updateGeoAddressStreet(String)
     case updateGeoAddressCity(String)
     case updateGeoAddressPostalCode(String)
@@ -102,7 +102,7 @@ enum LocationViewAction: Equatable {
 
 struct LocationViewEnvironment {
     let locationManager: LocationManager
-    let placeService: PlacesService
+    let placeService: PlacesServiceClient
 }
 
 let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationViewEnvironment>.combine(

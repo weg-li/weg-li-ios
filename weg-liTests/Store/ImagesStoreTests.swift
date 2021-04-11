@@ -11,11 +11,11 @@ class ImagesStoreTests: XCTestCase {
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [],
-                resolvedLocation: .zero
+                coordinateFromImagePicker: .zero
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: ImageConverterImplementation()
+                imageConverter: .noop
             )
         )
 
@@ -44,11 +44,11 @@ class ImagesStoreTests: XCTestCase {
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [storableImage1, storableImage2],
-                resolvedLocation: .zero
+                coordinateFromImagePicker: .zero
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: ImageConverterImplementation()
+                imageConverter: .noop
             )
         )
 
@@ -64,11 +64,11 @@ class ImagesStoreTests: XCTestCase {
             initialState: ImagesViewState(
                 showImagePicker: false,
                 storedPhotos: [],
-                resolvedLocation: .zero
+                coordinateFromImagePicker: .zero
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: ImageConverterImplementation()
+                imageConverter: .noop
             )
         )
 
@@ -97,7 +97,7 @@ class ImagesStoreTests: XCTestCase {
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: ImageConverterImplementation()
+                imageConverter: .noop
             )
         )
 

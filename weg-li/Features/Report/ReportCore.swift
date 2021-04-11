@@ -61,7 +61,7 @@ enum ReportAction: Equatable {
 struct ReportEnvironment {
     var mainQueue: AnySchedulerOf<DispatchQueue>
     var locationManager: LocationManager
-    var placeService: PlacesService
+    var placeService: PlacesServiceClient
     var regulatoryOfficeMapper: RegulatoryOfficeMapper
 
     let debounce = 1
@@ -73,7 +73,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     imagesReducer.pullback(
         state: \.images,
         action: /ReportAction.images,
-        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }
+        environment: { _ in ImagesViewEnvironment(imageConverter: .live()) }
     ),
     descriptionReducer.pullback(
         state: \.description,
