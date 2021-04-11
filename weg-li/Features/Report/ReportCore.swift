@@ -131,11 +131,18 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         case let .images(imageViewAction):
             switch imageViewAction {
             case let .setResolvedCoordinate(coordinate):
-                guard coordinate != state.location.userLocationState.region?.center else {
+                guard let coordinate = coordinate, coordinate != state.location.userLocationState.region?.center else {
                     return .none
                 }
                 state.location.userLocationState.region = CoordinateRegion(center: coordinate)
+                state.images.coordinateFromImagePicker = coordinate
                 return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
+            case .image:
+                if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
+                    state.images.coordinateFromImagePicker = nil
+                    state.location.resolvedAddress = .empty
+                }
+                return .none
             default:
                 return .none
             }

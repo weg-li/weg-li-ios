@@ -5,14 +5,26 @@ import CoreLocation
 import SwiftUI
 
 struct ImagesView: View {
+    struct ViewState: Equatable {
+        let resolvedLocation: CLLocationCoordinate2D?
+        let photos: [StorableImage?]
+        let showImagePicker: Bool
+
+        init(state: Report) {
+            resolvedLocation = state.images.coordinateFromImagePicker
+            photos = state.images.storedPhotos
+            showImagePicker = state.images.showImagePicker
+        }
+    }
+
     let store: Store<Report, ReportAction>
-    @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
+    @ObservedObject private var viewStore: ViewStore<ViewState, ImagesViewAction>
 
     init(store: Store<Report, ReportAction>) {
         self.store = store
         viewStore = ViewStore(
             store.scope(
-                state: \.images,
+                state: ViewState.init,
                 action: ReportAction.images
             )
         )
@@ -41,7 +53,7 @@ struct ImagesView: View {
                         send: ImagesViewAction.setShowImagePicker
                     ),
                     pickerResult: viewStore.binding(
-                        get: \.storedPhotos,
+                        get: \.photos,
                         send: ImagesViewAction.addPhotos
                     ),
                     coordinate: viewStore.binding(

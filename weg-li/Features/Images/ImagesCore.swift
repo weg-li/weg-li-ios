@@ -48,8 +48,11 @@ let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnviron
     case let .addPhotos(photos):
         state.storedPhotos = photos
         return .none
-    case let .setResolvedCoordinate(coordinate):
-        let resolved = CLLocation(from: state.resolvedLocation)
+    case let .setResolvedCoordinate(coordinate): // set coordinates from selected photos
+        guard let coordinate = coordinate, let resolvedCoordinate = state.coordinateFromImagePicker else {
+            return .none
+        }
+        let resolved = CLLocation(from: resolvedCoordinate)
         let location = CLLocation(from: coordinate)
 
         if resolved.distance(from: location) < env.distanceFilter {
