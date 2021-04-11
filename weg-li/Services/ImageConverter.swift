@@ -15,20 +15,20 @@ extension ImageConverter {
                     // Determine the scale factor that preserves aspect ratio
                     let widthRatio = size.width / image.size.width
                     let heightRatio = size.height / image.size.height
-                    
+
                     let scaleFactor = min(widthRatio, heightRatio)
-                    
+
                     // Compute the new image size that preserves aspect ratio
                     let scaledImageSize = CGSize(
                         width: image.size.width * scaleFactor,
                         height: image.size.height * scaleFactor
                     )
-                    
+
                     // Draw and return the resized UIImage
                     let renderer = UIGraphicsImageRenderer(
                         size: scaledImageSize
                     )
-                    
+
                     let scaledImage = renderer.image { _ in
                         image.draw(
                             in: CGRect(
@@ -37,18 +37,17 @@ extension ImageConverter {
                             )
                         )
                     }
-                    
+
                     return .success(scaledImage)
                 }
             }
         )
     }
-    
+
     static let noop = Self(
-        scalePreservingAspectRatio: { _ in return .none }
+        scalePreservingAspectRatio: { _ in .none }
     )
 }
-
 
 struct ImageConverterError: Equatable, Error {
     var message = ""

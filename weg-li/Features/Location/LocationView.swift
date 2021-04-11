@@ -146,44 +146,27 @@ struct LocationView: View {
 
 struct Location_Previews: PreviewProvider {
     static var previews: some View {
-        LocationView(
-            store: .init(
-                initialState: .init(
-                    images: .init(),
-                    contact: .preview,
-                    date: Date.init,
-                    location: LocationViewState(
-                        locationOption: .currentLocation,
-                        isMapExpanded: false,
-                        userLocationState: UserLocationState(
-                            alert: nil,
-                            isRequestingCurrentLocation: true,
-                            region: nil
+        Preview {
+            LocationView(
+                store: .init(
+                    initialState: .init(
+                        images: .init(),
+                        contact: .preview,
+                        date: Date.init,
+                        location: LocationViewState(
+                            locationOption: .currentLocation,
+                            isMapExpanded: false,
+                            userLocationState: UserLocationState(
+                                alert: nil,
+                                isRequestingCurrentLocation: true,
+                                region: nil
+                            )
                         )
-                    )
-                ),
-                reducer: .empty,
-                environment: ()
+                    ),
+                    reducer: .empty,
+                    environment: ()
+                )
             )
-        )
-//        .preferredColorScheme(.dark)
-//        .environment(\.sizeCategory, .large)
-    }
-}
-
-extension CLLocationCoordinate2D {
-    static let zero = CLLocationCoordinate2D(latitude: 0, longitude: 0)
-}
-
-extension LocationOption {
-    var text: some View {
-        switch self {
-        case .fromPhotos:
-            return Text(L10n.Location.PickerCopy.fromPhotos)
-        case .currentLocation:
-            return Text(L10n.Location.PickerCopy.currentLocation)
-        case .manual:
-            return Text(L10n.Location.PickerCopy.fromPhotos)
         }
     }
 }

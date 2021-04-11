@@ -95,12 +95,14 @@ struct ContactView: View {
 
 struct PersonalData_Previews: PreviewProvider {
     static var previews: some View {
-        ContactView(
-            store: .init(
-                initialState: .preview,
-                reducer: .empty,
-                environment: ()
+        Preview {
+            ContactView(
+                store: .init(
+                    initialState: .preview,
+                    reducer: .empty,
+                    environment: ()
+                )
             )
-        )
+        }
     }
 }

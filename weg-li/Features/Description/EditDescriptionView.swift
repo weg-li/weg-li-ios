@@ -80,34 +80,42 @@ struct EditDescriptionView: View {
     }
 
     private var toggleRow: some View {
-        HStack {
-            Text(L10n.Description.Row.didBlockOthers)
-            Spacer()
-            ToggleButton(
-                isOn: viewStore.binding(
-                    get: \.description.blockedOthers,
-                    send: { _ in ReportAction.description(.toggleBlockedOthers) }
-                )
-            ).animation(.easeIn(duration: 0.1))
-        }
+        Button(
+            action: {
+                viewStore.send(ReportAction.description(.toggleBlockedOthers))
+            },
+            label: {
+                HStack {
+                    Text(L10n.Description.Row.didBlockOthers)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    ToggleButton(
+                        isOn: viewStore.binding(
+                            get: \.description.blockedOthers,
+                            send: { _ in ReportAction.description(.toggleBlockedOthers) }
+                        )
+                    ).animation(.easeIn(duration: 0.1))
+                }
+            }
+        )
     }
 }
 
 struct Description_Previews: PreviewProvider {
     static var previews: some View {
-        EditDescriptionView(
-            store: .init(
-                initialState: .init(
-                    images: .init(),
-                    contact: .preview,
-                    date: Date.init,
-                    location: LocationViewState()
-                ),
-                reducer: .empty,
-                environment: ()
+        Preview {
+            EditDescriptionView(
+                store: .init(
+                    initialState: .init(
+                        images: .init(),
+                        contact: .preview,
+                        date: Date.init,
+                        location: LocationViewState()
+                    ),
+                    reducer: .empty,
+                    environment: ()
+                )
             )
-        )
-//        .preferredColorScheme(.dark)
-        .environment(\.sizeCategory, .extraExtraLarge)
+        }
     }
 }

@@ -8,6 +8,10 @@ extension CLLocationCoordinate2D: Equatable {
     }
 }
 
+extension CLLocationCoordinate2D {
+    static let zero = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+}
+
 extension CLLocationCoordinate2D: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()

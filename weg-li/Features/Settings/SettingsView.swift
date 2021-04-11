@@ -91,16 +91,16 @@ struct SettingsView: View {
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            SettingsView(
-                store: .init(
-                    initialState: .init(contact: .preview),
-                    reducer: .empty,
-                    environment: SettingsEnvironment(uiApplicationClient: .live)
+        Preview {
+            NavigationView {
+                SettingsView(
+                    store: .init(
+                        initialState: .init(contact: .preview),
+                        reducer: .empty,
+                        environment: SettingsEnvironment(uiApplicationClient: .live)
+                    )
                 )
-            )
+            }
         }
-//        .preferredColorScheme(.dark)
-//        .environment(\.sizeCategory, .extraExtraLarge)
     }
 }

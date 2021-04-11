@@ -49,6 +49,9 @@
 		73D117CD261261C2000D7B82 /* LocationOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117CC261261C2000D7B82 /* LocationOption.swift */; };
 		73D117D1261261DF000D7B82 /* CoordinateRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117D0261261DF000D7B82 /* CoordinateRegion.swift */; };
 		73DA970B26236CA200A05C2A /* OfficeMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA970A26236CA200A05C2A /* OfficeMapperTests.swift */; };
+		73DA97122623891300A05C2A /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA97112623891300A05C2A /* Preview.swift */; };
+		73DA971826238B4100A05C2A /* ReportCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA971726238B4100A05C2A /* ReportCellView.swift */; };
+		73DA971F26238B7800A05C2A /* AddReportButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */; };
 		73FC295C25F959100084BB4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 73FC295B25F959100084BB4E /* ComposableArchitecture */; };
 		73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FC296725F95FAE0084BB4E /* ContactCore.swift */; };
 		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
@@ -137,6 +140,9 @@
 		73D117CC261261C2000D7B82 /* LocationOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationOption.swift; sourceTree = "<group>"; };
 		73D117D0261261DF000D7B82 /* CoordinateRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateRegion.swift; sourceTree = "<group>"; };
 		73DA970A26236CA200A05C2A /* OfficeMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficeMapperTests.swift; sourceTree = "<group>"; };
+		73DA97112623891300A05C2A /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
+		73DA971726238B4100A05C2A /* ReportCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportCellView.swift; sourceTree = "<group>"; };
+		73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddReportButtonStyle.swift; sourceTree = "<group>"; };
 		73FC296725F95FAE0084BB4E /* ContactCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCore.swift; sourceTree = "<group>"; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
@@ -208,6 +214,7 @@
 			children = (
 				7308C52C260B563B00FE3333 /* HomeView.swift */,
 				9F9C430A248E24BD00FF514B /* HomeCore.swift */,
+				73DA971B26238B4900A05C2A /* Components */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -256,6 +263,23 @@
 				731E5A0B2612FBB40012FAAD /* GeoAddress.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		73DA9710262388FB00A05C2A /* SwiftUI Helper */ = {
+			isa = PBXGroup;
+			children = (
+				73DA97112623891300A05C2A /* Preview.swift */,
+			);
+			path = "SwiftUI Helper";
+			sourceTree = "<group>";
+		};
+		73DA971B26238B4900A05C2A /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				73DA971726238B4100A05C2A /* ReportCellView.swift */,
+				73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		9F2EB23824961CD6008B2D4E /* Description */ = {
@@ -330,6 +354,7 @@
 				7308C509260B54BD00FE3333 /* RowType.swift */,
 				73BA6742260625FD001248EF /* StorableImage.swift */,
 				9FB750AE2487BEEC00193948 /* Extensions */,
+				73DA9710262388FB00A05C2A /* SwiftUI Helper */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -656,15 +681,18 @@
 				9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				73719BA0261E44D9005E09A3 /* SettingsView.swift in Sources */,
+				73DA97122623891300A05C2A /* Preview.swift in Sources */,
 				73719B5F261B8A09005E09A3 /* WegliApp.swift in Sources */,
 				734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */,
 				733509712614F86A00D2FEA8 /* Mail.swift in Sources */,
 				9F64984D2488F3EA00514BD3 /* ContactWidget.swift in Sources */,
 				73D117C52611DD94000D7B82 /* ImagesCore.swift in Sources */,
 				F8EDCA82234CB8B7001E8D9C /* Widget.swift in Sources */,
+				73DA971F26238B7800A05C2A /* AddReportButtonStyle.swift in Sources */,
 				F889751A234E015E0014FCC8 /* ImagesView.swift in Sources */,
 				9FB5B12C2498BECB00830770 /* Bundle+Additions.swift in Sources */,
 				9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */,
+				73DA971826238B4100A05C2A /* ReportCellView.swift in Sources */,
 				731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */,
 				7308C51C260B55C600FE3333 /* ImageGrid.swift in Sources */,
 				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,
