@@ -25,6 +25,7 @@ struct DescriptionEnvironment {}
 
 // MARK: Reducer
 
+/// Reducer handing actions from EditDescriptionView.
 let descriptionReducer = Reducer<DescriptionState, DescriptionAction, DescriptionEnvironment> { state, action, _ in
     switch action {
     case let .setType(value):

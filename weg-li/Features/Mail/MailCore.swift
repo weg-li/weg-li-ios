@@ -17,6 +17,7 @@ enum MailViewAction: Equatable {
 
 struct MailViewEnvironment {}
 
+/// Reducer handling Mail submit actions and result.
 let mailViewReducer = Reducer<MailViewState, MailViewAction, MailViewEnvironment> { state, action, _ in
     switch action {
     case .submitButtonTapped:
@@ -34,7 +35,6 @@ extension MailViewState: Codable {
     private enum CodingKeys: String, CodingKey {
         case mailComposeResult
         case mail
-        case district
     }
 
     init(from decoder: Decoder) throws {

@@ -5,6 +5,7 @@ import ComposableArchitecture
 import Foundation
 
 struct RegulatoryOfficeMapper {
+    /// Map an Address to a District
     var mapAddressToDistrict: (GeoAddress) -> Effect<District, RegularityOfficeMapError>
 }
 

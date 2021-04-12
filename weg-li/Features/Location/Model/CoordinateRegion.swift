@@ -7,7 +7,11 @@ import MapKit
 struct CoordinateRegion: Equatable {
     var center: CLLocationCoordinate2D
     var span: MKCoordinateSpan
-
+    
+    /// Initialize with center coordinate
+    /// - Parameters:
+    ///   - center: Coordinate of the region center.
+    ///   - span: Zoom level with a default value of 0.02
     init(
         center: CLLocationCoordinate2D,
         span: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)

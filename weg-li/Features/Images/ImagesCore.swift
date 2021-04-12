@@ -31,10 +31,12 @@ struct ImagesViewEnvironment {
     let distanceFilter: Double = 50
 }
 
+/// Reducer handling actions from ImagesView combined with the single Image reducer.
 let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnvironment> { state, action, env in
     switch action {
     case let .image(id, imageAction):
         switch imageAction {
+        // filter storedPhotos by image ID which removes the selected one.
         case .removePhoto:
             let photos = state.storedPhotos
                 .compactMap { $0 }
@@ -48,7 +50,8 @@ let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnviron
     case let .addPhotos(photos):
         state.storedPhotos = photos
         return .none
-    case let .setResolvedCoordinate(coordinate): // set coordinates from selected photos
+    // set photo coordinate from selected photos first element.
+    case let .setResolvedCoordinate(coordinate):
         guard let coordinate = coordinate, let resolvedCoordinate = state.coordinateFromImagePicker else {
             return .none
         }

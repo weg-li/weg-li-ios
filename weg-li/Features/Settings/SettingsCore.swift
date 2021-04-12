@@ -21,6 +21,7 @@ struct SettingsEnvironment {
     var uiApplicationClient: UIApplicationClient
 }
 
+/// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
 let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment>.combine(
     contactReducer.pullback(
         state: \.contact,

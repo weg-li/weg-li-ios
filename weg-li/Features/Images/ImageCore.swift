@@ -19,6 +19,7 @@ enum ImageAction: Equatable {
 
 struct ImageEnvironment {}
 
+/// Reducer handling actions from a single ImageView.
 let imageReducer = Reducer<ImageState, ImageAction, ImageEnvironment> { _, action, _ in
     switch action {
     case .removePhoto:

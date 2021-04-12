@@ -68,7 +68,7 @@ struct ReportEnvironment {
     let postalCodeMinumimCharacters = 5
 }
 
-/// Combined reducer that is used in the ReportView
+/// Combined reducer that is used in the ReportView and combing descending reducers.
 let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     imagesReducer.pullback(
         state: \.images,
@@ -105,6 +105,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         struct DebounceID: Hashable {}
 
         switch action {
+        // Triggers district mapping after geoAddress is stored.
         case let .mapGeoAddressToDistrict(input):
             return environment
                 .regulatoryOfficeMapper
@@ -122,12 +123,13 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             state.district = district
             return .none
         case let .mapDistrictFinished(.failure(error)):
-            // present alert
+            // present alert maybe?
             debugPrint(error.message)
             return .none
 
         case let .images(imageViewAction):
             switch imageViewAction {
+            // After the images coordinate was set trigger resolve location and map to district.
             case let .setResolvedCoordinate(coordinate):
                 guard let coordinate = coordinate, coordinate != state.location.userLocationState.region?.center else {
                     return .none
@@ -135,6 +137,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 state.location.userLocationState.region = CoordinateRegion(center: coordinate)
                 state.images.coordinateFromImagePicker = coordinate
                 return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
+            // Handle single image remove action to reset map annotations and reset valid state.
             case .image:
                 if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
                     state.images.coordinateFromImagePicker = nil
@@ -146,12 +149,14 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             }
         case let .location(locationAction):
             switch locationAction {
+            // Trigger district mapping after address is resolved.
             case let .resolveAddressFinished(addressResult):
                 guard let address = try? addressResult.get().first else {
                     return .none
                 }
                 return Effect(value: ReportAction.mapGeoAddressToDistrict(address))
 
+            // Handle manual address entering to trigger district mapping.
             case let .updateGeoAddressPostalCode(postalCode):
                 guard postalCode.count == environment.postalCodeMinumimCharacters, postalCode.isNumeric else {
                     return .none
@@ -162,6 +167,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             default:
                 return .none
             }
+        // Compose mail when send mail button was tapped.
         case let .mail(mailAction):
             if MailViewAction.submitButtonTapped == mailAction {
                 guard let district = state.district else {

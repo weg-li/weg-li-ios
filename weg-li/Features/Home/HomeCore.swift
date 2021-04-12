@@ -52,6 +52,7 @@ struct HomeEnvironment {
     var imageConverter: ImageConverter
 }
 
+/// Reducer handling actions from the HomeView and combining it with the reducers from descending screens.
 let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
     reportReducer
         .pullback(
@@ -73,12 +74,15 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
     ),
     Reducer { state, action, environment in
         switch action {
-        case .onAppear: // restore state from userdefaults
+        // restore state from userdefaults
+        case .onAppear:
             if let contact = environment.userDefaultsClient.contact {
                 state.settings = SettingsState(contact: contact)
             }
             state.reports = environment.userDefaultsClient.reports
             return .none
+        // After the EditDescriptionView disappeared the contact data needs to be synced with the reportDraft
+        // and stored.
         case let .settings(settingsAction):
             switch settingsAction {
             case .contact(.onDisappear):
@@ -88,6 +92,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             default:
                 return .none
             }
+        // After the emailResult reports the mail has been sent the report will be stored.
         case let .report(reportAction):
             if case let ReportAction.mail(.setMailResult(result)) = reportAction {
                 guard let mailComposerResult = result else {
@@ -106,12 +111,15 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                     return .none
                 }
             }
-            // sync contact with draftReport contact
-            state.settings.contact = state.reportDraft.contact
+            if case ReportAction.contact(.onDisappear) = reportAction {
+                // sync contact with draftReport contact
+                state.settings.contact = state.reportDraft.contact
+            }
             return .none
         case let .showReportWizard(value):
             state.showReportWizard = value
             return .none
+        // Reset report draft after it was .
         case .reportSaved:
             state.reportDraft = Report(images: .init(), contact: state.settings.contact, date: Date.init)
             return .none

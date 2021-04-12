@@ -4,6 +4,7 @@ import Combine
 import ComposableArchitecture
 import CoreLocation
 
+/// Reverse geo coding client.
 struct PlacesServiceClient {
     var getPlacemarks: (CLLocation) -> Effect<[GeoAddress], PlacesServiceError>
 }
@@ -14,7 +15,7 @@ extension PlacesServiceClient {
             .future { promise in
                 CLGeocoder().reverseGeocodeLocation(location) { placemarks, error -> Void in
                     if let err = error {
-                        return promise(.failure(PlacesServiceError(message: "")))
+                        return promise(.failure(PlacesServiceError(message: "\(String(describing: error))")))
                     }
                     guard let marks = placemarks, !marks.isEmpty else {
                         return promise(.failure(PlacesServiceError(message: "\(String(describing: placemarks))")))

@@ -33,6 +33,7 @@ struct UserLocationEnvironment {
 private struct LocationManagerId: Hashable {}
 private struct CancelSearchId: Hashable {}
 
+/// Reducer handling location permission. Wrapping LocationManager
 let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, UserLocationEnvironment> {
     state, action, environment in
     switch action {
@@ -98,7 +99,7 @@ enum LocationViewAction: Equatable {
     case updateGeoAddressStreet(String)
     case updateGeoAddressCity(String)
     case updateGeoAddressPostalCode(String)
-    case setResolvedLocation(CLLocationCoordinate2D?) //
+    case setResolvedLocation(CLLocationCoordinate2D?)
 }
 
 struct LocationViewEnvironment {
@@ -106,7 +107,7 @@ struct LocationViewEnvironment {
     let placeService: PlacesServiceClient
 }
 
-/// LocationReducer responsible handling location permission and location widget actions.
+/// LocationReducer handling setup, location widget actions, alert presentation and reverse geo coding the user location.
 let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationViewEnvironment>.combine(
     locationManagerReducer.pullback(
         state: \.userLocationState,
