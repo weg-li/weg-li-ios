@@ -111,7 +111,7 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
                     return .none
                 }
             }
-            if case ReportAction.contact(.onDisappear) = reportAction {
+            if case ReportAction.contact = reportAction {
                 // sync contact with draftReport contact
                 state.settings.contact = state.reportDraft.contact
             }
