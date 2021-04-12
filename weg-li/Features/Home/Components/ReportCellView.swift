@@ -16,22 +16,28 @@ struct ReportCellView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "car")
                             .font(.title2)
+                            .accessibility(hidden: true)
                         VStack(alignment: .leading, spacing: 4) {
                             Text("\(report.description.type), \(report.description.color)")
                             Text(verbatim: report.description.licensePlateNumber)
                         }
                         .font(.body)
                     }
+                    .accessibility(label: Text("Vehicle info"))
+                    .accessibilityElement()
                     .padding(.bottom, 6)
                     HStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.title2)
+                            .accessibility(hidden: true)
                         VStack(alignment: .leading, spacing: 4) {
                             Text(report.description.time)
                             Text(DescriptionState.charges[report.description.selectedType])
                         }
                         .font(.body)
                     }
+                    .accessibility(label: Text("report info"))
+                    .accessibilityElement()
                 }
                 .padding()
                 Spacer()
