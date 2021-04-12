@@ -55,3 +55,11 @@ struct ReportCellView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
+
+struct ReportCellView_Previews: PreviewProvider {
+    static var previews: some View {
+        Preview {
+            ReportCellView(report: .preview)
+        }
+    }
+}

@@ -21,3 +21,17 @@ struct AddReportButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
     }
 }
+
+struct AddReportButtonStyle_Previews: PreviewProvider {
+    static var previews: some View {
+        Preview {
+            Button(
+                action: {}/*@END_MENU_TOKEN@*/,
+                label: {
+                    Text("+")
+                }
+            )
+            .buttonStyle(AddReportButtonStyle())
+        }
+    }
+}
