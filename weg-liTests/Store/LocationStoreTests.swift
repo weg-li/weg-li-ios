@@ -15,7 +15,6 @@ class LocationStoreTests: XCTestCase {
         var didRequestLocation = false
         let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
         let setSubject = PassthroughSubject<Never, Never>()
-        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
 
         let expectedAddress = GeoAddress(
             street: ContactState.preview.address.street,
@@ -33,10 +32,10 @@ class LocationStoreTests: XCTestCase {
                 },
                 set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
-            placeService: PlacesServiceMock(getPlacesSubject: placesSubject)
+            placeService: PlacesServiceClient(getPlacemarks: { _ in Effect(value: [expectedAddress]) })
         )
         let store = TestStore(
-            initialState: LocationViewState(storedPhotos: []),
+            initialState: LocationViewState(),
             reducer: locationReducer,
             environment: env
         )
@@ -81,16 +80,12 @@ class LocationStoreTests: XCTestCase {
             .receive(.resolveLocation(CLLocationCoordinate2D(latitude: 10, longitude: 20))) {
                 $0.isResolvingAddress = true
             },
-            .do {
-                placesSubject.send([expectedAddress])
-            },
             .receive(.resolveAddressFinished(.success([expectedAddress]))) {
                 $0.isResolvingAddress = false
                 $0.resolvedAddress = expectedAddress
             },
             .do {
                 setSubject.send(completion: .finished)
-                placesSubject.send(completion: .finished)
                 locationManagerSubject.send(completion: .finished)
             }
         )
@@ -100,7 +95,6 @@ class LocationStoreTests: XCTestCase {
     func test_disabledLocationService_shouldSetAlert() {
         let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
         let setSubject = PassthroughSubject<Never, Never>()
-        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
 
         let env = LocationViewEnvironment(
             locationManager: .unimplemented(
@@ -109,10 +103,10 @@ class LocationStoreTests: XCTestCase {
                 locationServicesEnabled: { false },
                 set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
-            placeService: PlacesServiceMock(getPlacesSubject: placesSubject)
+            placeService: .noop
         )
         let store = TestStore(
-            initialState: LocationViewState(storedPhotos: []),
+            initialState: LocationViewState(),
             reducer: locationReducer,
             environment: env
         )
@@ -131,7 +125,6 @@ class LocationStoreTests: XCTestCase {
             },
             .do {
                 setSubject.send(completion: .finished)
-                placesSubject.send(completion: .finished)
                 locationManagerSubject.send(completion: .finished)
             }
         )
@@ -142,7 +135,6 @@ class LocationStoreTests: XCTestCase {
         var didRequestInUseAuthorization = false
         let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
         let setSubject = PassthroughSubject<Never, Never>()
-        let placesSubject = PassthroughSubject<[GeoAddress], PlacesServiceImplementation.Error>()
 
         let env = LocationViewEnvironment(
             locationManager: .unimplemented(
@@ -154,10 +146,10 @@ class LocationStoreTests: XCTestCase {
                 },
                 set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
-            placeService: PlacesServiceMock(getPlacesSubject: placesSubject)
+            placeService: .noop
         )
         let store = TestStore(
-            initialState: LocationViewState(storedPhotos: []),
+            initialState: LocationViewState(),
             reducer: locationReducer,
             environment: env
         )
@@ -184,7 +176,6 @@ class LocationStoreTests: XCTestCase {
             },
             .do {
                 setSubject.send(completion: .finished)
-                placesSubject.send(completion: .finished)
                 locationManagerSubject.send(completion: .finished)
             }
         )
@@ -197,13 +188,12 @@ class LocationStoreTests: XCTestCase {
                 isMapExpanded: false,
                 isResolvingAddress: false,
                 resolvedAddress: .init(address: .init()),
-                storedPhotos: [],
                 userLocationState: .init()
             ),
             reducer: locationReducer,
             environment: LocationViewEnvironment(
                 locationManager: LocationManager.unimplemented(),
-                placeService: PlacesServiceMock()
+                placeService: .noop
             )
         )
 

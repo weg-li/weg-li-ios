@@ -20,9 +20,9 @@ extension District: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
         if let value = try? container.decode(Int.self, forKey: .zipCode) {
-            zipCode = String(value)
+            zipCode = String(value) // some zip codes are strings in the JSON
         } else {
-            zipCode = try container.decode(String.self, forKey: .zipCode)
+            zipCode = try container.decode(String.self, forKey: .zipCode) // others are Int
         }
         mail = try container.decode(String.self, forKey: .mail)
     }

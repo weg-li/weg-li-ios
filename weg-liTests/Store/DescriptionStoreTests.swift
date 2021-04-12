@@ -91,4 +91,24 @@ class DescriptionStoreTests: XCTestCase {
             }
         )
     }
+
+    func test_setCarLicensePlate_shouldUpdateState_andSetItValid() {
+        let store = TestStore(
+            initialState: DescriptionState(
+                color: "Rot",
+                type: "VW",
+                licensePlateNumber: ""
+            ),
+            reducer: descriptionReducer,
+            environment: DescriptionEnvironment()
+        )
+
+        store.assert(
+            .send(.setLicensePlateNumber("WEG-LI-101")) { state in
+                state.licensePlateNumber = "WEG-LI-101"
+
+                XCTAssertTrue(state.isValid)
+            }
+        )
+    }
 }

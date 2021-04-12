@@ -16,7 +16,6 @@
 		7313764A261F89AE00C5C9B7 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73137649261F89AE00C5C9B7 /* Colors.xcassets */; };
 		7313765E2620746900C5C9B7 /* String+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7313765D2620746900C5C9B7 /* String+Additions.swift */; };
 		731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A0B2612FBB40012FAAD /* GeoAddress.swift */; };
-		731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A122612FC160012FAAD /* PlacesServiceMock.swift */; };
 		731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */; };
 		731E5A2126130A130012FAAD /* LocationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731E5A2026130A130012FAAD /* LocationStoreTests.swift */; };
 		7335096D2614A34300D2FEA8 /* MailCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7335096C2614A34300D2FEA8 /* MailCore.swift */; };
@@ -42,6 +41,7 @@
 		73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */; };
 		73A715F4260CACFF00C88BCC /* ComposableCoreLocation in Frameworks */ = {isa = PBXBuildFile; productRef = 73A715F3260CACFF00C88BCC /* ComposableCoreLocation */; };
 		73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715F7260CB14E00C88BCC /* LocationCore.swift */; };
+		73A7256C262432FA00672990 /* OnWidgetInteractionButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A7256B262432FA00672990 /* OnWidgetInteractionButtonStyle.swift */; };
 		73BA6743260625FD001248EF /* StorableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA6742260625FD001248EF /* StorableImage.swift */; };
 		73C5440A2616602000A40639 /* RegulatoryOfficeMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */; };
 		73C544182616627E00A40639 /* MailStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544172616627E00A40639 /* MailStoreTests.swift */; };
@@ -49,6 +49,10 @@
 		73D117C52611DD94000D7B82 /* ImagesCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117C42611DD94000D7B82 /* ImagesCore.swift */; };
 		73D117CD261261C2000D7B82 /* LocationOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117CC261261C2000D7B82 /* LocationOption.swift */; };
 		73D117D1261261DF000D7B82 /* CoordinateRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D117D0261261DF000D7B82 /* CoordinateRegion.swift */; };
+		73DA970B26236CA200A05C2A /* OfficeMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA970A26236CA200A05C2A /* OfficeMapperTests.swift */; };
+		73DA97122623891300A05C2A /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA97112623891300A05C2A /* Preview.swift */; };
+		73DA971826238B4100A05C2A /* ReportCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA971726238B4100A05C2A /* ReportCellView.swift */; };
+		73DA971F26238B7800A05C2A /* AddReportButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */; };
 		73FC295C25F959100084BB4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 73FC295B25F959100084BB4E /* ComposableArchitecture */; };
 		73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FC296725F95FAE0084BB4E /* ContactCore.swift */; };
 		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
@@ -102,7 +106,6 @@
 		73137649261F89AE00C5C9B7 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		7313765D2620746900C5C9B7 /* String+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Additions.swift"; sourceTree = "<group>"; };
 		731E5A0B2612FBB40012FAAD /* GeoAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAddress.swift; sourceTree = "<group>"; };
-		731E5A122612FC160012FAAD /* PlacesServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesServiceMock.swift; sourceTree = "<group>"; };
 		731E5A1C2612FE400012FAAD /* ImagesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesStoreTests.swift; sourceTree = "<group>"; };
 		731E5A2026130A130012FAAD /* LocationStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStoreTests.swift; sourceTree = "<group>"; };
 		7335096C2614A34300D2FEA8 /* MailCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailCore.swift; sourceTree = "<group>"; };
@@ -130,6 +133,7 @@
 		73A715E6260C692800C88BCC /* HomeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeStoreTests.swift; sourceTree = "<group>"; };
 		73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactStoreTests.swift; sourceTree = "<group>"; };
 		73A715F7260CB14E00C88BCC /* LocationCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCore.swift; sourceTree = "<group>"; };
+		73A7256B262432FA00672990 /* OnWidgetInteractionButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnWidgetInteractionButtonStyle.swift; sourceTree = "<group>"; };
 		73BA6742260625FD001248EF /* StorableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorableImage.swift; sourceTree = "<group>"; };
 		73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegulatoryOfficeMapper.swift; sourceTree = "<group>"; };
 		73C544172616627E00A40639 /* MailStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailStoreTests.swift; sourceTree = "<group>"; };
@@ -137,6 +141,10 @@
 		73D117C42611DD94000D7B82 /* ImagesCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesCore.swift; sourceTree = "<group>"; };
 		73D117CC261261C2000D7B82 /* LocationOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationOption.swift; sourceTree = "<group>"; };
 		73D117D0261261DF000D7B82 /* CoordinateRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateRegion.swift; sourceTree = "<group>"; };
+		73DA970A26236CA200A05C2A /* OfficeMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficeMapperTests.swift; sourceTree = "<group>"; };
+		73DA97112623891300A05C2A /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
+		73DA971726238B4100A05C2A /* ReportCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportCellView.swift; sourceTree = "<group>"; };
+		73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddReportButtonStyle.swift; sourceTree = "<group>"; };
 		73FC296725F95FAE0084BB4E /* ContactCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCore.swift; sourceTree = "<group>"; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
@@ -208,16 +216,9 @@
 			children = (
 				7308C52C260B563B00FE3333 /* HomeView.swift */,
 				9F9C430A248E24BD00FF514B /* HomeCore.swift */,
+				73DA971B26238B4900A05C2A /* Components */,
 			);
 			path = Home;
-			sourceTree = "<group>";
-		};
-		731E5A112612FC050012FAAD /* Mocks */ = {
-			isa = PBXGroup;
-			children = (
-				731E5A122612FC160012FAAD /* PlacesServiceMock.swift */,
-			);
-			path = Mocks;
 			sourceTree = "<group>";
 		};
 		735FD877261A304700218A6C /* Services */ = {
@@ -266,6 +267,23 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		73DA9710262388FB00A05C2A /* SwiftUI Helper */ = {
+			isa = PBXGroup;
+			children = (
+				73DA97112623891300A05C2A /* Preview.swift */,
+			);
+			path = "SwiftUI Helper";
+			sourceTree = "<group>";
+		};
+		73DA971B26238B4900A05C2A /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				73DA971726238B4100A05C2A /* ReportCellView.swift */,
+				73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		9F2EB23824961CD6008B2D4E /* Description */ = {
 			isa = PBXGroup;
 			children = (
@@ -303,11 +321,11 @@
 		9F73E8F524878BB2002E22F4 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				73719B70261DB2E5005E09A3 /* ImageCore.swift */,
 				73D117C42611DD94000D7B82 /* ImagesCore.swift */,
 				F8897519234E015E0014FCC8 /* ImagesView.swift */,
-				9F73E8FE24878DFB002E22F4 /* UI */,
 				73719B6C261C7B75005E09A3 /* ImageView.swift */,
-				73719B70261DB2E5005E09A3 /* ImageCore.swift */,
+				9F73E8FE24878DFB002E22F4 /* UI */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -326,8 +344,8 @@
 			children = (
 				9F8575EE24B788BA000ABA01 /* weg-liTests-Bridging-Header.h */,
 				9F971E91247ABFCB00A68959 /* Info.plist */,
-				731E5A112612FC050012FAAD /* Mocks */,
 				73881231260BD491008B9956 /* Store */,
+				73DA970A26236CA200A05C2A /* OfficeMapperTests.swift */,
 			);
 			path = "weg-liTests";
 			sourceTree = "<group>";
@@ -338,6 +356,7 @@
 				7308C509260B54BD00FE3333 /* RowType.swift */,
 				73BA6742260625FD001248EF /* StorableImage.swift */,
 				9FB750AE2487BEEC00193948 /* Extensions */,
+				73DA9710262388FB00A05C2A /* SwiftUI Helper */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -362,9 +381,9 @@
 		9FB5B13C2499DC2900830770 /* Mail */ = {
 			isa = PBXGroup;
 			children = (
-				9FA3AA7724979ED6002EDC7D /* MailView.swift */,
-				7335096C2614A34300D2FEA8 /* MailCore.swift */,
 				9FA3AA792497A0AD002EDC7D /* MailContentView.swift */,
+				7335096C2614A34300D2FEA8 /* MailCore.swift */,
+				9FA3AA7724979ED6002EDC7D /* MailView.swift */,
 				9FB5B13D2499DC3200830770 /* Model */,
 			);
 			path = Mail;
@@ -420,6 +439,7 @@
 				9FFBAD66248E979200F66ADB /* ActivityIndicator.swift */,
 				F83853CE234D11A900DF1A9D /* DiscardButton.swift */,
 				9F0C2707249777F4001B1908 /* EditButtonStyle.swift */,
+				73A7256B262432FA00672990 /* OnWidgetInteractionButtonStyle.swift */,
 				F8EDCA7F234CB3CD001E8D9C /* SubmitButton.swift */,
 				9F0C270924977943001B1908 /* ToggleButton.swift */,
 				F8EDCA81234CB8B7001E8D9C /* Widget.swift */,
@@ -634,10 +654,10 @@
 			files = (
 				73719BBC261F2205005E09A3 /* SettingsStoreTests.swift in Sources */,
 				73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */,
-				731E5A132612FC160012FAAD /* PlacesServiceMock.swift in Sources */,
 				73C544182616627E00A40639 /* MailStoreTests.swift in Sources */,
 				7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */,
 				731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */,
+				73DA970B26236CA200A05C2A /* OfficeMapperTests.swift in Sources */,
 				731E5A2126130A130012FAAD /* LocationStoreTests.swift in Sources */,
 				7388122E260BD2E2008B9956 /* DescriptionStoreTests.swift in Sources */,
 				73A715E7260C692800C88BCC /* HomeStoreTests.swift in Sources */,
@@ -648,6 +668,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73A7256C262432FA00672990 /* OnWidgetInteractionButtonStyle.swift in Sources */,
 				F8EDCA86234CBCE2001E8D9C /* ReportCore.swift in Sources */,
 				9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */,
 				7308C51B260B55C600FE3333 /* ImagePicker.swift in Sources */,
@@ -664,15 +685,18 @@
 				9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
 				73719BA0261E44D9005E09A3 /* SettingsView.swift in Sources */,
+				73DA97122623891300A05C2A /* Preview.swift in Sources */,
 				73719B5F261B8A09005E09A3 /* WegliApp.swift in Sources */,
 				734EFF0D2610A4D1001406F5 /* LocationView.swift in Sources */,
 				733509712614F86A00D2FEA8 /* Mail.swift in Sources */,
 				9F64984D2488F3EA00514BD3 /* ContactWidget.swift in Sources */,
 				73D117C52611DD94000D7B82 /* ImagesCore.swift in Sources */,
 				F8EDCA82234CB8B7001E8D9C /* Widget.swift in Sources */,
+				73DA971F26238B7800A05C2A /* AddReportButtonStyle.swift in Sources */,
 				F889751A234E015E0014FCC8 /* ImagesView.swift in Sources */,
 				9FB5B12C2498BECB00830770 /* Bundle+Additions.swift in Sources */,
 				9F2EB23C2496A03E008B2D4E /* Array+Additions.swift in Sources */,
+				73DA971826238B4100A05C2A /* ReportCellView.swift in Sources */,
 				731E5A0C2612FBB40012FAAD /* GeoAddress.swift in Sources */,
 				7308C51C260B55C600FE3333 /* ImageGrid.swift in Sources */,
 				9FB5B13924994CF300830770 /* CLLocationCoordinate2D+Additions.swift in Sources */,

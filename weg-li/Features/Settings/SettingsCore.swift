@@ -21,6 +21,7 @@ struct SettingsEnvironment {
     var uiApplicationClient: UIApplicationClient
 }
 
+/// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
 let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment>.combine(
     contactReducer.pullback(
         state: \.contact,
@@ -33,8 +34,6 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment
             return URL(string: env.uiApplicationClient.openSettingsURLString())
                 .map {
                     env.uiApplicationClient.open($0, [:])
-                        .ignoreOutput()
-                        .eraseToEffect()
                         .fireAndForget()
                 }
                 ?? .none

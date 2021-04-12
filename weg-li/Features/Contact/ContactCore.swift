@@ -81,6 +81,7 @@ enum ContactAction: Equatable {
 
 struct ContactEnvironment {}
 
+/// Reducer handling ContactView actions
 let contactReducer =
     Reducer<ContactState, ContactAction, ContactEnvironment> { state, action, _ in
         switch action {

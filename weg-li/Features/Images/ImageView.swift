@@ -30,16 +30,6 @@ struct ImageView: View {
     }
 }
 
-struct OnWidgetInteractionButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .padding(20)
-            .background(configuration.isPressed ? Color(.systemGray6).opacity(0.3) : Color(.systemGray3).opacity(0.7))
-            .animation(.easeOut)
-            .clipShape(Circle())
-    }
-}
-
 private extension Image {
     var gridModifier: some View {
         self

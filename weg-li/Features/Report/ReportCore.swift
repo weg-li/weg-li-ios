@@ -25,7 +25,7 @@ struct Report: Codable {
         district: District? = nil,
         date: () -> Date = Date.init,
         description: DescriptionState = DescriptionState(),
-        location: LocationViewState = LocationViewState(storedPhotos: []),
+        location: LocationViewState = LocationViewState(),
         mail: MailViewState = MailViewState()
     ) {
         id = uuid.uuidString
@@ -54,7 +54,6 @@ enum ReportAction: Equatable {
     case description(DescriptionAction)
     case location(LocationViewAction)
     case mail(MailViewAction)
-    case viewAppeared
     case mapGeoAddressToDistrict(GeoAddress)
     case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
 }
@@ -62,19 +61,19 @@ enum ReportAction: Equatable {
 struct ReportEnvironment {
     var mainQueue: AnySchedulerOf<DispatchQueue>
     var locationManager: LocationManager
-    var placeService: PlacesService
+    var placeService: PlacesServiceClient
     var regulatoryOfficeMapper: RegulatoryOfficeMapper
 
     let debounce = 1
     let postalCodeMinumimCharacters = 5
 }
 
-/// Combined reducer that is used in the ReportView
+/// Combined reducer that is used in the ReportView and combing descending reducers.
 let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     imagesReducer.pullback(
         state: \.images,
         action: /ReportAction.images,
-        environment: { _ in ImagesViewEnvironment(imageConverter: ImageConverterImplementation()) }
+        environment: { _ in ImagesViewEnvironment(imageConverter: .live()) }
     ),
     descriptionReducer.pullback(
         state: \.description,
@@ -106,12 +105,11 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         struct DebounceID: Hashable {}
 
         switch action {
-        case .viewAppeared:
-            return .none
-        case let .mapGeoAddressToDistrict(geoAddress):
+        // Triggers district mapping after geoAddress is stored.
+        case let .mapGeoAddressToDistrict(input):
             return environment
                 .regulatoryOfficeMapper
-                .mapAddressToDistrict(OfficeMapperInput(geoAddress))
+                .mapAddressToDistrict(input)
                 .catchToEffect()
                 .map(ReportAction.mapDistrictFinished)
                 .eraseToEffect()
@@ -125,29 +123,40 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             state.district = district
             return .none
         case let .mapDistrictFinished(.failure(error)):
-            // present alert
+            // present alert maybe?
             debugPrint(error.message)
             return .none
 
         case let .images(imageViewAction):
             switch imageViewAction {
+            // After the images coordinate was set trigger resolve location and map to district.
             case let .setResolvedCoordinate(coordinate):
-                guard coordinate != state.location.userLocationState.region?.center else {
+                guard let coordinate = coordinate, coordinate != state.location.userLocationState.region?.center else {
                     return .none
                 }
                 state.location.userLocationState.region = CoordinateRegion(center: coordinate)
+                state.images.coordinateFromImagePicker = coordinate
                 return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
+            // Handle single image remove action to reset map annotations and reset valid state.
+            case .image:
+                if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
+                    state.images.coordinateFromImagePicker = nil
+                    state.location.resolvedAddress = .empty
+                }
+                return .none
             default:
                 return .none
             }
         case let .location(locationAction):
             switch locationAction {
+            // Trigger district mapping after address is resolved.
             case let .resolveAddressFinished(addressResult):
                 guard let address = try? addressResult.get().first else {
                     return .none
                 }
                 return Effect(value: ReportAction.mapGeoAddressToDistrict(address))
 
+            // Handle manual address entering to trigger district mapping.
             case let .updateGeoAddressPostalCode(postalCode):
                 guard postalCode.count == environment.postalCodeMinumimCharacters, postalCode.isNumeric else {
                     return .none
@@ -158,14 +167,14 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             default:
                 return .none
             }
+        // Compose mail when send mail button was tapped.
         case let .mail(mailAction):
             if MailViewAction.submitButtonTapped == mailAction {
                 guard let district = state.district else {
                     return .none
                 }
-                state.mail.district = district
                 state.mail.mail.address = district.mail
-                state.mail.mail.body = state.createMailBody()
+                state.mail.mail.body = Mail.createMailBody(from: state)
                 state.mail.mail.attachmentData = state.images.storedPhotos
                     .compactMap { $0 }
                     .map(\.image)
@@ -180,56 +189,6 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
 )
 
 extension Report {
-    func createMailBody() -> String {
-        return """
-        Sehr geehrte Damen und Herren,
-
-
-        hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
-
-        Kennzeichen: \(description.licensePlateNumber)
-
-        Marke: \(description.type)
-
-        Farbe: \(description.color)
-
-        Adresse: \(contact.address.humanReadableAddress)
-
-        Verstoß: \(DescriptionState.charges[description.selectedType])
-
-        Tatzeit: \(date.humandReadableDate)
-
-        Zeitraum: \(description.time)
-
-        Das Fahrzeug war verlassen.
-
-
-        Zeuge:
-
-        Name: \(contact.firstName) \(contact.name)
-
-        Anschrift: \(contact.address.humanReadableAddress)
-
-        Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
-        Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
-        Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
-
-
-        Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
-        Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.
-
-
-        Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser E-Mail durch eine Antwort.
-        Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine E-Mail weiter und setzen mich dabei in CC.
-        Dabei dürfen Sie auch meine persönlichen Daten weiterleiten und für die Dauer des Verfahrens speichern.
-
-
-        Mit freundlichen Grüßen
-
-        \(contact.firstName) \(contact.name)
-        """
-    }
-
     static var preview: Report {
         Report(
             uuid: UUID(),
@@ -252,7 +211,7 @@ extension Report {
                 selectedType: 0,
                 blockedOthers: false
             ),
-            location: LocationViewState(storedPhotos: [])
+            location: LocationViewState()
         )
     }
 }

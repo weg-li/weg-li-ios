@@ -79,8 +79,8 @@ struct MailContentView_Previews: PreviewProvider {
                 environment: ReportEnvironment(
                     mainQueue: .failing,
                     locationManager: .live,
-                    placeService: PlacesServiceImplementation(),
-                    regulatoryOfficeMapper: .live
+                    placeService: .noop,
+                    regulatoryOfficeMapper: .live()
                 )
             )
         )

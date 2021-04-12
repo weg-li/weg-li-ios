@@ -59,14 +59,14 @@ struct ReportForm: View {
 
 struct ReportForm_Previews: PreviewProvider {
     static var previews: some View {
-        ReportForm(
-            store: .init(
-                initialState: .preview,
-                reducer: .empty,
-                environment: ()
+        Preview {
+            ReportForm(
+                store: .init(
+                    initialState: .preview,
+                    reducer: .empty,
+                    environment: ()
+                )
             )
-        )
-//        .preferredColorScheme(.dark)
-//        .environment(\.sizeCategory, .large)
+        }
     }
 }

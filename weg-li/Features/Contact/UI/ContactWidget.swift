@@ -57,9 +57,6 @@ struct ContactWidget: View {
             }
             .fixedSize(horizontal: false, vertical: true)
         }
-        .onAppear {
-            viewStore.send(.viewAppeared)
-        }
     }
 
     private func row(callout: String, content: String) -> some View {

@@ -15,7 +15,8 @@ struct WegliApp: App {
                     reducer: homeReducer,
                     environment: HomeEnvironment(
                         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-                        userDefaultsClient: .live()
+                        userDefaultsClient: .live(),
+                        imageConverter: .live()
                     )
                 )
             )

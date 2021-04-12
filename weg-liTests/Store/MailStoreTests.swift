@@ -11,8 +11,7 @@ class MailStoreTests: XCTestCase {
             initialState: MailViewState(
                 mailComposeResult: nil,
                 mail: .init(),
-                isPresentingMailContent: false,
-                district: .init()
+                isPresentingMailContent: false
             ),
             reducer: mailViewReducer,
             environment: MailViewEnvironment()
@@ -30,8 +29,7 @@ class MailStoreTests: XCTestCase {
             initialState: MailViewState(
                 mailComposeResult: nil,
                 mail: .init(),
-                isPresentingMailContent: false,
-                district: .init()
+                isPresentingMailContent: false
             ),
             reducer: mailViewReducer,
             environment: MailViewEnvironment()

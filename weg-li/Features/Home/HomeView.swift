@@ -95,7 +95,7 @@ struct HomeView: View {
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
+        Preview {
             HomeView(
                 store: .init(
                     initialState: HomeState(reports: [.preview, .preview, .preview, .preview]),
@@ -104,81 +104,5 @@ struct MainView_Previews: PreviewProvider {
                 )
             )
         }
-//                .preferredColorScheme(.dark)
-        //        .environment(\.sizeCategory, .extraExtraLarge)
-    }
-}
-
-private struct AddReportButtonStyle: ButtonStyle {
-    let diameter: CGFloat = 70
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(.largeTitle))
-            .frame(width: diameter, height: diameter)
-            .lineLimit(1)
-            .foregroundColor(.white)
-            .background(Color.wegliBlue)
-            .clipShape(RoundedRectangle(cornerRadius: diameter / 2))
-            .overlay(
-                RoundedRectangle(cornerRadius: diameter / 2)
-                    .stroke(Color.white, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.3), radius: 6, x: 3, y: 3)
-            .scaleEffect(configuration.isPressed ? 0.98 : 1)
-    }
-}
-
-private struct ReportCellView: View {
-    let report: Report
-
-    var body: some View {
-        ZStack {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(report.date.humandReadableDate)
-                        .fontWeight(.bold)
-                        .font(.title)
-                        .padding(.bottom, 4)
-                    HStack(spacing: 12) {
-                        Image(systemName: "car")
-                            .font(.title2)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(report.description.type), \(report.description.color)")
-                            Text(verbatim: report.description.licensePlateNumber)
-                        }
-                        .font(.body)
-                    }
-                    .padding(.bottom, 6)
-                    HStack(spacing: 12) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.title2)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(report.description.time)
-                            Text(DescriptionState.charges[report.description.selectedType])
-                        }
-                        .font(.body)
-                    }
-                }
-                .padding()
-                Spacer()
-            }
-            .background(Color(.systemGray6))
-            .padding(.bottom)
-            // Design attempt :D
-            VStack {
-                HStack {
-                    Spacer()
-                    Image(systemName: "exclamationmark.octagon")
-                        .font(.system(size: 140))
-                        .offset(x: 70)
-                        .clipped()
-                        .blendMode(.overlay)
-                }
-                Spacer()
-            }
-            .accessibility(hidden: true)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }

@@ -18,16 +18,6 @@ struct UserLocationState: Equatable {
     var isRequestingCurrentLocation = false
     var region: CoordinateRegion?
 
-    init(
-        alert: AlertState<ReportAction>? = nil,
-        isRequestingCurrentLocation: Bool = false,
-        region: CoordinateRegion? = nil
-    ) {
-        self.alert = alert
-        self.isRequestingCurrentLocation = isRequestingCurrentLocation
-        self.region = region
-    }
-
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.isRequestingCurrentLocation == rhs.isRequestingCurrentLocation
             && lhs.region?.center.latitude == rhs.region?.center.latitude
@@ -43,6 +33,7 @@ struct UserLocationEnvironment {
 private struct LocationManagerId: Hashable {}
 private struct CancelSearchId: Hashable {}
 
+/// Reducer handling location permission. Wrapping LocationManager
 let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, UserLocationEnvironment> {
     state, action, environment in
     switch action {
@@ -81,11 +72,10 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
 // MARK: - Location Core
 
 struct LocationViewState: Equatable, Codable {
-    var locationOption: LocationOption = .fromPhotos(nil)
+    var locationOption: LocationOption = .fromPhotos
     var isMapExpanded = false
     var isResolvingAddress = false
-    var resolvedAddress: GeoAddress = .init(address: .init())
-    var storedPhotos: [StorableImage]
+    var resolvedAddress: GeoAddress = .empty
     var userLocationState = UserLocationState()
 
     private enum CodingKeys: String, CodingKey {
@@ -93,7 +83,6 @@ struct LocationViewState: Equatable, Codable {
         case isMapExpanded
         case isResolvingAddress
         case resolvedAddress
-        case storedPhotos
     }
 }
 
@@ -106,17 +95,19 @@ enum LocationViewAction: Equatable {
     case updateRegion(CoordinateRegion?)
     case userLocationAction(LocationManager.Action)
     case resolveLocation(CLLocationCoordinate2D)
-    case resolveAddressFinished(Result<[GeoAddress], PlacesServiceImplementation.Error>)
+    case resolveAddressFinished(Result<[GeoAddress], PlacesServiceError>)
     case updateGeoAddressStreet(String)
     case updateGeoAddressCity(String)
     case updateGeoAddressPostalCode(String)
+    case setResolvedLocation(CLLocationCoordinate2D?)
 }
 
 struct LocationViewEnvironment {
     let locationManager: LocationManager
-    let placeService: PlacesService
+    let placeService: PlacesServiceClient
 }
 
+/// LocationReducer handling setup, location widget actions, alert presentation and reverse geo coding the user location.
 let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationViewEnvironment>.combine(
     locationManagerReducer.pullback(
         state: \.userLocationState,
@@ -192,14 +183,14 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             default:
                 return .none
             }
-        case let .resolveLocation(coordinate):
+        case let .resolveLocation(coordinate): // reverse geo code coordinate to address
             state.isResolvingAddress = true
             let clLocation = CLLocation(
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude
             )
             return environment.placeService
-                .getPlacemarks(for: clLocation)
+                .getPlacemarks(clLocation)
                 .catchToEffect()
                 .map(LocationViewAction.resolveAddressFinished)
                 .cancellable(id: CancelSearchId(), cancelInFlight: true)
@@ -208,6 +199,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             state.resolvedAddress = address.first ?? .init(address: .init())
             return .none
         case let .resolveAddressFinished(.failure(error)):
+            debugPrint(error)
             state.isResolvingAddress = false
             return .none
 
@@ -223,6 +215,8 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             return .none
         case let .updateGeoAddressPostalCode(postalCode):
             state.resolvedAddress.postalCode = postalCode
+            return .none
+        case .setResolvedLocation:
             return .none
         }
     }

@@ -13,6 +13,7 @@ struct LocationView: View {
         let isMapExpanded: Bool
         let address: GeoAddress
         let showActivityIndicator: Bool
+        let resolvedLocationFromPhoto: CLLocationCoordinate2D?
 
         init(state: Report) {
             location = state.location
@@ -22,6 +23,7 @@ struct LocationView: View {
             address = state.location.resolvedAddress
             showActivityIndicator = state.location.userLocationState.isRequestingCurrentLocation
                 || state.location.isResolvingAddress
+            resolvedLocationFromPhoto = state.images.coordinateFromImagePicker
         }
     }
 
@@ -91,7 +93,11 @@ struct LocationView: View {
                             get: \.region,
                             send: LocationViewAction.updateRegion
                         ),
-                        showsLocation: viewStore.locationOption == .currentLocation
+                        showsLocation: viewStore.locationOption == .currentLocation,
+                        photoCoordinate: viewStore.binding(
+                            get: \.resolvedLocationFromPhoto,
+                            send: LocationViewAction.setResolvedLocation
+                        )
                     )
                     .frame(height: viewStore.isMapExpanded ? 300 : 150)
                     expandMapButton
@@ -140,45 +146,27 @@ struct LocationView: View {
 
 struct Location_Previews: PreviewProvider {
     static var previews: some View {
-        LocationView(
-            store: .init(
-                initialState: .init(
-                    images: .init(),
-                    contact: .preview,
-                    date: Date.init,
-                    location: LocationViewState(
-                        locationOption: .currentLocation,
-                        isMapExpanded: false,
-                        storedPhotos: [],
-                        userLocationState: UserLocationState(
-                            alert: nil,
-                            isRequestingCurrentLocation: true,
-                            region: nil
+        Preview {
+            LocationView(
+                store: .init(
+                    initialState: .init(
+                        images: .init(),
+                        contact: .preview,
+                        date: Date.init,
+                        location: LocationViewState(
+                            locationOption: .currentLocation,
+                            isMapExpanded: false,
+                            userLocationState: UserLocationState(
+                                alert: nil,
+                                isRequestingCurrentLocation: true,
+                                region: nil
+                            )
                         )
-                    )
-                ),
-                reducer: .empty,
-                environment: ()
+                    ),
+                    reducer: .empty,
+                    environment: ()
+                )
             )
-        )
-//        .preferredColorScheme(.dark)
-//        .environment(\.sizeCategory, .large)
-    }
-}
-
-extension CLLocationCoordinate2D {
-    static let zero = CLLocationCoordinate2D(latitude: 0, longitude: 0)
-}
-
-extension LocationOption {
-    var text: some View {
-        switch self {
-        case .fromPhotos:
-            return Text(L10n.Location.PickerCopy.fromPhotos)
-        case .currentLocation:
-            return Text(L10n.Location.PickerCopy.currentLocation)
-        case .manual:
-            return Text(L10n.Location.PickerCopy.fromPhotos)
         }
     }
 }

@@ -24,7 +24,7 @@ struct DescriptionView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 row(title: L10n.Description.Row.carType, content: viewStore.description.type)
                 row(title: L10n.Description.Row.carColor, content: viewStore.description.color)
                 row(title: L10n.Description.Row.licensplateNumber, content: viewStore.description.licensePlateNumber)
@@ -62,31 +62,33 @@ struct DescriptionView: View {
             Text(title)
                 .foregroundColor(Color(.secondaryLabel))
                 .font(.callout)
-                .fontWeight(.bold)
             Text(content)
                 .foregroundColor(Color(.label))
+                .fontWeight(.bold)
         }
     }
 }
 
 struct DescriptionWidgetView_Previews: PreviewProvider {
     static var previews: some View {
-        Widget(
-            title: Text("Beschreibung"),
-            isCompleted: true
-        ) {
-            DescriptionView(
-                store: .init(
-                    initialState: Report(
-                        images: ImagesViewState(),
-                        contact: .preview,
-                        date: Date.init,
-                        location: LocationViewState(storedPhotos: [])
-                    ),
-                    reducer: .empty,
-                    environment: ()
+        Preview {
+            Widget(
+                title: Text("Beschreibung"),
+                isCompleted: true
+            ) {
+                DescriptionView(
+                    store: .init(
+                        initialState: Report(
+                            images: ImagesViewState(),
+                            contact: .preview,
+                            date: Date.init,
+                            location: LocationViewState()
+                        ),
+                        reducer: .empty,
+                        environment: ()
+                    )
                 )
-            )
+            }
         }
     }
 }
