@@ -42,6 +42,7 @@
 		73A715F4260CACFF00C88BCC /* ComposableCoreLocation in Frameworks */ = {isa = PBXBuildFile; productRef = 73A715F3260CACFF00C88BCC /* ComposableCoreLocation */; };
 		73A715F8260CB14E00C88BCC /* LocationCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A715F7260CB14E00C88BCC /* LocationCore.swift */; };
 		73A7256C262432FA00672990 /* OnWidgetInteractionButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A7256B262432FA00672990 /* OnWidgetInteractionButtonStyle.swift */; };
+		73B0452F26257F01003F4644 /* PhotoLibraryAccessClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73B0452E26257F01003F4644 /* PhotoLibraryAccessClient.swift */; };
 		73BA6743260625FD001248EF /* StorableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA6742260625FD001248EF /* StorableImage.swift */; };
 		73C5440A2616602000A40639 /* RegulatoryOfficeMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */; };
 		73C544182616627E00A40639 /* MailStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C544172616627E00A40639 /* MailStoreTests.swift */; };
@@ -134,6 +135,7 @@
 		73A715EC260C6BEC00C88BCC /* ContactStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactStoreTests.swift; sourceTree = "<group>"; };
 		73A715F7260CB14E00C88BCC /* LocationCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCore.swift; sourceTree = "<group>"; };
 		73A7256B262432FA00672990 /* OnWidgetInteractionButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnWidgetInteractionButtonStyle.swift; sourceTree = "<group>"; };
+		73B0452E26257F01003F4644 /* PhotoLibraryAccessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryAccessClient.swift; sourceTree = "<group>"; };
 		73BA6742260625FD001248EF /* StorableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorableImage.swift; sourceTree = "<group>"; };
 		73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegulatoryOfficeMapper.swift; sourceTree = "<group>"; };
 		73C544172616627E00A40639 /* MailStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailStoreTests.swift; sourceTree = "<group>"; };
@@ -225,6 +227,7 @@
 			isa = PBXGroup;
 			children = (
 				73D117B82611CC71000D7B82 /* ImageConverter.swift */,
+				73B0452E26257F01003F4644 /* PhotoLibraryAccessClient.swift */,
 				9F98A7BD248EB25400E06AA4 /* PlacesService.swift */,
 				73C544092616602000A40639 /* RegulatoryOfficeMapper.swift */,
 				73719BB5261F18B1005E09A3 /* UIApplicationClient.swift */,
@@ -681,6 +684,7 @@
 				9FFBAD65248E975700F66ADB /* MapView.swift in Sources */,
 				F889751E234E01770014FCC8 /* EditDescriptionView.swift in Sources */,
 				7335096D2614A34300D2FEA8 /* MailCore.swift in Sources */,
+				73B0452F26257F01003F4644 /* PhotoLibraryAccessClient.swift in Sources */,
 				73BA6743260625FD001248EF /* StorableImage.swift in Sources */,
 				9F4BD317249B653200C6C44D /* DateFormatter+Additions.swift in Sources */,
 				F8EDCA80234CB3CD001E8D9C /* SubmitButton.swift in Sources */,
@@ -934,7 +938,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/App/Resources/Preview\\ Content";
-				DEVELOPMENT_TEAM = M3YVS85XC2;
+				DEVELOPMENT_TEAM = QDDL89SBZ7;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "weg-li/App/Resources/Info.plist";
@@ -942,7 +946,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mnin.weg-li";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vanbillstedt.weg-li";
 				PRODUCT_NAME = "weg-li";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
