@@ -9,19 +9,21 @@ struct ImagesView: View {
         let resolvedLocation: CLLocationCoordinate2D?
         let photos: [StorableImage?]
         let showImagePicker: Bool
+        let alert: AlertState<ImagesViewAction>?
 
         init(state: Report) {
             resolvedLocation = state.images.coordinateFromImagePicker
             photos = state.images.storedPhotos
             showImagePicker = state.images.showImagePicker
+            alert = state.images.alert
         }
     }
 
-    let store: Store<Report, ReportAction>
+    let store: Store<ImagesViewState, ImagesViewAction>
     @ObservedObject private var viewStore: ViewStore<ViewState, ImagesViewAction>
 
     init(store: Store<Report, ReportAction>) {
-        self.store = store
+        self.store = store.scope(state: { $0.images }, action: ReportAction.images)
         viewStore = ViewStore(
             store.scope(
                 state: ViewState.init,
@@ -32,15 +34,11 @@ struct ImagesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20.0) {
-            ImageGrid(
-                store: store.scope(
-                    state: \.images,
-                    action: ReportAction.images
-                )
-            )
+            ImageGrid(store: store)
             importButton
                 .buttonStyle(EditButtonStyle())
         }
+        .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
         .sheet(
             isPresented: viewStore.binding(
                 get: \.showImagePicker,
@@ -67,7 +65,7 @@ struct ImagesView: View {
 
     private var importButton: some View {
         Button(action: {
-            viewStore.send(.setShowImagePicker(true))
+            viewStore.send(.addPhotosButtonTapped)
         }) {
             HStack {
                 Image(systemName: "photo.fill.on.rectangle.fill")
