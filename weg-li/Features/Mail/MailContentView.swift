@@ -65,3 +65,26 @@ struct MailContentView: View {
         }
     }
 }
+
+#if DEBUG
+    struct MailContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            MailContentView(
+                store: .init(
+                    initialState: .init(
+                        images: .init(),
+                        contact: .preview,
+                        date: Date.init
+                    ),
+                    reducer: reportReducer,
+                    environment: ReportEnvironment(
+                        mainQueue: .failing,
+                        locationManager: .live,
+                        placeService: .noop,
+                        regulatoryOfficeMapper: .live()
+                    )
+                )
+            )
+        }
+    }
+#endif
