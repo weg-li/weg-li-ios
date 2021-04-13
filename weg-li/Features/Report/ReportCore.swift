@@ -73,7 +73,12 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
     imagesReducer.pullback(
         state: \.images,
         action: /ReportAction.images,
-        environment: { _ in ImagesViewEnvironment(imageConverter: .live()) }
+        environment: { reportEnvironment in ImagesViewEnvironment(
+            mainQueue: reportEnvironment.mainQueue,
+            imageConverter: .live(),
+            photoLibraryAccessClient: .live()
+        )
+        }
     ),
     descriptionReducer.pullback(
         state: \.description,
