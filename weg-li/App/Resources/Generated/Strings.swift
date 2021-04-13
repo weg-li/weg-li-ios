@@ -133,6 +133,10 @@ internal enum L10n {
   internal enum Photos {
     /// Fotos
     internal static let widgetTitle = L10n.tr("Localizable", "photos.widgetTitle")
+    internal enum Alert {
+      /// Um Fotos hinzuzufügen braucht die App deine Zustimmung
+      internal static let accessDenied = L10n.tr("Localizable", "photos.alert.accessDenied")
+    }
     internal enum ImportButton {
       /// Fotos importieren
       internal static let copy = L10n.tr("Localizable", "photos.importButton.copy")
