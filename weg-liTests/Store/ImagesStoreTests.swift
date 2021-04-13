@@ -1,11 +1,14 @@
 // Created for weg-li in 2021.
 
+import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
 @testable import weg_li
 import XCTest
 
 class ImagesStoreTests: XCTestCase {
+    let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
+
     func test_addPhoto_shouldUpdateState() {
         let store = TestStore(
             initialState: ImagesViewState(
@@ -15,7 +18,9 @@ class ImagesStoreTests: XCTestCase {
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: .noop
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: .noop
             )
         )
 
@@ -48,7 +53,9 @@ class ImagesStoreTests: XCTestCase {
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: .noop
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: .noop
             )
         )
 
@@ -68,7 +75,9 @@ class ImagesStoreTests: XCTestCase {
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: .noop
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: .noop
             )
         )
 
@@ -97,7 +106,9 @@ class ImagesStoreTests: XCTestCase {
             ),
             reducer: imagesReducer,
             environment: ImagesViewEnvironment(
-                imageConverter: .noop
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: .noop
             )
         )
 
@@ -116,6 +127,130 @@ class ImagesStoreTests: XCTestCase {
             },
             .send(.setResolvedCoordinate(.init(latitude: 23.3200000001, longitude: 13.3100000001))) {
                 $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
+            }
+        )
+    }
+
+    func test_addPhotosButtonTapped_shouldRequestAccess_andPresentPicker_whenAuthorised() {
+        let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.authorized)
+        let accessClient = PhotoLibraryAccessClient(
+            requestAuthorization: {
+                Effect(subject)
+            },
+            authorizationStatus: { .notDetermined }
+        )
+
+        let store = TestStore(
+            initialState: ImagesViewState(
+                showImagePicker: false,
+                storedPhotos: [],
+                coordinateFromImagePicker: .zero
+            ),
+            reducer: imagesReducer,
+            environment: ImagesViewEnvironment(
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: accessClient
+            )
+        )
+
+        store.assert(
+            .send(.addPhotosButtonTapped),
+            .receive(.requestPhotoLibraryAccess),
+            .receive(.requestPhotoLibraryAccessResult(.authorized)),
+            .receive(.setShowImagePicker(true)) {
+                $0.showImagePicker = true
+            },
+            .do { subject.send(completion: .finished) }
+        )
+    }
+
+    func test_addPhotosButtonTapped_shouldRequestAccess_andPresentPicker_whenLimited() {
+        let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.limited)
+        let accessClient = PhotoLibraryAccessClient(
+            requestAuthorization: {
+                Effect(subject)
+            },
+            authorizationStatus: { .notDetermined }
+        )
+
+        let store = TestStore(
+            initialState: ImagesViewState(
+                showImagePicker: false,
+                storedPhotos: [],
+                coordinateFromImagePicker: .zero
+            ),
+            reducer: imagesReducer,
+            environment: ImagesViewEnvironment(
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: accessClient
+            )
+        )
+
+        store.assert(
+            .send(.addPhotosButtonTapped),
+            .receive(.requestPhotoLibraryAccess),
+            .receive(.requestPhotoLibraryAccessResult(.limited)),
+            .receive(.setShowImagePicker(true)) {
+                $0.showImagePicker = true
+            },
+            .do { subject.send(completion: .finished) }
+        )
+    }
+
+    func test_addPhotosButtonTapped_shouldRequestAccess_andPresentAlert_whenAccessIsDenied() {
+        let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.denied)
+        let accessClient = PhotoLibraryAccessClient(
+            requestAuthorization: {
+                Effect(subject)
+            },
+            authorizationStatus: { .notDetermined }
+        )
+
+        let store = TestStore(
+            initialState: ImagesViewState(
+                showImagePicker: false,
+                storedPhotos: [],
+                coordinateFromImagePicker: .zero
+            ),
+            reducer: imagesReducer,
+            environment: ImagesViewEnvironment(
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: accessClient
+            )
+        )
+
+        store.assert(
+            .send(.addPhotosButtonTapped),
+            .receive(.requestPhotoLibraryAccess),
+            .receive(.requestPhotoLibraryAccessResult(.denied)) {
+                $0.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
+            },
+            .do { subject.send(completion: .finished) }
+        )
+    }
+
+    func test_dismissAlert_shouldUpdateState() {
+        let store = TestStore(
+            initialState: ImagesViewState(
+                alert: AlertState(title: TextState(L10n.Photos.Alert.accessDenied)),
+                showImagePicker: false,
+                storedPhotos: [],
+                coordinateFromImagePicker: .zero
+            ),
+            reducer: imagesReducer,
+            environment: ImagesViewEnvironment(
+                mainQueue: scheduler,
+                imageConverter: .noop,
+                photoLibraryAccessClient: .noop
+            )
+        )
+
+        store.assert(
+            .send(.dismissAlert) {
+                $0.alert = nil
             }
         )
     }
