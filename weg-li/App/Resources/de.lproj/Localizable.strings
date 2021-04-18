@@ -21,6 +21,10 @@
 
 "report.place.widgetTitle" = "Ort";
 
+"report.alert.title" = "Anzeige zurücksetzen?";
+
+"report.alert.reset" = "Zurücksetzen";
+
 
 // Photos
 "photos.widgetTitle" = "Fotos";
@@ -104,6 +108,10 @@
 "contact.rowType.zipCode" = "PLZ";
 
 "contact.rowType.phone" = "Telefon";
+
+"contact.alert.title" = "Daten zurücksetzen?";
+
+"contact.alert.reset" = "Zurücksetzen";
 
 
 // Mail
