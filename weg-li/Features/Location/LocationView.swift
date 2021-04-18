@@ -108,8 +108,11 @@ struct LocationView: View {
             addressView
         }
         .alert(
-            store.scope(state: { $0.location.userLocationState.alert }),
-            dismiss: ReportAction.location(.dismissAlertButtonTapped)
+            store.scope(
+                state: { $0.location.alert },
+                action: { _ in ReportAction.location(.dismissAlertButtonTapped) }
+            ),
+            dismiss: LocationViewAction.dismissAlertButtonTapped
         )
         .onAppear { viewStore.send(.onAppear) }
     }
@@ -157,7 +160,6 @@ struct Location_Previews: PreviewProvider {
                             locationOption: .currentLocation,
                             isMapExpanded: false,
                             userLocationState: UserLocationState(
-                                alert: nil,
                                 isRequestingCurrentLocation: true,
                                 region: nil
                             )
