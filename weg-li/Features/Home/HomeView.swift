@@ -14,7 +14,7 @@ struct HomeView: View {
 
     var body: some View {
         NavigationView {
-            ZStack {
+            ZStack(alignment: .bottomTrailing) {
                 if viewStore.reports.isEmpty {
                     emptyStateView
                 } else {
@@ -26,12 +26,18 @@ struct HomeView: View {
                     }
                 }
                 addReportButton
+                    .padding(24)
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .navigationBarTitle(L10n.Home.navigationBarTitle)
             .navigationBarItems(trailing: contactData)
             .onAppear { viewStore.send(.onAppear) }
+
+            if !.isPhone {
+                WelcomeView()
+            }
         }
+        .phoneOnlyStackNavigationView()
     }
 
     private var emptyStateView: some View {
@@ -44,36 +50,32 @@ struct HomeView: View {
                 .multilineTextAlignment(.center)
                 .padding()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var addReportButton: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                NavigationLink(
-                    destination: ReportForm(
-                        store: store.scope(
-                            state: \.reportDraft,
-                            action: HomeAction.report
-                        )
-                    ),
-                    isActive: viewStore.binding(
-                        get: \.showReportWizard,
-                        send: HomeAction.showReportWizard
-                    ),
-                    label: {
-                        Button(
-                            action: { viewStore.send(.showReportWizard(true)) },
-                            label: { Text("+") }
-                        )
-                        .buttonStyle(AddReportButtonStyle())
-                        .padding(24)
-                        .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
+        NavigationLink(
+            destination: ReportForm(
+                store: store.scope(
+                    state: \.reportDraft,
+                    action: HomeAction.report
+                )
+            ),
+            isActive: viewStore.binding(
+                get: \.showReportWizard,
+                send: HomeAction.showReportWizard
+            ),
+            label: {
+                Button(
+                    action: { viewStore.send(.showReportWizard(true)) },
+                    label: { Text("+")
+                        .font(.largeTitle)
                     }
                 )
+                .buttonStyle(AddReportButtonStyle())
+                .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
             }
-        }
+        )
     }
 
     private var contactData: some View {
@@ -98,11 +100,39 @@ struct MainView_Previews: PreviewProvider {
         Preview {
             HomeView(
                 store: .init(
-                    initialState: HomeState(reports: [.preview, .preview, .preview, .preview]),
+                    initialState: HomeState(
+                        reports: [.preview, .preview, .preview, .preview]
+//                        reports: []
+                    ),
                     reducer: .empty,
                     environment: ()
                 )
             )
         }
+    }
+}
+
+private extension Bool {
+    static var isPhone: Bool {
+        UIDevice.current.userInterfaceIdiom == .phone
+    }
+}
+
+private extension View {
+    @ViewBuilder func phoneOnlyStackNavigationView() -> some View {
+        if .isPhone {
+            navigationViewStyle(StackNavigationViewStyle())
+        } else {
+            self
+        }
+    }
+}
+
+struct WelcomeView: View {
+    var body: some View {
+        Text("Welcome to weg-li")
+            .font(.largeTitle)
+        Text("📸 📝 ✊")
+            .font(/*@START_MENU_TOKEN@*/ .title/*@END_MENU_TOKEN@*/)
     }
 }
