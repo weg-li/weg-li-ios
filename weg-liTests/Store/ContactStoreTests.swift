@@ -117,4 +117,33 @@ class ContactStoreTests: XCTestCase {
             }
         )
     }
+
+    func test_resetData_ButtonTap_PresentAnAlert() {
+        let store = TestStore(
+            initialState: ContactState.preview,
+            reducer: contactReducer,
+            environment: ContactEnvironment()
+        )
+
+        store.assert(
+            .send(.resetContactDataButtonTapped) {
+                $0.alert = .resetContactDataAlert
+            }
+        )
+    }
+
+    func test_resetData_ConfirmButtonTap_shouldResetTheState_andDismissAlert() {
+        let store = TestStore(
+            initialState: ContactState.preview,
+            reducer: contactReducer,
+            environment: ContactEnvironment()
+        )
+
+        store.assert(
+            .send(.resetContactConfirmButtonTapped) {
+                $0 = .empty
+            },
+            .receive(.dismissAlert)
+        )
+    }
 }

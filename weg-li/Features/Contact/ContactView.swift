@@ -72,8 +72,22 @@ struct ContactView: View {
                 }
             }
         }
+        .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
         .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
+        .navigationBarItems(trailing: resetButton)
         .onDisappear { viewStore.send(.onDisappear) }
+    }
+
+    private var resetButton: some View {
+        let isButtonDisabled = viewStore.state == .empty
+        return Button(
+            action: { viewStore.send(.resetContactDataButtonTapped) },
+            label: {
+                Text(L10n.Contact.Alert.reset)
+                    .foregroundColor(isButtonDisabled ? Color.red.opacity(0.6) : .red)
+            }
+        )
+        .disabled(isButtonDisabled)
     }
 
     private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {
