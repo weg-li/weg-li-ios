@@ -67,7 +67,7 @@ struct ReportForm: View {
         Button(
             action: { viewStore.send(.resetButtonTapped) },
             label: {
-                Text("Reset")
+                Text(L10n.Report.Alert.reset)
                     .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
             }
         )
