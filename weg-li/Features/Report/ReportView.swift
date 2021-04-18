@@ -9,12 +9,17 @@ struct ReportForm: View {
         let isContactValid: Bool
         let isDescriptionValid: Bool
         let isLocationValid: Bool
+        let isResetButtonDisabled: Bool
 
         init(state: Report) {
             isPhotosValid = !state.images.storedPhotos.isEmpty
             isContactValid = state.contact.isValid
             isDescriptionValid = state.description.isValid
             isLocationValid = state.location.resolvedAddress.isValid
+            isResetButtonDisabled = state.location.resolvedAddress == .empty
+                && state.images.storedPhotos.isEmpty
+                && state.description == .init()
+                && state.contact == .empty
         }
     }
 
@@ -53,7 +58,20 @@ struct ReportForm: View {
                     .padding()
             }
         }
+        .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
+        .navigationBarItems(trailing: resetButton)
         .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
+    }
+
+    private var resetButton: some View {
+        Button(
+            action: { viewStore.send(.resetButtonTapped) },
+            label: {
+                Text("Reset")
+                    .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
+            }
+        )
+        .disabled(viewStore.isResetButtonDisabled)
     }
 }
 

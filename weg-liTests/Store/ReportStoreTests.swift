@@ -11,23 +11,29 @@ class ReportStoreTests: XCTestCase {
     let fixedUUID = { UUID() }
     let fixedDate = { Date() }
 
+    var report: Report!
+    
+    override func setUp() {
+        super.setUp()
+        
+        report = Report(
+            uuid: fixedUUID(),
+            images: ImagesViewState(
+                showImagePicker: false,
+                storedPhotos: [StorableImage(uiImage:  UIImage(systemName: "pencil")!)!],
+                coordinateFromImagePicker: .zero
+            ),
+            contact: .preview,
+            district: nil,
+            date: fixedDate,
+            description: .init()
+        )
+    }
     // MARK: - Reducer integration tests
 
     func test_updateContact_shouldUpdateState() {
-        let image = UIImage(systemName: "pencil")!
         let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                images: ImagesViewState(
-                    showImagePicker: false,
-                    storedPhotos: [StorableImage(uiImage: image)!],
-                    coordinateFromImagePicker: .zero
-                ),
-                contact: .preview,
-                district: nil,
-                date: fixedDate,
-                description: .init()
-            ),
+            initialState: report,
             reducer: reportReducer,
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
@@ -54,20 +60,8 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_updateCar_shouldUpdateState() {
-        let image = UIImage(systemName: "pencil")!
         let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                images: ImagesViewState(
-                    showImagePicker: false,
-                    storedPhotos: [StorableImage(uiImage: image)!],
-                    coordinateFromImagePicker: .zero
-                ),
-                contact: .empty,
-                district: nil,
-                date: fixedDate,
-                description: .init()
-            ),
+            initialState: report,
             reducer: reportReducer,
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
@@ -90,20 +84,8 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_updateCharge_shouldUpdateState() {
-        let image = UIImage(systemName: "pencil")!
         let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                images: ImagesViewState(
-                    showImagePicker: false,
-                    storedPhotos: [StorableImage(uiImage: image)!],
-                    coordinateFromImagePicker: .zero
-                ),
-                contact: .empty,
-                district: nil,
-                date: fixedDate,
-                description: .init()
-            ),
+            initialState: report,
             reducer: reportReducer,
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
@@ -135,18 +117,7 @@ class ReportStoreTests: XCTestCase {
         )
 
         let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                images: ImagesViewState(
-                    showImagePicker: false,
-                    storedPhotos: [StorableImage(uiImage: image)!],
-                    coordinateFromImagePicker: .zero
-                ),
-                contact: .empty,
-                district: nil,
-                date: fixedDate,
-                description: .init()
-            ),
+            initialState: report,
             reducer: reportReducer,
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
@@ -178,7 +149,6 @@ class ReportStoreTests: XCTestCase {
 
     func test_submitButtonTap_createsMail_andPresentsMailView() {
         let image = UIImage(systemName: "pencil")!
-
         let store = TestStore(
             initialState: Report(
                 uuid: fixedUUID(),
@@ -225,26 +195,13 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() {
-        let image = UIImage(systemName: "pencil")!
-
         let districs = [
             District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
             District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
         ]
 
         let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                images: ImagesViewState(
-                    showImagePicker: false,
-                    storedPhotos: [StorableImage(uiImage: image)!],
-                    coordinateFromImagePicker: .zero
-                ),
-                contact: .empty,
-                district: nil,
-                date: fixedDate,
-                description: .init()
-            ),
+            initialState: report,
             reducer: reportReducer,
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
@@ -272,26 +229,13 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() {
-        let image = UIImage(systemName: "pencil")!
-
         let districs = [
             District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
             District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
         ]
 
         let store = TestStore(
-            initialState: Report(
-                uuid: fixedUUID(),
-                images: ImagesViewState(
-                    showImagePicker: false,
-                    storedPhotos: [StorableImage(uiImage: image)!],
-                    coordinateFromImagePicker: .zero
-                ),
-                contact: .empty,
-                district: nil,
-                date: fixedDate,
-                description: .init()
-            ),
+            initialState: report,
             reducer: reportReducer,
             environment: ReportEnvironment(
                 mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
@@ -481,6 +425,43 @@ class ReportStoreTests: XCTestCase {
             .send(.images(.image(id: fixedUUID(), action: .removePhoto))) {
                 $0.images.storedPhotos = []
                 $0.images.coordinateFromImagePicker = nil
+            }
+        )
+    }
+
+    func test_resetDataButtonTap_shouldPresentAnAlert() {
+        let store = TestStore(
+            initialState: Report(
+                uuid: fixedUUID(),
+                images: .init(),
+                contact: .empty,
+                district: nil,
+                date: fixedDate,
+                description: .init(),
+                location: .init(
+                    locationOption: .fromPhotos,
+                    isMapExpanded: false,
+                    isResolvingAddress: false,
+                    resolvedAddress: .init(
+                        street: "TestStrasse 3",
+                        city: "Berlin",
+                        postalCode: "1243"
+                    ),
+                    userLocationState: .init()
+                )
+            ),
+            reducer: reportReducer,
+            environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+                locationManager: LocationManager.unimplemented(),
+                placeService: .noop,
+                regulatoryOfficeMapper: .noop
+            )
+        )
+
+        store.assert(
+            .send(.resetButtonTapped) {
+                $0.alert = .resetReportAlert
             }
         )
     }

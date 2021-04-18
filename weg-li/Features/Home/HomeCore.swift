@@ -94,28 +94,38 @@ let homeReducer = Reducer<HomeState, HomeAction, HomeEnvironment>.combine(
             }
         // After the emailResult reports the mail has been sent the report will be stored.
         case let .report(reportAction):
-            if case let ReportAction.mail(.setMailResult(result)) = reportAction {
-                guard let mailComposerResult = result else {
-                    return .none
-                }
-                switch mailComposerResult {
-                case .sent:
-                    state.reports.append(state.reportDraft)
+            switch reportAction {
+            case let .mail(mailAction):
+                switch mailAction {
+                case let .setMailResult(result):
+                    guard let mailComposerResult = result else {
+                        return .none
+                    }
+                    switch mailComposerResult {
+                    case .sent:
+                        state.reports.append(state.reportDraft)
 
-                    return Effect.concatenate(
-                        environment.userDefaultsClient.setReports(state.reports)
-                            .fireAndForget(),
-                        Effect(value: HomeAction.reportSaved)
-                    )
+                        return Effect.concatenate(
+                            environment.userDefaultsClient.setReports(state.reports)
+                                .fireAndForget(),
+                            Effect(value: HomeAction.reportSaved)
+                        )
+                    default:
+                        return .none
+                    }
                 default:
                     return .none
                 }
-            }
-            if case ReportAction.contact = reportAction {
+            case .contact:
                 // sync contact with draftReport contact
                 state.settings.contact = state.reportDraft.contact
+                return .none
+            case .resetConfirmButtonTapped:
+                state.reportDraft = Report(images: .init(), contact: state.settings.contact, date: Date.init)
+                return .none
+            default:
+                return .none
             }
-            return .none
         case let .showReportWizard(value):
             state.showReportWizard = value
             return .none
