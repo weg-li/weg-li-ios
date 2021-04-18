@@ -3,6 +3,7 @@
 import Foundation
 
 enum Times: CaseIterable {
+    case empty
     case one
     case three
     case five
@@ -15,6 +16,7 @@ enum Times: CaseIterable {
 
     var value: Int {
         switch self {
+        case .empty: return 0
         case .one: return 1
         case .three: return 3
         case .five: return 5
@@ -29,6 +31,8 @@ enum Times: CaseIterable {
 
     var description: String {
         switch self {
+        case .empty:
+            return ""
         case .one:
             return "bis zu 3 Minuten"
         case .three, .five, .ten, .fifteen, .thirty, .fourtyfive:

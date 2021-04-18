@@ -61,7 +61,12 @@ extension DescriptionState {
 }
 
 extension DescriptionState {
-    static let charges = Bundle.main.decode([String].self, from: "charges.json")
+    static let charges: [String] = {
+        var all = Bundle.main.decode([String].self, from: "charges.json")
+        all.insert("", at: 0)
+        return all
+    }()
+
     static let times = Times.allCases
 
     var time: String { Times.allCases[selectedDuration].description }

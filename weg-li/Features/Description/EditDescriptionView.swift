@@ -55,7 +55,7 @@ struct EditDescriptionView: View {
                         send: { ReportAction.description(.setCharge($0)) }
                     )
                 ) {
-                    ForEach(0..<DescriptionState.charges.count, id: \.self) {
+                    ForEach(1..<DescriptionState.charges.count, id: \.self) {
                         Text(DescriptionState.charges[$0])
                             .tag($0)
                             .foregroundColor(Color(.label))
@@ -68,7 +68,7 @@ struct EditDescriptionView: View {
                         send: { ReportAction.description(.setDuraration($0)) }
                     )
                 ) {
-                    ForEach(0..<Times.allCases.count, id: \.self) {
+                    ForEach(1..<Times.allCases.count, id: \.self) {
                         Text(Times.allCases[$0].description)
                             .foregroundColor(Color(.label))
                     }
