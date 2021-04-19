@@ -6,7 +6,7 @@ struct Widget<Content: View>: View {
     let title: Text
     var isCompleted: Bool
     let content: () -> Content
-    @State private var isCollapsed: Bool = false
+    @State private var showDetail: Bool = true
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -15,19 +15,20 @@ struct Widget<Content: View>: View {
                 title.fontWeight(.bold)
                 Spacer()
                 Button(action: {
-                    withAnimation(.spring()) {
-                        self.isCollapsed.toggle()
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        self.showDetail.toggle()
                     }
                 }) {
-                    Image(systemName: "chevron.up.circle")
-                        .rotationEffect(.degrees(isCollapsed ? 180 : 0))
+                    Image(systemName: "chevron.right.circle")
+                        .rotationEffect(.degrees(showDetail ? 90 : 0))
+                        .scaleEffect(showDetail ? 1.1 : 1)
                 }
                 .accessibility(label: Text(L10n.Widget.A11y.toggleCollapseButtonLabel))
                 .foregroundColor(.secondary)
             }
             .font(.title)
             .padding(.bottom)
-            if !isCollapsed {
+            if showDetail {
                 content().transition(.opacity)
             }
         }
