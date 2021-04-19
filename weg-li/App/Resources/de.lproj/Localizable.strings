@@ -138,3 +138,13 @@
 "settings.row.licenses" = "Lizenzen";
 
 "settings.row.contribute" = "Beitragen";
+
+
+// Times
+"times.description.upTo3" = "bis zu 3 Minuten";
+
+"times.description.longerThenNMinutes" = "länger als %@ Minuten";
+
+"times.description.longerThenNStunde" = "länger als %@ Stunde";
+
+"times.description.longerThenNStunden" = "länger als %@ Stunden";

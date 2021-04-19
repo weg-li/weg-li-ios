@@ -185,6 +185,25 @@ internal enum L10n {
     }
   }
 
+  internal enum Times {
+    internal enum Description {
+      /// länger als %@ Minuten
+      internal static func longerThenNMinutes(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "times.description.longerThenNMinutes", String(describing: p1))
+      }
+      /// länger als %@ Stunde
+      internal static func longerThenNStunde(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "times.description.longerThenNStunde", String(describing: p1))
+      }
+      /// länger als %@ Stunden
+      internal static func longerThenNStunden(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "times.description.longerThenNStunden", String(describing: p1))
+      }
+      /// bis zu 3 Minuten
+      internal static let upTo3 = L10n.tr("Localizable", "times.description.upTo3")
+    }
+  }
+
   internal enum Widget {
     internal enum A11y {
       /// erweitern

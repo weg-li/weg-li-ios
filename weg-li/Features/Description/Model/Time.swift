@@ -34,13 +34,13 @@ enum Times: CaseIterable {
         case .empty:
             return ""
         case .one:
-            return "bis zu 3 Minuten"
+            return L10n.Times.Description.upTo3
         case .three, .five, .ten, .fifteen, .thirty, .fourtyfive:
-            return "länger als \(value) Minuten"
+            return L10n.Times.Description.longerThenNMinutes(value)
         case .sixty:
-            return "länger als \(value) Stunde"
+            return L10n.Times.Description.longerThenNStunde(value)
         case .hundredEighty:
-            return "länger als \(value) Stunden"
+            return L10n.Times.Description.longerThenNStunden(value)
         }
     }
 }
