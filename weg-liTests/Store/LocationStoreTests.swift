@@ -21,6 +21,7 @@ class LocationStoreTests: XCTestCase {
             city: ContactState.preview.address.city,
             postalCode: ContactState.preview.address.postalCode
         )
+        
         let env = LocationViewEnvironment(
             locationManager: .unimplemented(
                 authorizationStatus: { .notDetermined },
@@ -32,8 +33,10 @@ class LocationStoreTests: XCTestCase {
                 },
                 set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
-            placeService: PlacesServiceClient(getPlacemarks: { _ in Effect(value: [expectedAddress]) })
+            placeService: PlacesServiceClient(getPlacemarks: { _ in Effect(value: [expectedAddress]) }),
+            uiApplicationClient: .noop
         )
+        
         let store = TestStore(
             initialState: LocationViewState(),
             reducer: locationReducer,
@@ -103,7 +106,8 @@ class LocationStoreTests: XCTestCase {
                 locationServicesEnabled: { false },
                 set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
-            placeService: .noop
+            placeService: .noop,
+            uiApplicationClient: .noop
         )
         let store = TestStore(
             initialState: LocationViewState(),
@@ -119,9 +123,7 @@ class LocationStoreTests: XCTestCase {
             },
             .receive(.locationRequested) {
                 $0.userLocationState.isRequestingCurrentLocation = false
-                $0.userLocationState.alert = AlertState<ReportAction>(
-                    title: TextState("Location services are turned off.")
-                )
+                $0.alert = .servicesOff
             },
             .do {
                 setSubject.send(completion: .finished)
@@ -146,7 +148,8 @@ class LocationStoreTests: XCTestCase {
                 },
                 set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
-            placeService: .noop
+            placeService: .noop,
+            uiApplicationClient: .noop
         )
         let store = TestStore(
             initialState: LocationViewState(),
@@ -169,9 +172,7 @@ class LocationStoreTests: XCTestCase {
                 locationManagerSubject.send(.didChangeAuthorization(.denied))
             },
             .receive(.userLocationAction(.didChangeAuthorization(.denied))) {
-                $0.userLocationState.alert = AlertState(
-                    title: .init("Location makes this app better. Please consider giving us access.")
-                )
+                $0.alert = .provideAuth
                 $0.userLocationState.isRequestingCurrentLocation = false
             },
             .do {
@@ -193,7 +194,8 @@ class LocationStoreTests: XCTestCase {
             reducer: locationReducer,
             environment: LocationViewEnvironment(
                 locationManager: LocationManager.unimplemented(),
-                placeService: .noop
+                placeService: .noop,
+                uiApplicationClient: .noop
             )
         )
 
@@ -215,5 +217,38 @@ class LocationStoreTests: XCTestCase {
                 XCTAssertTrue($0.resolvedAddress.isValid)
             }
         )
+    }
+    
+    func test_goToSettingsAction_shouldOpenSettingsURL() {
+        var openedUrl: URL!
+        let settingsURL = "settings:weg-li//weg-li/settings"
+        let uiApplicationClient: UIApplicationClient = .init(
+            open: { url, _ in
+                openedUrl = url
+                return .init(value: true)
+            },
+            openSettingsURLString: { settingsURL }
+        )
+        
+        let store = TestStore(
+            initialState: LocationViewState(
+                locationOption: .manual,
+                isMapExpanded: false,
+                isResolvingAddress: false,
+                resolvedAddress: .init(address: .init()),
+                userLocationState: .init()
+            ),
+            reducer: locationReducer,
+            environment: LocationViewEnvironment(
+                locationManager: LocationManager.unimplemented(),
+                placeService: .noop,
+                uiApplicationClient: uiApplicationClient
+            )
+        )
+
+        store.assert(
+            .send(.goToSettingsButtonTapped)
+        )
+        XCTAssertEqual(openedUrl, URL(string: settingsURL))
     }
 }

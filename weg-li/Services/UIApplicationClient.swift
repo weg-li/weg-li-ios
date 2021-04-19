@@ -9,7 +9,7 @@ struct UIApplicationClient {
 }
 
 extension UIApplicationClient {
-    public static let live = Self(
+    static let live = Self(
         open: { url, options in
             .future { callback in
                 UIApplication.shared.open(url, options: options) { bool in
@@ -18,5 +18,10 @@ extension UIApplicationClient {
             }
         },
         openSettingsURLString: { UIApplication.openSettingsURLString }
+    )
+    
+    static let noop = Self(
+        open: { _, _ in .none },
+        openSettingsURLString: { "" }
     )
 }

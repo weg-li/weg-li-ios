@@ -21,6 +21,10 @@
 
 "report.place.widgetTitle" = "Ort";
 
+"report.alert.title" = "Anzeige zurücksetzen?";
+
+"report.alert.reset" = "Zurücksetzen";
+
 
 // Photos
 "photos.widgetTitle" = "Fotos";
@@ -105,6 +109,10 @@
 
 "contact.rowType.phone" = "Telefon";
 
+"contact.alert.title" = "Daten zurücksetzen?";
+
+"contact.alert.reset" = "Zurücksetzen";
+
 
 // Mail
 "mail.deviceErrorCopy" = "Auf diesem Gerät können leider keine E-Mails versendet werden!";
@@ -130,3 +138,13 @@
 "settings.row.licenses" = "Lizenzen";
 
 "settings.row.contribute" = "Beitragen";
+
+
+// Times
+"times.description.upTo3" = "bis zu 3 Minuten";
+
+"times.description.longerThenNMinutes" = "länger als %@ Minuten";
+
+"times.description.longerThenNStunde" = "länger als %@ Stunde";
+
+"times.description.longerThenNStunden" = "länger als %@ Stunden";

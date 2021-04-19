@@ -11,9 +11,25 @@ class HomeStoreTests: XCTestCase {
     let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
     private var userDefaults: UserDefaults!
 
+    private var report: Report!
+
     override func setUp() {
         super.setUp()
 
+        report = Report(
+            uuid: fixedUUID(),
+            images: ImagesViewState(
+                showImagePicker: false,
+                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
+                coordinateFromImagePicker: .zero
+            ),
+            contact: .preview,
+            district: nil,
+            date: fixedDate,
+            description: .init(),
+            location: .init(),
+            mail: .init()
+        )
         userDefaults = UserDefaults(suiteName: #file)
         userDefaults.removePersistentDomain(forName: #file)
     }
@@ -60,21 +76,6 @@ class HomeStoreTests: XCTestCase {
     }
 
     func test_sentMailResult_shouldAppendDraftReportToReports() {
-        let report = Report(
-            uuid: fixedUUID(),
-            images: ImagesViewState(
-                showImagePicker: false,
-                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                coordinateFromImagePicker: .zero
-            ),
-            contact: ContactState(),
-            district: nil,
-            date: fixedDate,
-            description: .init(),
-            location: .init(),
-            mail: .init()
-        )
-
         let store = TestStore(
             initialState: HomeState(reportDraft: report),
             reducer: homeReducer,
@@ -87,7 +88,7 @@ class HomeStoreTests: XCTestCase {
 
         store.assert(
             .send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
-                $0.reports = [report]
+                $0.reports = [self.report]
             },
             .receive(.reportSaved) {
                 $0.reportDraft = Report(images: .init(), contact: .init())
@@ -96,21 +97,6 @@ class HomeStoreTests: XCTestCase {
     }
 
     func test_contactStateShouldBeSaved_onContactViewDisappearAction() {
-        let report = Report(
-            uuid: fixedUUID(),
-            images: ImagesViewState(
-                showImagePicker: false,
-                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
-                coordinateFromImagePicker: .zero
-            ),
-            contact: .preview,
-            district: nil,
-            date: fixedDate,
-            description: .init(),
-            location: .init(),
-            mail: .init()
-        )
-
         let store = TestStore(
             initialState: HomeState(reportDraft: report),
             reducer: homeReducer,
@@ -130,6 +116,32 @@ class HomeStoreTests: XCTestCase {
                 // check if contact has been saved to defaults
                 XCTAssertEqual(store.environment.userDefaultsClient.contact, $0.settings.contact)
             }
+        )
+    }
+
+    func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
+        var homeState = HomeState(reportDraft: report)
+        homeState.settings.contact = .preview
+
+        let store = TestStore(
+            initialState: homeState,
+            reducer: homeReducer,
+            environment: HomeEnvironment(
+                mainQueue: scheduler.eraseToAnyScheduler(),
+                userDefaultsClient: .live(userDefaults: userDefaults),
+                imageConverter: .noop
+            )
+        )
+
+        store.assert(
+            .send(.report(.resetConfirmButtonTapped)) {
+                $0.reportDraft = Report(
+                    images: .init(),
+                    contact: homeState.settings.contact,
+                    date: self.fixedDate
+                )
+            },
+            .receive(.report(.dismissAlert))
         )
     }
 }

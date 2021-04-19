@@ -20,6 +20,12 @@ internal enum L10n {
     internal static let reportHintCopy = L10n.tr("Localizable", "contact.reportHintCopy")
     /// Kontaktdaten
     internal static let widgetTitle = L10n.tr("Localizable", "contact.widgetTitle")
+    internal enum Alert {
+      /// Zurücksetzen
+      internal static let reset = L10n.tr("Localizable", "contact.alert.reset")
+      /// Daten zurücksetzen?
+      internal static let title = L10n.tr("Localizable", "contact.alert.title")
+    }
     internal enum Row {
       /// Stadt
       internal static let cityCopy = L10n.tr("Localizable", "contact.row.cityCopy")
@@ -146,6 +152,12 @@ internal enum L10n {
   internal enum Report {
     /// Anzeige
     internal static let navigationBarTitle = L10n.tr("Localizable", "report.navigationBarTitle")
+    internal enum Alert {
+      /// Zurücksetzen
+      internal static let reset = L10n.tr("Localizable", "report.alert.reset")
+      /// Anzeige zurücksetzen?
+      internal static let title = L10n.tr("Localizable", "report.alert.title")
+    }
     internal enum Contact {
       /// Kontaktdaten
       internal static let widgetTitle = L10n.tr("Localizable", "report.contact.widgetTitle")
@@ -170,6 +182,25 @@ internal enum L10n {
     internal enum Section {
       /// Projekt
       internal static let projectTitle = L10n.tr("Localizable", "settings.section.projectTitle")
+    }
+  }
+
+  internal enum Times {
+    internal enum Description {
+      /// länger als %@ Minuten
+      internal static func longerThenNMinutes(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "times.description.longerThenNMinutes", String(describing: p1))
+      }
+      /// länger als %@ Stunde
+      internal static func longerThenNStunde(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "times.description.longerThenNStunde", String(describing: p1))
+      }
+      /// länger als %@ Stunden
+      internal static func longerThenNStunden(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "times.description.longerThenNStunden", String(describing: p1))
+      }
+      /// bis zu 3 Minuten
+      internal static let upTo3 = L10n.tr("Localizable", "times.description.upTo3")
     }
   }
 

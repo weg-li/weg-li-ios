@@ -18,6 +18,8 @@ struct Report: Codable {
     var location: LocationViewState
     var mail: MailViewState
 
+    var alert: AlertState<ReportAction>?
+
     init(
         uuid: UUID = UUID(),
         images: ImagesViewState,
@@ -36,6 +38,10 @@ struct Report: Codable {
         self.description = description
         self.location = location
         self.mail = mail
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, images, contact, district, date, description, location, mail
     }
 }
 
@@ -56,6 +62,9 @@ enum ReportAction: Equatable {
     case mail(MailViewAction)
     case mapGeoAddressToDistrict(GeoAddress)
     case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
+    case resetButtonTapped
+    case resetConfirmButtonTapped
+    case dismissAlert
 }
 
 struct ReportEnvironment {
@@ -96,7 +105,8 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         environment: {
             LocationViewEnvironment(
                 locationManager: $0.locationManager,
-                placeService: $0.placeService
+                placeService: $0.placeService,
+                uiApplicationClient: .live
             )
         }
     ),
@@ -189,6 +199,15 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             }
         case .contact, .description:
             return .none
+        case .resetButtonTapped:
+            state.alert = .resetReportAlert
+            return .none
+        case .resetConfirmButtonTapped:
+            // Reset report will be handled in the homeReducer
+            return Effect(value: .dismissAlert)
+        case .dismissAlert:
+            state.alert = nil
+            return .none
         }
     }
 )
@@ -219,4 +238,12 @@ extension Report {
             location: LocationViewState()
         )
     }
+}
+
+extension AlertState where Action == ReportAction {
+    static let resetReportAlert = Self(
+        title: TextState(L10n.Report.Alert.title),
+        primaryButton: .destructive(.init(L10n.Report.Alert.reset), send: .resetConfirmButtonTapped),
+        secondaryButton: .cancel(send: .dismissAlert)
+    )
 }

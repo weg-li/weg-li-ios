@@ -58,13 +58,13 @@ struct DescriptionView: View {
     }
 
     private func row(title: String, content: String) -> some View {
-        VStack(alignment: .leading, spacing: 2.0) {
+        VStack(alignment: .leading, spacing: 4.0) {
             Text(title)
-                .foregroundColor(Color(.secondaryLabel))
+                .foregroundColor(.secondary)
                 .font(.callout)
             Text(content)
-                .foregroundColor(Color(.label))
-                .fontWeight(.bold)
+                .foregroundColor(.primary)
+                .fontWeight(.semibold)
         }
     }
 }

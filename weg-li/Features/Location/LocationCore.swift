@@ -14,7 +14,6 @@ enum UserLocationError: Error {
 // MARK: - UserLocationState
 
 struct UserLocationState: Equatable {
-    var alert: AlertState<ReportAction>?
     var isRequestingCurrentLocation = false
     var region: CoordinateRegion?
 
@@ -48,9 +47,6 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
 
     case .didChangeAuthorization(.denied):
         if state.isRequestingCurrentLocation {
-            state.alert = .init(
-                title: TextState(L10n.Location.Alert.provideAuth)
-            )
             state.isRequestingCurrentLocation = false
         }
         return .none
@@ -72,6 +68,7 @@ let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, 
 // MARK: - Location Core
 
 struct LocationViewState: Equatable, Codable {
+    var alert: AlertState<LocationViewAction>?
     var locationOption: LocationOption = .fromPhotos
     var isMapExpanded = false
     var isResolvingAddress = false
@@ -90,6 +87,7 @@ enum LocationViewAction: Equatable {
     case onAppear
     case locationRequested
     case toggleMapExpanded
+    case goToSettingsButtonTapped
     case dismissAlertButtonTapped
     case setLocationOption(LocationOption)
     case updateRegion(CoordinateRegion?)
@@ -105,6 +103,7 @@ enum LocationViewAction: Equatable {
 struct LocationViewEnvironment {
     let locationManager: LocationManager
     let placeService: PlacesServiceClient
+    let uiApplicationClient: UIApplicationClient
 }
 
 /// LocationReducer handling setup, location widget actions, alert presentation and reverse geo coding the user location.
@@ -128,7 +127,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
 
         case .locationRequested:
             guard environment.locationManager.locationServicesEnabled() else {
-                state.userLocationState.alert = .init(title: TextState(L10n.Location.Alert.serviceIsOff))
+                state.alert = .servicesOff
                 return .none
             }
             switch environment.locationManager.authorizationStatus() {
@@ -140,11 +139,11 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                     .fireAndForget()
 
             case .restricted:
-                state.userLocationState.alert = .init(title: TextState(L10n.Location.Alert.provideAccessToLocationService))
+                state.alert = .goToSettingsAlert
                 return .none
 
             case .denied:
-                state.userLocationState.alert = .init(title: TextState(L10n.Location.Alert.provideAccessToLocationService))
+                state.alert = .goToSettingsAlert
                 return .none
 
             case .authorizedAlways, .authorizedWhenInUse:
@@ -156,7 +155,7 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                 return .none
             }
         case .dismissAlertButtonTapped:
-            state.userLocationState.alert = nil
+            state.alert = nil
             return .none
 
         case .toggleMapExpanded:
@@ -180,6 +179,9 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                     return .none
                 }
                 return Effect(value: LocationViewAction.resolveLocation(region.center))
+            case .didChangeAuthorization(.denied):
+                state.alert = .provideAuth
+                return .none
             default:
                 return .none
             }
@@ -218,6 +220,13 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
             return .none
         case .setResolvedLocation:
             return .none
+        case .goToSettingsButtonTapped:
+            return URL(string: environment.uiApplicationClient.openSettingsURLString())
+                .map {
+                    environment.uiApplicationClient.open($0, [:])
+                        .fireAndForget()
+                }
+                ?? .none
         }
     }
 )
@@ -232,4 +241,19 @@ private extension LocationManager {
             distanceFilter: 100.0,
             showsBackgroundLocationIndicator: true)
     }
+}
+
+extension AlertState where Action == LocationViewAction {
+    static let goToSettingsAlert = Self(
+        title: .init(L10n.Location.Alert.provideAccessToLocationService),
+        primaryButton: .default(.init("Einstellungen"), send: .goToSettingsButtonTapped),
+        secondaryButton: .default("OK")
+    )
+    
+    static let provideAuth = Self(title: TextState(L10n.Location.Alert.provideAuth))
+    static let servicesOff = Self(title: TextState(L10n.Location.Alert.serviceIsOff))
+    
+    static let provideAccessToLocationService = Self(
+        title: TextState(L10n.Location.Alert.provideAccessToLocationService)
+    )
 }

@@ -38,32 +38,6 @@ struct Widget<Content: View>: View {
     }
 }
 
-enum CompletionIndicator: View {
-    case completed
-    case uncompleted
-
-    init(isValid: Bool) {
-        if isValid {
-            self = .completed
-        } else {
-            self = .uncompleted
-        }
-    }
-
-    var body: some View {
-        switch self {
-        case .completed:
-            return Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.green)
-                .accessibility(label: Text(L10n.Widget.A11y.CompletionIndicatorLabel.isValid))
-        case .uncompleted:
-            return Image(systemName: "exclamationmark.circle.fill")
-                .foregroundColor(.orange)
-                .accessibility(label: Text(L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid))
-        }
-    }
-}
-
 struct Widget_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
