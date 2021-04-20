@@ -1,16 +1,10 @@
-//
-//  CompletionIndicator.swift
-//  weg-li
-//
-//  Created by Malte on 18.04.21.
-//  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-//
+// Created for weg-li in 2021.
 
 import SwiftUI
 
 struct CompletionIndicator: View {
     var isValid: Bool
-    
+
     var body: some View {
         let a11yLabel = isValid ? L10n.Widget.A11y.CompletionIndicatorLabel.isValid : L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid
         return

@@ -249,10 +249,10 @@ extension AlertState where Action == LocationViewAction {
         primaryButton: .default(.init("Einstellungen"), send: .goToSettingsButtonTapped),
         secondaryButton: .default("OK")
     )
-    
+
     static let provideAuth = Self(title: TextState(L10n.Location.Alert.provideAuth))
     static let servicesOff = Self(title: TextState(L10n.Location.Alert.serviceIsOff))
-    
+
     static let provideAccessToLocationService = Self(
         title: TextState(L10n.Location.Alert.provideAccessToLocationService)
     )

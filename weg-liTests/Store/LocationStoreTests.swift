@@ -21,7 +21,7 @@ class LocationStoreTests: XCTestCase {
             city: ContactState.preview.address.city,
             postalCode: ContactState.preview.address.postalCode
         )
-        
+
         let env = LocationViewEnvironment(
             locationManager: .unimplemented(
                 authorizationStatus: { .notDetermined },
@@ -36,7 +36,7 @@ class LocationStoreTests: XCTestCase {
             placeService: PlacesServiceClient(getPlacemarks: { _ in Effect(value: [expectedAddress]) }),
             uiApplicationClient: .noop
         )
-        
+
         let store = TestStore(
             initialState: LocationViewState(),
             reducer: locationReducer,
@@ -218,7 +218,7 @@ class LocationStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_goToSettingsAction_shouldOpenSettingsURL() {
         var openedUrl: URL!
         let settingsURL = "settings:weg-li//weg-li/settings"
@@ -229,7 +229,7 @@ class LocationStoreTests: XCTestCase {
             },
             openSettingsURLString: { settingsURL }
         )
-        
+
         let store = TestStore(
             initialState: LocationViewState(
                 locationOption: .manual,

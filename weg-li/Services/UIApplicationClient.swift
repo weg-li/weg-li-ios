@@ -19,7 +19,7 @@ extension UIApplicationClient {
         },
         openSettingsURLString: { UIApplication.openSettingsURLString }
     )
-    
+
     static let noop = Self(
         open: { _, _ in .none },
         openSettingsURLString: { "" }
