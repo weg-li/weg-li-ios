@@ -10,11 +10,8 @@ import XCTest
 class OfficeMapperTests: XCTestCase {
     var sut: RegulatoryOfficeMapper!
 
-    let districts = [
-        District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
-        District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
-    ]
     private var bag = Set<AnyCancellable>()
+    let districts = DistrictFixtures.districts
 
     override func setUp() {
         super.setUp()

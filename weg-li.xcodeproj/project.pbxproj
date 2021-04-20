@@ -55,6 +55,7 @@
 		73DA97122623891300A05C2A /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA97112623891300A05C2A /* Preview.swift */; };
 		73DA971826238B4100A05C2A /* ReportCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA971726238B4100A05C2A /* ReportCellView.swift */; };
 		73DA971F26238B7800A05C2A /* AddReportButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */; };
+		73F0C411262EDB9400B49837 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F0C410262EDB9400B49837 /* Fixtures.swift */; };
 		73FC295C25F959100084BB4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 73FC295B25F959100084BB4E /* ComposableArchitecture */; };
 		73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FC296725F95FAE0084BB4E /* ContactCore.swift */; };
 		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
@@ -149,6 +150,7 @@
 		73DA97112623891300A05C2A /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		73DA971726238B4100A05C2A /* ReportCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportCellView.swift; sourceTree = "<group>"; };
 		73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddReportButtonStyle.swift; sourceTree = "<group>"; };
+		73F0C410262EDB9400B49837 /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
 		73FC296725F95FAE0084BB4E /* ContactCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCore.swift; sourceTree = "<group>"; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 				9F971E91247ABFCB00A68959 /* Info.plist */,
 				73881231260BD491008B9956 /* Store */,
 				73DA970A26236CA200A05C2A /* OfficeMapperTests.swift */,
+				73F0C410262EDB9400B49837 /* Fixtures.swift */,
 			);
 			path = "weg-liTests";
 			sourceTree = "<group>";
@@ -661,6 +664,7 @@
 				73719BBC261F2205005E09A3 /* SettingsStoreTests.swift in Sources */,
 				73A715ED260C6BEC00C88BCC /* ContactStoreTests.swift in Sources */,
 				73C544182616627E00A40639 /* MailStoreTests.swift in Sources */,
+				73F0C411262EDB9400B49837 /* Fixtures.swift in Sources */,
 				7388123B260BD5BD008B9956 /* ReportStoreTests.swift in Sources */,
 				731E5A1D2612FE400012FAAD /* ImagesStoreTests.swift in Sources */,
 				73DA970B26236CA200A05C2A /* OfficeMapperTests.swift in Sources */,

@@ -11,16 +11,18 @@ class ReportStoreTests: XCTestCase {
     let fixedUUID = { UUID() }
     let fixedDate = { Date() }
 
+    let districs = DistrictFixtures.districts
+
     var report: Report!
-    
+
     override func setUp() {
         super.setUp()
-        
+
         report = Report(
             uuid: fixedUUID(),
             images: ImagesViewState(
                 showImagePicker: false,
-                storedPhotos: [StorableImage(uiImage:  UIImage(systemName: "pencil")!)!],
+                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
                 coordinateFromImagePicker: .zero
             ),
             contact: .preview,
@@ -29,6 +31,7 @@ class ReportStoreTests: XCTestCase {
             description: .init()
         )
     }
+
     // MARK: - Reducer integration tests
 
     func test_updateContact_shouldUpdateState() {
@@ -158,11 +161,7 @@ class ReportStoreTests: XCTestCase {
                     coordinateFromImagePicker: .zero
                 ),
                 contact: .empty,
-                district: District(
-                    name: "Berlin",
-                    zipCode: "12437",
-                    mail: "amt@berlin.da"
-                ),
+                district: districs[0],
                 date: fixedDate,
                 description: .init(),
                 location: LocationViewState(
@@ -195,11 +194,6 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() {
-        let districs = [
-            District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
-            District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
-        ]
-
         let store = TestStore(
             initialState: report,
             reducer: reportReducer,
@@ -223,17 +217,12 @@ class ReportStoreTests: XCTestCase {
             },
             .receive(.mapGeoAddressToDistrict(expectedAddress)),
             .receive(.mapDistrictFinished(.success(districs[0]))) {
-                $0.district = districs[0]
+                $0.district = self.districs[0]
             }
         )
     }
 
     func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() {
-        let districs = [
-            District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
-            District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
-        ]
-
         let store = TestStore(
             initialState: report,
             reducer: reportReducer,
@@ -263,11 +252,6 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() {
-        let districs = [
-            District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
-            District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
-        ]
-
         let store = TestStore(
             initialState: Report(
                 uuid: fixedUUID(),
@@ -324,11 +308,6 @@ class ReportStoreTests: XCTestCase {
     }
 
     func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() {
-        let districs = [
-            District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
-            District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
-        ]
-
         let store = TestStore(
             initialState: Report(
                 uuid: fixedUUID(),
@@ -375,16 +354,12 @@ class ReportStoreTests: XCTestCase {
             },
             .receive(.mapGeoAddressToDistrict(expectedAddress)),
             .receive(.mapDistrictFinished(.success(districs[0]))) {
-                $0.district = districs[0]
+                $0.district = self.districs[0]
             }
         )
     }
 
     func test_removeImage_shouldSetResolvedCoordinateToNil_whenPhotosIsEmptyAfterDelete() {
-        let districs = [
-            District(name: "Berlin", zipCode: "10629", mail: "Anzeige@bowi.berlin.de"),
-            District(name: "Dortmund", zipCode: "44287", mail: "fremdanzeigen.verkehrsueberwachung@stadtdo.de")
-        ]
         let images = [StorableImage(id: fixedUUID(), uiImage: UIImage(systemName: "pencil")!)]
         let coordinate = CLLocationCoordinate2D(latitude: 23.21, longitude: 67.76)
 
