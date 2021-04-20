@@ -11,5 +11,9 @@ extension Array {
 }
 
 extension Array where Element == District {
-    static let all = Bundle.main.decode([District].self, from: "districts.json")
+    static let all = Bundle.main.decode(
+        [District].self, from: "districts.json",
+        dateDecodingStrategy: .iso8601,
+        keyDecodingStrategy: .convertFromSnakeCase
+    )
 }
