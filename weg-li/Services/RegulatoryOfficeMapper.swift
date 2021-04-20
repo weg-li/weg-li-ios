@@ -14,7 +14,7 @@ extension RegulatoryOfficeMapper {
         Self(
             mapAddressToDistrict: { address in
                 .result {
-                    if let districtMAtchedByPostalCode = districts.first(where: { $0.zipCode == address.postalCode }) {
+                    if let districtMAtchedByPostalCode = districts.first(where: { $0.zip == address.postalCode }) {
                         return .success(districtMAtchedByPostalCode)
                     } else if let districtMatchedByName = districts.first(where: { $0.name == address.city }) {
                         return .success(districtMatchedByName)

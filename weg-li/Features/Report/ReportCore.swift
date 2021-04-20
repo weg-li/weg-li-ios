@@ -188,7 +188,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 guard let district = state.district else {
                     return .none
                 }
-                state.mail.mail.address = district.mail
+                state.mail.mail.address = district.email
                 state.mail.mail.body = Mail.createMailBody(from: state)
                 state.mail.mail.attachmentData = state.images.storedPhotos
                     .compactMap { $0 }
@@ -223,8 +223,11 @@ extension Report {
             contact: .preview,
             district: District(
                 name: "Hamburg St. Pauli",
-                zipCode: "20099",
-                mail: "mail@stpauli.de"
+                zip: "20099",
+                email: "mail@stpauli.de",
+                latitude: 53.53,
+                longitude: 13.13,
+                personalEmail: true
             ),
             date: Date.init,
             description: .init(
