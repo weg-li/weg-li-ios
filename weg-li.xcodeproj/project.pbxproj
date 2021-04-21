@@ -58,6 +58,8 @@
 		73F0C411262EDB9400B49837 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F0C410262EDB9400B49837 /* Fixtures.swift */; };
 		73FC295C25F959100084BB4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 73FC295B25F959100084BB4E /* ComposableArchitecture */; };
 		73FC296825F95FAE0084BB4E /* ContactCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FC296725F95FAE0084BB4E /* ContactCore.swift */; };
+		8315EB032630765F00B96224 /* colors.json in Resources */ = {isa = PBXBuildFile; fileRef = 8315EB022630765F00B96224 /* colors.json */; };
+		8315EB07263076A200B96224 /* brands.json in Resources */ = {isa = PBXBuildFile; fileRef = 8315EB06263076A200B96224 /* brands.json */; };
 		9F0C2708249777F4001B1908 /* EditButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C2707249777F4001B1908 /* EditButtonStyle.swift */; };
 		9F0C270A24977943001B1908 /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C270924977943001B1908 /* ToggleButton.swift */; };
 		9F2EB23A24961CEE008B2D4E /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2EB23924961CEE008B2D4E /* DescriptionView.swift */; };
@@ -152,6 +154,8 @@
 		73DA971E26238B7800A05C2A /* AddReportButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddReportButtonStyle.swift; sourceTree = "<group>"; };
 		73F0C410262EDB9400B49837 /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
 		73FC296725F95FAE0084BB4E /* ContactCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCore.swift; sourceTree = "<group>"; };
+		8315EB022630765F00B96224 /* colors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = colors.json; sourceTree = "<group>"; };
+		8315EB06263076A200B96224 /* brands.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = brands.json; sourceTree = "<group>"; };
 		9F0C2707249777F4001B1908 /* EditButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditButtonStyle.swift; sourceTree = "<group>"; };
 		9F0C270924977943001B1908 /* ToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		9F2EB23924961CEE008B2D4E /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
@@ -374,6 +378,8 @@
 			children = (
 				734BED402618EE5A00CCA2ED /* districts.json */,
 				9FDB5B422498BBC600BE2AEA /* charges.json */,
+				8315EB022630765F00B96224 /* colors.json */,
+				8315EB06263076A200B96224 /* brands.json */,
 			);
 			path = JSON;
 			sourceTree = "<group>";
@@ -622,9 +628,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				7313764A261F89AE00C5C9B7 /* Colors.xcassets in Resources */,
+				8315EB032630765F00B96224 /* colors.json in Resources */,
 				73719BA6261F137D005E09A3 /* Settings.bundle in Resources */,
 				F834759A234C61CF00244D6F /* LaunchScreen.storyboard in Resources */,
 				F8347597234C61CF00244D6F /* Preview Assets.xcassets in Resources */,
+				8315EB07263076A200B96224 /* brands.json in Resources */,
 				9FB7509424878FDB00193948 /* README.md in Resources */,
 				734BED492618F12600CCA2ED /* Localizable.strings in Resources */,
 				734BED412618EE5A00CCA2ED /* districts.json in Resources */,
