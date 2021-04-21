@@ -44,7 +44,9 @@ struct SettingsView: View {
                     }
                 )
             }
-            Section(header: Text(L10n.Settings.Section.projectTitle)) {
+            Section(
+                header: Text(L10n.Settings.Section.projectTitle)
+            ) {
                 Button(
                     action: { viewStore.send(.openLicensesRowTapped) },
                     label: {
@@ -67,11 +69,18 @@ struct SettingsView: View {
                     }
                 )
             }
+            versionNumberView
         }
         .foregroundColor(Color(.label))
         .navigationTitle(L10n.Settings.title)
     }
 
+    private var versionNumberView: some View {
+        Text("Version: \(Bundle.main.versionNumber).\(Bundle.main.buildNumber)")
+            .frame(maxWidth: .infinity)
+            .font(.subheadline)
+    }
+    
     private var linkIcon: some View {
         Image(systemName: "link.circle.fill")
             .font(.title)
