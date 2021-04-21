@@ -17,16 +17,16 @@ struct SubmitButtonStyle: ViewModifier {
 }
 
 struct ReadySubmitButton: View {
-    let ordnungsamt: String?
+    let district: String?
     var disabled: Bool = false
 
     var body: some View {
         HStack {
             Image(systemName: "envelope.fill")
             VStack(alignment: .leading) {
-                Text("Anzeige aufgeben").font(.headline)
-                if let amt = ordnungsamt {
-                    Text("Ordnungsamt \(amt)").font(.caption)
+                Text("Anzeige erstatten").font(.headline)
+                if let amt = district {
+                    Text("Bezirk \(amt)").font(.caption)
                 }
             }
         }
@@ -67,7 +67,7 @@ struct SubmitButton: View {
     enum Status {
         case unsupportedLocation
         case missingData
-        case readyToSubmit(ordnungsamt: String?)
+        case readyToSubmit(district: String?)
     }
 
     var body: some View {
@@ -77,10 +77,10 @@ struct SubmitButton: View {
                 return AnyView(MissingDataButton())
             case .unsupportedLocation:
                 return AnyView(UnsupportedLocationButton())
-            case let .readyToSubmit(ordnungsamt: ordnungsamt):
+            case let .readyToSubmit(district: district):
                 return AnyView(
                     ReadySubmitButton(
-                        ordnungsamt: ordnungsamt,
+                        district: district,
                         disabled: disabled
                     )
                 )
@@ -95,15 +95,15 @@ struct SubmitButton_Previews: PreviewProvider {
         VStack {
             UnsupportedLocationButton()
             MissingDataButton()
-            ReadySubmitButton(ordnungsamt: "Hamburg", disabled: true)
-            ReadySubmitButton(ordnungsamt: "Hamburg", disabled: false)
+            ReadySubmitButton(district: "Hamburg", disabled: true)
+            ReadySubmitButton(district: "Hamburg", disabled: false)
             SubmitButton(state: .unsupportedLocation) {
                 print("yes")
             }
             SubmitButton(state: .missingData) {
                 print("yes")
             }
-            SubmitButton(state: .readyToSubmit(ordnungsamt: "Hamburg")) {
+            SubmitButton(state: .readyToSubmit(district: "Hamburg")) {
                 print("yes")
             }
         }

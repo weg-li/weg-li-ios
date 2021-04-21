@@ -38,7 +38,7 @@ struct MailContentView: View {
     var body: some View {
         VStack(spacing: 6) {
             SubmitButton(
-                state: .readyToSubmit(ordnungsamt: viewStore.districtName),
+                state: .readyToSubmit(district: viewStore.districtName),
                 disabled: viewStore.isSubmitButtonDisabled
             ) {
                 viewStore.send(.submitButtonTapped)
