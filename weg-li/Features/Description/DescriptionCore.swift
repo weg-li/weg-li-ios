@@ -61,9 +61,10 @@ extension DescriptionState {
 }
 
 extension DescriptionState {
-    static let charges: [String] = {
-        var all = Bundle.main.decode([String].self, from: "charges.json")
-        all.insert("", at: 0)
+    static let charges: [(key: String, value: String)] = {
+        var all = Bundle.main.decode([String: String].self, from: "charges.json")
+            .compactMap { $0 }
+        all.insert(("", ""), at: 0)
         return all
     }()
 

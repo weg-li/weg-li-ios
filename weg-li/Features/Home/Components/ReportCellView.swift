@@ -32,7 +32,7 @@ struct ReportCellView: View {
                             .accessibility(hidden: true)
                         VStack(alignment: .leading, spacing: 4) {
                             Text(report.description.time)
-                            Text(DescriptionState.charges[report.description.selectedType])
+                            Text(DescriptionState.charges[report.description.selectedType].value)
                         }
                         .font(.body)
                     }

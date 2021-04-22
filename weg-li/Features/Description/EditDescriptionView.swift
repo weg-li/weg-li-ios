@@ -56,7 +56,7 @@ struct EditDescriptionView: View {
                     )
                 ) {
                     ForEach(1..<DescriptionState.charges.count, id: \.self) {
-                        Text(DescriptionState.charges[$0])
+                        Text(DescriptionState.charges[$0].value)
                             .tag($0)
                             .foregroundColor(Color(.label))
                     }

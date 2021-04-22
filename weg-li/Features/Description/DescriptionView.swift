@@ -10,7 +10,7 @@ struct DescriptionView: View {
 
         init(state: Report) {
             description = state.description
-            chargeType = DescriptionState.charges[state.description.selectedType]
+            chargeType = DescriptionState.charges[state.description.selectedType].value
         }
     }
 
