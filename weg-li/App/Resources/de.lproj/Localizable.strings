@@ -139,6 +139,8 @@
 
 "settings.row.contribute" = "Beitragen";
 
+"settings.row.donate" = "Spenden";
+
 
 // Times
 "times.description.upTo3" = "bis zu 3 Minuten";

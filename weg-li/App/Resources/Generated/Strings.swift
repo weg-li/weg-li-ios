@@ -174,6 +174,8 @@ internal enum L10n {
     internal enum Row {
       /// Beitragen
       internal static let contribute = L10n.tr("Localizable", "settings.row.contribute")
+      /// Spenden
+      internal static let donate = L10n.tr("Localizable", "settings.row.donate")
       /// Impressum
       internal static let imprint = L10n.tr("Localizable", "settings.row.imprint")
       /// Lizenzen
