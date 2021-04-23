@@ -43,6 +43,16 @@ struct SettingsView: View {
                         }
                     }
                 )
+                Button(
+                    action: { viewStore.send(.donateTapped) },
+                    label: {
+                        HStack {
+                            Text(L10n.Settings.Row.donate)
+                            Spacer()
+                            linkIcon
+                        }
+                    }
+                )
             }
             Section(
                 header: Text(L10n.Settings.Section.projectTitle)
