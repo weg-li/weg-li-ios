@@ -25,7 +25,7 @@ extension Mail {
 
         Adresse: \(report.contact.address.humanReadableAddress)
 
-        Verstoß: \(DescriptionState.charges[report.description.selectedType])
+        Verstoß: \(DescriptionState.charges[report.description.selectedType].value)
 
         Tatzeit: \(report.date.humandReadableTime)
 

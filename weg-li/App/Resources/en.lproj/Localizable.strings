@@ -29,7 +29,7 @@
 // Photos
 "photos.widgetTitle" = "Fotos";
 
-"photos.importButton.copy" = "Fotos importieren";
+"photos.importButton.copy" = "Fotos auswählen";
 
 "photos.alert.accessDenied" = "Um Fotos hinzuzufügen braucht die App deine Zustimmung";
 
