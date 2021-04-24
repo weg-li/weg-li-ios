@@ -19,7 +19,6 @@ struct ReportForm: View {
             isResetButtonDisabled = state.location.resolvedAddress == .empty
                 && state.images.storedPhotos.isEmpty
                 && state.description == .init()
-                && state.contact == .empty
         }
     }
 

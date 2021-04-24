@@ -25,11 +25,19 @@
 
 "report.alert.reset" = "Zurücksetzen";
 
+"report.error.images" = "Die Anzeige enthält keine Bilder";
+
+"report.error.location" = "Die Anzeige enthält keine Adresse der Tat";
+
+"report.error.description" = "Die Anzeige enthält keine Beschreibung";
+
+"report.error.contact" = "Die Anzeige enthält keine Kontaktdaten";
+
 
 // Photos
 "photos.widgetTitle" = "Fotos";
 
-"photos.importButton.copy" = "Fotos importieren";
+"photos.importButton.copy" = "Fotos auswählen";
 
 "photos.alert.accessDenied" = "Um Fotos hinzuzufügen braucht die App deine Zustimmung";
 
@@ -83,6 +91,10 @@
 // Contact
 "contact.widgetTitle" = "Kontaktdaten";
 
+"contact.section.required" = "Erforderlich";
+
+"contact.section.optional" = "Optional";
+
 "contact.row.nameCopy" = "Name";
 
 "contact.row.streetCopy" = "Strasse";
@@ -90,6 +102,10 @@
 "contact.row.cityCopy" = "Stadt";
 
 "contact.row.phoneCopy" = "Telefon";
+
+"contact.row.dateOfBirth" = "Geburtstag";
+
+"contact.row.addressAddition" = "Addresszusatz";
 
 "contact.editButtonCopy" =  "Kontaktdaten bearbeiten";
 
@@ -150,3 +166,9 @@
 "times.description.longerThenNStunde" = "länger als %@ Stunde";
 
 "times.description.longerThenNStunden" = "länger als %@ Stunden";
+
+
+// SubmitButton
+"button.submit.title" = "Anzeige erstatten";
+
+"button.submit.district" = "Bezirk: %@";

@@ -24,9 +24,9 @@ struct ReadySubmitButton: View {
         HStack {
             Image(systemName: "envelope.fill")
             VStack(alignment: .leading) {
-                Text("Anzeige erstatten").font(.headline)
+                Text(L10n.Button.Submit.title).font(.headline)
                 if let amt = district {
-                    Text("Bezirk \(amt)").font(.caption)
+                    Text(L10n.Button.Submit.district(amt)).font(.caption)
                 }
             }
         }
