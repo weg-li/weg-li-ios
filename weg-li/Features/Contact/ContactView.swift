@@ -15,7 +15,7 @@ struct ContactView: View {
     var body: some View {
         VStack {
             Form {
-                Section {
+                Section(header: Text(L10n.Contact.Section.required)) {
                     dataRow(
                         type: .firstName,
                         textFieldBinding: viewStore.binding(
@@ -53,11 +53,27 @@ struct ContactView: View {
                             )
                         )
                     }
+                }
+                Section(header: Text(L10n.Contact.Section.optional)) {
                     dataRow(
                         type: .phone,
                         textFieldBinding: viewStore.binding(
                             get: \.phone,
                             send: ContactAction.phoneChanged
+                        )
+                    )
+                    dataRow(
+                        type: .dateOfBirth,
+                        textFieldBinding: viewStore.binding(
+                            get: \.dateOfBirth,
+                            send: ContactAction.dateOfBirthChanged
+                        )
+                    )
+                    dataRow(
+                        type: .addressAddition,
+                        textFieldBinding: viewStore.binding(
+                            get: \.address.addition,
+                            send: ContactAction.addressAdditionChanged
                         )
                     )
                 }

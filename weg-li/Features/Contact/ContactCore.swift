@@ -9,12 +9,14 @@ struct ContactState: Equatable, Codable {
         var street: String = ""
         var postalCode: String = ""
         var city: String = ""
+        var addition: String = ""
     }
 
     var firstName: String = ""
     var name: String = ""
     var address: Address = .init()
     var phone: String = ""
+    var dateOfBirth: String = ""
 
     var alert: AlertState<ContactAction>?
 
@@ -22,7 +24,6 @@ struct ContactState: Equatable, Codable {
         [
             firstName,
             name,
-            phone,
             address.street,
             address.city
         ].allSatisfy { !$0.isEmpty }
@@ -80,6 +81,8 @@ enum ContactAction: Equatable {
     case streetChanged(String)
     case zipCodeChanged(String)
     case townChanged(String)
+    case dateOfBirthChanged(String)
+    case addressAdditionChanged(String)
     case resetContactDataButtonTapped
     case resetContactConfirmButtonTapped
     case dismissAlert
@@ -110,6 +113,12 @@ let contactReducer = Reducer<ContactState, ContactAction, ContactEnvironment> { 
         return .none
     case let .zipCodeChanged(zipCode):
         state.address.postalCode = zipCode
+        return .none
+    case let .dateOfBirthChanged(date):
+        state.dateOfBirth = date
+        return .none
+    case let .addressAdditionChanged(addition):
+        state.address.addition = addition
         return .none
     case .resetContactDataButtonTapped:
         state.alert = .resetContactDataAlert

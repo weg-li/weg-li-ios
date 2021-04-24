@@ -11,6 +11,8 @@ struct ContactWidget: View {
         let postalCode: String
         let city: String
         let phone: String
+        let dateOfBirth: String
+        let addressAddition: String
 
         init(state: ContactState) {
             firstName = state.firstName
@@ -19,6 +21,8 @@ struct ContactWidget: View {
             postalCode = state.address.postalCode
             city = state.address.city
             phone = state.phone
+            dateOfBirth = state.dateOfBirth
+            addressAddition = state.address.addition
         }
     }
 
@@ -35,7 +39,15 @@ struct ContactWidget: View {
             row(callout: L10n.Contact.Row.nameCopy, content: "\(viewStore.firstName) \(viewStore.name)")
             row(callout: L10n.Contact.Row.streetCopy, content: viewStore.street)
             row(callout: L10n.Contact.Row.cityCopy, content: "\(viewStore.postalCode) \(viewStore.city)")
-            row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.phone)
+            if !viewStore.phone.isEmpty {
+                row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.phone)
+            }
+            if !viewStore.dateOfBirth.isEmpty {
+                row(callout: L10n.Contact.Row.dateOfBirth, content: viewStore.dateOfBirth)
+            }
+            if !viewStore.addressAddition.isEmpty {
+                row(callout: L10n.Contact.Row.addressAddition, content: viewStore.addressAddition)
+            }
             VStack(spacing: 8.0) {
                 NavigationLink(
                     destination: ContactView(
@@ -45,8 +57,11 @@ struct ContactWidget: View {
                         )
                     ),
                     label: {
-                        Text(L10n.Contact.editButtonCopy)
-                            .frame(maxWidth: .infinity)
+                        HStack {
+                            Image(systemName: "pencil")
+                            Text(L10n.Contact.editButtonCopy)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                 )
                 .buttonStyle(EditButtonStyle())

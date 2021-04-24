@@ -4,7 +4,7 @@ import Foundation
 import UIKit
 
 enum RowType {
-    case firstName, lastName, street, town, zipCode, phone
+    case firstName, lastName, street, town, zipCode, phone, dateOfBirth, addressAddition
 
     var label: String {
         switch self {
@@ -14,6 +14,8 @@ enum RowType {
         case .town: return L10n.Contact.RowType.city
         case .zipCode: return L10n.Contact.RowType.zipCode
         case .phone: return L10n.Contact.RowType.phone
+        case .dateOfBirth: return L10n.Contact.Row.dateOfBirth
+        case .addressAddition: return L10n.Contact.Row.addressAddition
         }
     }
 
@@ -25,6 +27,8 @@ enum RowType {
         case .town: return "Hamburg"
         case .zipCode: return "20095"
         case .phone: return "+491235346435"
+        case .dateOfBirth: return "01.01.2001"
+        case .addressAddition: return "Hinterhaus"
         }
     }
 
@@ -36,6 +40,7 @@ enum RowType {
         case .town: return .addressCity
         case .zipCode: return .postalCode
         case .phone: return .telephoneNumber
+        case .dateOfBirth, .addressAddition: return nil
         }
     }
 
@@ -43,6 +48,7 @@ enum RowType {
         switch self {
         case .phone: return .phonePad
         case .zipCode: return .numberPad
+        case .dateOfBirth: return .numbersAndPunctuation
         default: return .default
         }
     }

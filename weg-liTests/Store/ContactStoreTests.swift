@@ -98,7 +98,37 @@ class ContactStoreTests: XCTestCase {
             }
         )
     }
+    
+    func test_changeDateOfBirth_shouldUpdateState() {
+        let store = TestStore(
+            initialState: ContactState.preview,
+            reducer: contactReducer,
+            environment: ContactEnvironment()
+        )
 
+        let newValue = "01.01.2992"
+        store.assert(
+            .send(.dateOfBirthChanged(newValue)) {
+                $0.dateOfBirth = newValue
+            }
+        )
+    }
+    
+    func test_changeAddressAddition_shouldUpdateState() {
+        let store = TestStore(
+            initialState: ContactState.preview,
+            reducer: contactReducer,
+            environment: ContactEnvironment()
+        )
+
+        let newValue = "Hinterhaus"
+        store.assert(
+            .send(.addressAdditionChanged(newValue)) {
+                $0.address.addition = newValue
+            }
+        )
+    }
+    
     func test_setEmptyValues_shouldInvalidContact() {
         let store = TestStore(
             initialState: ContactState.preview,
