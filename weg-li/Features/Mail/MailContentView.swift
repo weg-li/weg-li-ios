@@ -10,10 +10,20 @@ struct MailContentView: View {
         let districtName: String?
         let isSubmitButtonDisabled: Bool
         let isMailComposerPresented: Bool
+        
+        let isImagesValid: Bool
+        let isLocationValid: Bool
+        let isDescriptionValid: Bool
+        let isContactValid: Bool
 
         init(state: Report) {
             districtName = state.district?.name
-            let isValid = !state.images.storedPhotos.isEmpty
+            isImagesValid  = state.images.isValid
+            isLocationValid = state.location.resolvedAddress.isValid
+            isDescriptionValid = state.description.isValid
+            isContactValid = state.contact.isValid
+            
+            let isValid = state.images.isValid
                 && state.contact.isValid
                 && state.description.isValid
                 && state.location.resolvedAddress.isValid
@@ -49,8 +59,24 @@ struct MailContentView: View {
                     Text(L10n.Mail.deviceErrorCopy)
                 }
                 if viewStore.isSubmitButtonDisabled {
-                    Text(L10n.Mail.readyToSubmitErrorCopy)
-                        .fontWeight(.semibold)
+                    VStack(spacing: 8) {
+                        Text(L10n.Mail.readyToSubmitErrorCopy)
+                            .fontWeight(.semibold)
+                        VStack(spacing: 4) {
+                            if !viewStore.isImagesValid {
+                                Text(L10n.Report.Error.images)
+                            }
+                            if !viewStore.isLocationValid {
+                                Text(L10n.Report.Error.location.asBulletPoint)
+                            }
+                            if !viewStore.isDescriptionValid {
+                                Text(L10n.Report.Error.description.asBulletPoint)
+                            }
+                            if !viewStore.isContactValid {
+                                Text(L10n.Report.Error.contact.asBulletPoint)
+                            }
+                        }
+                    }
                 }
             }
             .foregroundColor(.red)
@@ -63,6 +89,12 @@ struct MailContentView: View {
         )) {
             MailView(store: store)
         }
+    }
+}
+
+private extension String {
+    var asBulletPoint: Self {
+        "\u{2022} \(self)"
     }
 }
 
