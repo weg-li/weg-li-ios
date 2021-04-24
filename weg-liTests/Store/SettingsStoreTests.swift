@@ -76,7 +76,7 @@ class SettingsStoreTests: XCTestCase {
         )
         XCTAssertEqual(openedUrl, env.gitHubProjectLink)
     }
-    
+
     func test_donateTapped_shouldCallURL() {
         var openedUrl: URL!
 

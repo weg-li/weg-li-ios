@@ -98,7 +98,7 @@ struct ContactWidget: View {
             }
         )
     }
-    
+
     private var resetButton: some View {
         Button(
             action: { viewStore.send(.contact(.resetContactDataButtonTapped)) },

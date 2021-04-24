@@ -69,9 +69,10 @@ struct DescriptionView: View {
             isPresented: viewStore.binding(
                 get: \.showEditScreen,
                 send: ReportAction.setShowEditDescription
-        ), content: {
-            EditDescriptionView(store: store)
-        })
+            ), content: {
+                EditDescriptionView(store: store)
+            }
+        )
     }
 
     private func row(title: String, content: String) -> some View {

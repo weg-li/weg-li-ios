@@ -10,7 +10,7 @@ struct MailContentView: View {
         let districtName: String?
         let isSubmitButtonDisabled: Bool
         let isMailComposerPresented: Bool
-        
+
         let isImagesValid: Bool
         let isLocationValid: Bool
         let isDescriptionValid: Bool
@@ -18,11 +18,11 @@ struct MailContentView: View {
 
         init(state: Report) {
             districtName = state.district?.name
-            isImagesValid  = state.images.isValid
+            isImagesValid = state.images.isValid
             isLocationValid = state.location.resolvedAddress.isValid
             isDescriptionValid = state.description.isValid
             isContactValid = state.contact.isValid
-            
+
             let isValid = state.images.isValid
                 && state.contact.isValid
                 && state.description.isValid

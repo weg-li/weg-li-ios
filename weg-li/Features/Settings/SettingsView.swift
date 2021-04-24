@@ -90,7 +90,7 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity)
             .font(.subheadline)
     }
-    
+
     private var linkIcon: some View {
         Image(systemName: "link.circle.fill")
             .font(.title)

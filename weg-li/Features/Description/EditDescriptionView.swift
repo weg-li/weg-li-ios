@@ -97,7 +97,7 @@ struct EditDescriptionView: View {
             .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
         }
     }
-    
+
     private var closeButton: some View {
         Button(
             action: { viewStore.send(.setShowEditDescription(false)) },

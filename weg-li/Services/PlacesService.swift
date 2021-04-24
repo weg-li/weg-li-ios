@@ -23,7 +23,7 @@ extension PlacesServiceClient {
                     return promise(
                         .success(
                             marks
-                                .compactMap { $0.postalAddress }
+                                .compactMap(\.postalAddress)
                                 .map { GeoAddress(address: $0) }
                         )
                     )

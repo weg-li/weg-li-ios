@@ -15,7 +15,7 @@ class DescriptionStoreTests: XCTestCase {
         store.assert(
             .send(.setColor(1)) { state in
                 state.selectedColor = 1
-                
+
                 XCTAssertEqual(DescriptionState.colors[1].value, "Beige")
             }
         )
@@ -31,7 +31,7 @@ class DescriptionStoreTests: XCTestCase {
         store.assert(
             .send(.setBrand(1)) { state in
                 state.selectedBrand = 1
-                
+
                 XCTAssertEqual(DescriptionState.brands[1], "Abarth")
             }
         )
@@ -69,7 +69,7 @@ class DescriptionStoreTests: XCTestCase {
         store.assert(
             .send(.setCharge(1)) { state in
                 state.selectedType = 1
-                
+
                 XCTAssertEqual(DescriptionState.charges[1].value, "Parken an einer engen/unübersichtlichen Straßenstelle")
             }
         )

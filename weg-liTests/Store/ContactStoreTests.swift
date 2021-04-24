@@ -98,7 +98,7 @@ class ContactStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_changeDateOfBirth_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
@@ -113,7 +113,7 @@ class ContactStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_changeAddressAddition_shouldUpdateState() {
         let store = TestStore(
             initialState: ContactState.preview,
@@ -128,7 +128,7 @@ class ContactStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_setEmptyValues_shouldInvalidContact() {
         let store = TestStore(
             initialState: ContactState.preview,

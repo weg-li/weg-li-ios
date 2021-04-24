@@ -11,7 +11,7 @@ struct Mail: Equatable, Codable {
 
 extension Mail {
     static func createMailBody(from report: Report) -> String {
-        return """
+        """
         Sehr geehrte Damen und Herren,
 
 

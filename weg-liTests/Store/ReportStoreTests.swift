@@ -440,7 +440,7 @@ class ReportStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_setShowContact_shouldPresentAnAlert() {
         let store = TestStore(
             initialState: Report(
@@ -477,7 +477,7 @@ class ReportStoreTests: XCTestCase {
             }
         )
     }
-    
+
     func test_setShowDescription_shouldPresentAnAlert() {
         let store = TestStore(
             initialState: Report(

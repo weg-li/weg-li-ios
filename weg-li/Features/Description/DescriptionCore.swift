@@ -65,26 +65,27 @@ extension DescriptionState {
         all.insert(("", ""), at: 0) // insert empty object for picker to start without initial selection
         return all
     }()
-    
+
     static let colors: [(key: String, value: String)] = {
         var all = Bundle.main.decode(
             [String: String].self, from: "colors.json",
-            keyDecodingStrategy: .convertFromSnakeCase)
-            .compactMap { $0 }
-            .sorted { a, b -> Bool in
-                a.value < b.value
-            }
+            keyDecodingStrategy: .convertFromSnakeCase
+        )
+        .compactMap { $0 }
+        .sorted { a, b -> Bool in
+            a.value < b.value
+        }
         all.insert(("", ""), at: 0) // insert empty object for picker to start without initial selection
         return all
     }()
-    
+
     static let brands: [String] = {
         var all = Bundle.main.decode([String].self, from: "brands.json")
-        all.insert((""), at: 0) // insert empty object for picker to start without initial selection
+        all.insert("", at: 0) // insert empty object for picker to start without initial selection
         return all
     }()
-    
+
     static let times = Times.allCases
-    
+
     var time: String { Times.allCases[selectedDuration].description }
 }

@@ -23,7 +23,7 @@ struct ImagesViewState: Equatable, Codable {
                 .map { ImageState(id: $0.id, image: $0) }
         )
     }
-    
+
     var isValid: Bool {
         !storedPhotos.isEmpty
     }

@@ -19,7 +19,7 @@ struct Report: Codable {
     var mail: MailViewState
 
     var alert: AlertState<ReportAction>?
-    
+
     var showEditDescription = false
     var showEditContact = false
 
@@ -50,7 +50,7 @@ struct Report: Codable {
 
 extension Report: Equatable {
     static func == (lhs: Report, rhs: Report) -> Bool {
-        return lhs.contact == rhs.contact
+        lhs.contact == rhs.contact
             && lhs.district == rhs.district
             && lhs.description == rhs.description
             && lhs.location == rhs.location
