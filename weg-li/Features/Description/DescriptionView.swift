@@ -7,9 +7,13 @@ struct DescriptionView: View {
     struct ViewState: Equatable {
         let description: DescriptionState
         let chargeType: String
+        let brand: String
+        let color: String
 
         init(state: Report) {
             description = state.description
+            brand = DescriptionState.brands[state.description.selectedBrand]
+            color = DescriptionState.colors[state.description.selectedColor].value
             chargeType = DescriptionState.charges[state.description.selectedType].value
         }
     }
@@ -25,8 +29,8 @@ struct DescriptionView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 12) {
-                row(title: L10n.Description.Row.carType, content: viewStore.description.type)
-                row(title: L10n.Description.Row.carColor, content: viewStore.description.color)
+                row(title: L10n.Description.Row.carType, content: viewStore.brand)
+                row(title: L10n.Description.Row.carColor, content: viewStore.color)
                 row(title: L10n.Description.Row.licensplateNumber, content: viewStore.description.licensePlateNumber)
                 row(title: L10n.Description.Row.length, content: viewStore.description.time)
                 row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)

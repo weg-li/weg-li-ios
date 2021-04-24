@@ -231,9 +231,9 @@ extension Report {
             ),
             date: Date.init,
             description: .init(
-                color: "Gelb",
-                type: "Kleinbus",
                 licensePlateNumber: "HH-ST-PAULI",
+                selectedColor: 0,
+                selectedBrand: 0,
                 selectedDuration: 0,
                 selectedType: 0,
                 blockedOthers: false

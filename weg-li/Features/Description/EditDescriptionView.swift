@@ -24,26 +24,38 @@ struct EditDescriptionView: View {
         Form {
             Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
                 TextField(
-                    L10n.Description.Row.carType,
-                    text: viewStore.binding(
-                        get: \.description.type,
-                        send: { ReportAction.description(.setType($0)) }
-                    )
-                )
-                TextField(
-                    L10n.Description.Row.carColor,
-                    text: viewStore.binding(
-                        get: \.description.color,
-                        send: { ReportAction.description(.setColor($0)) }
-                    )
-                )
-                TextField(
-                    L10n.Description.Row.licensplateNumber,
+                    "\(L10n.Description.Row.licensplateNumber) *",
                     text: viewStore.binding(
                         get: \.description.licensePlateNumber,
                         send: { ReportAction.description(.setLicensePlateNumber($0)) }
                     )
                 )
+                Picker(
+                    L10n.Description.Row.carType,
+                    selection: viewStore.binding(
+                        get: \.description.selectedBrand,
+                        send: { ReportAction.description(.setBrand($0)) }
+                    )
+                ) {
+                    ForEach(1..<DescriptionState.brands.count, id: \.self) {
+                        Text(DescriptionState.brands[$0])
+                            .tag($0)
+                            .foregroundColor(Color(.label))
+                    }
+                }
+                Picker(
+                    L10n.Description.Row.carColor,
+                    selection: viewStore.binding(
+                        get: \.description.selectedColor,
+                        send: { ReportAction.description(.setColor($0)) }
+                    )
+                ) {
+                    ForEach(1..<DescriptionState.colors.count, id: \.self) {
+                        Text(DescriptionState.colors[$0].value)
+                            .tag($0)
+                            .foregroundColor(Color(.label))
+                    }
+                }
             }
             .padding(.top, 4)
             .textFieldStyle(PlainTextFieldStyle())

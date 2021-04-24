@@ -74,14 +74,14 @@ class ReportStoreTests: XCTestCase {
             )
         )
 
-        let color = "Red"
-        let type = "Plymouth Valiant"
+        let color = 1
+        let type = 2
         store.assert(
             .send(.description(.setColor(color))) {
-                $0.description.color = color
+                $0.description.selectedColor = color
             },
-            .send(.description(.setType(type))) {
-                $0.description.type = type
+            .send(.description(.setBrand(type))) {
+                $0.description.selectedBrand = type
             }
         )
     }

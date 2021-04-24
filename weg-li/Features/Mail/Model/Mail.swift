@@ -19,9 +19,9 @@ extension Mail {
 
         Kennzeichen: \(report.description.licensePlateNumber)
 
-        Marke: \(report.description.type)
+        Marke: \(report.description.selectedType)
 
-        Farbe: \(report.description.color)
+        Farbe: \(DescriptionState.colors[report.description.selectedColor].value)
 
         Adresse: \(report.contact.address.humanReadableAddress)
 
