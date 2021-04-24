@@ -52,7 +52,7 @@ struct ReportForm: View {
                 Widget(
                     title: Text(L10n.Report.Contact.widgetTitle),
                     isCompleted: viewStore.isContactValid
-                ) { ContactWidget(store: store.scope(state: { $0.contact })) }
+                ) { ContactWidget(store: store.scope(state: { $0 })) }
                 MailContentView(store: store)
                     .padding()
             }
@@ -66,7 +66,7 @@ struct ReportForm: View {
         Button(
             action: { viewStore.send(.resetButtonTapped) },
             label: {
-                Text(L10n.Report.Alert.reset)
+                Image(systemName: "arrow.counterclockwise")
                     .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
             }
         )

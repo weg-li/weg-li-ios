@@ -12,6 +12,8 @@ import Foundation
 internal enum L10n {
 
   internal enum Button {
+    /// Abbrechen
+    internal static let close = L10n.tr("Localizable", "button.close")
     internal enum Submit {
       /// Bezirk: %@
       internal static func district(_ p1: Any) -> String {

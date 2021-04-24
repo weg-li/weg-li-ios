@@ -440,4 +440,78 @@ class ReportStoreTests: XCTestCase {
             }
         )
     }
+    
+    func test_setShowContact_shouldPresentAnAlert() {
+        let store = TestStore(
+            initialState: Report(
+                uuid: fixedUUID(),
+                images: .init(),
+                contact: .empty,
+                district: nil,
+                date: fixedDate,
+                description: .init(),
+                location: .init(
+                    locationOption: .fromPhotos,
+                    isMapExpanded: false,
+                    isResolvingAddress: false,
+                    resolvedAddress: .init(
+                        street: "TestStrasse 3",
+                        city: "Berlin",
+                        postalCode: "1243"
+                    ),
+                    userLocationState: .init()
+                )
+            ),
+            reducer: reportReducer,
+            environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+                locationManager: LocationManager.unimplemented(),
+                placeService: .noop,
+                regulatoryOfficeMapper: .noop
+            )
+        )
+
+        store.assert(
+            .send(.setShowEditContact(true)) {
+                $0.showEditContact = true
+            }
+        )
+    }
+    
+    func test_setShowDescription_shouldPresentAnAlert() {
+        let store = TestStore(
+            initialState: Report(
+                uuid: fixedUUID(),
+                images: .init(),
+                contact: .empty,
+                district: nil,
+                date: fixedDate,
+                description: .init(),
+                location: .init(
+                    locationOption: .fromPhotos,
+                    isMapExpanded: false,
+                    isResolvingAddress: false,
+                    resolvedAddress: .init(
+                        street: "TestStrasse 3",
+                        city: "Berlin",
+                        postalCode: "1243"
+                    ),
+                    userLocationState: .init()
+                )
+            ),
+            reducer: reportReducer,
+            environment: ReportEnvironment(
+                mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+                locationManager: LocationManager.unimplemented(),
+                placeService: .noop,
+                regulatoryOfficeMapper: .noop
+            )
+        )
+
+        store.assert(
+            .send(.setShowEditDescription(true)) {
+                $0.showEditDescription = true
+            }
+        )
+    }
 }

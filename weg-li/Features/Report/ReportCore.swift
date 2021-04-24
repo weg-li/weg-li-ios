@@ -19,6 +19,9 @@ struct Report: Codable {
     var mail: MailViewState
 
     var alert: AlertState<ReportAction>?
+    
+    var showEditDescription = false
+    var showEditContact = false
 
     init(
         uuid: UUID = UUID(),
@@ -64,6 +67,8 @@ enum ReportAction: Equatable {
     case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
     case resetButtonTapped
     case resetConfirmButtonTapped
+    case setShowEditDescription(Bool)
+    case setShowEditContact(Bool)
     case dismissAlert
 }
 
@@ -205,6 +210,12 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         case .resetConfirmButtonTapped:
             // Reset report will be handled in the homeReducer
             return Effect(value: .dismissAlert)
+        case let .setShowEditDescription(value):
+            state.showEditDescription = value
+            return .none
+        case let .setShowEditContact(value):
+            state.showEditContact = value
+            return .none
         case .dismissAlert:
             state.alert = nil
             return .none

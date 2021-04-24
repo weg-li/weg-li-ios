@@ -21,74 +21,88 @@ struct EditDescriptionView: View {
     }
 
     var body: some View {
-        Form {
-            Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
-                TextField(
-                    "\(L10n.Description.Row.licensplateNumber) *",
-                    text: viewStore.binding(
-                        get: \.description.licensePlateNumber,
-                        send: { ReportAction.description(.setLicensePlateNumber($0)) }
+        NavigationView {
+            Form {
+                Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
+                    TextField(
+                        "\(L10n.Description.Row.licensplateNumber) *",
+                        text: viewStore.binding(
+                            get: \.description.licensePlateNumber,
+                            send: { ReportAction.description(.setLicensePlateNumber($0)) }
+                        )
                     )
-                )
-                Picker(
-                    L10n.Description.Row.carType,
-                    selection: viewStore.binding(
-                        get: \.description.selectedBrand,
-                        send: { ReportAction.description(.setBrand($0)) }
-                    )
-                ) {
-                    ForEach(1..<DescriptionState.brands.count, id: \.self) {
-                        Text(DescriptionState.brands[$0])
-                            .tag($0)
-                            .foregroundColor(Color(.label))
+                    Picker(
+                        L10n.Description.Row.carType,
+                        selection: viewStore.binding(
+                            get: \.description.selectedBrand,
+                            send: { ReportAction.description(.setBrand($0)) }
+                        )
+                    ) {
+                        ForEach(1..<DescriptionState.brands.count, id: \.self) {
+                            Text(DescriptionState.brands[$0])
+                                .tag($0)
+                                .foregroundColor(Color(.label))
+                        }
+                        .navigationTitle(Text(L10n.Description.Row.carType))
+                    }
+                    Picker(
+                        L10n.Description.Row.carColor,
+                        selection: viewStore.binding(
+                            get: \.description.selectedColor,
+                            send: { ReportAction.description(.setColor($0)) }
+                        )
+                    ) {
+                        ForEach(1..<DescriptionState.colors.count, id: \.self) {
+                            Text(DescriptionState.colors[$0].value)
+                                .tag($0)
+                                .foregroundColor(Color(.label))
+                        }
+                        .navigationTitle(Text(L10n.Description.Row.carColor))
                     }
                 }
-                Picker(
-                    L10n.Description.Row.carColor,
-                    selection: viewStore.binding(
-                        get: \.description.selectedColor,
-                        send: { ReportAction.description(.setColor($0)) }
-                    )
-                ) {
-                    ForEach(1..<DescriptionState.colors.count, id: \.self) {
-                        Text(DescriptionState.colors[$0].value)
-                            .tag($0)
-                            .foregroundColor(Color(.label))
+                .padding(.top, 4)
+                .textFieldStyle(PlainTextFieldStyle())
+                Section(header: Text(L10n.Description.Section.Violation.copy)) {
+                    Picker(
+                        L10n.Description.Row.chargeType,
+                        selection: viewStore.binding(
+                            get: \.description.selectedType,
+                            send: { ReportAction.description(.setCharge($0)) }
+                        )
+                    ) {
+                        ForEach(1..<DescriptionState.charges.count, id: \.self) {
+                            Text(DescriptionState.charges[$0].value)
+                                .tag($0)
+                                .foregroundColor(Color(.label))
+                        }
+                        .navigationTitle(Text(L10n.Description.Row.chargeType))
                     }
+                    Picker(
+                        L10n.Description.Row.length,
+                        selection: viewStore.binding(
+                            get: \.description.selectedDuration,
+                            send: { ReportAction.description(.setDuraration($0)) }
+                        )
+                    ) {
+                        ForEach(1..<Times.allCases.count, id: \.self) {
+                            Text(Times.allCases[$0].description)
+                                .foregroundColor(Color(.label))
+                        }
+                        .navigationTitle(Text(L10n.Description.Row.length))
+                    }
+                    toggleRow
                 }
             }
-            .padding(.top, 4)
-            .textFieldStyle(PlainTextFieldStyle())
-            Section(header: Text(L10n.Description.Section.Violation.copy)) {
-                Picker(
-                    L10n.Description.Row.chargeType,
-                    selection: viewStore.binding(
-                        get: \.description.selectedType,
-                        send: { ReportAction.description(.setCharge($0)) }
-                    )
-                ) {
-                    ForEach(1..<DescriptionState.charges.count, id: \.self) {
-                        Text(DescriptionState.charges[$0].value)
-                            .tag($0)
-                            .foregroundColor(Color(.label))
-                    }
-                }
-                Picker(
-                    L10n.Description.Row.length,
-                    selection: viewStore.binding(
-                        get: \.description.selectedDuration,
-                        send: { ReportAction.description(.setDuraration($0)) }
-                    )
-                ) {
-                    ForEach(1..<Times.allCases.count, id: \.self) {
-                        Text(Times.allCases[$0].description)
-                            .foregroundColor(Color(.label))
-                    }
-                }
-                toggleRow
-            }
+            .navigationBarItems(leading: closeButton)
+            .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
         }
-        .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
+    }
+    
+    private var closeButton: some View {
+        Button(
+            action: { viewStore.send(.setShowEditDescription(false)) },
+            label: { Text(L10n.Button.close) }
+        )
     }
 
     private var toggleRow: some View {

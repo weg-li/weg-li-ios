@@ -9,12 +9,14 @@ struct DescriptionView: View {
         let chargeType: String
         let brand: String
         let color: String
+        let showEditScreen: Bool
 
         init(state: Report) {
             description = state.description
             brand = DescriptionState.brands[state.description.selectedBrand]
             color = DescriptionState.colors[state.description.selectedColor].value
             chargeType = DescriptionState.charges[state.description.selectedType].value
+            showEditScreen = state.showEditDescription
         }
     }
 
@@ -46,8 +48,8 @@ struct DescriptionView: View {
                     }
                 }
             }
-            NavigationLink(
-                destination: EditDescriptionView(store: store),
+            Button(
+                action: { viewStore.send(.setShowEditDescription(true)) },
                 label: {
                     HStack {
                         Image(systemName: "pencil")
@@ -59,6 +61,17 @@ struct DescriptionView: View {
             .buttonStyle(EditButtonStyle())
             .padding(.top)
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewStore.send(.setShowEditDescription(true))
+        }
+        .sheet(
+            isPresented: viewStore.binding(
+                get: \.showEditScreen,
+                send: ReportAction.setShowEditDescription
+        ), content: {
+            EditDescriptionView(store: store)
+        })
     }
 
     private func row(title: String, content: String) -> some View {

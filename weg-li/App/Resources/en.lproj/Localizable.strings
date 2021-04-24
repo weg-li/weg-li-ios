@@ -172,3 +172,5 @@
 "button.submit.title" = "Anzeige erstatten";
 
 "button.submit.district" = "Bezirk: %@";
+
+"button.close" = "Schließen";

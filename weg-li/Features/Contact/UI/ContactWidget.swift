@@ -13,23 +13,27 @@ struct ContactWidget: View {
         let phone: String
         let dateOfBirth: String
         let addressAddition: String
+        let showEditScreen: Bool
+        let isResetButtonDisabled: Bool
 
-        init(state: ContactState) {
-            firstName = state.firstName
-            name = state.name
-            street = state.address.street
-            postalCode = state.address.postalCode
-            city = state.address.city
-            phone = state.phone
-            dateOfBirth = state.dateOfBirth
-            addressAddition = state.address.addition
+        init(state: Report) {
+            firstName = state.contact.firstName
+            name = state.contact.name
+            street = state.contact.address.street
+            postalCode = state.contact.address.postalCode
+            city = state.contact.address.city
+            phone = state.contact.phone
+            dateOfBirth = state.contact.dateOfBirth
+            addressAddition = state.contact.address.addition
+            showEditScreen = state.showEditContact
+            isResetButtonDisabled = state.contact == .empty
         }
     }
 
-    let store: Store<ContactState, ReportAction>
+    let store: Store<Report, ReportAction>
     @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
 
-    init(store: Store<ContactState, ReportAction>) {
+    init(store: Store<Report, ReportAction>) {
         self.store = store
         viewStore = ViewStore(store.scope(state: ViewState.init))
     }
@@ -49,13 +53,8 @@ struct ContactWidget: View {
                 row(callout: L10n.Contact.Row.addressAddition, content: viewStore.addressAddition)
             }
             VStack(spacing: 8.0) {
-                NavigationLink(
-                    destination: ContactView(
-                        store: store.scope(
-                            state: { $0 },
-                            action: ReportAction.contact
-                        )
-                    ),
+                Button(
+                    action: { viewStore.send(.setShowEditContact(true)) },
                     label: {
                         HStack {
                             Image(systemName: "pencil")
@@ -72,6 +71,43 @@ struct ContactWidget: View {
             }
             .fixedSize(horizontal: false, vertical: true)
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewStore.send(.setShowEditContact(true))
+        }
+        .sheet(
+            isPresented: viewStore.binding(
+                get: \.showEditScreen,
+                send: ReportAction.setShowEditContact
+            ), content: {
+                NavigationView {
+                    ContactView(
+                        store: store.scope(
+                            state: { $0.contact },
+                            action: ReportAction.contact
+                        )
+                    )
+                    .navigationBarItems(
+                        leading: Button(
+                            action: { viewStore.send(.setShowEditContact(false)) },
+                            label: { Text(L10n.Button.close) }
+                        ),
+                        trailing: resetButton
+                    )
+                }
+            }
+        )
+    }
+    
+    private var resetButton: some View {
+        Button(
+            action: { viewStore.send(.contact(.resetContactDataButtonTapped)) },
+            label: {
+                Image(systemName: "arrow.counterclockwise")
+                    .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
+            }
+        )
+        .disabled(viewStore.isResetButtonDisabled)
     }
 
     private func row(callout: String, content: String) -> some View {
