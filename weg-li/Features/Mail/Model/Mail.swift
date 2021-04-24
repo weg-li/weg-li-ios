@@ -36,7 +36,7 @@ extension Mail {
 
         Zeuge:
 
-        Name: \(report.contact.firstName) \(report.contact.name)
+        Name: \(report.contact.humandReadableContact)
 
         Anschrift: \(report.contact.address.humanReadableAddress)
 

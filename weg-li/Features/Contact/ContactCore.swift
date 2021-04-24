@@ -30,6 +30,17 @@ struct ContactState: Equatable, Codable {
             && address.postalCode.isNumeric
             && address.postalCode.count == 5
     }
+    
+    var humandReadableContact: String {
+        var contact = "\(firstName) \(name)"
+        if !phone.isEmpty {
+            contact.append("\nTelefonnummer: \(phone)")
+        }
+        if !dateOfBirth.isEmpty {
+            contact.append("\nGeburtstag: \(dateOfBirth)")
+        }
+        return contact
+    }
 
     private enum CodingKeys: String, CodingKey {
         case address, firstName, name, phone
