@@ -111,6 +111,8 @@
 
 "contact.reportHintCopy" = "Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
 
+"contact.mailInfo" = "Ihre Emailadresse wird über die Mail App konfiguriert.";
+
 "contact.isSavedInAppHintCopy" = "Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.";
 
 "contact.rowType.firstName" = "Vorname";

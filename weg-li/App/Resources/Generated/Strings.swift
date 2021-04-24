@@ -12,7 +12,7 @@ import Foundation
 internal enum L10n {
 
   internal enum Button {
-    /// Abbrechen
+    /// Schließen
     internal static let close = L10n.tr("Localizable", "button.close")
     internal enum Submit {
       /// Bezirk: %@
@@ -29,6 +29,8 @@ internal enum L10n {
     internal static let editButtonCopy = L10n.tr("Localizable", "contact.editButtonCopy")
     /// Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.
     internal static let isSavedInAppHintCopy = L10n.tr("Localizable", "contact.isSavedInAppHintCopy")
+    /// Ihre Emailadresse wird über die Mail App konfiguriert.
+    internal static let mailInfo = L10n.tr("Localizable", "contact.mailInfo")
     /// Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.
     internal static let reportHintCopy = L10n.tr("Localizable", "contact.reportHintCopy")
     /// Kontaktdaten

@@ -77,14 +77,14 @@ struct ContactView: View {
                         )
                     )
                 }
-                Section {
-                    VStack {
-                        Image(systemName: "info.circle")
-                            .padding(.bottom, 4)
+                Section(header: Image(systemName: "info.circle").font(.body)) {
+                    VStack(spacing: 16) {
+                        Text(L10n.Contact.mailInfo)
+                            .multilineTextAlignment(.center)
                         Text(L10n.Contact.isSavedInAppHintCopy)
                             .multilineTextAlignment(.center)
-                            .font(.callout)
                     }
+                    .font(.callout)
                 }
             }
         }
