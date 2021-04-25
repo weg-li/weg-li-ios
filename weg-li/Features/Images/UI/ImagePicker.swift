@@ -27,7 +27,8 @@ struct ImagePicker: UIViewControllerRepresentable {
                 if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
                     if let assetId = result.assetIdentifier {
                         let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-                        parent.coordinate = assetResults.firstObject?.location?.coordinate ?? .zero
+                        parent.coordinate = assetResults.firstObject?.location?.coordinate
+                        
                     }
                     result.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
                         if let error = error {
