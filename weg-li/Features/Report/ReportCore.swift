@@ -152,6 +152,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
             // After the images coordinate was set trigger resolve location and map to district.
             case let .setResolvedCoordinate(coordinate):
                 guard let coordinate = coordinate, coordinate != state.location.userLocationState.region?.center else {
+                    state.alert = .noPhotoCoordinate
                     return .none
                 }
                 state.location.userLocationState.region = CoordinateRegion(center: coordinate)
@@ -259,5 +260,9 @@ extension AlertState where Action == ReportAction {
         title: TextState(L10n.Report.Alert.title),
         primaryButton: .destructive(.init(L10n.Report.Alert.reset), send: .resetConfirmButtonTapped),
         secondaryButton: .cancel(send: .dismissAlert)
+    )
+    
+    static let noPhotoCoordinate = Self(
+        title: TextState(L10n.Location.Alert.noCoordinate)
     )
 }

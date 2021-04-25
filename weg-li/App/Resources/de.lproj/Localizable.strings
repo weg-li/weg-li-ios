@@ -87,6 +87,8 @@
 
 "location.alert.provideAccessToLocationService" = "Bitte geben Sie uns in den Einstellungen Zugriff auf Ihren Standort.";
 
+"location.alert.noCoordinate" = "Es konnte keine Koordinate aus dem Foto gelesen werden.";
+
 
 // Contact
 "contact.widgetTitle" = "Kontaktdaten";
