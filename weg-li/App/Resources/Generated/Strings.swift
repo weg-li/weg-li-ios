@@ -129,6 +129,8 @@ internal enum L10n {
       internal static let expandButtonLabel = L10n.tr("Localizable", "location.a11y.expandButtonLabel")
     }
     internal enum Alert {
+      /// Es konnte keine Koordinate aus dem Foto gelesen werden.
+      internal static let noCoordinate = L10n.tr("Localizable", "location.alert.noCoordinate")
       /// Bitte geben Sie uns in den Einstellungen Zugriff auf Ihren Standort.
       internal static let provideAccessToLocationService = L10n.tr("Localizable", "location.alert.provideAccessToLocationService")
       /// Die Standortnutzung macht diese App besser. Bitte geben Sie uns Zugang.
