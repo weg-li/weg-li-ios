@@ -101,9 +101,11 @@ struct ContactView: View {
             label: {
                 Text(L10n.Contact.Alert.reset)
                     .foregroundColor(isButtonDisabled ? Color.red.opacity(0.6) : .red)
+                    .accessibility(hidden: true)
             }
         )
         .disabled(isButtonDisabled)
+        .accessibility(label: Text(L10n.Report.Alert.reset))
     }
 
     private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {

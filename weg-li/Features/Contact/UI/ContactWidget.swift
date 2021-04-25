@@ -105,9 +105,11 @@ struct ContactWidget: View {
             label: {
                 Image(systemName: "arrow.counterclockwise")
                     .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
+                    .accessibilityHidden(true)
             }
         )
         .disabled(viewStore.isResetButtonDisabled)
+        .accessibility(label: Text(L10n.Report.Alert.reset))
     }
 
     private func row(callout: String, content: String) -> some View {
