@@ -43,8 +43,20 @@ struct SettingsView: View {
                         }
                     }
                 )
+                Button(
+                    action: { viewStore.send(.donateTapped) },
+                    label: {
+                        HStack {
+                            Text(L10n.Settings.Row.donate)
+                            Spacer()
+                            linkIcon
+                        }
+                    }
+                )
             }
-            Section(header: Text(L10n.Settings.Section.projectTitle)) {
+            Section(
+                header: Text(L10n.Settings.Section.projectTitle)
+            ) {
                 Button(
                     action: { viewStore.send(.openLicensesRowTapped) },
                     label: {
@@ -67,9 +79,16 @@ struct SettingsView: View {
                     }
                 )
             }
+            versionNumberView
         }
         .foregroundColor(Color(.label))
         .navigationTitle(L10n.Settings.title)
+    }
+
+    private var versionNumberView: some View {
+        Text("Version: \(Bundle.main.versionNumber).\(Bundle.main.buildNumber)")
+            .frame(maxWidth: .infinity)
+            .font(.subheadline)
     }
 
     private var linkIcon: some View {

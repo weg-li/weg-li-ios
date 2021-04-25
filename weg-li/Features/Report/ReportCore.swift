@@ -20,6 +20,9 @@ struct Report: Codable {
 
     var alert: AlertState<ReportAction>?
 
+    var showEditDescription = false
+    var showEditContact = false
+
     init(
         uuid: UUID = UUID(),
         images: ImagesViewState,
@@ -47,7 +50,7 @@ struct Report: Codable {
 
 extension Report: Equatable {
     static func == (lhs: Report, rhs: Report) -> Bool {
-        return lhs.contact == rhs.contact
+        lhs.contact == rhs.contact
             && lhs.district == rhs.district
             && lhs.description == rhs.description
             && lhs.location == rhs.location
@@ -64,6 +67,8 @@ enum ReportAction: Equatable {
     case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
     case resetButtonTapped
     case resetConfirmButtonTapped
+    case setShowEditDescription(Bool)
+    case setShowEditContact(Bool)
     case dismissAlert
 }
 
@@ -205,6 +210,12 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
         case .resetConfirmButtonTapped:
             // Reset report will be handled in the homeReducer
             return Effect(value: .dismissAlert)
+        case let .setShowEditDescription(value):
+            state.showEditDescription = value
+            return .none
+        case let .setShowEditContact(value):
+            state.showEditContact = value
+            return .none
         case .dismissAlert:
             state.alert = nil
             return .none
@@ -231,9 +242,9 @@ extension Report {
             ),
             date: Date.init,
             description: .init(
-                color: "Gelb",
-                type: "Kleinbus",
                 licensePlateNumber: "HH-ST-PAULI",
+                selectedColor: 0,
+                selectedBrand: 0,
                 selectedDuration: 0,
                 selectedType: 0,
                 blockedOthers: false

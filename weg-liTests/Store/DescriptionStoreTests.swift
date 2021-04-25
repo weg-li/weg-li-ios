@@ -13,29 +13,37 @@ class DescriptionStoreTests: XCTestCase {
         )
 
         store.assert(
-            .send(.setColor("Rot")) { state in
-                state.color = "Rot"
+            .send(.setColor(1)) { state in
+                state.selectedColor = 1
+
+                XCTAssertEqual(DescriptionState.colors[1].value, "Beige")
             }
         )
     }
 
     func test_setCarType_shouldUpdateState() {
         let store = TestStore(
-            initialState: DescriptionState(color: "Rot"),
+            initialState: DescriptionState(selectedColor: 1),
             reducer: descriptionReducer,
             environment: DescriptionEnvironment()
         )
 
         store.assert(
-            .send(.setType("VW")) { state in
-                state.type = "VW"
+            .send(.setBrand(1)) { state in
+                state.selectedBrand = 1
+
+                XCTAssertEqual(DescriptionState.brands[1], "Abarth")
             }
         )
     }
 
     func test_setCarLicensePlate_shouldUpdateState() {
         let store = TestStore(
-            initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
+            initialState: DescriptionState(
+                licensePlateNumber: "",
+                selectedColor: 1,
+                selectedBrand: 1
+            ),
             reducer: descriptionReducer,
             environment: DescriptionEnvironment()
         )
@@ -49,7 +57,11 @@ class DescriptionStoreTests: XCTestCase {
 
     func test_selectCharge_shouldUpdateState() {
         let store = TestStore(
-            initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
+            initialState: DescriptionState(
+                licensePlateNumber: "",
+                selectedColor: 1,
+                selectedBrand: 1
+            ),
             reducer: descriptionReducer,
             environment: DescriptionEnvironment()
         )
@@ -57,13 +69,19 @@ class DescriptionStoreTests: XCTestCase {
         store.assert(
             .send(.setCharge(1)) { state in
                 state.selectedType = 1
+
+                XCTAssertEqual(DescriptionState.charges[1].value, "Parken an einer engen/unübersichtlichen Straßenstelle")
             }
         )
     }
 
     func test_selectDuration_shouldUpdateState() {
         let store = TestStore(
-            initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
+            initialState: DescriptionState(
+                licensePlateNumber: "",
+                selectedColor: 1,
+                selectedBrand: 1
+            ),
             reducer: descriptionReducer,
             environment: DescriptionEnvironment()
         )
@@ -77,7 +95,11 @@ class DescriptionStoreTests: XCTestCase {
 
     func test_toggleBlockedOthers_shouldUpdateState() {
         let store = TestStore(
-            initialState: DescriptionState(color: "Rot", type: "VW", licensePlateNumber: ""),
+            initialState: DescriptionState(
+                licensePlateNumber: "",
+                selectedColor: 1,
+                selectedBrand: 1
+            ),
             reducer: descriptionReducer,
             environment: DescriptionEnvironment()
         )
@@ -95,9 +117,9 @@ class DescriptionStoreTests: XCTestCase {
     func test_setCarLicensePlate_shouldUpdateState_andSetItValid() {
         let store = TestStore(
             initialState: DescriptionState(
-                color: "Rot",
-                type: "VW",
-                licensePlateNumber: ""
+                licensePlateNumber: "",
+                selectedColor: 1,
+                selectedBrand: 1
             ),
             reducer: descriptionReducer,
             environment: DescriptionEnvironment()

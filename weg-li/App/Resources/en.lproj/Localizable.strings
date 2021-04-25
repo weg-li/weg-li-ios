@@ -25,6 +25,14 @@
 
 "report.alert.reset" = "Zurücksetzen";
 
+"report.error.images" = "Die Anzeige enthält keine Bilder";
+
+"report.error.location" = "Die Anzeige enthält keine Adresse der Tat";
+
+"report.error.description" = "Die Anzeige enthält keine Beschreibung";
+
+"report.error.contact" = "Die Anzeige enthält keine Kontaktdaten";
+
 
 // Photos
 "photos.widgetTitle" = "Fotos";
@@ -83,6 +91,10 @@
 // Contact
 "contact.widgetTitle" = "Kontaktdaten";
 
+"contact.section.required" = "Erforderlich";
+
+"contact.section.optional" = "Optional";
+
 "contact.row.nameCopy" = "Name";
 
 "contact.row.streetCopy" = "Strasse";
@@ -91,9 +103,15 @@
 
 "contact.row.phoneCopy" = "Telefon";
 
+"contact.row.dateOfBirth" = "Geburtstag";
+
+"contact.row.addressAddition" = "Addresszusatz";
+
 "contact.editButtonCopy" =  "Kontaktdaten bearbeiten";
 
 "contact.reportHintCopy" = "Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
+
+"contact.mailInfo" = "Ihre Emailadresse wird über die Mail App konfiguriert.";
 
 "contact.isSavedInAppHintCopy" = "Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.";
 
@@ -139,6 +157,8 @@
 
 "settings.row.contribute" = "Beitragen";
 
+"settings.row.donate" = "Spenden";
+
 
 // Times
 "times.description.upTo3" = "bis zu 3 Minuten";
@@ -148,3 +168,11 @@
 "times.description.longerThenNStunde" = "länger als %@ Stunde";
 
 "times.description.longerThenNStunden" = "länger als %@ Stunden";
+
+
+// SubmitButton
+"button.submit.title" = "Anzeige erstatten";
+
+"button.submit.district" = "Bezirk: %@";
+
+"button.close" = "Schließen";

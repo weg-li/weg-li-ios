@@ -15,7 +15,7 @@ struct ContactView: View {
     var body: some View {
         VStack {
             Form {
-                Section {
+                Section(header: Text(L10n.Contact.Section.required)) {
                     dataRow(
                         type: .firstName,
                         textFieldBinding: viewStore.binding(
@@ -53,6 +53,8 @@ struct ContactView: View {
                             )
                         )
                     }
+                }
+                Section(header: Text(L10n.Contact.Section.optional)) {
                     dataRow(
                         type: .phone,
                         textFieldBinding: viewStore.binding(
@@ -60,15 +62,29 @@ struct ContactView: View {
                             send: ContactAction.phoneChanged
                         )
                     )
+                    dataRow(
+                        type: .dateOfBirth,
+                        textFieldBinding: viewStore.binding(
+                            get: \.dateOfBirth,
+                            send: ContactAction.dateOfBirthChanged
+                        )
+                    )
+                    dataRow(
+                        type: .addressAddition,
+                        textFieldBinding: viewStore.binding(
+                            get: \.address.addition,
+                            send: ContactAction.addressAdditionChanged
+                        )
+                    )
                 }
-                Section {
-                    VStack {
-                        Image(systemName: "info.circle")
-                            .padding(.bottom, 4)
+                Section(header: Image(systemName: "info.circle").font(.body)) {
+                    VStack(spacing: 16) {
+                        Text(L10n.Contact.mailInfo)
+                            .multilineTextAlignment(.center)
                         Text(L10n.Contact.isSavedInAppHintCopy)
                             .multilineTextAlignment(.center)
-                            .font(.callout)
                     }
+                    .font(.callout)
                 }
             }
         }
@@ -85,9 +101,11 @@ struct ContactView: View {
             label: {
                 Text(L10n.Contact.Alert.reset)
                     .foregroundColor(isButtonDisabled ? Color.red.opacity(0.6) : .red)
+                    .accessibility(hidden: true)
             }
         )
         .disabled(isButtonDisabled)
+        .accessibility(label: Text(L10n.Report.Alert.reset))
     }
 
     private func dataRow(type: RowType, textFieldBinding: Binding<String>) -> some View {

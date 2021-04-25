@@ -11,11 +11,26 @@ import Foundation
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 internal enum L10n {
 
+  internal enum Button {
+    /// Schließen
+    internal static let close = L10n.tr("Localizable", "button.close")
+    internal enum Submit {
+      /// Bezirk: %@
+      internal static func district(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "button.submit.district", String(describing: p1))
+      }
+      /// Anzeige erstatten
+      internal static let title = L10n.tr("Localizable", "button.submit.title")
+    }
+  }
+
   internal enum Contact {
     /// Kontaktdaten bearbeiten
     internal static let editButtonCopy = L10n.tr("Localizable", "contact.editButtonCopy")
     /// Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.
     internal static let isSavedInAppHintCopy = L10n.tr("Localizable", "contact.isSavedInAppHintCopy")
+    /// Ihre Emailadresse wird über die Mail App konfiguriert.
+    internal static let mailInfo = L10n.tr("Localizable", "contact.mailInfo")
     /// Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.
     internal static let reportHintCopy = L10n.tr("Localizable", "contact.reportHintCopy")
     /// Kontaktdaten
@@ -27,8 +42,12 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "contact.alert.title")
     }
     internal enum Row {
+      /// Addresszusatz
+      internal static let addressAddition = L10n.tr("Localizable", "contact.row.addressAddition")
       /// Stadt
       internal static let cityCopy = L10n.tr("Localizable", "contact.row.cityCopy")
+      /// Geburtstag
+      internal static let dateOfBirth = L10n.tr("Localizable", "contact.row.dateOfBirth")
       /// Name
       internal static let nameCopy = L10n.tr("Localizable", "contact.row.nameCopy")
       /// Telefon
@@ -49,6 +68,12 @@ internal enum L10n {
       internal static let street = L10n.tr("Localizable", "contact.rowType.street")
       /// PLZ
       internal static let zipCode = L10n.tr("Localizable", "contact.rowType.zipCode")
+    }
+    internal enum Section {
+      /// Optional
+      internal static let `optional` = L10n.tr("Localizable", "contact.section.optional")
+      /// Erforderlich
+      internal static let `required` = L10n.tr("Localizable", "contact.section.required")
     }
   }
 
@@ -144,7 +169,7 @@ internal enum L10n {
       internal static let accessDenied = L10n.tr("Localizable", "photos.alert.accessDenied")
     }
     internal enum ImportButton {
-      /// Fotos importieren
+      /// Fotos auswählen
       internal static let copy = L10n.tr("Localizable", "photos.importButton.copy")
     }
   }
@@ -162,6 +187,16 @@ internal enum L10n {
       /// Kontaktdaten
       internal static let widgetTitle = L10n.tr("Localizable", "report.contact.widgetTitle")
     }
+    internal enum Error {
+      /// Die Anzeige enthält keine Kontaktdaten
+      internal static let contact = L10n.tr("Localizable", "report.error.contact")
+      /// Die Anzeige enthält keine Beschreibung
+      internal static let description = L10n.tr("Localizable", "report.error.description")
+      /// Die Anzeige enthält keine Bilder
+      internal static let images = L10n.tr("Localizable", "report.error.images")
+      /// Die Anzeige enthält keine Adresse der Tat
+      internal static let location = L10n.tr("Localizable", "report.error.location")
+    }
     internal enum Place {
       /// Ort
       internal static let widgetTitle = L10n.tr("Localizable", "report.place.widgetTitle")
@@ -174,6 +209,8 @@ internal enum L10n {
     internal enum Row {
       /// Beitragen
       internal static let contribute = L10n.tr("Localizable", "settings.row.contribute")
+      /// Spenden
+      internal static let donate = L10n.tr("Localizable", "settings.row.donate")
       /// Impressum
       internal static let imprint = L10n.tr("Localizable", "settings.row.imprint")
       /// Lizenzen

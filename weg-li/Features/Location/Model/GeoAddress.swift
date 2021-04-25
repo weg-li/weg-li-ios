@@ -8,7 +8,7 @@ struct GeoAddress: Equatable, Codable {
     var postalCode: String
 
     var isValid: Bool {
-        return [street, city, postalCode]
+        [street, city, postalCode]
             .allSatisfy { !$0.isEmpty }
     }
 }

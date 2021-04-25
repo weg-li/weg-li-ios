@@ -54,28 +54,32 @@ struct HomeView: View {
     }
 
     private var addReportButton: some View {
-        NavigationLink(
-            destination: ReportForm(
-                store: store.scope(
-                    state: \.reportDraft,
-                    action: HomeAction.report
-                )
-            ),
-            isActive: viewStore.binding(
-                get: \.showReportWizard,
-                send: HomeAction.showReportWizard
-            ),
-            label: {
-                Button(
-                    action: { viewStore.send(.showReportWizard(true)) },
-                    label: { Text("+")
-                        .font(.largeTitle)
-                    }
-                )
-                .buttonStyle(AddReportButtonStyle())
-                .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
-            }
-        )
+        VStack {
+            NavigationLink(
+                destination: ReportForm(
+                    store: store.scope(
+                        state: \.reportDraft,
+                        action: HomeAction.report
+                    )
+                ),
+                isActive: viewStore.binding(
+                    get: \.showReportWizard,
+                    send: HomeAction.showReportWizard
+                ),
+                label: {
+                    EmptyView()
+                }
+            )
+            Button(
+                action: { viewStore.send(.showReportWizard(true)) },
+                label: { Text("+")
+                    .font(.largeTitle)
+                }
+            )
+            
+            .buttonStyle(AddReportButtonStyle())
+            .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
+        }
     }
 
     private var contactData: some View {

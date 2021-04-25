@@ -11,7 +11,7 @@ struct Mail: Equatable, Codable {
 
 extension Mail {
     static func createMailBody(from report: Report) -> String {
-        return """
+        """
         Sehr geehrte Damen und Herren,
 
 
@@ -19,9 +19,9 @@ extension Mail {
 
         Kennzeichen: \(report.description.licensePlateNumber)
 
-        Marke: \(report.description.type)
+        Marke: \(report.description.selectedType)
 
-        Farbe: \(report.description.color)
+        Farbe: \(DescriptionState.colors[report.description.selectedColor].value)
 
         Adresse: \(report.contact.address.humanReadableAddress)
 
@@ -36,7 +36,7 @@ extension Mail {
 
         Zeuge:
 
-        Name: \(report.contact.firstName) \(report.contact.name)
+        Name: \(report.contact.humandReadableContact)
 
         Anschrift: \(report.contact.address.humanReadableAddress)
 

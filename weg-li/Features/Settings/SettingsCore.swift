@@ -12,12 +12,14 @@ enum SettingsAction: Equatable {
     case contact(ContactAction)
     case openLicensesRowTapped
     case openImprintTapped
+    case donateTapped
     case openGitHubProjectTapped
 }
 
 struct SettingsEnvironment {
     let imprintLink = URL(string: "https://www.weg.li/imprint")!
     let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
+    let donateLink = URL(string: "https://www.weg.li/donate")!
     var uiApplicationClient: UIApplicationClient
 }
 
@@ -42,6 +44,9 @@ let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment
                 .fireAndForget()
         case .openGitHubProjectTapped:
             return env.uiApplicationClient.open(env.gitHubProjectLink, [:])
+                .fireAndForget()
+        case .donateTapped:
+            return env.uiApplicationClient.open(env.donateLink, [:])
                 .fireAndForget()
         case .contact:
             return .none
