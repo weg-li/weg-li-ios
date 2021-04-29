@@ -67,16 +67,11 @@ struct SettingsView: View {
                         }
                     }
                 )
+            }
+            Section {
                 Button(
                     action: { viewStore.send(.openGitHubProjectTapped) },
-                    label: {
-                        HStack {
-                            gitHubLogo
-                            Text(L10n.Settings.Row.contribute)
-                            Spacer()
-                            linkIcon
-                        }
-                    }
+                    label: { githubView }
                 )
             }
             versionNumberView
@@ -84,7 +79,34 @@ struct SettingsView: View {
         .foregroundColor(Color(.label))
         .navigationTitle(L10n.Settings.title)
     }
-
+    
+    private var githubView: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading) {
+                Text("weg-li ist open source")
+                    .font(.system(.headline, design: .monospaced))
+                    .foregroundColor(.white)
+                VStack(alignment: .leading) {
+                    Text("Dir fehlt ein feature oder du willst einen bug fixen?")
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundColor(Color.hex(0x40C8DD))
+                }
+                .padding(.top, 4)
+            }
+            Spacer()
+            Image(uiImage: UIImage(named: "GitHub")!)
+                .resizable()
+                .frame(maxWidth: 32, maxHeight: 32)
+                .colorInvert()
+                .padding(.leading, 6)
+        }
+        .padding([.top, .bottom], 4)
+        .background(
+            Color.hex(0x483C46)
+                .padding(-20)
+        )
+    }
+    
     private var versionNumberView: some View {
         Text("Version: \(Bundle.main.versionNumber).\(Bundle.main.buildNumber)")
             .frame(maxWidth: .infinity)
@@ -94,17 +116,6 @@ struct SettingsView: View {
     private var linkIcon: some View {
         Image(systemName: "link.circle.fill")
             .font(.title)
-    }
-
-    @ViewBuilder private var gitHubLogo: some View {
-        let logo = Image(uiImage: UIImage(named: "GitHub")!)
-            .resizable()
-            .frame(maxWidth: 32, maxHeight: 32)
-        if colorScheme == ColorScheme.dark {
-            logo.colorInvert()
-        } else {
-            logo
-        }
     }
 }
 
@@ -121,5 +132,16 @@ struct SettingsView_Previews: PreviewProvider {
                 )
             }
         }
+    }
+}
+
+extension Color {
+    public static func hex(_ hex: UInt) -> Self {
+        Self(
+            red: Double((hex & 0xff0000) >> 16) / 255,
+            green: Double((hex & 0x00ff00) >> 8) / 255,
+            blue: Double(hex & 0x0000ff) / 255,
+            opacity: 1
+        )
     }
 }
