@@ -306,14 +306,6 @@
 			path = Description;
 			sourceTree = "<group>";
 		};
-		9F649854248945CC00514BD3 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				9F64984C2488F3EA00514BD3 /* ContactWidget.swift */,
-			);
-			path = UI;
-			sourceTree = "<group>";
-		};
 		9F73E8F424878B84002E22F4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -336,18 +328,18 @@
 				73D117C42611DD94000D7B82 /* ImagesCore.swift */,
 				F8897519234E015E0014FCC8 /* ImagesView.swift */,
 				73719B6C261C7B75005E09A3 /* ImageView.swift */,
-				9F73E8FE24878DFB002E22F4 /* UI */,
+				9F73E8FE24878DFB002E22F4 /* Components */,
 			);
 			path = Images;
 			sourceTree = "<group>";
 		};
-		9F73E8FE24878DFB002E22F4 /* UI */ = {
+		9F73E8FE24878DFB002E22F4 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				7308C51A260B55C600FE3333 /* ImageGrid.swift */,
 				7308C519260B55C600FE3333 /* ImagePicker.swift */,
 			);
-			path = UI;
+			path = Components;
 			sourceTree = "<group>";
 		};
 		9F971E8E247ABFCB00A68959 /* weg-liTests */ = {
@@ -417,7 +409,7 @@
 			children = (
 				73FC296725F95FAE0084BB4E /* ContactCore.swift */,
 				9FB7509E2487B09500193948 /* ContactView.swift */,
-				9F649854248945CC00514BD3 /* UI */,
+				9F64984C2488F3EA00514BD3 /* ContactWidget.swift */,
 			);
 			path = Contact;
 			sourceTree = "<group>";
