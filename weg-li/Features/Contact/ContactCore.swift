@@ -148,7 +148,7 @@ let contactReducer = Reducer<ContactState, ContactAction, ContactEnvironment> { 
 extension AlertState where Action == ContactAction {
     static let resetContactDataAlert = Self(
         title: TextState(L10n.Contact.Alert.title),
-        primaryButton: .destructive(.init(L10n.Contact.Alert.reset), send: .resetContactConfirmButtonTapped),
+        primaryButton: .destructive(TextState(L10n.Contact.Alert.reset), send: .resetContactConfirmButtonTapped),
         secondaryButton: .cancel(send: .dismissAlert)
     )
 }

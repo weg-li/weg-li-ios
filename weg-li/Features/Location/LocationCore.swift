@@ -245,9 +245,9 @@ private extension LocationManager {
 
 extension AlertState where Action == LocationViewAction {
     static let goToSettingsAlert = Self(
-        title: .init(L10n.Location.Alert.provideAccessToLocationService),
-        primaryButton: .default(.init("Einstellungen"), send: .goToSettingsButtonTapped),
-        secondaryButton: .default("OK")
+        title: TextState(L10n.Location.Alert.provideAccessToLocationService),
+        primaryButton: .default(TextState("Einstellungen"), send: .goToSettingsButtonTapped),
+        secondaryButton: .default(TextState("OK"))
     )
 
     static let provideAuth = Self(title: TextState(L10n.Location.Alert.provideAuth))

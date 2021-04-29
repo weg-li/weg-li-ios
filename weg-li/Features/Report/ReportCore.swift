@@ -258,7 +258,7 @@ extension Report {
 extension AlertState where Action == ReportAction {
     static let resetReportAlert = Self(
         title: TextState(L10n.Report.Alert.title),
-        primaryButton: .destructive(.init(L10n.Report.Alert.reset), send: .resetConfirmButtonTapped),
+        primaryButton: .destructive(TextState(L10n.Report.Alert.reset), send: .resetConfirmButtonTapped),
         secondaryButton: .cancel(send: .dismissAlert)
     )
     
