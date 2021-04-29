@@ -78,7 +78,7 @@ struct ReportEnvironment {
     var placeService: PlacesServiceClient
     var regulatoryOfficeMapper: RegulatoryOfficeMapper
 
-    let debounce = 1
+    let debounce = 0.5
     let postalCodeMinumimCharacters = 5
 }
 
@@ -158,6 +158,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 state.location.userLocationState.region = CoordinateRegion(center: coordinate)
                 state.images.coordinateFromImagePicker = coordinate
                 return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
+
             // Handle single image remove action to reset map annotations and reset valid state.
             case .image:
                 if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
@@ -185,6 +186,13 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
             case let .updateGeoAddressCity(city):
                 return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
+                
+            case let .setLocationOption(option) where option == .fromPhotos:
+                if !state.images.storedPhotos.isEmpty, let coordinate = state.images.coordinateFromImagePicker {
+                    return Effect(value: .location(.resolveLocation(coordinate)))
+                } else {
+                    return .none
+                }
             default:
                 return .none
             }
