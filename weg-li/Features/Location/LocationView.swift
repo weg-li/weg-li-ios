@@ -99,13 +99,16 @@ struct LocationView: View {
                             send: LocationViewAction.setResolvedLocation
                         )
                     )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .frame(height: viewStore.isMapExpanded ? 300 : 150)
                     expandMapButton
                         .padding(4)
                         .accessibility(label: Text(L10n.Location.A11y.expandButtonLabel))
                 }
             }
-            addressView
+            if viewStore.address != .empty {
+                addressView
+            }
         }
         .alert(
             store.scope(
@@ -119,14 +122,16 @@ struct LocationView: View {
 
     @ViewBuilder private var addressView: some View {
         HStack(spacing: 4) {
-            Image(systemName: "location.fill")
-                .accessibility(hidden: true)
-            if viewStore.showActivityIndicator {
+            if !viewStore.showActivityIndicator && viewStore.address == .empty {
+                EmptyView()
+            }
+            else if viewStore.showActivityIndicator {
                 ActivityIndicator(style: .medium)
             } else {
+                Image(systemName: "location.fill")
+                    .accessibility(hidden: true)
                 Text(viewStore.address.humanReadableAddress)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: true, vertical: false)
+                    .lineLimit(2)
             }
         }
         .font(.body)
