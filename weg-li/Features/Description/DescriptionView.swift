@@ -82,7 +82,7 @@ struct DescriptionView: View {
                 .font(.callout)
             Text(content)
                 .foregroundColor(.primary)
-                .fontWeight(.semibold)
+                .font(.body)
         }
     }
 }

@@ -198,10 +198,11 @@ let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationVie
                 .cancellable(id: CancelSearchId(), cancelInFlight: true)
         case let .resolveAddressFinished(.success(address)):
             state.isResolvingAddress = false
-            state.resolvedAddress = address.first ?? .init(address: .init())
+            state.resolvedAddress = address.first ?? .empty
             return .none
         case let .resolveAddressFinished(.failure(error)):
             debugPrint(error)
+            state.alert = .reverseGeoCodingFailed
             state.isResolvingAddress = false
             return .none
 
@@ -245,14 +246,14 @@ private extension LocationManager {
 
 extension AlertState where Action == LocationViewAction {
     static let goToSettingsAlert = Self(
-        title: .init(L10n.Location.Alert.provideAccessToLocationService),
-        primaryButton: .default(.init("Einstellungen"), send: .goToSettingsButtonTapped),
-        secondaryButton: .default("OK")
+        title: TextState(L10n.Location.Alert.provideAccessToLocationService),
+        primaryButton: .default(TextState("Einstellungen"), send: .goToSettingsButtonTapped),
+        secondaryButton: .default(TextState("OK"))
     )
 
     static let provideAuth = Self(title: TextState(L10n.Location.Alert.provideAuth))
     static let servicesOff = Self(title: TextState(L10n.Location.Alert.serviceIsOff))
-
+    static let reverseGeoCodingFailed = Self(title: TextState("Reverse geo coding failed"))
     static let provideAccessToLocationService = Self(
         title: TextState(L10n.Location.Alert.provideAccessToLocationService)
     )

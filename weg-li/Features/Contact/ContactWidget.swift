@@ -117,10 +117,10 @@ struct ContactWidget: View {
             Text(callout)
                 .foregroundColor(Color(.secondaryLabel))
                 .font(.callout)
-                .fontWeight(.bold)
             Spacer()
             Text(content)
                 .foregroundColor(Color(.label))
+                .font(.body)
         }
     }
 }
