@@ -178,3 +178,6 @@
 "button.submit.district" = "Bezirk: %@";
 
 "button.close" = "Schließen";
+
+// General
+"cancel" = "Abbrechen";
