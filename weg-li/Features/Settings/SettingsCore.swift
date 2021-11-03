@@ -17,9 +17,11 @@ enum SettingsAction: Equatable {
 }
 
 struct SettingsEnvironment {
+    // swiftlint:disable force_unwrapping
     let imprintLink = URL(string: "https://www.weg.li/imprint")!
     let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
     let donateLink = URL(string: "https://www.weg.li/donate")!
+    // swiftlint:enable force_unwrapping
     var uiApplicationClient: UIApplicationClient
 }
 

@@ -10,6 +10,7 @@ struct Mail: Equatable, Codable {
 }
 
 extension Mail {
+    // swiftlint:disable:next function_body_length
     static func createMailBody(from report: Report) -> String {
         """
         Sehr geehrte Damen und Herren,

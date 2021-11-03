@@ -79,7 +79,7 @@ struct SettingsView: View {
         .foregroundColor(Color(.label))
         .navigationTitle(L10n.Settings.title)
     }
-    
+
     private var githubView: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading) {
@@ -94,6 +94,7 @@ struct SettingsView: View {
                 .padding(.top, 4)
             }
             Spacer()
+            // swiftlint:disable:next force_unwrapping
             Image(uiImage: UIImage(named: "GitHub")!)
                 .resizable()
                 .frame(maxWidth: 32, maxHeight: 32)
@@ -106,7 +107,7 @@ struct SettingsView: View {
                 .padding(-20)
         )
     }
-    
+
     private var versionNumberView: some View {
         Text("Version: \(Bundle.main.versionNumber).\(Bundle.main.buildNumber)")
             .frame(maxWidth: .infinity)
@@ -135,12 +136,12 @@ struct SettingsView_Previews: PreviewProvider {
     }
 }
 
-extension Color {
-    public static func hex(_ hex: UInt) -> Self {
+public extension Color {
+    static func hex(_ hex: UInt) -> Self {
         Self(
-            red: Double((hex & 0xff0000) >> 16) / 255,
-            green: Double((hex & 0x00ff00) >> 8) / 255,
-            blue: Double(hex & 0x0000ff) / 255,
+            red: Double((hex & 0xFF0000) >> 16) / 255,
+            green: Double((hex & 0x00FF00) >> 8) / 255,
+            blue: Double(hex & 0x0000FF) / 255,
             opacity: 1
         )
     }

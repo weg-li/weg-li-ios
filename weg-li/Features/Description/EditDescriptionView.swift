@@ -40,7 +40,7 @@ struct EditDescriptionView: View {
             .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
         }
     }
-    
+
     private var licensePlateView: some View {
         TextField(
             "\(L10n.Description.Row.licensplateNumber) *",
@@ -50,7 +50,7 @@ struct EditDescriptionView: View {
             )
         )
     }
-    
+
     private var carBrandView: some View {
         Picker(
             L10n.Description.Row.carType,
@@ -67,7 +67,7 @@ struct EditDescriptionView: View {
             .navigationTitle(Text(L10n.Description.Row.carType))
         }
     }
-    
+
     private var carColorView: some View {
         Picker(
             L10n.Description.Row.carColor,
@@ -84,7 +84,7 @@ struct EditDescriptionView: View {
             .navigationTitle(Text(L10n.Description.Row.carColor))
         }
     }
-    
+
     private var chargTypeView: some View {
         Picker(
             L10n.Description.Row.chargeType,
@@ -101,7 +101,7 @@ struct EditDescriptionView: View {
             .navigationTitle(Text(L10n.Description.Row.chargeType))
         }
     }
-    
+
     private var chargeLengthView: some View {
         Picker(
             L10n.Description.Row.length,
@@ -138,7 +138,7 @@ struct EditDescriptionView: View {
             }
         )
     }
-    
+
     private var closeButton: some View {
         Button(
             action: { viewStore.send(.setShowEditDescription(false)) },

@@ -76,7 +76,7 @@ struct HomeView: View {
                     .font(.largeTitle)
                 }
             )
-            
+
             .buttonStyle(AddReportButtonStyle())
             .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
         }

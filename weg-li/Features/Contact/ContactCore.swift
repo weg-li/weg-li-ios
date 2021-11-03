@@ -30,7 +30,7 @@ struct ContactState: Equatable, Codable {
             && address.postalCode.isNumeric
             && address.postalCode.count == 5
     }
-    
+
     var humandReadableContact: String {
         var contact = "\(firstName) \(name)"
         if !phone.isEmpty {
@@ -148,7 +148,10 @@ let contactReducer = Reducer<ContactState, ContactAction, ContactEnvironment> { 
 extension AlertState where Action == ContactAction {
     static let resetContactDataAlert = Self(
         title: TextState(L10n.Contact.Alert.title),
-        primaryButton: .destructive(TextState(L10n.Contact.Alert.reset), send: .resetContactConfirmButtonTapped),
-        secondaryButton: .cancel(send: .dismissAlert)
+        primaryButton: .destructive(
+            TextState(L10n.Contact.Alert.reset),
+            action: .send(.resetContactConfirmButtonTapped)
+        ),
+        secondaryButton: .cancel(.init(L10n.cancel), action: .send(.dismissAlert))
     )
 }

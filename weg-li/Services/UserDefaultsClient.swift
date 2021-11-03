@@ -12,7 +12,7 @@ struct UserDefaultsClient {
     var setData: (Data?, String) -> Effect<Never, Never>
     var setDouble: (Double, String) -> Effect<Never, Never>
 
-    var contact: ContactState? { (try? dataForKey(contactKey)?.decoded())
+    var contact: ContactState? { try? dataForKey(contactKey)?.decoded()
     }
 
     func setContact(_ contact: ContactState) -> Effect<Never, Never> {
@@ -34,7 +34,9 @@ private let reportsKey = "reportsKey"
 private let contactKey = "contactKey"
 
 extension UserDefaultsClient {
-    static func live(userDefaults: UserDefaults = UserDefaults(suiteName: "group.weg-li")!) -> Self {
+    static func live(
+        userDefaults: UserDefaults = UserDefaults(suiteName: "group.weg-li")! // swiftlint:disable:this force_unwrapping
+    ) -> Self {
         Self(
             boolForKey: userDefaults.bool(forKey:),
             dataForKey: { userDefaults.object(forKey: $0) as? Data },

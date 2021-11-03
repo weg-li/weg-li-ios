@@ -18,7 +18,7 @@ struct ImagesViewState: Equatable, Codable {
 
     var imageStates: IdentifiedArrayOf<ImageState> {
         IdentifiedArray(
-            storedPhotos
+            uniqueElements: storedPhotos
                 .compactMap { $0 }
                 .map { ImageState(id: $0.id, image: $0) }
         )

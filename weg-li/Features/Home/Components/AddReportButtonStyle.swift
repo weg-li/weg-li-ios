@@ -4,7 +4,7 @@ import SwiftUI
 
 struct AddReportButtonStyle: ButtonStyle {
     let diameter: CGFloat = 70
-    
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundColor(.white)

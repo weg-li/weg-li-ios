@@ -22,10 +22,11 @@ struct MailView: UIViewControllerRepresentable {
 
         private let mail: Mail
 
-        init(isShowing: Binding<Bool>,
-             result: Binding<MFMailComposeResult?>,
-             mail: Mail)
-        {
+        init(
+            isShowing: Binding<Bool>,
+            result: Binding<MFMailComposeResult?>,
+            mail: Mail
+        ) {
             _isShowing = isShowing
             _result = result
             self.mail = mail

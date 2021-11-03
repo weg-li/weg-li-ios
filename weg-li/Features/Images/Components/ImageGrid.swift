@@ -38,9 +38,11 @@ struct ImageGrid_Previews: PreviewProvider {
                 initialState: .init(
                     showImagePicker: false,
                     storedPhotos: [
+                        // swiftlint:disable force_unwrapping
                         StorableImage(uiImage: UIImage(systemName: "book")!)!,
                         StorableImage(uiImage: UIImage(systemName: "book")!)!,
                         StorableImage(uiImage: UIImage(systemName: "book")!)!
+                        // swiftlint:enable force_unwrapping
                     ],
                     coordinateFromImagePicker: .zero
                 ),

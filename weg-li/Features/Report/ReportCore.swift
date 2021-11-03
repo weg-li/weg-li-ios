@@ -186,7 +186,7 @@ let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
                 return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
             case let .updateGeoAddressCity(city):
                 return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
-                
+
             case let .setLocationOption(option) where option == .fromPhotos:
                 if !state.images.storedPhotos.isEmpty, let coordinate = state.images.coordinateFromImagePicker {
                     return Effect(value: .location(.resolveLocation(coordinate)))
@@ -238,7 +238,7 @@ extension Report {
             uuid: UUID(),
             images: .init(
                 showImagePicker: false,
-                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!]
+                storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
             ),
             contact: .preview,
             district: District(
@@ -266,10 +266,16 @@ extension Report {
 extension AlertState where Action == ReportAction {
     static let resetReportAlert = Self(
         title: TextState(L10n.Report.Alert.title),
-        primaryButton: .destructive(TextState(L10n.Report.Alert.reset), send: .resetConfirmButtonTapped),
-        secondaryButton: .cancel(send: .dismissAlert)
+        primaryButton: .destructive(
+            TextState(L10n.Report.Alert.reset),
+            action: .send(.resetConfirmButtonTapped)
+        ),
+        secondaryButton: .cancel(
+            .init(L10n.cancel),
+            action: .send(.dismissAlert)
+        )
     )
-    
+
     static let noPhotoCoordinate = Self(
         title: TextState(L10n.Location.Alert.noCoordinate)
     )

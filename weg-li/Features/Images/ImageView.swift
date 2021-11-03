@@ -13,7 +13,7 @@ struct ImageView: View {
     }
 
     var body: some View {
-        Image(uiImage: viewStore.image.asUIImage!)
+        Image(uiImage: viewStore.image.asUIImage!) // swiftlint:disable:this force_unwrapping
             .gridModifier
             .padding(4)
             .overlay(deleteButton, alignment: .center)
@@ -51,7 +51,7 @@ struct ImageView_Previews: PreviewProvider {
             store: Store<ImageState, ImageAction>(
                 initialState: .init(
                     id: .init(),
-                    image: StorableImage(uiImage: UIImage(systemName: "pencil")!)!
+                    image: StorableImage(uiImage: UIImage(systemName: "pencil")!)! // swiftlint:disable:this force_unwrapping
                 ),
                 reducer: .empty,
                 environment: ImageEnvironment()

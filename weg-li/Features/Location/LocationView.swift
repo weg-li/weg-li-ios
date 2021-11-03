@@ -122,10 +122,9 @@ struct LocationView: View {
 
     @ViewBuilder private var addressView: some View {
         HStack(spacing: 4) {
-            if !viewStore.showActivityIndicator && viewStore.address == .empty {
+            if !viewStore.showActivityIndicator, viewStore.address == .empty {
                 EmptyView()
-            }
-            else if viewStore.showActivityIndicator {
+            } else if viewStore.showActivityIndicator {
                 ActivityIndicator(style: .medium)
             } else {
                 Image(systemName: "location.fill")

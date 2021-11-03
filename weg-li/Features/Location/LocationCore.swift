@@ -33,8 +33,7 @@ private struct LocationManagerId: Hashable {}
 private struct CancelSearchId: Hashable {}
 
 /// Reducer handling location permission. Wrapping LocationManager
-let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, UserLocationEnvironment> {
-    state, action, environment in
+let locationManagerReducer = Reducer<UserLocationState, LocationManager.Action, UserLocationEnvironment> { state, action, environment in
     switch action {
     case .didChangeAuthorization(.authorizedAlways),
          .didChangeAuthorization(.authorizedWhenInUse):
@@ -247,7 +246,10 @@ private extension LocationManager {
 extension AlertState where Action == LocationViewAction {
     static let goToSettingsAlert = Self(
         title: TextState(L10n.Location.Alert.provideAccessToLocationService),
-        primaryButton: .default(TextState("Einstellungen"), send: .goToSettingsButtonTapped),
+        primaryButton: .default(
+            TextState(L10n.Settings.title),
+            action: .send(.goToSettingsButtonTapped)
+        ),
         secondaryButton: .default(TextState("OK"))
     )
 

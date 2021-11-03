@@ -42,7 +42,7 @@ extension MailViewState: Codable {
         let mailComposeResult = try container.decodeIfPresent(Int.self, forKey: .mailComposeResult)
         let mail = try container.decode(Mail.self, forKey: .mail)
         self.init(
-            mailComposeResult: MFMailComposeResult(rawValue: mailComposeResult ?? 0)!,
+            mailComposeResult: MFMailComposeResult(rawValue: mailComposeResult ?? 0)!, // swiftlint:disable:this force_unwrapping
             mail: mail,
             isPresentingMailContent: false
         )

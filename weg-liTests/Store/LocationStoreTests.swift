@@ -31,7 +31,7 @@ class LocationStoreTests: XCTestCase {
                 requestWhenInUseAuthorization: { _ in
                     .fireAndForget { didRequestInUseAuthorization = true }
                 },
-                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
+                set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
             placeService: PlacesServiceClient(getPlacemarks: { _ in Effect(value: [expectedAddress]) }),
             uiApplicationClient: .noop
@@ -104,7 +104,7 @@ class LocationStoreTests: XCTestCase {
                 authorizationStatus: { .denied },
                 create: { _ in locationManagerSubject.eraseToEffect() },
                 locationServicesEnabled: { false },
-                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
+                set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
             placeService: .noop,
             uiApplicationClient: .noop
@@ -146,7 +146,7 @@ class LocationStoreTests: XCTestCase {
                 requestWhenInUseAuthorization: { _ in
                     .fireAndForget { didRequestInUseAuthorization = true }
                 },
-                set: { (_, _) -> Effect<Never, Never> in setSubject.eraseToEffect() }
+                set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
             ),
             placeService: .noop,
             uiApplicationClient: .noop
