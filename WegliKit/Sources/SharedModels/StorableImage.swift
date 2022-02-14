@@ -5,17 +5,17 @@ import UIKit
 
 public struct StorableImage: Hashable, Identifiable, Codable {
   public let id: String
-  public let image: Data
+  public let data: Data
   public let imageUrl: URL?
   
-  public init(id: String = UUID().uuidString, image: Data, imageUrl: URL? = nil) {
+  public init(id: String = UUID().uuidString, data: Data, imageUrl: URL? = nil) {
     self.id = id
-    self.image = image
+    self.data = data
     self.imageUrl = imageUrl
   }
   
   public var asUIImage: UIImage? {
-    UIImage(data: image)
+    UIImage(data: data)
   }
 }
 
@@ -24,7 +24,7 @@ public extension StorableImage {
     guard let data = uiImage.pngData() else {
       return nil
     }
-    self.image = data
+    self.data = data
     self.id = id
     self.imageUrl = imageUrl
   }
