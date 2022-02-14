@@ -93,6 +93,7 @@ let package = Package(
     .target(
       name: "ImageConverter",
       dependencies: [
+        "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ]
     ),

@@ -35,6 +35,8 @@ public struct ImagePicker: UIViewControllerRepresentable {
       for result in results {
         let prov = result.itemProvider
         
+        // get the location from the first image because
+        // hopefully the selected images are from one location 🤞
         if let assetId = result.assetIdentifier {
           let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
           parent.coordinate = assetResults.firstObject?.location?.coordinate
@@ -42,6 +44,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
         
         prov.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] url, error in
           guard let self = self else { return }
+          
           guard error == nil else {
             debugPrint(error!.localizedDescription, #file, #function)
             return
@@ -52,7 +55,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
             return
           }
           
-          // Copy the file to a folder in your app.
+          // Copy the file the documents folder of the app.
           let fileURL = FileManager.default.getDocumentsDirectory()
           do {
             try FileManager.default.copyItem(at: url, to: fileURL)
@@ -60,14 +63,11 @@ public struct ImagePicker: UIViewControllerRepresentable {
             debugPrint(error.localizedDescription, #file, #function)
           }
           
-          self.converter.downsample(
-            url,
-            to: .init(width: 1500, height: 1500),
-            on: self.converterQueue.eraseToAnyScheduler()
-          )
-            .subscribe(on: DispatchQueue.main, options: nil)
-            .sink { image in
-              self.parent.pickerResult.append(StorableImage(uiImage: image, imageUrl: fileURL))
+          self.converter.downsample(url, on: self.converterQueue.eraseToAnyScheduler())
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+            } receiveValue: { [weak self] image in
+              self?.parent.pickerResult.append(image)
             }
             .store(in: &self.bag)
         }
@@ -97,6 +97,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
   }
 }
 
+// MARK: Helper
 extension FileManager {
   func getDocumentsDirectory() -> URL {
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)

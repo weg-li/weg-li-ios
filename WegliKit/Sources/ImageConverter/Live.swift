@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import Combine
+import SharedModels
 import UIKit.UIImage
+import UniformTypeIdentifiers
 
 public extension ImageConverter {
   static func live(_ size: CGSize = .init(width: 1000, height: 1000)) -> Self {
@@ -37,10 +39,12 @@ public extension ImageConverter {
           }
       },
       downsample: { imageURL, pointSize, scale in
-          .result {
+          .future { promise in
             let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
             guard let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, imageSourceOptions) else {
-              return .failure(.init(message: "Source can not be created"))
+              promise(.failure(.init(message: "Source can not be created")))
+              assertionFailure()
+              return
             }
             
             // Calculate the desired dimension
@@ -53,12 +57,36 @@ public extension ImageConverter {
               kCGImageSourceCreateThumbnailWithTransform: true,
               kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
             ] as CFDictionary
+            
             guard let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions) else {
-              return .failure(.init(message: "Creates a thumbnail failed"))
+              promise(.success(nil))
+              return
             }
             
+            let data = NSMutableData()
+            guard let imageDestination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
+              promise(.success(nil))
+              assertionFailure()
+              return
+            }
+            
+            let destinationProperties = [
+              kCGImageDestinationLossyCompressionQuality: 0.9
+            ] as CFDictionary
+            
+            CGImageDestinationAddImage(imageDestination, downsampledImage, destinationProperties)
+            CGImageDestinationFinalize(imageDestination)
+            
+            let dataSize = ByteCountFormatter.string(fromByteCount: Int64(data.length), countStyle: .memory)
+            debugPrint("\((#file as NSString).lastPathComponent)[\(#line)], \(#function): load image \(dataSize)")
+            
+            let storableImage = StorableImage(
+              data: data as Data,
+              imageUrl: imageURL
+            )
+            
             // Return the downsampled image as UIImage
-            return .success(UIImage(cgImage: downsampledImage))
+            promise(.success(storableImage))
           }
       }
     )
