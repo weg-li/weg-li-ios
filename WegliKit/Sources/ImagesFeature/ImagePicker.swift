@@ -2,6 +2,7 @@
 
 import Combine
 import CoreLocation
+import ImageConverter
 import PhotosUI
 import SharedModels
 import SwiftUI
@@ -11,36 +12,64 @@ public struct ImagePicker: UIViewControllerRepresentable {
   @Binding var pickerResult: [StorableImage?]
   @Binding var coordinate: CLLocationCoordinate2D?
   
+  
   public class Coordinator: NSObject, PHPickerViewControllerDelegate {
-    private let parent: ImagePicker
+    let parent: ImagePicker
+    let converter: ImageConverter = .live()
+    let converterQueue = DispatchQueue(label: "li.weg.iOS-Client.ConverterQueue")
+    var bag: Set<AnyCancellable> = .init()
     
     public init(_ parent: ImagePicker) {
       self.parent = parent
     }
     
-    public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+    public func picker(
+      _ picker: PHPickerViewController,
+      didFinishPicking results: [PHPickerResult]
+    ) {
       guard !results.isEmpty else {
         parent.isPresented = false
         return
       }
       
       for result in results {
-        if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-          if let assetId = result.assetIdentifier {
-            let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-            parent.coordinate = assetResults.firstObject?.location?.coordinate
+        let prov = result.itemProvider
+        
+        if let assetId = result.assetIdentifier {
+          let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
+          parent.coordinate = assetResults.firstObject?.location?.coordinate
+        }
+        
+        prov.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] url, error in
+          guard let self = self else { return }
+          guard error == nil else {
+            debugPrint(error!.localizedDescription, #file, #function)
+            return
           }
-          result.itemProvider.loadObject(ofClass: UIImage.self) { selectedImage, error in
-            if let error = error {
-              debugPrint(error.localizedDescription)
-            } else if let image = selectedImage as? UIImage {
-              DispatchQueue.main.async {
-                self.parent.pickerResult.append(StorableImage(uiImage: image))
-              }
-            } else {
-              debugPrint("Can not load asset")
+          
+          guard let url = url else {
+            debugPrint("itemProvider file representation URL is nil")
+            return
+          }
+          
+          // Copy the file to a folder in your app.
+          let fileURL = FileManager.default.getDocumentsDirectory()
+          do {
+            try FileManager.default.copyItem(at: url, to: fileURL)
+          } catch {
+            debugPrint(error.localizedDescription, #file, #function)
+          }
+          
+          self.converter.downsample(
+            url,
+            to: .init(width: 1500, height: 1500),
+            on: self.converterQueue.eraseToAnyScheduler()
+          )
+            .subscribe(on: DispatchQueue.main, options: nil)
+            .sink { image in
+              self.parent.pickerResult.append(StorableImage(uiImage: image, imageUrl: fileURL))
             }
-          }
+            .store(in: &self.bag)
         }
       }
       parent.isPresented = false
@@ -65,5 +94,13 @@ public struct ImagePicker: UIViewControllerRepresentable {
     context: UIViewControllerRepresentableContext<ImagePicker>
   ) {
     uiViewController.navigationItem.leftBarButtonItem?.tintColor = .purple
+  }
+}
+
+extension FileManager {
+  func getDocumentsDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    let documentsDirectory = paths[0]
+    return documentsDirectory
   }
 }

@@ -6,10 +6,12 @@ import UIKit
 public struct StorableImage: Hashable, Identifiable, Codable {
   public let id: String
   public let image: Data
+  public let imageUrl: URL?
   
-  public init(id: String = UUID().uuidString, image: Data) {
+  public init(id: String = UUID().uuidString, image: Data, imageUrl: URL? = nil) {
     self.id = id
     self.image = image
+    self.imageUrl = imageUrl
   }
   
   public var asUIImage: UIImage? {
@@ -18,11 +20,12 @@ public struct StorableImage: Hashable, Identifiable, Codable {
 }
 
 public extension StorableImage {
-  init?(id: String = UUID().uuidString, uiImage: UIImage) {
+  init?(id: String = UUID().uuidString, uiImage: UIImage, imageUrl: URL? = nil) {
     guard let data = uiImage.pngData() else {
       return nil
     }
-    image = data
+    self.image = data
     self.id = id
+    self.imageUrl = imageUrl
   }
 }

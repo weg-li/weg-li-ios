@@ -6,14 +6,14 @@ import SwiftUI
 
 public struct ImageGrid: View {
   let store: Store<ImagesViewState, ImagesViewAction>
-  @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
+  @ObservedObject var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
   
   public init(store: Store<ImagesViewState, ImagesViewAction>) {
     self.store = store
     viewStore = ViewStore(store)
   }
   
-  private let gridItemLayout = [
+  let gridItemLayout = [
     GridItem(.flexible(minimum: 50, maximum: .infinity)),
     GridItem(.flexible(minimum: 50, maximum: .infinity)),
     GridItem(.flexible(minimum: 50, maximum: .infinity))
@@ -24,9 +24,9 @@ public struct ImageGrid: View {
       ForEachStore(
         store.scope(
           state: \.imageStates,
-          action: ImagesViewAction.image(id:action:)
+          action: ImagesViewAction.image
         ),
-        content: ImageView.init(store:)
+        content: ImageView.init
       )
     }
   }
