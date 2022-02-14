@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1310"
+   LastUpgradeVersion = "1320"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -16,10 +16,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9F971E8C247ABFCB00A68959"
-               BuildableName = "weg-liTests.xctest"
-               BlueprintName = "weg-liTests"
-               ReferencedContainer = "container:weg-li.xcodeproj">
+               BlueprintIdentifier = "MailFeatureTests"
+               BuildableName = "MailFeatureTests"
+               BlueprintName = "MailFeatureTests"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
       </Testables>
