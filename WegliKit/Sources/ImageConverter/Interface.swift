@@ -5,14 +5,11 @@ import UIKit.UIImage
 
 public struct ImageConverter {
   public init(
-    scale: @escaping (UIImage) -> Effect<UIImage, ImageConverterError>,
     downsample: @escaping (URL, CGSize, CGFloat) -> Effect<StorableImage?, ImageConverterError>
   ) {
-    self.scale = scale
     self.downsample = downsample
   }
   
-  public var scale: (UIImage) -> Effect<UIImage, ImageConverterError>
   public var downsample: (URL, CGSize, CGFloat) -> Effect<StorableImage?, ImageConverterError>
   
   public func downsample(

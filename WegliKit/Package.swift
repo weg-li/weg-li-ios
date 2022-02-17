@@ -251,7 +251,6 @@ package.targets.append(
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
-    .testTarget(name: "ImageConverterTests"),
     .testTarget(
       name: "ImagesFeatureTests",
       dependencies: [

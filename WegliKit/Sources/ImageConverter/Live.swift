@@ -5,39 +5,8 @@ import UIKit.UIImage
 import UniformTypeIdentifiers
 
 public extension ImageConverter {
-  static func live(_ size: CGSize = .init(width: 1000, height: 1000)) -> Self {
+  static func live() -> Self {
     Self(
-      scale: { image in
-          .result {
-            // Determine the scale factor that preserves aspect ratio
-            let widthRatio = size.width / image.size.width
-            let heightRatio = size.height / image.size.height
-            
-            let scaleFactor = min(widthRatio, heightRatio)
-            
-            // Compute the new image size that preserves aspect ratio
-            let scaledImageSize = CGSize(
-              width: image.size.width * scaleFactor,
-              height: image.size.height * scaleFactor
-            )
-            
-            // Draw and return the resized UIImage
-            let renderer = UIGraphicsImageRenderer(
-              size: scaledImageSize
-            )
-            
-            let scaledImage = renderer.image { _ in
-              image.draw(
-                in: CGRect(
-                  origin: .zero,
-                  size: scaledImageSize
-                )
-              )
-            }
-            
-            return .success(scaledImage)
-          }
-      },
       downsample: { imageURL, pointSize, scale in
           .future { promise in
             let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
@@ -85,7 +54,6 @@ public extension ImageConverter {
               imageUrl: imageURL
             )
             
-            // Return the downsampled image as UIImage
             promise(.success(storableImage))
           }
       }
