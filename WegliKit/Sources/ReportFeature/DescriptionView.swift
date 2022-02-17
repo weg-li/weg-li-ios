@@ -18,11 +18,11 @@ public struct DescriptionView: View {
     let showEditScreen: Bool
     
     init(state: Report) {
-      description = state.description
-      brand = DescriptionState.brands[state.description.selectedBrand]
-      color = DescriptionState.colors[state.description.selectedColor].value
-      chargeType = DescriptionState.charges[state.description.selectedType].value
-      showEditScreen = state.showEditDescription
+      self.description = state.description
+      self.brand = DescriptionState.brands[state.description.selectedBrand]
+      self.color = DescriptionState.colors[state.description.selectedColor].value
+      self.chargeType = DescriptionState.charges[state.description.selectedType].value
+      self.showEditScreen = state.showEditDescription
     }
   }
   
@@ -39,7 +39,7 @@ public struct DescriptionView: View {
       VStack(alignment: .leading, spacing: 12) {
         row(title: L10n.Description.Row.carType, content: viewStore.brand)
         row(title: L10n.Description.Row.carColor, content: viewStore.color)
-        row(title: L10n.Description.Row.licensplateNumber, content: viewStore.description.licensePlateNumber)
+        row(title: L10n.Description.Row.licenseplateNumber, content: viewStore.description.licensePlateNumber)
         row(title: L10n.Description.Row.length, content: viewStore.description.time)
         row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)
         if viewStore.description.blockedOthers {

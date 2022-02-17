@@ -28,7 +28,24 @@ public extension Address {
   }
   
   var humanReadableAddress: String {
-    "\(street), \(postalCode) \(city)"
+    let formatter = CNPostalAddressFormatter()
+    
+    let address = CNMutablePostalAddress()
+    address.postalCode = postalCode
+    address.city = city
+    address.street = street
+    
+    return formatter.string(from: address)
+  }
+    
+  var humanReadableCity: String {
+    let formatter = CNPostalAddressFormatter()
+    
+    let address = CNMutablePostalAddress()
+    address.postalCode = postalCode
+    address.city = city
+    
+    return formatter.string(from: address)
   }
   
   var isValid: Bool {

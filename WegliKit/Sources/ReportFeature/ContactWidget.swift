@@ -12,11 +12,15 @@ public struct ContactWidget: View {
     let isResetButtonDisabled: Bool
     let contact: Contact
     let showEditScreen: Bool
+    let fullName: String
+    let city: String
     
     init(state: Report) {
       self.isResetButtonDisabled = state.contactState == .empty
       self.contact = state.contactState.contact
       self.showEditScreen = state.showEditContact
+      self.fullName = state.contactState.contact.fullName
+      self.city = state.contactState.contact.address.humanReadableCity
     }
   }
   
@@ -30,9 +34,9 @@ public struct ContactWidget: View {
   
   public var body: some View {
     VStack(alignment: .leading, spacing: 10) {
-      row(callout: L10n.Contact.Row.nameCopy, content: "\(viewStore.contact.firstName) \(viewStore.contact.name)")
+      row(callout: L10n.Contact.Row.nameCopy, content: viewStore.fullName)
       row(callout: L10n.Contact.Row.streetCopy, content: viewStore.contact.address.street)
-      row(callout: L10n.Contact.Row.cityCopy, content: "\(viewStore.contact.address.postalCode) \(viewStore.contact.address.city)")
+      row(callout: L10n.Contact.Row.cityCopy, content: viewStore.city)
       if !viewStore.contact.phone.isEmpty {
         row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.contact.phone)
       }

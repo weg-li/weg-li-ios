@@ -43,3 +43,26 @@ public extension Contact {
     phone: RowType.phone.placeholder
   )
 }
+
+public extension SharedModels.Contact {
+  var fullName: String {
+    let formatter = PersonNameComponentsFormatter()
+    
+    var components = PersonNameComponents()
+    components.givenName = firstName
+    components.familyName = name
+    
+    return formatter.string(from: components)
+  }
+  
+  var humanReadableContact: String {
+    var output = fullName
+    if !phone.isEmpty {
+      output.append("\nTelefonnummer: \(phone)")
+    }
+    if !dateOfBirth.isEmpty {
+      output.append("\nGeburtstag: \(dateOfBirth)")
+    }
+    return output
+  }
+}

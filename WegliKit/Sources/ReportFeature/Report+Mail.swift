@@ -1,4 +1,6 @@
 import DescriptionFeature
+import Foundation
+import SharedModels
 
 public extension Report {
   // swiftlint:disable:next function_body_length
@@ -27,7 +29,7 @@ public extension Report {
     
     Zeuge:
     
-    Name: \(contactState.humandReadableContact)
+    Name: \(contactState.contact.humanReadableContact)
     
     Anschrift: \(contactState.contact.address.humanReadableAddress)
     

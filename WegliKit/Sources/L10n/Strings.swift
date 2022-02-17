@@ -98,7 +98,7 @@ public enum L10n {
       /// Dauer
       public static let length = L10n.tr("Localizable", "description.row.length")
       /// Kennzeichen
-      public static let licensplateNumber = L10n.tr("Localizable", "description.row.licensplateNumber")
+      public static let licenseplateNumber = L10n.tr("Localizable", "description.row.licenseplateNumber")
     }
     public enum Section {
       public enum Vehicle {
