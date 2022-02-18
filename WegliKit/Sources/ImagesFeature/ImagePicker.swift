@@ -3,6 +3,7 @@
 import Combine
 import CoreLocation
 import ImageConverter
+import os.log
 import PhotosUI
 import SharedModels
 import SwiftUI
@@ -35,15 +36,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
       for result in results {
         let prov = result.itemProvider
         
-        // get the location from the first image because
-        // hopefully the selected images are from one location 🤞
-        if let assetId = result.assetIdentifier {
-          let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-          parent.coordinate = assetResults.firstObject?.location?.coordinate
-        }
-        
         prov.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] url, error in
-          guard let self = self else { return }
           
           guard error == nil else {
             debugPrint(error!.localizedDescription, #file, #function)
@@ -58,18 +51,65 @@ public struct ImagePicker: UIViewControllerRepresentable {
           // Copy the file the documents folder of the app.
           let fileURL = FileManager.default.getDocumentsDirectory()
           do {
-            try FileManager.default.copyItem(at: url, to: fileURL)
+            try FileManager.default.secureCopyItem(at: url, to: fileURL)
           } catch {
-            debugPrint(error.localizedDescription, #file, #function)
+            debugPrint("🖼🛠", error.localizedDescription, #fileID, #function)
           }
           
-          self.converter.downsample(url, on: self.converterQueue.eraseToAnyScheduler())
-            .receive(on: DispatchQueue.main)
-            .sink { _ in
-            } receiveValue: { [weak self] image in
-              self?.parent.pickerResult.append(image)
-            }
-            .store(in: &self.bag)
+          guard let self = self else { return }
+          
+          let imageDocumentsUrl = fileURL.appendingPathComponent(url.lastPathComponent)
+          debugPrint(imageDocumentsUrl.absoluteString)
+          
+          // TODO: make async
+          let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+          guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
+            return
+          }
+
+          let downsampleOptions = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 1536,
+          ] as CFDictionary
+
+          guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
+            debugPrint("CGImageSourceCreateThumbnailAtIndex failed", #fileID, #function)
+            return
+          }
+
+          let data = NSMutableData()
+          guard let imageDestination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
+            assertionFailure()
+            return
+          }
+
+          let destinationProperties = [
+            kCGImageDestinationLossyCompressionQuality: 0.9
+          ] as CFDictionary
+
+          CGImageDestinationAddImage(imageDestination, cgImage, destinationProperties)
+          CGImageDestinationFinalize(imageDestination)
+
+          let dataSize = ByteCountFormatter.string(fromByteCount: Int64(data.length), countStyle: .memory)
+          debugPrint(#fileID, #line, #function, "load image \(dataSize)")
+          
+          
+          let result = StorableImage(
+            data: data as Data,
+            imageUrl: imageDocumentsUrl
+          )
+          
+          DispatchQueue.main.async {
+            self.parent.pickerResult.append(result)
+          }
+        }
+        
+        // get the location from the first image because
+        // hopefully the selected images are from one location 🤞
+        if let assetId = result.assetIdentifier {
+          let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
+          parent.coordinate = assetResults.firstObject?.location?.coordinate
         }
       }
       parent.isPresented = false
@@ -104,4 +144,18 @@ extension FileManager {
     let documentsDirectory = paths[0]
     return documentsDirectory
   }
+  
+  @discardableResult
+  open func secureCopyItem(at srcURL: URL, to dstURL: URL) throws -> Bool {
+    do {
+      if FileManager.default.fileExists(atPath: dstURL.path) {
+        try FileManager.default.removeItem(at: dstURL)
+      }
+      try FileManager.default.copyItem(at: srcURL, to: dstURL)
+    } catch {
+      return false
+    }
+    return true
+  }
 }
+

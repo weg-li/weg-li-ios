@@ -13,12 +13,16 @@ public struct ImageView: View {
     self.store = store
     viewStore = ViewStore(store)
   }
-  
+
   public var body: some View {
-    Image(uiImage: viewStore.image.asUIImage!) // swiftlint:disable:this force_unwrapping
-      .gridModifier
-      .padding(4)
-      .overlay(deleteButton, alignment: .center)
+    if let image = viewStore.image.asUIImage {
+      Image(uiImage: image)
+        .gridModifier
+        .padding(4)
+        .overlay(deleteButton, alignment: .center)
+    } else {
+      ActivityIndicator(style: .medium)
+    }
   }
   
   var deleteButton: some View {
@@ -32,14 +36,14 @@ public struct ImageView: View {
   }
 }
 
-private extension Image {
+extension Image {
   var gridModifier: some View {
     self
       .resizable()
       .aspectRatio(contentMode: .fill)
       .frame(
         minWidth: 50,
-        maxWidth: .infinity/*@END_MENU_TOKEN@*/,
+        maxWidth: .infinity,
         minHeight: 100,
         maxHeight: 100
       )

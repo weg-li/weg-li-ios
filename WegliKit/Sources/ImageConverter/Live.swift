@@ -7,15 +7,14 @@ import UniformTypeIdentifiers
 public extension ImageConverter {
   static func live() -> Self {
     Self(
-      downsample: { imageURL, pointSize, scale in
+      downsample: { url, pointSize, scale in
           .future { promise in
-            let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-            guard let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, imageSourceOptions) else {
+            let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+            guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
               promise(.failure(.init(message: "Source can not be created")))
-              assertionFailure()
               return
             }
-            
+                        
             // Calculate the desired dimension
             let maxDimensionInPixels = max(pointSize.width, pointSize.height) * scale
             
@@ -27,7 +26,7 @@ public extension ImageConverter {
               kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
             ] as CFDictionary
             
-            guard let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions) else {
+            guard let downsampledImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
               promise(.success(nil))
               return
             }
@@ -51,7 +50,7 @@ public extension ImageConverter {
             
             let storableImage = StorableImage(
               data: data as Data,
-              imageUrl: imageURL
+              imageUrl: url
             )
             
             promise(.success(storableImage))
