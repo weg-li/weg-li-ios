@@ -162,7 +162,7 @@ class ReportStoreTests: XCTestCase {
       $0.location.isResolvingAddress = false
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapGeoAddressToDistrict(expectedAddress))
+    store.receive(.mapAddressToDistrict(expectedAddress))
     store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
       $0.district = expectedDistrict
     }
@@ -233,7 +233,7 @@ class ReportStoreTests: XCTestCase {
     store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapGeoAddressToDistrict(expectedAddress))
+    store.receive(.mapAddressToDistrict(expectedAddress))
     store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }
@@ -262,7 +262,7 @@ class ReportStoreTests: XCTestCase {
     store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapGeoAddressToDistrict(expectedAddress))
+    store.receive(.mapAddressToDistrict(expectedAddress))
     store.receive(.mapDistrictFinished(.failure(.unableToMatchRegularityOffice))) {
       $0.district = nil
     }
@@ -314,7 +314,7 @@ class ReportStoreTests: XCTestCase {
         postalCode: newPostalCode, city: ""
       )
     }
-    store.receive(.mapGeoAddressToDistrict(expectedAddress))
+    store.receive(.mapAddressToDistrict(expectedAddress))
     store.receive(.mapDistrictFinished(.failure(.unableToMatchRegularityOffice))) {
       $0.district = nil
     }
@@ -363,7 +363,7 @@ class ReportStoreTests: XCTestCase {
     store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapGeoAddressToDistrict(expectedAddress))
+    store.receive(.mapAddressToDistrict(expectedAddress))
     store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }

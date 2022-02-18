@@ -18,10 +18,10 @@ public struct CoordinateRegion: Equatable {
   }
   
   public static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.center.latitude == rhs.center.latitude
-    && lhs.center.longitude == rhs.center.longitude
-    && lhs.span.latitudeDelta == rhs.span.latitudeDelta
-    && lhs.span.longitudeDelta == rhs.span.longitudeDelta
+    lhs.center.latitude.isEqual(to: rhs.center.latitude)
+    && lhs.center.longitude.isEqual(to: rhs.center.longitude)
+    && lhs.span.latitudeDelta.isEqual(to: rhs.span.latitudeDelta)
+    && lhs.span.longitudeDelta.isEqual(to: rhs.span.longitudeDelta)
   }
 }
 

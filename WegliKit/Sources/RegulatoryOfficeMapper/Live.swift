@@ -9,16 +9,24 @@ public extension RegulatoryOfficeMapper {
   static func live(_ districts: [District] = .all) -> Self {
     Self(
       mapAddressToDistrict: { address in
-          .result {
-            if let districtMAtchedByPostalCode = districts.first(where: { $0.zip == address.postalCode }) {
-              return .success(districtMAtchedByPostalCode)
-            } else if let districtMatchedByName = districts.first(where: { $0.name == address.city }) {
-              return .success(districtMatchedByName)
-            } else {
-              return .failure(.unableToMatchRegularityOffice)
+          .future { promise in
+            mapperQueue.async {
+              if let districtMAtchedByPostalCode = districts.first(where: { $0.zip == address.postalCode }) {
+                promise(.success(districtMAtchedByPostalCode))
+              } else if let districtMatchedByName = districts.first(where: { $0.name == address.city }) {
+                promise(.success(districtMatchedByName))
+              } else {
+                promise(.failure(.unableToMatchRegularityOffice))
+              }
             }
           }
       }
     )
   }
 }
+
+let mapperQueue = DispatchQueue(
+  label: "li.weg.iosclient.RegulatoryOfficeMapper",
+  qos: .userInitiated,
+  attributes: .concurrent
+)

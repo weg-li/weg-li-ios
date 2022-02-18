@@ -73,7 +73,7 @@ public enum ReportAction: Equatable {
   case description(DescriptionAction)
   case location(LocationViewAction)
   case mail(MailViewAction)
-  case mapGeoAddressToDistrict(Address)
+  case mapAddressToDistrict(Address)
   case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
   case resetButtonTapped
   case resetConfirmButtonTapped
@@ -150,11 +150,10 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     
     switch action {
       // Triggers district mapping after geoAddress is stored.
-    case let .mapGeoAddressToDistrict(input):
-      return environment
-        .regulatoryOfficeMapper
+    case let .mapAddressToDistrict(input):
+      return environment.regulatoryOfficeMapper
         .mapAddressToDistrict(input)
-      //        .subscribe(on: , options: )
+        .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(ReportAction.mapDistrictFinished)
         .eraseToEffect()
@@ -203,7 +202,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         guard let address = resolvedAddresses.first else {
           return .none
         }
-        return Effect(value: ReportAction.mapGeoAddressToDistrict(address))
+        return Effect(value: ReportAction.mapAddressToDistrict(address))
       case let .resolveAddressFinished(.failure(error)):
         debugPrint(error.localizedDescription)
         return .none
@@ -213,10 +212,10 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         guard postalCode.count == environment.postalCodeMinumimCharacters, postalCode.isNumeric else {
           return .none
         }
-        return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
+        return Effect(value: ReportAction.mapAddressToDistrict(state.location.resolvedAddress))
       
       case let .updateGeoAddressCity(city):
-        return Effect(value: ReportAction.mapGeoAddressToDistrict(state.location.resolvedAddress))
+        return Effect(value: ReportAction.mapAddressToDistrict(state.location.resolvedAddress))
         
       case let .setLocationOption(option) where option == .fromPhotos:
         if !state.images.storedPhotos.isEmpty, let coordinate = state.images.coordinateFromImagePicker {
@@ -268,7 +267,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       return .none
     }
   }
-)
+).debug()
 
 public extension Report {
   static var preview: Report {

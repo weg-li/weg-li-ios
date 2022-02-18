@@ -100,6 +100,7 @@ let package = Package(
     .target(
       name: "ImagesFeature",
       dependencies: [
+        "Helper",
         "ImageConverter",
         "L10n",
         "PhotoLibraryAccessClient",

@@ -71,6 +71,7 @@ public let locationManagerReducer = Reducer<UserLocationState, LocationManager.A
     guard let location = locations.first else { return .none }
     state.region = CoordinateRegion(center: location.coordinate)
     return .none
+      
   case let .didFailWithError(error):
     print(error.localizedDescription)
     return .none
@@ -176,7 +177,6 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       switch environment.locationManager.authorizationStatus() {
       case .notDetermined:
         state.userLocationState.isRequestingCurrentLocation = true
-        
         return environment.locationManager
           .requestWhenInUseAuthorization(id: LocationManagerId())
           .fireAndForget()
@@ -197,6 +197,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       @unknown default:
         return .none
       }
+        
     case .dismissAlertButtonTapped:
       state.alert = nil
       return .none
@@ -204,9 +205,9 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     case .toggleMapExpanded:
       state.isMapExpanded.toggle()
       return .none
+        
     case let .setLocationOption(value):
       state.locationOption = value
-      
       switch value {
       case .fromPhotos:
         return .none
@@ -215,6 +216,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       case .manual:
         return .none
       }
+        
     case let .userLocationAction(userLocationAction):
       switch userLocationAction {
       case let .didUpdateLocations(locations):
@@ -228,13 +230,13 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       default:
         return .none
       }
+        
     case let .resolveLocation(coordinate): // reverse geo code coordinate to address
       state.isResolvingAddress = true
       let clLocation = CLLocation(
         latitude: coordinate.latitude,
         longitude: coordinate.longitude
       )
-      
       return environment.placeService
         .placemarks(clLocation)
         .receive(on: environment.mainRunLoop)
@@ -252,6 +254,13 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       return .none
       
     case let .updateRegion(region):
+      if
+        let center = region?.center,
+        let storedCenter = state.userLocationState.region?.center,
+        center.distance(from: storedCenter) > 50
+      {
+        return .none
+      }
       state.userLocationState.region = region
       return .none
       
@@ -264,8 +273,10 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     case let .updateGeoAddressPostalCode(postalCode):
       state.resolvedAddress.postalCode = postalCode
       return .none
+    
     case .setResolvedLocation:
       return .none
+        
     case .goToSettingsButtonTapped:
       return URL(string: environment.uiApplicationClient.openSettingsURLString())
         .map {
@@ -305,4 +316,16 @@ public extension AlertState where Action == LocationViewAction {
   static let provideAccessToLocationService = Self(
     title: TextState(L10n.Location.Alert.provideAccessToLocationService)
   )
+}
+
+
+extension CLLocationCoordinate2D {
+  /// Returns distance from coordianate in meters.
+  /// - Parameter from: coordinate which will be used as end point.
+  /// - Returns: Returns distance in meters.
+  func distance(from: CLLocationCoordinate2D) -> CLLocationDistance {
+    let from = CLLocation(latitude: from.latitude, longitude: from.longitude)
+    let to = CLLocation(latitude: self.latitude, longitude: self.longitude)
+    return from.distance(from: to)
+  }
 }

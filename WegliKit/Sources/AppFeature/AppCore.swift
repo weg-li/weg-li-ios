@@ -161,7 +161,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       return .none
       // Reset report draft after it was .
     case .reportSaved:
-      state.reportDraft = Report(images: .init(), contactState: state.settings.contact, date: Date.init)
+//      state.reportDraft = Report(images: .init(), contactState: state.settings.contact, date: Date.init)
       return .none
     }
   }

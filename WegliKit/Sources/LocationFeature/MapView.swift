@@ -34,7 +34,7 @@ struct MapView: UIViewRepresentable {
     mapView.showsUserLocation = showsLocation
     
     if let region = self.region {
-      mapView.setRegion(region.asMKCoordinateRegion, animated: true)
+      mapView.setRegion(region.asMKCoordinateRegion, animated: false)
     }
     
     let currentlyDisplayedPOIs = mapView.annotations.compactMap { $0 as? PointOfInterestAnnotation }

@@ -8,6 +8,8 @@ import Styleguide
 import SwiftUI
 
 public struct EditDescriptionView: View {
+  @Environment(\.presentationMode) var presentationMode
+  
   let store: Store<DescriptionState, DescriptionAction>
   @ObservedObject private var viewStore: ViewStore<DescriptionState, DescriptionAction>
   
@@ -32,12 +34,12 @@ public struct EditDescriptionView: View {
           blockedOthersView
         }
       }
-      .navigationBarItems(leading: closeButton)
       .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
+      .navigationBarItems(leading: closeButton)
     }
   }
   
-  private var licensePlateView: some View {
+  var licensePlateView: some View {
     TextField(
       "\(L10n.Description.Row.licenseplateNumber) *",
       text: viewStore.binding(
@@ -47,7 +49,7 @@ public struct EditDescriptionView: View {
     )
   }
   
-  private var carBrandView: some View {
+  var carBrandView: some View {
     Picker(
       L10n.Description.Row.carType,
       selection: viewStore.binding(
@@ -64,7 +66,7 @@ public struct EditDescriptionView: View {
     }
   }
   
-  private var carColorView: some View {
+  var carColorView: some View {
     Picker(
       L10n.Description.Row.carColor,
       selection: viewStore.binding(
@@ -81,7 +83,7 @@ public struct EditDescriptionView: View {
     }
   }
   
-  private var chargTypeView: some View {
+  var chargTypeView: some View {
     Picker(
       L10n.Description.Row.chargeType,
       selection: viewStore.binding(
@@ -94,11 +96,10 @@ public struct EditDescriptionView: View {
           .tag($0)
           .foregroundColor(Color(.label))
       }
-      .navigationTitle(Text(L10n.Description.Row.chargeType))
     }
   }
   
-  private var chargeLengthView: some View {
+  var chargeLengthView: some View {
     Picker(
       L10n.Description.Row.length,
       selection: viewStore.binding(
@@ -114,7 +115,7 @@ public struct EditDescriptionView: View {
     }
   }
   
-  private var blockedOthersView: some View {
+  var blockedOthersView: some View {
     Button(
       action: {
         viewStore.send(.toggleBlockedOthers)
@@ -129,15 +130,15 @@ public struct EditDescriptionView: View {
               get: \.blockedOthers,
               send: DescriptionAction.toggleBlockedOthers
             )
-          ).animation(.easeIn(duration: 0.1))
+          ).animation(.easeIn(duration: 0.1), value: viewStore.blockedOthers)
         }
       }
     )
   }
   
-  private var closeButton: some View {
+  var closeButton: some View {
     Button(
-      action: { },
+      action: { presentationMode.wrappedValue.dismiss() },
       label: { Text(L10n.Button.close) }
     )
   }
