@@ -9,7 +9,7 @@ public struct OnWidgetInteractionButtonStyle: ButtonStyle {
     configuration.label
       .padding(20)
       .background(configuration.isPressed ? Color(.systemGray6).opacity(0.3) : Color(.systemGray3).opacity(0.7))
-      .animation(.easeOut)
+      .animation(.easeOut, value: configuration.isPressed)
       .clipShape(Circle())
   }
 }

@@ -6,6 +6,8 @@ import Styleguide
 import SwiftUI
 
 public struct ImageView: View {
+  @Environment(\.accessibilityReduceMotion) var reduceMotion
+  
   let store: Store<ImageState, ImageAction>
   @ObservedObject private var viewStore: ViewStore<ImageState, ImageAction>
   
@@ -17,6 +19,7 @@ public struct ImageView: View {
   public var body: some View {
     if let url = viewStore.image.imageUrl {
       AsyncThumbnailView(url: url)
+        .gridModifier
         .padding(4)
         .overlay(deleteButton, alignment: .center)
     } else {
@@ -26,7 +29,7 @@ public struct ImageView: View {
   
   var deleteButton: some View {
     Button(
-      action: { viewStore.send(.removePhoto) },
+      action: { viewStore.send(.removePhoto, animation: .easeOut(duration: 0.2)) },
       label: { Image(systemName: "trash") }
     )
       .foregroundColor(.red)
@@ -35,11 +38,9 @@ public struct ImageView: View {
   }
 }
 
-extension Image {
+private extension View {
   var gridModifier: some View {
     self
-      .resizable()
-      .aspectRatio(contentMode: .fill)
       .frame(
         minWidth: 50,
         maxWidth: .infinity,

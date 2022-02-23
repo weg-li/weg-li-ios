@@ -49,7 +49,7 @@ public extension Report {
     
     Mit freundlichen Grüßen
     
-    \(contactState.contact.firstName) \(contactState.contact.name)
+    \(contactState.contact.fullName)
     """
   }
 }

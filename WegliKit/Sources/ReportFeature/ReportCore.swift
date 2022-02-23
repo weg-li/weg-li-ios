@@ -154,7 +154,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       // Triggers district mapping after geoAddress is stored.
     case let .mapAddressToDistrict(input):
       return environment.regulatoryOfficeMapper
-        .mapAddressToDistrict(input)
+        .mapAddress(address: input, on: environment.mapAddressQueue)
         .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(ReportAction.mapDistrictFinished)
@@ -269,8 +269,9 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       return .none
     }
   }
-).debug()
+)
 
+// MARK: Helper
 public extension Report {
   static var preview: Report {
     Report(

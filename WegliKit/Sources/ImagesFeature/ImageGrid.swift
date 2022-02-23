@@ -29,6 +29,7 @@ public struct ImageGrid: View {
         content: ImageView.init
       )
     }
+    .transition(.opacity)
   }
 }
 

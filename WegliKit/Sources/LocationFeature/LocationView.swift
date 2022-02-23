@@ -20,13 +20,13 @@ public struct LocationView: View {
     let resolvedLocationFromPhoto: CLLocationCoordinate2D?
     
     public init(state: LocationViewState) {
-      locationOption = state.locationOption
-      region = state.userLocationState.region
-      isMapExpanded = state.isMapExpanded
-      address = state.resolvedAddress
-      showActivityIndicator = state.userLocationState.isRequestingCurrentLocation
+      self.locationOption = state.locationOption
+      self.region = state.userLocationState.region
+      self.isMapExpanded = state.isMapExpanded
+      self.address = state.resolvedAddress
+      self.showActivityIndicator = state.userLocationState.isRequestingCurrentLocation
       || state.isResolvingAddress
-      resolvedLocationFromPhoto = .zero
+      self.resolvedLocationFromPhoto = .zero
     }
   }
   
@@ -109,10 +109,9 @@ public struct LocationView: View {
             .accessibility(label: Text(L10n.Location.A11y.expandButtonLabel))
         }
       }
-      if viewStore.address != .init() {
-        addressView
-      }
+      addressView
     }
+    .transition(.opacity)
     .alert(
       store.scope(
         state: { $0.alert },
@@ -125,10 +124,10 @@ public struct LocationView: View {
   
   @ViewBuilder var addressView: some View {
     HStack(spacing: 4) {
-      if !viewStore.showActivityIndicator, viewStore.address == .init() {
-        EmptyView()
-      } else if viewStore.showActivityIndicator {
+      if viewStore.showActivityIndicator {
         ActivityIndicator(style: .medium)
+      } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
+        EmptyView()
       } else {
         Image(systemName: "location.fill")
           .accessibility(hidden: true)
@@ -136,6 +135,7 @@ public struct LocationView: View {
           .lineLimit(2)
       }
     }
+    .transition(.opacity)
     .font(.body)
   }
   

@@ -27,8 +27,8 @@ let package = Package(
       targets: ["ImagesFeature"]
     ),
     .library(
-        name: "LocationFeature",
-        targets: ["LocationFeature"]
+      name: "LocationFeature",
+      targets: ["LocationFeature"]
     ),
     .library(
       name: "MailFeature",
@@ -51,7 +51,6 @@ let package = Package(
     .target(
       name: "AppFeature",
       dependencies: [
-        "ImageConverter",
         "L10n",
         "ReportFeature",
         "SettingsFeature",
@@ -91,17 +90,9 @@ let package = Package(
       dependencies: []
     ),
     .target(
-      name: "ImageConverter",
-      dependencies: [
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-      ]
-    ),
-    .target(
       name: "ImagesFeature",
       dependencies: [
         "Helper",
-        "ImageConverter",
         "L10n",
         "PhotoLibraryAccessClient",
         "SharedModels",
@@ -113,23 +104,23 @@ let package = Package(
       name: "L10n"
     ),
     .target(
-        name: "LocationFeature",
-        dependencies: [
-            "L10n",
-            "Helper",
-            "PlacesServiceClient",
-            "SharedModels",
-            "Styleguide",
-            "UIApplicationClient",
-            .product(
-                name: "ComposableArchitecture",
-                package: "swift-composable-architecture"
-            ),
-            .product(
-                name: "ComposableCoreLocation",
-                package: "composable-core-location"
-            )
-        ]
+      name: "LocationFeature",
+      dependencies: [
+        "L10n",
+        "Helper",
+        "PlacesServiceClient",
+        "SharedModels",
+        "Styleguide",
+        "UIApplicationClient",
+        .product(
+          name: "ComposableArchitecture",
+          package: "swift-composable-architecture"
+        ),
+        .product(
+          name: "ComposableCoreLocation",
+          package: "composable-core-location"
+        )
+      ]
     ),
     .target(
       name: "MailFeature",
@@ -174,8 +165,8 @@ let package = Package(
         "RegulatoryOfficeMapper",
         "SharedModels",
         .product(
-            name: "ComposableCoreLocation",
-            package: "composable-core-location"
+          name: "ComposableCoreLocation",
+          package: "composable-core-location"
         ),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ]
@@ -261,8 +252,8 @@ package.targets.append(
         "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(
-            name: "ComposableCoreLocation",
-            package: "composable-core-location"
+          name: "ComposableCoreLocation",
+          package: "composable-core-location"
         )
       ]
     ),
@@ -275,8 +266,8 @@ package.targets.append(
         "UIApplicationClient",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(
-            name: "ComposableCoreLocation",
-            package: "composable-core-location"
+          name: "ComposableCoreLocation",
+          package: "composable-core-location"
         )
       ]
     ),
