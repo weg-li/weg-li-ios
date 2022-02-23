@@ -5,17 +5,17 @@ import UIKit
 
 public struct StorableImage: Hashable, Identifiable, Codable {
   public let id: String
-  public let data: Data
+  public let data: Data?
   public let imageUrl: URL?
   
-  public init(id: String = UUID().uuidString, data: Data, imageUrl: URL? = nil) {
+  public init(id: String = UUID().uuidString, data: Data? = nil, imageUrl: URL? = nil) {
     self.id = id
     self.data = data
     self.imageUrl = imageUrl
   }
   
   public var asUIImage: UIImage? {
-    UIImage(data: data)
+    self.data.flatMap(UIImage.init)
   }
 }
 

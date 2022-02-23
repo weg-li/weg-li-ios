@@ -236,8 +236,8 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         state.mail.mail.address = district.email
         state.mail.mail.body = state.createMailBody()
         state.mail.mail.attachmentData = state.images.storedPhotos
-          .compactMap { $0 }
-          .map(\.data)
+          .compactMap { $0?.imageUrl }
+          .compactMap { try? Data(contentsOf: $0) }
         return Effect(value: ReportAction.mail(.presentMailContentView(true)))
       } else {
         return .none

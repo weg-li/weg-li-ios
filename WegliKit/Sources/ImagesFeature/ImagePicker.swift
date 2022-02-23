@@ -48,60 +48,15 @@ public struct ImagePicker: UIViewControllerRepresentable {
             return
           }
           
-          // Copy the file the documents folder of the app.
-          let fileURL = FileManager.default.getDocumentsDirectory()
-          do {
-            try FileManager.default.secureCopyItem(at: url, to: fileURL)
-          } catch {
-            debugPrint("🖼🛠", error.localizedDescription, #fileID, #function)
-          }
+          let destinationURL = FileManager.default
+            .getDocumentsDirectory()
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension(url.pathExtension)
           
-          guard let self = self else { return }
-          
-          let imageDocumentsUrl = fileURL.appendingPathComponent(url.lastPathComponent)
-          debugPrint(imageDocumentsUrl.absoluteString)
-          
-          // TODO: make async
-          let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-          guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
-            return
-          }
-
-          let downsampleOptions = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 1536,
-          ] as CFDictionary
-
-          guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
-            debugPrint("CGImageSourceCreateThumbnailAtIndex failed", #fileID, #function)
-            return
-          }
-
-          let data = NSMutableData()
-          guard let imageDestination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
-            assertionFailure()
-            return
-          }
-
-          let destinationProperties = [
-            kCGImageDestinationLossyCompressionQuality: 0.9
-          ] as CFDictionary
-
-          CGImageDestinationAddImage(imageDestination, cgImage, destinationProperties)
-          CGImageDestinationFinalize(imageDestination)
-
-          let dataSize = ByteCountFormatter.string(fromByteCount: Int64(data.length), countStyle: .memory)
-          debugPrint(#fileID, #line, #function, "load image \(dataSize)")
-          
-          
-          let result = StorableImage(
-            data: data as Data,
-            imageUrl: imageDocumentsUrl
-          )
+          try? FileManager.default.secureCopyItem(at: url, to: destinationURL)
           
           DispatchQueue.main.async {
-            self.parent.pickerResult.append(result)
+            self?.parent.pickerResult.append(.init(imageUrl: destinationURL))            
           }
         }
         

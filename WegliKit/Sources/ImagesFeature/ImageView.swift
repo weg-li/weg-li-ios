@@ -15,9 +15,8 @@ public struct ImageView: View {
   }
 
   public var body: some View {
-    if let image = viewStore.image.asUIImage {
-      Image(uiImage: image)
-        .gridModifier
+    if let url = viewStore.image.imageUrl {
+      AsyncThumbnailView(url: url)
         .padding(4)
         .overlay(deleteButton, alignment: .center)
     } else {
