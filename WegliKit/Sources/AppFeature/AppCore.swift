@@ -135,6 +135,10 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           case .sent:
             state.reports.append(state.reportDraft)
             
+            state.reportDraft.images.storedPhotos.forEach { image in
+              // TODO: remove copied images app dir
+            }
+            
             return Effect.concatenate(
               environment.userDefaultsClient.setReports(state.reports)
                 .fireAndForget(),

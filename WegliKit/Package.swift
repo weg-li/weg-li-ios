@@ -7,7 +7,7 @@ let package = Package(
   name: "WegliKit",
   defaultLocalization: "de",
   platforms: [
-    .iOS(.v14)
+    .iOS(.v15)
   ],
   products: [
     .library(
