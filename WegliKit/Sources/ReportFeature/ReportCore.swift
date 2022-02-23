@@ -112,7 +112,6 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     environment: {
       ImagesViewEnvironment(
         mainQueue: $0.mainQueue,
-        imageConverter: .live(),
         photoLibraryAccessClient: .live()
       )
     }

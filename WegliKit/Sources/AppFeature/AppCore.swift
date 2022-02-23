@@ -5,7 +5,6 @@ import ComposableArchitecture
 import ComposableCoreLocation
 import Contacts
 import Foundation
-import ImageConverter
 import MapKit
 import PlacesServiceClient
 import ReportFeature
@@ -65,17 +64,14 @@ public enum AppAction: Equatable {
 public struct AppEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
-    userDefaultsClient: UserDefaultsClient,
-    imageConverter: ImageConverter
+    userDefaultsClient: UserDefaultsClient
   ) {
     self.mainQueue = mainQueue
     self.userDefaultsClient = userDefaultsClient
-    self.imageConverter = imageConverter
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
   public var userDefaultsClient: UserDefaultsClient
-  public var imageConverter: ImageConverter
 }
 
 /// Reducer handling actions from the HomeView and combining it with the reducers from descending screens.
@@ -122,7 +118,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       default:
         return .none
       }
-      // After the emailResult reports the mail has been sent the report will be stored.
+    // After the emailResult reports the mail has been sent the report will be stored.
     case let .report(reportAction):
       switch reportAction {
       case let .mail(mailAction):

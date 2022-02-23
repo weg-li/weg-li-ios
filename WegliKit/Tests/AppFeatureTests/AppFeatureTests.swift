@@ -45,8 +45,7 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .noop,
-        imageConverter: .noop
+        userDefaultsClient: .noop
       )
     )
     
@@ -69,8 +68,7 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .noop,
-        imageConverter: .noop
+        userDefaultsClient: .noop
       )
     )
     
@@ -94,8 +92,7 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .noop,
-        imageConverter: .noop
+        userDefaultsClient: .noop
       )
     )
     
@@ -123,8 +120,7 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .live(userDefaults: userDefaults),
-        imageConverter: .noop
+        userDefaultsClient: .live(userDefaults: userDefaults)
       )
     )
     
@@ -156,8 +152,7 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .live(userDefaults: userDefaults),
-        imageConverter: .noop
+        userDefaultsClient: .live(userDefaults: userDefaults)
       )
     )
     

@@ -22,7 +22,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: .noop
       )
     )
@@ -55,7 +54,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: .noop
       )
     )
@@ -75,7 +73,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: .noop
       )
     )
@@ -104,7 +101,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: .noop
       )
     )
@@ -144,7 +140,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: accessClient
       )
     )
@@ -176,7 +171,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: accessClient
       )
     )
@@ -208,7 +202,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: accessClient
       )
     )
@@ -232,7 +225,6 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        imageConverter: .noop,
         photoLibraryAccessClient: .noop
       )
     )

@@ -2,7 +2,6 @@
 
 import Combine
 import CoreLocation
-import ImageConverter
 import os.log
 import PhotosUI
 import SharedModels
@@ -13,12 +12,8 @@ public struct ImagePicker: UIViewControllerRepresentable {
   @Binding var pickerResult: [StorableImage?]
   @Binding var coordinate: CLLocationCoordinate2D?
   
-  
   public class Coordinator: NSObject, PHPickerViewControllerDelegate {
     let parent: ImagePicker
-    let converter: ImageConverter = .live()
-    let converterQueue = DispatchQueue(label: "li.weg.iOS-Client.ConverterQueue")
-    var bag: Set<AnyCancellable> = .init()
     
     public init(_ parent: ImagePicker) {
       self.parent = parent
@@ -35,7 +30,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
       
       for result in results {
         let prov = result.itemProvider
-        
+                
         prov.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] url, error in
           
           guard error == nil else {

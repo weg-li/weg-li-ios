@@ -4,7 +4,6 @@ import ComposableArchitecture
 import CoreLocation
 import Foundation
 import Helper
-import ImageConverter
 import L10n
 import PhotoLibraryAccessClient
 import SharedModels
@@ -61,16 +60,13 @@ public enum ImagesViewAction: Equatable {
 public struct ImagesViewEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
-    imageConverter: ImageConverter,
     photoLibraryAccessClient: PhotoLibraryAccessClient
   ) {
     self.mainQueue = mainQueue
-    self.imageConverter = imageConverter
     self.photoLibraryAccessClient = photoLibraryAccessClient
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
-  public let imageConverter: ImageConverter
   public let distanceFilter: Double = 50
   public let photoLibraryAccessClient: PhotoLibraryAccessClient
 }
