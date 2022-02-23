@@ -136,6 +136,7 @@ class ReportStoreTests: XCTestCase {
       reducer: reportReducer,
       environment: ReportEnvironment(
         mainQueue: dispatchQueue.eraseToAnyScheduler(),
+        mapAddressQueue: dispatchQueue.eraseToAnyScheduler(),
         locationManager: LocationManager.unimplemented(
           authorizationStatus: { .authorizedAlways },
           create: { _ in locationManagerSubject.eraseToEffect() },
@@ -163,6 +164,7 @@ class ReportStoreTests: XCTestCase {
       $0.location.resolvedAddress = expectedAddress
     }
     store.receive(.mapAddressToDistrict(expectedAddress))
+    
     store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
       $0.district = expectedDistrict
     }
@@ -218,6 +220,7 @@ class ReportStoreTests: XCTestCase {
       reducer: reportReducer,
       environment: ReportEnvironment(
         mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs)
@@ -246,6 +249,7 @@ class ReportStoreTests: XCTestCase {
       reducer: reportReducer,
       environment: ReportEnvironment(
         mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs)
@@ -295,6 +299,7 @@ class ReportStoreTests: XCTestCase {
       reducer: reportReducer,
       environment: ReportEnvironment(
         mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs)
@@ -347,6 +352,7 @@ class ReportStoreTests: XCTestCase {
       reducer: reportReducer,
       environment: ReportEnvironment(
         mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs)

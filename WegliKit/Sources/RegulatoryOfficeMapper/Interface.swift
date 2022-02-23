@@ -10,8 +10,21 @@ public struct RegulatoryOfficeMapper {
     self.mapAddressToDistrict = mapAddressToDistrict
   }
   
-  /// Map an Address to a District
   public var mapAddressToDistrict: (Address) -> Effect<District, RegularityOfficeMapError>
+  
+  /// Map an Address to a District
+  /// - Parameters:
+  ///   - address: A valid address
+  ///   - queue: a queue to perform the mapping task on
+  /// - Returns: Effect which has a mapped district or an `unableToMatchRegularityOffice` error
+  public func mapAddress(
+    address: Address,
+    on queue: AnySchedulerOf<DispatchQueue>
+  ) -> Effect<District, RegularityOfficeMapError> {
+    self.mapAddressToDistrict(address)
+      .subscribe(on: queue)
+      .eraseToEffect()
+  }
 }
 
 // MARK: RegularityOfficeMapError

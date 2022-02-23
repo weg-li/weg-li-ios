@@ -85,17 +85,20 @@ public enum ReportAction: Equatable {
 public struct ReportEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
+    mapAddressQueue: AnySchedulerOf<DispatchQueue> = mapperQueue.eraseToAnyScheduler(),
     locationManager: LocationManager,
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper
   ) {
     self.mainQueue = mainQueue
+    self.mapAddressQueue = mapAddressQueue
     self.locationManager = locationManager
     self.placeService = placeService
     self.regulatoryOfficeMapper = regulatoryOfficeMapper
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
+  public var mapAddressQueue: AnySchedulerOf<DispatchQueue>
   public var locationManager: LocationManager
   public var placeService: PlacesServiceClient
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
@@ -316,3 +319,9 @@ public extension AlertState where Action == ReportAction {
     title: TextState(L10n.Location.Alert.noCoordinate)
   )
 }
+
+public let mapperQueue = DispatchQueue(
+  label: "li.weg.iosclient.RegulatoryOfficeMapper",
+  qos: .userInitiated,
+  attributes: .concurrent
+)
