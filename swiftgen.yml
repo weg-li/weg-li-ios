@@ -1,6 +1,8 @@
 strings:
  inputs: 
-  - weg-li/App/Resources/de.lproj/Localizable.strings
+  - WegliKit/Sources/L10n/Resources/de.lproj/Localizable.strings
  outputs:
    - templateName: structured-swift4
-     output: weg-li/App/Resources/Generated/Strings.swift
+     output: WegliKit/Sources/L10n/Strings.swift
+     params:
+        publicAccess: true

@@ -1,0 +1,183 @@
+/*
+  Localizable.strings
+  weg-li
+
+  Created by Malte on 03.04.21.
+  Copyright © 2021 Martin Wilhelmi. All rights reserved.
+*/
+
+// HOME
+"home.navigationBarTitle" = "Anzeigen";
+
+"home.emptyStateCopy" = "Keine gespeicherten Anzeigen";
+
+"home.a11y.addReportButtonLabel" = "Anzeige erstellen";
+
+
+// Report
+"report.navigationBarTitle" = "Anzeige";
+
+"report.contact.widgetTitle" = "Kontaktdaten";
+
+"report.place.widgetTitle" = "Ort";
+
+"report.alert.title" = "Anzeige zurücksetzen?";
+
+"report.alert.reset" = "Zurücksetzen";
+
+"report.error.images" = "Die Anzeige enthält keine Bilder";
+
+"report.error.location" = "Die Anzeige enthält keine Adresse der Tat";
+
+"report.error.description" = "Die Anzeige enthält keine Beschreibung";
+
+"report.error.contact" = "Die Anzeige enthält keine Kontaktdaten";
+
+
+// Photos
+"photos.widgetTitle" = "Fotos";
+
+"photos.importButton.copy" = "Fotos auswählen";
+
+"photos.alert.accessDenied" = "Um Fotos hinzuzufügen braucht die App deine Zustimmung";
+
+
+// Description
+"description.widgetTitle" = "Beschreibung";
+
+"description.row.carType" = "Marke";
+
+"description.row.carColor" = "Farbe";
+
+"description.row.licenseplateNumber" = "Kennzeichen";
+
+"description.row.length" = "Dauer";
+
+"description.row.chargeType" = "Art des Verstoßes";
+
+"description.row.didBlockOthers" = "Behinderung anderer Verkehrsteilnehmer";
+
+"description.editButton.copy" = "Beschreibung bearbeiten";
+
+"description.section.violation.copy" = "Verstoß";
+
+"description.section.vehicle.copy" = "Fahrzeug";
+
+
+// Location
+"location.widgetTitle" = "Ort";
+
+"location.placeholder.street" = "Straße + Hausnummer";
+
+"location.placeholder.postalCode" = "PLZ";
+
+"location.placeholder.city" = "Stadt";
+
+"location.a11y.expandButtonLabel" = "Karteansicht erweitern";
+
+"location.pickerCopy.fromPhotos" = "Aus Fotos";
+
+"location.pickerCopy.currentLocation" = "Standort";
+
+"location.pickerCopy.manual" = "Manuell";
+
+"location.alert.provideAuth" = "Die Standortnutzung macht diese App besser. Bitte geben Sie uns Zugang.";
+
+"location.alert.serviceIsOff" = "Ortungsdienste sind deaktiviert.";
+
+"location.alert.provideAccessToLocationService" = "Bitte geben Sie uns in den Einstellungen Zugriff auf Ihren Standort.";
+
+"location.alert.noCoordinate" = "Es konnte keine Koordinate aus dem Foto gelesen werden.";
+
+
+// Contact
+"contact.widgetTitle" = "Kontaktdaten";
+
+"contact.section.required" = "Erforderlich";
+
+"contact.section.optional" = "Optional";
+
+"contact.row.nameCopy" = "Name";
+
+"contact.row.streetCopy" = "Strasse";
+
+"contact.row.cityCopy" = "Stadt";
+
+"contact.row.phoneCopy" = "Telefon";
+
+"contact.row.dateOfBirth" = "Geburtstag";
+
+"contact.row.addressAddition" = "Addresszusatz";
+
+"contact.editButtonCopy" =  "Kontaktdaten bearbeiten";
+
+"contact.reportHintCopy" = "Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
+
+"contact.mailInfo" = "Ihre Emailadresse wird über die Mail App konfiguriert.";
+
+"contact.isSavedInAppHintCopy" = "Deine Adresse wird lokal in der App gespeichert, um diese im Report schon vorauszufüllen.";
+
+"contact.rowType.firstName" = "Vorname";
+
+"contact.rowType.lastName" = "Nachname";
+
+"contact.rowType.street" = "Strasse";
+
+"contact.rowType.city" = "Stadt";
+
+"contact.rowType.zipCode" = "PLZ";
+
+"contact.rowType.phone" = "Telefon";
+
+"contact.alert.title" = "Daten zurücksetzen?";
+
+"contact.alert.reset" = "Zurücksetzen";
+
+
+// Mail
+"mail.deviceErrorCopy" = "Auf diesem Gerät können leider keine E-Mails versendet werden!";
+
+"mail.readyToSubmitErrorCopy" = "Gib alle nötigen Daten an um die Anzeige zu versenden";
+
+
+// Widget
+"widget.a11y.toggleCollapseButtonLabel" = "erweitern";
+
+"widget.a11y.completionIndicatorLabel.isValid" = "ist gültig";
+
+"widget.a11y.completionIndicatorLabel.isNotValid" = "ist nicht gültig";
+
+
+// Settings
+"settings.title" = "Einstellungen";
+
+"settings.section.projectTitle" = "Projekt";
+
+"settings.row.imprint" = "Impressum";
+
+"settings.row.licenses" = "Lizenzen";
+
+"settings.row.contribute" = "Beitragen";
+
+"settings.row.donate" = "Spenden";
+
+
+// Times
+"times.description.upTo3" = "bis zu 3 Minuten";
+
+"times.description.longerThenNMinutes" = "länger als %@ Minuten";
+
+"times.description.longerThenNStunde" = "länger als %@ Stunde";
+
+"times.description.longerThenNStunden" = "länger als %@ Stunden";
+
+
+// SubmitButton
+"button.submit.title" = "Anzeige erstatten";
+
+"button.submit.district" = "Bezirk: %@";
+
+"button.close" = "Schließen";
+
+// General
+"cancel" = "Cancel";
