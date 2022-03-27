@@ -134,7 +134,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             state.reports.append(state.reportDraft)
             
             state.reportDraft.images.storedPhotos.forEach { image in
-              // TODO: remove copied images app dir
+              _ = image?.imageUrl.flatMap { safeUrl in
+                Task.detached(priority: .background) {
+                  try FileManager.default.removeItem(at: safeUrl)
+                }
+              }
             }
             
             return Effect.concatenate(
