@@ -22,6 +22,11 @@ public struct ImageView: View {
         .gridModifier
         .padding(4)
         .overlay(deleteButton, alignment: .center)
+    } else if let image = viewStore.image.asUIImage {
+      Image(uiImage: image)
+        .gridModifier
+        .padding(4)
+        .overlay(deleteButton, alignment: .center)
     } else {
       ActivityIndicator(style: .medium)
     }
