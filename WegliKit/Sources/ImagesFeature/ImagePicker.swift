@@ -48,7 +48,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension(url.pathExtension)
           
-          try? FileManager.default.secureCopyItem(at: url, to: destinationURL)
+          _ = try? FileManager.default.secureCopyItem(at: url, to: destinationURL)
           
           DispatchQueue.main.async {
             self?.parent.pickerResult.append(.init(imageUrl: destinationURL))            

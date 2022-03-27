@@ -23,18 +23,24 @@ public struct EditDescriptionView: View {
       Form {
         Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
           licensePlateView
+
           carBrandView
+
           carColorView
         }
         .padding(.top, 4)
         .textFieldStyle(PlainTextFieldStyle())
+        
         Section(header: Text(L10n.Description.Section.Violation.copy)) {
           chargTypeView
+
           chargeLengthView
+
           blockedOthersView
         }
       }
-      .navigationBarTitle(Text(L10n.Description.widgetTitle), displayMode: .inline)
+      .navigationTitle(Text(L10n.Description.widgetTitle))
+      .navigationBarTitleDisplayMode(.inline)
       .navigationBarItems(leading: closeButton)
     }
   }
@@ -62,7 +68,6 @@ public struct EditDescriptionView: View {
           .tag($0)
           .foregroundColor(Color(.label))
       }
-      .navigationTitle(Text(L10n.Description.Row.carType))
     }
   }
   
@@ -79,7 +84,6 @@ public struct EditDescriptionView: View {
           .tag($0)
           .foregroundColor(Color(.label))
       }
-      .navigationTitle(Text(L10n.Description.Row.carColor))
     }
   }
   
@@ -111,7 +115,6 @@ public struct EditDescriptionView: View {
         Text(Times.allCases[$0].description)
           .foregroundColor(Color(.label))
       }
-      .navigationTitle(Text(L10n.Description.Row.length))
     }
   }
   
@@ -130,7 +133,7 @@ public struct EditDescriptionView: View {
               get: \.blockedOthers,
               send: DescriptionAction.toggleBlockedOthers
             )
-          ).animation(.easeIn(duration: 0.1), value: viewStore.blockedOthers)
+          ).animation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
         }
       }
     )
