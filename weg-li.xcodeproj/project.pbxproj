@@ -374,7 +374,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.vanbillstedt.weg-li";
+				PRODUCT_BUNDLE_IDENTIFIER = li.weg.app.ios;
 				PRODUCT_NAME = "weg-li";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -389,7 +389,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/iOS\\ App/Resources/Preview\\ Content";
-				DEVELOPMENT_TEAM = M3YVS85XC2;
+				DEVELOPMENT_TEAM = QDDL89SBZ7;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "weg-li/iOS App/Resources/Info.plist";
@@ -397,7 +397,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mnin.weg-li";
+				PRODUCT_BUNDLE_IDENTIFIER = li.weg.app.ios;
 				PRODUCT_NAME = "weg-li";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

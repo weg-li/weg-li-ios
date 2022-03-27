@@ -46,6 +46,11 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.28.0"),
     .package(url: "https://github.com/pointfreeco/composable-core-location", from: "0.1.0"),
+    .package(
+      name: "SnapshotTesting",
+      url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
+      .upToNextMajor(from: "1.8.2")
+    ),
   ],
   targets: [
     .target(
@@ -227,6 +232,9 @@ package.targets.append(
         "ReportFeature",
         "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+      ],
+      exclude: [
+        "AppFeatureTests.swift.plist"
       ]
     ),
     .testTarget(
@@ -297,6 +305,19 @@ package.targets.append(
         "SettingsFeature",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ]
+    ),
+    .testTarget(
+      name: "AppStoreConnectScreenshots",
+      dependencies: [
+        "AppFeature",
+        "DescriptionFeature",
+        "ReportFeature",
+        .product(name: "SnapshotTesting", package: "SnapshotTesting")
+      ],
+      exclude: [
+        "__Snapshots__"
+      ],
+      resources: [.process("Resources")]
     )
   ]
 )

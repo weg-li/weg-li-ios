@@ -289,14 +289,14 @@ public extension Report {
         longitude: 13.13,
         personalEmail: true
       ),
-      date: Date.init,
+      date: { Date(timeIntervalSince1970: 1580624207) },
       description: .init(
         licensePlateNumber: "HH-ST-PAULI",
-        selectedColor: 0,
-        selectedBrand: 0,
-        selectedDuration: 0,
-        selectedType: 0,
-        blockedOthers: false
+        selectedColor: 3,
+        selectedBrand: 5,
+        selectedDuration: 5,
+        selectedType: 3,
+        blockedOthers: true
       ),
       location: LocationViewState()
     )
