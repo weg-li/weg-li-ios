@@ -16,16 +16,6 @@ import UserDefaultsClient
 // MARK: - AppState
 
 public struct AppState: Equatable {
-  public init(
-    settings: SettingsState = SettingsState(contact: .empty),
-    reports: [Report] = [],
-    showReportWizard: Bool = false
-  ) {
-    self.settings = settings
-    self.reports = reports
-    self.showReportWizard = showReportWizard
-  }
-  
   /// Settings
   public var settings = SettingsState(contact: .empty)
   
@@ -47,6 +37,18 @@ public struct AppState: Equatable {
   }
   
   var showReportWizard = false
+}
+
+public extension AppState {
+  init(
+    settings: SettingsState = SettingsState(contact: .empty),
+    reports: [Report] = [],
+    showReportWizard: Bool = false
+  ) {
+    self.settings = settings
+    self.reports = reports
+    self.showReportWizard = showReportWizard
+  }
 }
 
 // MARK: - AppAction
