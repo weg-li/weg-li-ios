@@ -10,7 +10,7 @@ import LocationFeature
 import Styleguide
 import SwiftUI
 
-public struct ReportForm: View {
+public struct ReportView: View {
   public struct ViewState: Equatable {
     public let isPhotosValid: Bool
     public let isContactValid: Bool
@@ -103,7 +103,7 @@ public struct ReportForm: View {
 struct ReportForm_Previews: PreviewProvider {
   static var previews: some View {
     Preview {
-      ReportForm(
+      ReportView(
         store: .init(
           initialState: .preview,
           reducer: .empty,

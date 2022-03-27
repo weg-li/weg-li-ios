@@ -61,7 +61,7 @@ public struct AppView: View {
   private var addReportButton: some View {
     VStack {
       NavigationLink(
-        destination: ReportForm(
+        destination: ReportView(
           store: store.scope(
             state: \.reportDraft,
             action: AppAction.report
