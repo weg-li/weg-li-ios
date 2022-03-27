@@ -56,6 +56,7 @@ public struct LocationView: View {
           Text(selection.title).tag(selection)
         }
       }.pickerStyle(SegmentedPickerStyle())
+      
       if LocationOption.manual == viewStore.locationOption {
         VStack(spacing: 8) {
           TextField(
@@ -141,9 +142,7 @@ public struct LocationView: View {
   
   var expandMapButton: some View {
     Button(action: {
-      withAnimation {
-        viewStore.send(.toggleMapExpanded)
-      }
+      viewStore.send(.toggleMapExpanded)
     }, label: {
       Image(systemName: viewStore.isMapExpanded
             ? "arrow.down.right.and.arrow.up.left"
