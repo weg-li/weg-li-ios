@@ -23,18 +23,13 @@ public struct ImagePicker: UIViewControllerRepresentable {
       _ picker: PHPickerViewController,
       didFinishPicking results: [PHPickerResult]
     ) {
-      guard !results.isEmpty else {
-        parent.isPresented = false
-        return
-      }
-      
       for result in results {
         let prov = result.itemProvider
                 
         prov.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] url, error in
           
           guard error == nil else {
-            debugPrint(error!.localizedDescription, #file, #function)
+            debugPrint(error!.localizedDescription, #fileID, #function)
             return
           }
           
@@ -43,15 +38,23 @@ public struct ImagePicker: UIViewControllerRepresentable {
             return
           }
           
-          let destinationURL = FileManager.default
-            .getDocumentsDirectory()
-            .appendingPathComponent(UUID().uuidString)
-            .appendingPathExtension(url.pathExtension)
+          let tempFileName = UUID().uuidString
           
-          _ = try? FileManager.default.secureCopyItem(at: url, to: destinationURL)
-          
-          DispatchQueue.main.async {
-            self?.parent.pickerResult.append(.init(imageUrl: destinationURL))            
+          do {
+            let data = try Data(contentsOf: url)
+            let tempFileUrl = FileManager.default.createDataTempFile(withData: data, withFileName: tempFileName)
+            let destinationUrl = try FileManager.default.replaceExistingFile(
+              withTempFile: tempFileUrl,
+              existingFileName: tempFileName,
+              withSubDirectory: "wegli"
+            )
+            
+            
+            DispatchQueue.main.async {
+              self?.parent.pickerResult.append(.init(imageUrl: destinationUrl))
+            }
+          } catch {
+            debugPrint(error.localizedDescription)
           }
         }
         
@@ -94,18 +97,69 @@ extension FileManager {
     let documentsDirectory = paths[0]
     return documentsDirectory
   }
-  
-  @discardableResult
-  open func secureCopyItem(at srcURL: URL, to dstURL: URL) throws -> Bool {
-    do {
-      if FileManager.default.fileExists(atPath: dstURL.path) {
-        try FileManager.default.removeItem(at: dstURL)
-      }
-      try FileManager.default.copyItem(at: srcURL, to: dstURL)
-    } catch {
-      return false
+    
+  func createDataTempFile(withData data: Data?, withFileName name: String) -> URL? {
+    let fileManager = FileManager.default
+    guard
+      let destinationURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first,
+      let data = data
+    else {
+      return nil
     }
-    return true
+    
+    var itemReplacementDirectoryURL: URL?
+    do {
+      try itemReplacementDirectoryURL = fileManager.url(
+        for: .itemReplacementDirectory,
+           in: .userDomainMask,
+           appropriateFor: destinationURL,
+           create: true
+      )
+    } catch let error {
+      debugPrint("error \(error)")
+    }
+    guard let destURL = itemReplacementDirectoryURL else { return nil }
+    
+    let tempFileURL = destURL.appendingPathComponent(name)
+    do {
+      try data.write(to: tempFileURL, options: .atomic)
+      return tempFileURL
+    } catch let error {
+      debugPrint("error \(error)")
+      return nil
+    }
+  }
+  
+  func replaceExistingFile(
+    withTempFile fileURL: URL?,
+    existingFileName: String,
+    withSubDirectory: String
+  ) throws -> URL? {
+    guard let fileURL = fileURL else { return nil }
+    let fileManager = FileManager.default
+    
+    let destPath = try? fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    guard let fullDestPath = destPath?.appendingPathComponent(withSubDirectory + "/" + existingFileName) else { return nil }
+    
+    let dta = try Data(contentsOf: fileURL)
+    createDirectory(withFolderName: "\(withSubDirectory)", toDirectory: .applicationSupportDirectory)
+    try dta.write(to: fullDestPath, options: .atomic)
+    
+    return fullDestPath
+  }
+  
+  func createDirectory(withFolderName dest: String, toDirectory directory: FileManager.SearchPathDirectory = .applicationSupportDirectory) {
+      let fileManager = FileManager.default
+      let urls = fileManager.urls(for: directory, in: .userDomainMask)
+      if let applicationSupportURL = urls.last {
+          do{
+              var newURL = applicationSupportURL
+              newURL = newURL.appendingPathComponent(dest, isDirectory: true)
+              try fileManager.createDirectory(at: newURL, withIntermediateDirectories: true, attributes: nil)
+          }
+          catch{
+              debugPrint("error \(error)")
+          }
+      }
   }
 }
-
