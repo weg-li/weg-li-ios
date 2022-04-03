@@ -22,6 +22,7 @@ public struct AppView: View {
       ZStack(alignment: .bottomTrailing) {
         if viewStore.reports.isEmpty {
           emptyStateView
+            .padding(.horizontal)
         } else {
           ScrollView {
             ForEach(viewStore.reports, id: \.id) { report in
@@ -37,12 +38,8 @@ public struct AppView: View {
       .navigationBarTitle(L10n.Home.navigationBarTitle)
       .navigationBarItems(trailing: contactData)
       .onAppear { viewStore.send(.onAppear) }
-      
-      if !.isPhone {
-        WelcomeView()
-      }
     }
-    .phoneOnlyStackNavigationView()
+    .navigationViewStyle(StackNavigationViewStyle())
   }
   
   private var emptyStateView: some View {
@@ -77,8 +74,8 @@ public struct AppView: View {
       )
       Button(
         action: { viewStore.send(.showReportWizard(true)) },
-        label: { Text("+")
-            .font(.largeTitle)
+        label: {
+          Image(systemName: "plus").font(.title)
         }
       )
       
@@ -111,28 +108,11 @@ struct MainView_Previews: PreviewProvider {
         store: .init(
           initialState: AppState(
             reports: [.preview, .preview, .preview, .preview]
-            //                        reports: []
           ),
           reducer: .empty,
           environment: ()
         )
       )
-    }
-  }
-}
-
-extension Bool {
-  static var isPhone: Bool {
-    UIDevice.current.userInterfaceIdiom == .phone
-  }
-}
-
-extension View {
-  @ViewBuilder func phoneOnlyStackNavigationView() -> some View {
-    if .isPhone {
-      navigationViewStyle(StackNavigationViewStyle())
-    } else {
-      self
     }
   }
 }
