@@ -89,16 +89,27 @@ public struct EditDescriptionView: View {
   
   var chargTypeView: some View {
     Picker(
-      L10n.Description.Row.chargeType,
       selection: viewStore.binding(
         get: \.selectedType,
         send: DescriptionAction.setCharge
-      )
-    ) {
-      ForEach(1..<DescriptionState.charges.count, id: \.self) {
-        Text(DescriptionState.charges[$0].value)
-          .tag($0)
+      ),
+      label: Text(L10n.Description.Row.chargeType),
+      content: {
+        ForEach(1..<DescriptionState.charges.count, id: \.self) { index in
+          let charge = DescriptionState.charges[index].value
+          chargeView(charge)
+            .tag(index)
+        }
+      })
+  }
+  
+  @ViewBuilder private func chargeView(_ charge: String) -> some View {
+    VStack(alignment: .leading) {
+      HStack {
+        Text(charge)
           .foregroundColor(Color(.label))
+          .multilineTextAlignment(.leading)
+        Spacer()
       }
     }
   }
