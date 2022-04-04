@@ -17,7 +17,7 @@ public enum UserLocationError: Error {
 
 // MARK: - UserLocationState
 
-public struct UserLocationState: Equatable {
+public struct UserLocationState: Equatable, Codable {
   public init(
     isRequestingCurrentLocation: Bool = false,
     region: CoordinateRegion? = nil
@@ -28,12 +28,6 @@ public struct UserLocationState: Equatable {
   
   public var isRequestingCurrentLocation = false
   public var region: CoordinateRegion?
-  
-  public static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.isRequestingCurrentLocation == rhs.isRequestingCurrentLocation
-    && lhs.region?.center.latitude == rhs.region?.center.latitude
-    && lhs.region?.center.longitude == rhs.region?.center.longitude
-  }
 }
 
 public struct UserLocationEnvironment {
@@ -90,7 +84,8 @@ public struct LocationViewState: Equatable, Codable {
     isMapExpanded: Bool = false,
     isResolvingAddress: Bool = false,
     resolvedAddress: Address = .init(),
-    userLocationState: UserLocationState = UserLocationState()
+    userLocationState: UserLocationState,
+    pinCoordinate: CLLocationCoordinate2D? = nil
   ) {
     self.alert = alert
     self.locationOption = locationOption
@@ -98,6 +93,7 @@ public struct LocationViewState: Equatable, Codable {
     self.isResolvingAddress = isResolvingAddress
     self.resolvedAddress = resolvedAddress
     self.userLocationState = userLocationState
+    self.pinCoordinate = pinCoordinate
   }
   
   public var alert: AlertState<LocationViewAction>?
@@ -105,12 +101,14 @@ public struct LocationViewState: Equatable, Codable {
   public var isMapExpanded = false
   public var isResolvingAddress = false
   public var resolvedAddress: Address = .init()
-  public var userLocationState = UserLocationState()
+  public var userLocationState: UserLocationState
+  public var pinCoordinate: CLLocationCoordinate2D?
   
   private enum CodingKeys: String, CodingKey {
     case locationOption
     case isMapExpanded
     case resolvedAddress
+    case userLocationState
   }
 }
 
@@ -129,6 +127,7 @@ public enum LocationViewAction: Equatable {
   case updateGeoAddressCity(String)
   case updateGeoAddressPostalCode(String)
   case setResolvedLocation(CLLocationCoordinate2D?)
+  case setPinCoordinate(CLLocationCoordinate2D?)
 }
 
 public struct LocationViewEnvironment {
@@ -223,7 +222,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
         guard let region = state.userLocationState.region else {
           return .none
         }
-        return Effect(value: LocationViewAction.resolveLocation(region.center))
+        return Effect(value: LocationViewAction.resolveLocation(region.center.asCLLocationCoordinate2D))
       case .didChangeAuthorization(.denied):
         state.alert = .provideAuth
         return .none
@@ -255,8 +254,8 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       
     case let .updateRegion(region):
       if
-        let center = region?.center,
-        let storedCenter = state.userLocationState.region?.center,
+        let center = region?.center.asCLLocationCoordinate2D,
+        let storedCenter = state.userLocationState.region?.center.asCLLocationCoordinate2D,
         center.distance(from: storedCenter) > 50
       {
         return .none
@@ -275,6 +274,12 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       return .none
     
     case .setResolvedLocation:
+      return .none
+      
+    case let .setPinCoordinate(coordinate):
+      if state.locationOption == .currentLocation {
+        state.pinCoordinate = coordinate
+      }
       return .none
         
     case .goToSettingsButtonTapped:

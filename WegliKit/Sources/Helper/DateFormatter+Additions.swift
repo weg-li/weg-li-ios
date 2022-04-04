@@ -5,6 +5,7 @@ import Foundation
 public extension DateFormatter {
   static let dateFormatterWithoutTimeMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "de_DE")
     formatter.timeStyle = .none
     formatter.dateStyle = .medium
     return formatter
@@ -12,6 +13,7 @@ public extension DateFormatter {
   
   static let dateFormatterWithoutDateMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "de_DE")
     formatter.timeStyle = .long
     formatter.dateStyle = .none
     return formatter

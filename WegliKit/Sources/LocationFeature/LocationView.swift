@@ -18,6 +18,7 @@ public struct LocationView: View {
     let address: Address
     let showActivityIndicator: Bool
     let resolvedLocationFromPhoto: CLLocationCoordinate2D?
+    let pinCoordinate: CLLocationCoordinate2D?
     
     public init(state: LocationViewState) {
       self.locationOption = state.locationOption
@@ -27,6 +28,7 @@ public struct LocationView: View {
       self.showActivityIndicator = state.userLocationState.isRequestingCurrentLocation
       || state.isResolvingAddress
       self.resolvedLocationFromPhoto = .zero
+      self.pinCoordinate = state.pinCoordinate
     }
   }
   
@@ -101,6 +103,10 @@ public struct LocationView: View {
             photoCoordinate: viewStore.binding(
               get: \.resolvedLocationFromPhoto,
               send: LocationViewAction.setResolvedLocation
+            ),
+            pinCoordinate: viewStore.binding(
+              get: \.pinCoordinate,
+              send: LocationViewAction.setPinCoordinate
             )
           )
             .clipShape(RoundedRectangle(cornerRadius: 8))

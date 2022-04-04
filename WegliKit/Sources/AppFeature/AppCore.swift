@@ -178,7 +178,12 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         state.settings.contact = state.reportDraft.contactState
         return .none
       case .resetConfirmButtonTapped:
-        state.reportDraft = Report(images: .init(), contactState: state.settings.contact, date: Date.init)
+        state.reportDraft = Report(
+          images: .init(),
+          contactState: state.settings.contact,
+          date: Date.init,
+          location: .init(userLocationState: .init())
+        )
         return .none
       default:
         return .none
@@ -189,7 +194,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case .reportSaved:
       // Reset report draft after it was saved
-      state.reportDraft = Report(images: .init(), contactState: state.settings.contact, date: Date.init)
+      state.reportDraft = Report(
+        images: .init(),
+        contactState: state.settings.contact,
+        date: Date.init
+      )
       return .none
     }
   }

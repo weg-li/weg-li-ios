@@ -110,8 +110,7 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
             initialState: Report(
               images: ImagesViewState(),
               contactState: .preview,
-              date: Date.init,
-              location: LocationViewState()
+              date: Date.init
             ),
             reducer: .empty,
             environment: ()

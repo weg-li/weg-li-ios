@@ -32,7 +32,7 @@ public struct EditDescriptionView: View {
         .textFieldStyle(PlainTextFieldStyle())
         
         Section(header: Text(L10n.Description.Section.Violation.copy)) {
-          chargTypeView
+          chargeTypeView
 
           chargeLengthView
 
@@ -87,7 +87,7 @@ public struct EditDescriptionView: View {
     }
   }
   
-  var chargTypeView: some View {
+  var chargeTypeView: some View {
     Picker(
       selection: viewStore.binding(
         get: \.selectedType,

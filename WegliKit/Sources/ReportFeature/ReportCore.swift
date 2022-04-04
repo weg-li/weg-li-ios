@@ -41,7 +41,7 @@ public struct Report: Codable {
     district: District? = nil,
     date: () -> Date = Date.init,
     description: DescriptionState = DescriptionState(),
-    location: LocationViewState = LocationViewState(),
+    location: LocationViewState = LocationViewState(userLocationState: .init()),
     mail: MailViewState = MailViewState()
   ) {
     id = uuid.uuidString
@@ -185,7 +185,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       switch imageViewAction {
         // After the images coordinate was set trigger resolve location and map to district.
       case let .setResolvedCoordinate(coordinate):
-        guard let coordinate = coordinate, coordinate != state.location.userLocationState.region?.center else {
+        guard let coordinate = coordinate, coordinate != state.location.userLocationState.region?.center.asCLLocationCoordinate2D else {
           state.alert = .noPhotoCoordinate
           return .none
         }
@@ -232,6 +232,11 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         } else {
           return .none
         }
+        
+      case let .setPinCoordinate(coordinate):
+        guard let coordinate = coordinate, state.location.locationOption == .currentLocation else { return .none }
+        return Effect(value: .location(.resolveLocation(coordinate)))
+        
       default:
         return .none
       }
@@ -312,8 +317,7 @@ public extension Report {
         selectedDuration: 5,
         selectedType: 3,
         blockedOthers: true
-      ),
-      location: LocationViewState()
+      )
     )
   }
 }

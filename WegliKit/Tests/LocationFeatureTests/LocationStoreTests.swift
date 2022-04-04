@@ -41,7 +41,7 @@ class LocationStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: LocationViewState(),
+      initialState: LocationViewState(userLocationState: .init()),
       reducer: locationReducer,
       environment: env
     )
@@ -109,7 +109,7 @@ class LocationStoreTests: XCTestCase {
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
     let store = TestStore(
-      initialState: LocationViewState(),
+      initialState: LocationViewState(userLocationState: .init()),
       reducer: locationReducer,
       environment: env
     )
@@ -148,7 +148,7 @@ class LocationStoreTests: XCTestCase {
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
     let store = TestStore(
-      initialState: LocationViewState(),
+      initialState: LocationViewState(userLocationState: .init()),
       reducer: locationReducer,
       environment: env
     )

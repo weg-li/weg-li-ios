@@ -9,19 +9,30 @@ struct MapView: UIViewRepresentable {
   @Binding var region: CoordinateRegion?
   private let showsLocation: Bool
   @Binding var photoCoordinate: CLLocationCoordinate2D?
+  @Binding var pinCoordinate: CLLocationCoordinate2D?
+  
+  var placemarks: [MKPointAnnotation] = []
   
   init(
     region: Binding<CoordinateRegion?>,
     showsLocation: Bool,
-    photoCoordinate: Binding<CLLocationCoordinate2D?>
+    photoCoordinate: Binding<CLLocationCoordinate2D?>,
+    pinCoordinate: Binding<CLLocationCoordinate2D?>
   ) {
     _region = region
     self.showsLocation = showsLocation
     _photoCoordinate = photoCoordinate
+    _pinCoordinate = pinCoordinate
   }
   
   func makeUIView(context: Context) -> MKMapView {
     let mapView = MKMapView(frame: .zero)
+    mapView.delegate = context.coordinator
+    let longPressed = UILongPressGestureRecognizer(
+      target: context.coordinator,
+      action: #selector(context.coordinator.addPinBasedOnGesture(_:))
+    )
+    mapView.addGestureRecognizer(longPressed)
     return mapView
   }
   
@@ -30,22 +41,20 @@ struct MapView: UIViewRepresentable {
   }
   
   private func updateView(mapView: MKMapView, delegate: MKMapViewDelegate) {
-    mapView.delegate = delegate
     mapView.showsUserLocation = showsLocation
-    
+      
     if let region = self.region {
       mapView.setRegion(region.asMKCoordinateRegion, animated: false)
     }
     
-    let currentlyDisplayedPOIs = mapView.annotations.compactMap { $0 as? PointOfInterestAnnotation }
-    
-    if currentlyDisplayedPOIs.filter({ $0.coordinate == photoCoordinate }).isEmpty {
-      mapView.removeAnnotations(currentlyDisplayedPOIs)
-    }
-    
-    if let photoCoordinate = self.photoCoordinate {
-      let annotation = PointOfInterestAnnotation(coordinate: photoCoordinate)
-      mapView.addAnnotations([annotation])
+    if let pinCoordinate = pinCoordinate {
+      let annotation = MKPointAnnotation()
+      annotation.coordinate = pinCoordinate
+      
+      mapView.removeAnnotations(mapView.annotations)
+      mapView.addAnnotation(annotation)
+    } else {
+      mapView.removeAnnotations(mapView.annotations)
     }
   }
   
@@ -61,19 +70,44 @@ struct MapView: UIViewRepresentable {
     
     func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
       parent.region = CoordinateRegion(
-        center: mapView.region.center,
-        span: mapView.region.span
+        center: .init(mapView.region.center),
+        span: .init(mapView.region.span) 
       )
     }
     
+    @objc func addPinBasedOnGesture(_ gestureRecognizer:UIGestureRecognizer) {
+      let touchPoint = gestureRecognizer.location(in: gestureRecognizer.view)
+      let newCoordinates = (gestureRecognizer.view as? MKMapView)?.convert(
+        touchPoint, toCoordinateFrom: gestureRecognizer.view
+      )
+      let annotation = MKPointAnnotation()
+      guard let _newCoordinates = newCoordinates else { return }
+      annotation.coordinate = _newCoordinates
+              
+      parent.pinCoordinate = annotation.coordinate
+
+    }
+    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-      let identifier = PhotoAnnotationView.identifier
-      var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-      if annotationView == nil {
-        annotationView = PhotoAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-      } else {
-        annotationView?.annotation = annotation
+      guard !annotation.isKind(of: MKUserLocation.self) else {
+        // Make a fast exit if the annotation is the `MKUserLocation`, as it's not an annotation view we wish to customize.
+        return nil
       }
+      
+      var annotationView: MKAnnotationView?
+      
+      if let annotation = annotation as? MKPointAnnotation {
+        annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "userPin")
+      } else {
+        let identifier = PhotoAnnotationView.identifier
+        annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+        if annotationView == nil {
+          annotationView = PhotoAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+        } else {
+          annotationView?.annotation = annotation
+        }
+      }
+      
       return annotationView
     }
   }
@@ -104,6 +138,17 @@ final class PhotoAnnotationView: MKMarkerAnnotationView {
 
 struct MapView_Previews: PreviewProvider {
   static var previews: some View {
-    MapView(region: .constant(nil), showsLocation: false, photoCoordinate: .constant(.zero))
+    MapView(
+      region: .constant(nil),
+      showsLocation: false,
+      photoCoordinate: .constant(.zero),
+      pinCoordinate: .constant(nil)
+    )
+  }
+}
+
+extension MKPointAnnotation {
+  static func <(lhs: MKPointAnnotation, rhs: MKPointAnnotation) -> Bool {
+    lhs.coordinate.latitude < rhs.coordinate.latitude
   }
 }
