@@ -119,9 +119,11 @@ struct MailContentView_Previews: PreviewProvider {
         reducer: reportReducer,
         environment: ReportEnvironment(
           mainQueue: .failing,
+          backgroundQueue: .failing,
           locationManager: .live,
           placeService: .noop,
-          regulatoryOfficeMapper: .live()
+          regulatoryOfficeMapper: .live(),
+          fileClient: .noop
         )
       )
     )

@@ -1,6 +1,7 @@
 // Created for weg-li in 2021.
 
 import ComposableArchitecture
+import Combine
 import L10n
 import SharedModels
 import SwiftUI
@@ -47,6 +48,7 @@ public struct ContactView: View {
                 send: ContactAction.zipCodeChanged
               )
             )
+            
             dataRow(
               type: .town,
               textFieldBinding: viewStore.binding(

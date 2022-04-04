@@ -3,6 +3,7 @@
 import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
+import FileClient
 import ImagesFeature
 import LocationFeature
 import MapKit
@@ -38,15 +39,25 @@ class ReportStoreTests: XCTestCase {
   
   // MARK: - Reducer integration tests
   
-  func test_updateContact_shouldUpdateState() {
+  func test_updateContact_shouldUpdateState_andWriteContactToFile() {
+    var didWriteContactToFile = false
+    
+    var fileClient = FileClient.noop
+    fileClient.save = { fileName, data in
+      didWriteContactToFile = fileName == "contact-settings"
+      return .none
+    }
+    
     let store = TestStore(
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: fileClient
       )
     )
     
@@ -63,6 +74,8 @@ class ReportStoreTests: XCTestCase {
     store.send(.contact(.townChanged(city))) {
       $0.contactState.contact.address.city = city
     }
+    
+    XCTAssertTrue(didWriteContactToFile)
   }
   
   func test_updateCar_shouldUpdateState() {
@@ -70,10 +83,12 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
       )
     )
     
@@ -93,10 +108,12 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
       )
     )
     
@@ -113,8 +130,7 @@ class ReportStoreTests: XCTestCase {
   func test_updateImages_shouldTriggerAddressResolve() {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
-    let dispatchQueue = DispatchQueue.immediate
-    
+  
     let image = UIImage(systemName: "pencil")!
     let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
     let expectedAddress = Address(
@@ -135,8 +151,9 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: dispatchQueue.eraseToAnyScheduler(),
-        mapAddressQueue: dispatchQueue.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        mapAddressQueue: .immediate,
         locationManager: LocationManager.unimplemented(
           authorizationStatus: { .authorizedAlways },
           create: { _ in locationManagerSubject.eraseToEffect() },
@@ -146,7 +163,8 @@ class ReportStoreTests: XCTestCase {
         placeService: PlacesServiceClient(
           placemarks: { _ in Effect(value: [expectedAddress]) }
         ),
-        regulatoryOfficeMapper: .live()
+        regulatoryOfficeMapper: .live(),
+        fileClient: .noop
       )
     )
     
@@ -201,10 +219,12 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
       )
     )
     
@@ -219,11 +239,13 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
-        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        mapAddressQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .live(districs)
+        regulatoryOfficeMapper: .live(districs),
+        fileClient: .noop
       )
     )
     
@@ -248,11 +270,13 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
-        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        mapAddressQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .live(districs)
+        regulatoryOfficeMapper: .live(districs),
+        fileClient: .noop
       )
     )
     
@@ -298,11 +322,13 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
-        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        mapAddressQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .live(districs)
+        regulatoryOfficeMapper: .live(districs),
+        fileClient: .noop
       )
     )
     
@@ -351,11 +377,13 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
-        mapAddressQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        mapAddressQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .live(districs)
+        regulatoryOfficeMapper: .live(districs),
+        fileClient: .noop
       )
     )
     
@@ -410,10 +438,12 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .live(districs)
+        regulatoryOfficeMapper: .live(districs),
+        fileClient: .noop
       )
     )
     
@@ -445,10 +475,12 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
       )
     )
     
@@ -480,10 +512,12 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
       )
     )
     
@@ -515,10 +549,12 @@ class ReportStoreTests: XCTestCase {
       ),
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: DispatchQueue.immediate.eraseToAnyScheduler(),
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
-        regulatoryOfficeMapper: .noop
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
       )
     )
     

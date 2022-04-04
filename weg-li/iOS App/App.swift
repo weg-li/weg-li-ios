@@ -8,18 +8,37 @@ import UIKit
 
 @main
 struct WegliApp: App {
+  @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+  @Environment(\.scenePhase) var scenePhase
+  
+  init() {}
+  
   var body: some Scene {
     WindowGroup {
-      AppView(
-        store: Store(
-          initialState: AppState(),
-          reducer: appReducer,
-          environment: AppEnvironment(
-            mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-            userDefaultsClient: .live()
-          )
-        )
-      )
+      AppView(store: self.appDelegate.store)
+        .onChange(of: scenePhase) { _ in }
     }
+  }
+}
+
+// MARK: AppDelegate
+final class AppDelegate: NSObject, UIApplicationDelegate {
+  let store = Store(
+    initialState: .init(),
+    reducer: appReducer,
+    environment: .live
+  )
+  lazy var viewStore = ViewStore(
+    self.store.scope(state: { _ in () }),
+    removeDuplicates: ==
+  )
+  
+  func application(
+    _ application: UIApplication,
+    // swiftlint:disable:next discouraged_optional_collection
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+  ) -> Bool {
+    self.viewStore.send(.appDelegate(.didFinishLaunching))
+    return true
   }
 }

@@ -4,6 +4,7 @@ import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
 import Contacts
+import FileClient
 import Foundation
 import MapKit
 import PlacesServiceClient
@@ -11,16 +12,15 @@ import ReportFeature
 import SettingsFeature
 import SharedModels
 import UIKit
-import UserDefaultsClient
 
 // MARK: - AppState
 
 public struct AppState: Equatable {
   /// Settings
-  public var settings = SettingsState(contact: .empty)
+  public var settings: SettingsState
   
   /// Reports a user has sent
-  public var reports: [Report] = []
+  public var reports: [Report]
   
   /// Holds a report that has not been stored or sent via mail
   var _storedReport: Report?
@@ -37,11 +37,9 @@ public struct AppState: Equatable {
   }
   
   var showReportWizard = false
-}
-
-public extension AppState {
-  init(
-    settings: SettingsState = SettingsState(contact: .empty),
+  
+  public init(
+    settings: SettingsState = .init(contact: .empty),
     reports: [Report] = [],
     showReportWizard: Bool = false
   ) {
@@ -49,11 +47,15 @@ public extension AppState {
     self.reports = reports
     self.showReportWizard = showReportWizard
   }
+  
 }
 
 // MARK: - AppAction
 
 public enum AppAction: Equatable {
+  case appDelegate(AppDelegateAction)
+  case contactSettingsLoaded(Result<Contact, NSError>)
+  case storedReportsLoaded(Result<[Report], NSError>)
   case settings(SettingsAction)
   case report(ReportAction)
   case showReportWizard(Bool)
@@ -66,14 +68,25 @@ public enum AppAction: Equatable {
 public struct AppEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
-    userDefaultsClient: UserDefaultsClient
+    backgroundQueue: AnySchedulerOf<DispatchQueue>,
+    fileClient: FileClient
   ) {
     self.mainQueue = mainQueue
-    self.userDefaultsClient = userDefaultsClient
+    self.backgroundQueue = backgroundQueue
+    self.fileClient = fileClient
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
-  public var userDefaultsClient: UserDefaultsClient
+  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
+  public var fileClient: FileClient
+}
+
+public extension AppEnvironment {
+  static let live = Self(
+    mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+    backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
+    fileClient: .live
+  )
 }
 
 /// Reducer handling actions from the HomeView and combining it with the reducers from descending screens.
@@ -85,9 +98,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       environment: { environment in
         ReportEnvironment(
           mainQueue: environment.mainQueue,
+          backgroundQueue: environment.backgroundQueue,
           locationManager: .live,
           placeService: .live,
-          regulatoryOfficeMapper: .live()
+          regulatoryOfficeMapper: .live(),
+          fileClient: environment.fileClient
         )
       }
     ),
@@ -98,28 +113,35 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
   ),
   Reducer { state, action, environment in
     switch action {
+    case let .appDelegate(appDelegateAction):
+      return .merge(
+        .concatenate(
+          environment.fileClient.loadContactSettings()
+            .map(AppAction.contactSettingsLoaded),
+          environment.fileClient.loadReports()
+            .map(AppAction.storedReportsLoaded)
+        )
+      )
+      
+    case let .contactSettingsLoaded(result):
+      let contact = (try? result.get()) ?? .init()
+      state.settings = SettingsState(
+        contact: .init(contact: contact, alert: nil)
+      )
+      return .none
+      
+    case let .storedReportsLoaded(result):
+      let reports = (try? result.get()) ?? []
+      state.reports = reports
+      return .none
+      
       // restore state from userdefaults
     case .onAppear:
-      if let contact = environment.userDefaultsClient.contact {
-        state.settings = SettingsState(
-          contact: .init(
-            contact: contact, alert: nil
-          )
-        )
-      }
-      state.reports = environment.userDefaultsClient.reports
       return .none
-      // After the EditDescriptionView disappeared the contact data needs to be synced with the reportDraft
-      // and stored.
-    case let .settings(settingsAction):
-      switch settingsAction {
-      case .contact(.onDisappear):
-        state.reportDraft.contactState = state.settings.contact
-        return environment.userDefaultsClient.setContact(state.settings.contact.contact)
-          .fireAndForget()
-      default:
-        return .none
-      }
+      
+    case .settings:
+      return .none
+      
     // After the emailResult reports the mail has been sent the report will be stored.
     case let .report(reportAction):
       switch reportAction {
@@ -131,18 +153,17 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           }
           switch mailComposerResult {
           case .sent:
-            state.reports.append(state.reportDraft)
-            
             state.reportDraft.images.storedPhotos.forEach { image in
-              _ = image?.imageUrl.flatMap { safeUrl in
-                Task.detached(priority: .background) {
-                  try FileManager.default.removeItem(at: safeUrl)
-                }
+              _ = try? image?.imageUrl.flatMap { safeUrl in
+                try FileManager.default.removeItem(at: safeUrl)
               }
             }
+            state.reportDraft.images.storedPhotos.removeAll()
+            state.reports.append(state.reportDraft)
             
             return Effect.concatenate(
-              environment.userDefaultsClient.setReports(state.reports)
+              environment.fileClient
+                .saveReports(state.reports, on: environment.backgroundQueue)
                 .fireAndForget(),
               Effect(value: AppAction.reportSaved)
             )
@@ -165,13 +186,23 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .showReportWizard(value):
       state.showReportWizard = value
       return .none
-      // Reset report draft after it was .
+      
     case .reportSaved:
-//      state.reportDraft = Report(images: .init(), contactState: state.settings.contact, date: Date.init)
+      // Reset report draft after it was saved
+      state.reportDraft = Report(images: .init(), contactState: state.settings.contact, date: Date.init)
       return .none
     }
   }
 )
+.onChange(of: \.settings.contact) { contact, state, _, environment in
+  struct SaveDebounceId: Hashable {}
+  state.reportDraft.contactState = contact
+
+  return environment.fileClient
+    .saveContactSettings(contact.contact, on: environment.backgroundQueue)
+    .fireAndForget()
+    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+}
 
 
 // MARK: Helper
@@ -184,16 +215,3 @@ extension AppState {
     self.reports = reports
   }
 }
-
-extension UserDefaultsClient {
-  public var reports: [Report] {
-    (try? dataForKey(reportsKey)?.decoded()) ?? []
-  }
-
-  public func setReports(_ reports: [Report]) -> Effect<Never, Never> {
-    let data = try? reports.encoded()
-    return setData(data, reportsKey)
-  }
-}
-
-let reportsKey = "reportsKey"

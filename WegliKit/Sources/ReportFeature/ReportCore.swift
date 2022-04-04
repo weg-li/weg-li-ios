@@ -14,6 +14,7 @@ import PlacesServiceClient
 import RegulatoryOfficeMapper
 import SharedModels
 import SwiftUI
+import FileClient
 
 // MARK: - Report Core
 
@@ -85,23 +86,29 @@ public enum ReportAction: Equatable {
 public struct ReportEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
+    backgroundQueue: AnySchedulerOf<DispatchQueue>,
     mapAddressQueue: AnySchedulerOf<DispatchQueue> = mapperQueue.eraseToAnyScheduler(),
     locationManager: LocationManager,
     placeService: PlacesServiceClient,
-    regulatoryOfficeMapper: RegulatoryOfficeMapper
+    regulatoryOfficeMapper: RegulatoryOfficeMapper,
+    fileClient: FileClient
   ) {
     self.mainQueue = mainQueue
+    self.backgroundQueue = backgroundQueue
     self.mapAddressQueue = mapAddressQueue
     self.locationManager = locationManager
     self.placeService = placeService
     self.regulatoryOfficeMapper = regulatoryOfficeMapper
+    self.fileClient = fileClient
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
+  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
   public var mapAddressQueue: AnySchedulerOf<DispatchQueue>
   public var locationManager: LocationManager
   public var placeService: PlacesServiceClient
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
+  public let fileClient: FileClient
   
   let debounce = 0.5
   let postalCodeMinumimCharacters = 5
@@ -270,8 +277,16 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     }
   }
 )
+.onChange(of: \.contactState.contact) { contact, state, _, environment in
+  struct SaveDebounceId: Hashable {}
+  
+  return environment.fileClient
+    .saveContactSettings(contact, on: environment.backgroundQueue)
+    .fireAndForget()
+    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+}
 
-// MARK: Helper
+// MARK: - Helper
 public extension Report {
   static var preview: Report {
     Report(
@@ -326,3 +341,18 @@ public let mapperQueue = DispatchQueue(
   qos: .userInitiated,
   attributes: .concurrent
 )
+
+
+public extension FileClient {
+  func loadReports() -> Effect<Result<[Report], NSError>, Never> {
+    self.load([Report].self, from: reportsFileName)
+  }
+
+  func saveReports(
+    _ reports: [Report], on queue: AnySchedulerOf<DispatchQueue>
+  ) -> Effect<Never, Never> {
+    self.save(reports, to: reportsFileName, on: queue)
+  }
+}
+
+let reportsFileName = "reports"

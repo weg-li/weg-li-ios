@@ -56,12 +56,12 @@ let package = Package(
     .target(
       name: "AppFeature",
       dependencies: [
+        "FileClient",
         "L10n",
         "ReportFeature",
         "SettingsFeature",
         "SharedModels",
         "Styleguide",
-        "UserDefaultsClient",
         .product(
           name: "ComposableArchitecture",
           package: "swift-composable-architecture"
@@ -91,8 +91,18 @@ let package = Package(
       resources: [.process("Resources")]
     ),
     .target(
+      name: "FileClient",
+      dependencies: [
+        "Helper",
+        "SharedModels",
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+      ]
+    ),
+    .target(
       name: "Helper",
-      dependencies: []
+      dependencies: [
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+      ]
     ),
     .target(
       name: "ImagesFeature",
@@ -161,6 +171,7 @@ let package = Package(
       dependencies: [
         "ContactFeature",
         "DescriptionFeature",
+        "FileClient",
         "Helper",
         "ImagesFeature",
         "L10n",
@@ -205,14 +216,6 @@ let package = Package(
     .target(
       name: "UIApplicationClient",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-      ]
-    ),
-    .target(
-      name: "UserDefaultsClient",
-      dependencies: [
-        "Helper",
-        "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ]
     )

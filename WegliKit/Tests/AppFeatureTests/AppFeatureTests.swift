@@ -4,6 +4,7 @@ import AppFeature
 import ComposableArchitecture
 import ComposableCoreLocation
 import ContactFeature
+import FileClient
 import ImagesFeature
 import MessageUI
 import ReportFeature
@@ -45,7 +46,8 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .noop
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop
       )
     )
     
@@ -58,6 +60,7 @@ class AppStoreTests: XCTestCase {
         )
       )
     ) {
+      $0.reportDraft.contactState.contact.firstName = newContact.contact.firstName
       $0.settings.contact.contact.firstName = newContact.contact.firstName
     }
   }
@@ -68,7 +71,8 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .noop
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop
       )
     )
     
@@ -87,60 +91,33 @@ class AppStoreTests: XCTestCase {
   }
   
   func test_sentMailResult_shouldAppendDraftReportToReports() {
+    var didWriteReports = false
+    var fileCient = FileClient.noop
+    fileCient.save = { key, _ in
+      didWriteReports = key == "reports"
+      return .none
+    }
+    
     let store = TestStore(
       initialState: AppState(reportDraft: report),
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .noop
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: fileCient
       )
     )
     
-//    store.send(
-//      .report(
-//        .mail(
-//          .setMailResult(MFMailComposeResult(rawValue: 2)
-//                        )
-//        )
-//      )
-//    ) {
-//      $0.reports = [self.report]
-//    }
-//    store.receive(.reportSaved) {
-//      $0.reportDraft = Report(
-//        images: .init(),
-//        contactState: .init(contact: .empty, alert: nil)
-//      )
-//    }
-  }
-  
-  func test_contactStateShouldBeSaved_onContactViewDisappearAction() {
-    let store = TestStore(
-      initialState: AppState(reportDraft: report),
-      reducer: appReducer,
-      environment: AppEnvironment(
-        mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .live(userDefaults: userDefaults)
-      )
-    )
-    
-    store.send(
-      .settings(
-        .contact(
-          .firstNameChanged("Bob")
-        )
-      )
-    ) {
-      $0.settings.contact.contact.firstName = "Bob"
+    store.send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
+      $0.reports = [self.report]
     }
-    store.send(.settings(.contact(.onDisappear))) {
-      $0.reportDraft.contactState = $0.settings.contact
-      // check if contact has been saved to defaults
-      XCTAssertEqual(
-        store.environment.userDefaultsClient.contact,
-        $0.settings.contact.contact
+    store.receive(.reportSaved) {
+      $0.reportDraft = Report(
+        images: .init(),
+        contactState: .init(contact: .empty, alert: nil)
       )
     }
+    XCTAssertTrue(didWriteReports)
   }
   
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
@@ -152,7 +129,8 @@ class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
-        userDefaultsClient: .live(userDefaults: userDefaults)
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop
       )
     )
     

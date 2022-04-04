@@ -6,7 +6,7 @@ import UIKit
 public struct StorableImage: Hashable, Identifiable, Codable {
   public let id: String
   public let data: Data?
-  public let imageUrl: URL?
+  public var imageUrl: URL?
   
   public init(id: String = UUID().uuidString, data: Data? = nil, imageUrl: URL? = nil) {
     self.id = id
