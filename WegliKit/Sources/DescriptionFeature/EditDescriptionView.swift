@@ -9,6 +9,7 @@ import SwiftUI
 
 public struct EditDescriptionView: View {
   @Environment(\.presentationMode) var presentationMode
+  @Environment(\.isSearching) var isSearching
   
   let store: Store<DescriptionState, DescriptionAction>
   @ObservedObject private var viewStore: ViewStore<DescriptionState, DescriptionAction>
@@ -39,6 +40,7 @@ public struct EditDescriptionView: View {
           blockedOthersView
         }
       }
+      .onAppear { viewStore.send(.onAppear) }
       .navigationTitle(Text(L10n.Description.widgetTitle))
       .navigationBarTitleDisplayMode(.inline)
       .navigationBarItems(leading: closeButton)
@@ -88,30 +90,48 @@ public struct EditDescriptionView: View {
   }
   
   var chargeTypeView: some View {
-    Picker(
-      selection: viewStore.binding(
-        get: \.selectedType,
-        send: DescriptionAction.setCharge
-      ),
-      label: Text(L10n.Description.Row.chargeType),
-      content: {
-        ForEach(1..<DescriptionState.charges.count, id: \.self) { index in
-          let charge = DescriptionState.charges[index].value
-          chargeView(charge)
-            .tag(index)
+    NavigationLink(
+      destination: {
+        List {
+          ForEach(viewStore.searchResults, id: \.id) { charge in
+            ChargeView(
+              text: charge.text,
+              isSelected: viewStore.selectedCharge == charge,
+              isFavorite: charge.isFavorite
+            )
+              .onTapGesture {
+                viewStore.send(.setCharge(charge))
+              }
+              .swipeActions {
+                Button(
+                  action: {
+                    viewStore.send(.toggleChargeFavorite(charge))
+                  },
+                  label: {
+                    Image(systemName: "star.fill")
+                  }
+                )
+                  .tint(.yellow)
+              }
+          }
+        }.searchable(
+          text: viewStore.binding(
+            get: \.chargeTypeSearchText,
+            send: DescriptionAction.setChargeTypeSearchText
+          ),
+          placement: .navigationBarDrawer(displayMode: .always)
+        )
+      },
+      label: {
+        HStack {
+          Text(L10n.Description.Row.chargeType)
+          if let charge = viewStore.state.selectedCharge {
+            Spacer()
+            Text(charge.text)
+          }
         }
-      })
-  }
-  
-  @ViewBuilder private func chargeView(_ charge: String) -> some View {
-    VStack(alignment: .leading) {
-      HStack {
-        Text(charge)
-          .foregroundColor(Color(.label))
-          .multilineTextAlignment(.leading)
-        Spacer()
       }
-    }
+    )
   }
   
   var chargeLengthView: some View {

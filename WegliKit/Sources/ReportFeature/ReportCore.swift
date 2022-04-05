@@ -129,7 +129,13 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
   descriptionReducer.pullback(
     state: \.description,
     action: /ReportAction.description,
-    environment: { _ in DescriptionEnvironment() }
+    environment: {
+      DescriptionEnvironment(
+        mainQueue: $0.mainQueue,
+        backgroundQueue: $0.backgroundQueue,
+        fileClient: $0.fileClient
+      )
+    }
   ),
   contactReducer.pullback(
     state: \.contactState,
@@ -315,7 +321,7 @@ public extension Report {
         selectedColor: 3,
         selectedBrand: 5,
         selectedDuration: 5,
-        selectedType: 3,
+        selectedCharge: .init(id: "1", text: "Parken auf dem Radweg", isFavorite: true, isSelected: false),
         blockedOthers: true
       )
     )

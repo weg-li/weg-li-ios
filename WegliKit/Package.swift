@@ -82,6 +82,7 @@ let package = Package(
     .target(
       name: "DescriptionFeature",
       dependencies: [
+        "FileClient",
         "Helper",
         "L10n",
         "SharedModels",

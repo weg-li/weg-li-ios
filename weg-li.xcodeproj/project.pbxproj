@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		733DA61327FC41BB001910E8 /* DescriptionFeatureAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733DA61227FC41BB001910E8 /* DescriptionFeatureAppApp.swift */; };
+		733DA61727FC41BB001910E8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 733DA61627FC41BB001910E8 /* Assets.xcassets */; };
+		733DA61A27FC41BB001910E8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 733DA61927FC41BB001910E8 /* Preview Assets.xcassets */; };
+		733DA61F27FC41CC001910E8 /* DescriptionFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 733DA61E27FC41CC001910E8 /* DescriptionFeature */; };
 		734BED492618F12600CCA2ED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 734BED4B2618F12600CCA2ED /* Localizable.strings */; };
 		73719B5F261B8A09005E09A3 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73719B5E261B8A09005E09A3 /* App.swift */; };
 		73719BA6261F137D005E09A3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 73719BA5261F137D005E09A3 /* Settings.bundle */; };
@@ -18,6 +22,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		733DA61027FC41BB001910E8 /* DescriptionFeatureApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DescriptionFeatureApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		733DA61227FC41BB001910E8 /* DescriptionFeatureAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionFeatureAppApp.swift; sourceTree = "<group>"; };
+		733DA61627FC41BB001910E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		733DA61927FC41BB001910E8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		734BED442618F0AD00CCA2ED /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		734BED4E2618F12A00CCA2ED /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		73719B5E261B8A09005E09A3 /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -33,6 +41,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		733DA60D27FC41BB001910E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				733DA61F27FC41CC001910E8 /* DescriptionFeature in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8347587234C61CE00244D6F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -44,6 +60,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		733DA61127FC41BB001910E8 /* DescriptionFeatureApp */ = {
+			isa = PBXGroup;
+			children = (
+				733DA61227FC41BB001910E8 /* DescriptionFeatureAppApp.swift */,
+				733DA61627FC41BB001910E8 /* Assets.xcassets */,
+				733DA61827FC41BB001910E8 /* Preview Content */,
+			);
+			path = DescriptionFeatureApp;
+			sourceTree = "<group>";
+		};
+		733DA61827FC41BB001910E8 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				733DA61927FC41BB001910E8 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		73774AB127B0586600BAE36F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +113,7 @@
 				73719BA5261F137D005E09A3 /* Settings.bundle */,
 				9FB7509324878FDB00193948 /* README.md */,
 				F834758C234C61CE00244D6F /* weg-li */,
+				733DA61127FC41BB001910E8 /* DescriptionFeatureApp */,
 				F834758B234C61CE00244D6F /* Products */,
 				73774AB127B0586600BAE36F /* Frameworks */,
 			);
@@ -88,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				F834758A234C61CE00244D6F /* weg-li.app */,
+				733DA61027FC41BB001910E8 /* DescriptionFeatureApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,6 +148,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		733DA60F27FC41BB001910E8 /* DescriptionFeatureApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 733DA61D27FC41BB001910E8 /* Build configuration list for PBXNativeTarget "DescriptionFeatureApp" */;
+			buildPhases = (
+				733DA60C27FC41BB001910E8 /* Sources */,
+				733DA60D27FC41BB001910E8 /* Frameworks */,
+				733DA60E27FC41BB001910E8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DescriptionFeatureApp;
+			packageProductDependencies = (
+				733DA61E27FC41CC001910E8 /* DescriptionFeature */,
+			);
+			productName = DescriptionFeatureApp;
+			productReference = 733DA61027FC41BB001910E8 /* DescriptionFeatureApp.app */;
+			productType = "com.apple.product-type.application";
+		};
 		F8347589234C61CE00244D6F /* weg-li */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F834759E234C61CF00244D6F /* Build configuration list for PBXNativeTarget "weg-li" */;
@@ -139,10 +195,13 @@
 		F8347582234C61CE00244D6F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1140;
+				LastSwiftUpdateCheck = 1320;
 				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Martin Wilhelmi";
 				TargetAttributes = {
+					733DA60F27FC41BB001910E8 = {
+						CreatedOnToolsVersion = 13.2;
+					};
 					F8347589234C61CE00244D6F = {
 						CreatedOnToolsVersion = 11.1;
 					};
@@ -165,11 +224,21 @@
 			projectRoot = "";
 			targets = (
 				F8347589234C61CE00244D6F /* weg-li */,
+				733DA60F27FC41BB001910E8 /* DescriptionFeatureApp */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		733DA60E27FC41BB001910E8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				733DA61A27FC41BB001910E8 /* Preview Assets.xcassets in Resources */,
+				733DA61727FC41BB001910E8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8347588234C61CE00244D6F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -207,6 +276,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		733DA60C27FC41BB001910E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				733DA61327FC41BB001910E8 /* DescriptionFeatureAppApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8347586234C61CE00244D6F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -238,6 +315,68 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		733DA61B27FC41BB001910E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DescriptionFeatureApp/Preview Content\"";
+				DEVELOPMENT_TEAM = QDDL89SBZ7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = li.weg.DescriptionFeatureApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		733DA61C27FC41BB001910E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DescriptionFeatureApp/Preview Content\"";
+				DEVELOPMENT_TEAM = QDDL89SBZ7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = li.weg.DescriptionFeatureApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F834759C234C61CF00244D6F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -407,6 +546,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		733DA61D27FC41BB001910E8 /* Build configuration list for PBXNativeTarget "DescriptionFeatureApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				733DA61B27FC41BB001910E8 /* Debug */,
+				733DA61C27FC41BB001910E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F8347585234C61CE00244D6F /* Build configuration list for PBXProject "weg-li" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -428,6 +576,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		733DA61E27FC41CC001910E8 /* DescriptionFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DescriptionFeature;
+		};
 		E053B36A27B9549F00B2F877 /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;

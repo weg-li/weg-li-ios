@@ -12,13 +12,13 @@ public extension Report {
     
     Kennzeichen: \(description.licensePlateNumber)
     
-    Marke: \(description.selectedType)
+    Marke: \(DescriptionState.brands[description.selectedBrand])
     
     Farbe: \(DescriptionState.colors[description.selectedColor].value)
     
     Adresse: \(contactState.contact.address.humanReadableAddress)
     
-    Verstoß: \(DescriptionState.charges[description.selectedType].value)
+    Verstoß: \(description.selectedCharge?.text ?? "")
     
     Tatzeit: \(date.humandReadableTime)
     

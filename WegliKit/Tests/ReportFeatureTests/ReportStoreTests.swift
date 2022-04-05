@@ -4,6 +4,7 @@ import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
 import FileClient
+import DescriptionFeature
 import ImagesFeature
 import LocationFeature
 import MapKit
@@ -118,9 +119,9 @@ class ReportStoreTests: XCTestCase {
     )
     
     let duration = 42
-    let type = 23
-    store.send(.description(.setCharge(type))) {
-      $0.description.selectedType = type
+    let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
+    store.send(.description(.setCharge(testCharge))) {
+      $0.description.selectedCharge = testCharge
     }
     store.send(.description(.setDuraration(duration))) {
       $0.description.selectedDuration = duration

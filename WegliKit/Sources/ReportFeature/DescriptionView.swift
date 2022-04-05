@@ -21,7 +21,7 @@ public struct DescriptionView: View {
       self.description = state.description
       self.brand = DescriptionState.brands[state.description.selectedBrand]
       self.color = DescriptionState.colors[state.description.selectedColor].value
-      self.chargeType = DescriptionState.charges[state.description.selectedType].value
+      self.chargeType = state.description.selectedCharge?.text ?? ""
       self.showEditScreen = state.showEditDescription
     }
   }
