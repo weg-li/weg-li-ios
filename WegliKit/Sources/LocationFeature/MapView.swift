@@ -8,7 +8,6 @@ import UIKit
 struct MapView: UIViewRepresentable {
   @Binding var region: CoordinateRegion?
   private let showsLocation: Bool
-  @Binding var photoCoordinate: CLLocationCoordinate2D?
   @Binding var pinCoordinate: CLLocationCoordinate2D?
   
   var placemarks: [MKPointAnnotation] = []
@@ -16,12 +15,10 @@ struct MapView: UIViewRepresentable {
   init(
     region: Binding<CoordinateRegion?>,
     showsLocation: Bool,
-    photoCoordinate: Binding<CLLocationCoordinate2D?>,
     pinCoordinate: Binding<CLLocationCoordinate2D?>
   ) {
     _region = region
     self.showsLocation = showsLocation
-    _photoCoordinate = photoCoordinate
     _pinCoordinate = pinCoordinate
   }
   
@@ -141,7 +138,6 @@ struct MapView_Previews: PreviewProvider {
     MapView(
       region: .constant(nil),
       showsLocation: false,
-      photoCoordinate: .constant(.zero),
       pinCoordinate: .constant(nil)
     )
   }

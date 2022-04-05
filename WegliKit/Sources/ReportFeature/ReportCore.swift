@@ -197,12 +197,15 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         }
         state.location.userLocationState.region = CoordinateRegion(center: coordinate)
         state.images.coordinateFromImagePicker = coordinate
+        state.location.pinCoordinate = coordinate
+        
         return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
         
         // Handle single image remove action to reset map annotations and reset valid state.
       case .image:
         if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
           state.images.coordinateFromImagePicker = nil
+          state.location.pinCoordinate = nil
           state.location.resolvedAddress = .init()
         }
         return .none

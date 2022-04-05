@@ -174,6 +174,7 @@ class ReportStoreTests: XCTestCase {
     }
     store.send(.images(.setResolvedCoordinate(coordinate))) {
       $0.location.userLocationState.region = CoordinateRegion(center: coordinate)
+      $0.location.pinCoordinate = coordinate
     }
     store.receive(.location(.resolveLocation(coordinate))) {
       $0.location.isResolvingAddress = true

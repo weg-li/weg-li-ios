@@ -17,7 +17,6 @@ public struct LocationView: View {
     let isMapExpanded: Bool
     let address: Address
     let showActivityIndicator: Bool
-    let resolvedLocationFromPhoto: CLLocationCoordinate2D?
     let pinCoordinate: CLLocationCoordinate2D?
     
     public init(state: LocationViewState) {
@@ -27,7 +26,6 @@ public struct LocationView: View {
       self.address = state.resolvedAddress
       self.showActivityIndicator = state.userLocationState.isRequestingCurrentLocation
       || state.isResolvingAddress
-      self.resolvedLocationFromPhoto = .zero
       self.pinCoordinate = state.pinCoordinate
     }
   }
@@ -93,17 +91,13 @@ public struct LocationView: View {
         .multilineTextAlignment(.leading)
         .textFieldStyle(RoundedBorderTextFieldStyle())
       } else {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .bottomTrailing) {
           MapView(
             region: viewStore.binding(
               get: \.region,
               send: LocationViewAction.updateRegion
             ),
             showsLocation: viewStore.locationOption == .currentLocation,
-            photoCoordinate: viewStore.binding(
-              get: \.resolvedLocationFromPhoto,
-              send: LocationViewAction.setResolvedLocation
-            ),
             pinCoordinate: viewStore.binding(
               get: \.pinCoordinate,
               send: LocationViewAction.setPinCoordinate
