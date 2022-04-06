@@ -93,7 +93,7 @@ public struct ReportView: View {
       action: { viewStore.send(.resetButtonTapped) },
       label: {
         Image(systemName: "arrow.counterclockwise")
-          .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
+          .foregroundColor(viewStore.isResetButtonDisabled ? .gray : .red)
       }
     )
       .disabled(viewStore.isResetButtonDisabled)
