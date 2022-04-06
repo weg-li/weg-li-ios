@@ -56,6 +56,7 @@ struct MailContentView: View {
       ) {
         viewStore.send(.mail(.submitButtonTapped))
       }
+      .padding(.bottom, 8)
       .disabled(viewStore.isSubmitButtonDisabled)
       VStack(spacing: 8) {
         if !MFMailComposeViewController.canSendMail() {
@@ -67,7 +68,7 @@ struct MailContentView: View {
               .fontWeight(.semibold)
             VStack(spacing: 4) {
               if !viewStore.isImagesValid {
-                Text(L10n.Report.Error.images)
+                Text(L10n.Report.Error.images.asBulletPoint)
               }
               if !viewStore.isLocationValid {
                 Text(L10n.Report.Error.location.asBulletPoint)

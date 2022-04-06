@@ -34,6 +34,7 @@ public struct ReadySubmitButton: View {
   public var body: some View {
     HStack {
       Image(systemName: "envelope.fill")
+        .font(.title2)
       VStack(alignment: .leading) {
         Text(L10n.Button.Submit.title).font(.headline)
         if let amt = district {
