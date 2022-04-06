@@ -151,13 +151,14 @@ extension DescriptionState: Codable {}
 
 public extension DescriptionState {
   var isValid: Bool {
-    [
+    let arguments = [
       !licensePlateNumber.isEmpty,
       selectedColor != 0,
       selectedBrand != 0,
       selectedDuration != 0,
       selectedCharge != nil
-    ].allSatisfy { $0 == true }
+    ]
+    return arguments.allSatisfy { $0 == true }
   }
 }
 

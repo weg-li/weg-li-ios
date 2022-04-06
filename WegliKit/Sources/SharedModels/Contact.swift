@@ -40,7 +40,8 @@ public extension Contact {
       postalCode: RowType.zipCode.placeholder,
       city: RowType.town.placeholder
     ),
-    phone: RowType.phone.placeholder
+    phone: RowType.phone.placeholder,
+    dateOfBirth: RowType.dateOfBirth.placeholder
   )
 }
 

@@ -28,14 +28,10 @@ public extension Address {
   }
   
   var humanReadableAddress: String {
-    let formatter = CNPostalAddressFormatter()
-    
-    let address = CNMutablePostalAddress()
-    address.postalCode = postalCode
-    address.city = city
-    address.street = street
-    
-    return formatter.string(from: address)
+    """
+    \(street)
+    \(postalCode) \(city)
+    """
   }
     
   var humanReadableCity: String {

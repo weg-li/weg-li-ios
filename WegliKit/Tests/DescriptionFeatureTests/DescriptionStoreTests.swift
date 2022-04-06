@@ -108,7 +108,10 @@ class DescriptionStoreTests: XCTestCase {
       initialState: DescriptionState(
         licensePlateNumber: "",
         selectedColor: 1,
-        selectedBrand: 1
+        selectedBrand: 1,
+        selectedDuration: 3,
+        selectedCharge: .init(id: "12", text: "213", isFavorite: false, isSelected: false),
+        blockedOthers: false
       ),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
