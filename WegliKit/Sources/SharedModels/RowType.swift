@@ -37,7 +37,7 @@ public enum RowType {
     switch self {
     case .firstName: return .givenName
     case .lastName: return .familyName
-    case .street: return .fullStreetAddress
+    case .street: return .streetAddressLine1
     case .town: return .addressCity
     case .zipCode: return .postalCode
     case .phone: return .telephoneNumber
