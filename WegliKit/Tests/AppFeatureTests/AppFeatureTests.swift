@@ -56,7 +56,7 @@ class AppStoreTests: XCTestCase {
     store.send(
       .settings(
         .contact(
-          .firstNameChanged(newContact.contact.firstName)
+          .contact(.set(\.$firstName, newContact.contact.firstName))
         )
       )
     ) {
@@ -81,7 +81,7 @@ class AppStoreTests: XCTestCase {
     store.send(
       .report(
         .contact(
-          .firstNameChanged(newContact.contact.firstName)
+          .contact(.set(\.$firstName, newContact.contact.firstName))
         )
       )
     ) {

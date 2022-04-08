@@ -70,7 +70,7 @@ extension Report: Equatable {
 
 public enum ReportAction: Equatable {
   case images(ImagesViewAction)
-  case contact(ContactAction)
+  case contact(ContactStateAction)
   case description(DescriptionAction)
   case location(LocationViewAction)
   case mail(MailViewAction)
@@ -137,7 +137,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       )
     }
   ),
-  contactReducer.pullback(
+  contactViewReducer.pullback(
     state: \.contactState,
     action: /ReportAction.contact,
     environment: { _ in ContactEnvironment() }

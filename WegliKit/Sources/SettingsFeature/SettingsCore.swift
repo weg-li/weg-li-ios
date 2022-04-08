@@ -16,7 +16,7 @@ public struct SettingsState: Equatable {
 }
 
 public enum SettingsAction: Equatable {
-  case contact(ContactAction)
+  case contact(ContactStateAction)
   case openLicensesRowTapped
   case openImprintTapped
   case donateTapped
@@ -38,7 +38,7 @@ public struct SettingsEnvironment {
 
 /// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
 public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment>.combine(
-  contactReducer.pullback(
+  contactViewReducer.pullback(
     state: \.contact,
     action: /SettingsAction.contact,
     environment: { _ in ContactEnvironment() }

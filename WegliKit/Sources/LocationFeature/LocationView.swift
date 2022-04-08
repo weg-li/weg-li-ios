@@ -84,8 +84,8 @@ public struct LocationView: View {
               send: LocationViewAction.updateGeoAddressCity
             )
           )
-            .keyboardType(RowType.town.keyboardType)
-            .textContentType(RowType.town.textContentType)
+            .keyboardType(RowType.city.keyboardType)
+            .textContentType(RowType.city.textContentType)
             .disableAutocorrection(true)
         }
         .multilineTextAlignment(.leading)

@@ -1,4 +1,5 @@
 import Contacts
+import ComposableArchitecture
 import Foundation
 
 public struct Address: Equatable, Codable {
@@ -14,10 +15,10 @@ public struct Address: Equatable, Codable {
     self.addition = addition
   }
   
-  public var street: String
-  public var postalCode: String
-  public var city: String
-  public var addition: String = ""
+  @BindableState public var street: String
+  @BindableState public var postalCode: String
+  @BindableState public var city: String
+  @BindableState public var addition: String = ""
 }
 
 public extension Address {

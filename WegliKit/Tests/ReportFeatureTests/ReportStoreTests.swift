@@ -66,13 +66,13 @@ class ReportStoreTests: XCTestCase {
     let lastName = "ROSS"
     let city = "Rosstown"
     
-    store.send(.contact(.firstNameChanged(firstName))) {
+    store.send(.contact(.contact(.set(\.$firstName, firstName)))) {
       $0.contactState.contact.firstName = firstName
     }
-    store.send(.contact(.lastNameChanged(lastName))) {
+    store.send(.contact(.contact(.set(\.$name, lastName)))) {
       $0.contactState.contact.name = lastName
     }
-    store.send(.contact(.townChanged(city))) {
+    store.send(.contact(.contact(.set(\.address.$city, city)))) {
       $0.contactState.contact.address.city = city
     }
     

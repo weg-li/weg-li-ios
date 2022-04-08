@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Foundation
 
 public struct Contact: Equatable, Codable {
@@ -15,11 +16,11 @@ public struct Contact: Equatable, Codable {
     self.dateOfBirth = dateOfBirth
   }
   
-  public var firstName: String
-  public var name: String
-  public var address: Address
-  public var phone: String
-  public var dateOfBirth: String
+  @BindableState public var firstName: String
+  @BindableState public var name: String
+  @BindableState public var address: Address
+  @BindableState public var phone: String
+  @BindableState public var dateOfBirth: String
 }
 
 
@@ -38,7 +39,7 @@ public extension Contact {
     address: .init(
       street: RowType.street.placeholder,
       postalCode: RowType.zipCode.placeholder,
-      city: RowType.town.placeholder
+      city: RowType.city.placeholder
     ),
     phone: RowType.phone.placeholder,
     dateOfBirth: RowType.dateOfBirth.placeholder

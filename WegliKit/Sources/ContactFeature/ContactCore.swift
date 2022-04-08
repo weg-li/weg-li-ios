@@ -10,14 +10,16 @@ import SharedModels
 public struct ContactState: Equatable, Codable {
   public init(
     contact: Contact = .empty,
-    alert: AlertState<ContactAction>? = nil
+    alert: AlertState<ContactStateAction>? = nil
   ) {
     self.contact = contact
     self.alert = alert
   }
   
+  @BindableState
   public var contact: Contact
-  public var alert: AlertState<ContactAction>?
+  @BindableState
+  public var alert: AlertState<ContactStateAction>?
   
   public var isValid: Bool {
     [
@@ -37,15 +39,8 @@ public struct ContactState: Equatable, Codable {
 
 // MARK: - Action
 
-public enum ContactAction: Equatable {
-  case firstNameChanged(String)
-  case lastNameChanged(String)
-  case phoneChanged(String)
-  case streetChanged(String)
-  case zipCodeChanged(String)
-  case townChanged(String)
-  case dateOfBirthChanged(String)
-  case addressAdditionChanged(String)
+public enum ContactStateAction: Equatable {
+  case contact(ContactAction)
   case resetContactDataButtonTapped
   case resetContactConfirmButtonTapped
   case dismissAlert
@@ -59,48 +54,46 @@ public struct ContactEnvironment {
 }
 
 /// Reducer handling ContactView actions
-public let contactReducer = Reducer<ContactState, ContactAction, ContactEnvironment> { state, action, _ in
+public let contactViewReducer = Reducer<ContactState, ContactStateAction, ContactEnvironment>.combine(
+  contactReducer.pullback(
+    state: \.contact,
+    action: /ContactStateAction.contact,
+    environment: { _ in .init() }
+  ),
+  Reducer { state, action, _ in
+    switch action {
+    case .contact:
+      return .none
+    case .resetContactDataButtonTapped:
+      state.alert = .resetContactDataAlert
+      return .none
+    case .resetContactConfirmButtonTapped:
+      state.contact = .empty
+      return Effect(value: .dismissAlert)
+    case .dismissAlert:
+      state.alert = nil
+      return .none
+    case .onDisappear:
+      return .none
+    }
+  }
+)
+
+public enum ContactAction: BindableAction, Equatable {
+  case binding(BindingAction<Contact>)
+}
+
+public let contactReducer = Reducer<Contact, ContactAction, ContactEnvironment> { state, action, _ in
   switch action {
-  case let .firstNameChanged(firstName):
-    state.contact.firstName = firstName
-    return .none
-  case let .lastNameChanged(lastName):
-    state.contact.name = lastName
-    return .none
-  case let .phoneChanged(phone):
-    state.contact.phone = phone
-    return .none
-  case let .streetChanged(street):
-    state.contact.address.street = street
-    return .none
-  case let .townChanged(town):
-    state.contact.address.city = town
-    return .none
-  case let .zipCodeChanged(zipCode):
-    state.contact.address.postalCode = zipCode
-    return .none
-  case let .dateOfBirthChanged(date):
-    state.contact.dateOfBirth = date
-    return .none
-  case let .addressAdditionChanged(addition):
-    state.contact.address.addition = addition
-    return .none
-  case .resetContactDataButtonTapped:
-    state.alert = .resetContactDataAlert
-    return .none
-  case .resetContactConfirmButtonTapped:
-    state.contact = .empty
-    return Effect(value: .dismissAlert)
-  case .dismissAlert:
-    state.alert = nil
-    return .none
-  case .onDisappear:
+  case .binding:
     return .none
   }
 }
+.binding()
+
 
 // MARK: Helper
-public extension AlertState where Action == ContactAction {
+public extension AlertState where Action == ContactStateAction {
   static let resetContactDataAlert = Self(
     title: TextState(L10n.Contact.Alert.title),
     primaryButton: .destructive(
@@ -123,7 +116,7 @@ public extension ContactState {
       address: .init(
         street: RowType.street.placeholder,
         postalCode: RowType.zipCode.placeholder,
-        city: RowType.town.placeholder
+        city: RowType.city.placeholder
       ),
       phone: RowType.phone.placeholder
     ),
