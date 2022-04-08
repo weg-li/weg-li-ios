@@ -52,7 +52,7 @@ class ReportMailTests: XCTestCase {
     let mailBody = report.createMailBody()
     
     let expectedBody = """
-    Sehr geehrte Damen und Herren,
+    Hallo,
     
     hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
     
