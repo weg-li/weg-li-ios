@@ -211,6 +211,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       case .fromPhotos:
         return .none
       case .currentLocation:
+        state.isResolvingAddress = true
         return Effect(value: .locationRequested)
       case .manual:
         return .none
