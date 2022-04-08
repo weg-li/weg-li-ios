@@ -201,6 +201,6 @@ public extension DescriptionState {
     guard let interval = Times.allCases[selectedDuration].interval(from: startDate) else {
       return time
     }
-    return "\(time) - \(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!)"  
+    return "\(time) (\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!))"  
   }
 }

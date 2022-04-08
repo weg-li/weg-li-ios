@@ -70,7 +70,7 @@ class ReportMailTests: XCTestCase {
     
     Tatzeit: 01.01.2001, 01:00:00 MEZ
     
-    Zeitraum: länger als 10 Minuten - 01:00:00 – 01:10:00
+    Zeitraum: länger als 10 Minuten (01:00:00 – 01:10:00)
     
     Das Fahrzeug war verlassen.
     
