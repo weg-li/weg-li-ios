@@ -119,8 +119,8 @@ public struct DeviceState {
 
     public static let pad = Self(
       idiom: .pad,
-      orientation: .portrait,
-      previousOrientation: .portrait
+      orientation: .landscapeLeft,
+      previousOrientation: .landscapeLeft
     )
   #endif
 }

@@ -10,7 +10,7 @@ let appStoreViewConfigs: [String: SnapshotConfig] = [
   "iPhone_5_5": .init(adaptiveSize: .medium, deviceState: .phone, viewImageConfig: .iPhone8Plus),
   "iPhone_6_5": .init(adaptiveSize: .large, deviceState: .phone, viewImageConfig: .iPhoneXsMax),
   "iPad_12_9": .init(
-    adaptiveSize: .large, deviceState: .pad, viewImageConfig: .iPadPro12_9(.portrait)),
+    adaptiveSize: .large, deviceState: .pad, viewImageConfig: .iPadPro12_9(.landscape)),
 ]
 
 class AppStoreConnectScreenshots: XCTestCase {
@@ -21,7 +21,7 @@ class AppStoreConnectScreenshots: XCTestCase {
 
   override func setUpWithError() throws {
     try super.setUpWithError()
-//    isRecording = true
+    isRecording = true
   }
 
   override func tearDown() {
@@ -64,7 +64,7 @@ class AppStoreConnectScreenshots: XCTestCase {
     )
     
     assertAppStoreSnapshots(
-      view: AnyView(view),
+      view: AnyView(NavigationView(content: { view }).navigationViewStyle(StackNavigationViewStyle())),
       description: { Text("Erstelle eine Anzeige mit Hilfe der App") },
       backgroundColor: .wegliBlue,
       colorScheme: .light
