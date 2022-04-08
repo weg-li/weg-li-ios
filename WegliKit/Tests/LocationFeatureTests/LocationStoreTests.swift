@@ -59,6 +59,7 @@ class LocationStoreTests: XCTestCase {
     store.send(.onAppear)
     // simulate user decision of segmented control
     store.send(.setLocationOption(.currentLocation)) {
+      $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
     store.receive(.locationRequested) {
@@ -118,6 +119,7 @@ class LocationStoreTests: XCTestCase {
     store.send(.onAppear)
     // simulate user decision of segmented control
     store.send(.setLocationOption(.currentLocation)) {
+      $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
     store.receive(.locationRequested) {
@@ -155,6 +157,7 @@ class LocationStoreTests: XCTestCase {
     store.send(.onAppear)
     // simulate user decision of segmented control
     store.send(.setLocationOption(.currentLocation)) {
+      $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
     store.receive(.locationRequested) {
