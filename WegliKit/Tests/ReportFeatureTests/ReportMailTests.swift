@@ -2,7 +2,7 @@ import ReportFeature
 import XCTest
 
 class ReportMailTests: XCTestCase {
-  func test_() {
+  func test_MailGeneration() {
     let date = Date(timeIntervalSinceReferenceDate: 0)
     
     let report = Report(
@@ -27,7 +27,7 @@ class ReportMailTests: XCTestCase {
         licensePlateNumber: "B-HH-123",
         selectedColor: 1,
         selectedBrand: 1,
-        selectedDuration: 1,
+        selectedDuration: 4,
         selectedCharge: .init(
           id: "112402",
           text: "Parken verbotswidrig auf einem Gehweg",
@@ -68,9 +68,9 @@ class ReportMailTests: XCTestCase {
     
     Verstoß: Parken verbotswidrig auf einem Gehweg
     
-    Tatzeit: \(date.humandReadableTime)
+    Tatzeit: 01.01.2001, 01:00:00 MEZ
     
-    Zeitraum: bis zu 3 Minuten
+    Zeitraum: länger als 10 Minuten - 01:00:00 – 01:10:00
     
     Das Fahrzeug war verlassen.
     

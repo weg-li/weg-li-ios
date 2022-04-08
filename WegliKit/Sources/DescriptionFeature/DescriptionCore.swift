@@ -196,4 +196,11 @@ public extension DescriptionState {
   static let times = Times.allCases
   
   var time: String { Times.allCases[selectedDuration].description }
+  
+  func timeInterval(from startDate: Date) -> String {
+    guard let interval = Times.allCases[selectedDuration].interval(from: startDate) else {
+      return time
+    }
+    return "\(time) - \(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!)"  
+  }
 }

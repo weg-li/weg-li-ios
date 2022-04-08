@@ -1,5 +1,6 @@
 import DescriptionFeature
 import Foundation
+import Helper
 import SharedModels
 
 public extension Report {
@@ -21,9 +22,9 @@ public extension Report {
     
     Verstoß: \(description.selectedCharge?.text ?? "")
     
-    Tatzeit: \(date.humandReadableTime)
+    Tatzeit: \(date.humandReadableTimeAndDate)
     
-    Zeitraum: \(description.time)
+    Zeitraum: \(description.timeInterval(from: date))
     
     Das Fahrzeug war verlassen.
     

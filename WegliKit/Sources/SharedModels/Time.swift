@@ -30,6 +30,16 @@ public enum Times: CaseIterable {
     }
   }
   
+  public func interval(from startDate: Date, calendar: Calendar = .current) -> DateInterval? {
+    switch self {
+    case .empty, .one:
+      return nil
+    default:
+      let endDate = calendar.date(byAdding: .minute, value: value, to: startDate)!
+      return .init(start: startDate, end: endDate)
+    }
+  }
+  
   public var description: String {
     switch self {
     case .empty:

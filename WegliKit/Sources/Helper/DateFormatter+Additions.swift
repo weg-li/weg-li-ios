@@ -5,17 +5,27 @@ import Foundation
 public extension DateFormatter {
   static let dateFormatterWithoutTimeMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "de_DE")
+    formatter.locale = 🇩🇪
     formatter.timeStyle = .none
     formatter.dateStyle = .medium
     return formatter
   }()
   
-  static let dateFormatterWithoutDateMediumStyle: DateFormatter = {
+  static let dateFormatterMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "de_DE")
+    formatter.locale = 🇩🇪
     formatter.timeStyle = .long
+    formatter.dateStyle = .medium
+    return formatter
+  }()
+}
+
+public extension DateIntervalFormatter {
+  static let reportTimeFormatter: DateIntervalFormatter = {
+    let formatter = DateIntervalFormatter()
     formatter.dateStyle = .none
+    formatter.timeStyle = .medium
+    formatter.locale = 🇩🇪
     return formatter
   }()
 }
@@ -25,7 +35,9 @@ public extension Date {
     DateFormatter.dateFormatterWithoutTimeMediumStyle.string(from: self)
   }
   
-  var humandReadableTime: String {
-    DateFormatter.dateFormatterWithoutDateMediumStyle.string(from: self)
+  var humandReadableTimeAndDate: String {
+    DateFormatter.dateFormatterMediumStyle.string(from: self)
   }
 }
+
+let 🇩🇪 = Locale(identifier: "de_DE")
