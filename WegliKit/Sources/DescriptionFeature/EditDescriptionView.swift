@@ -164,7 +164,7 @@ public struct EditDescriptionView: View {
               get: \.blockedOthers,
               send: DescriptionAction.toggleBlockedOthers
             )
-          ).animation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
+          ).accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
         }
       }
     )

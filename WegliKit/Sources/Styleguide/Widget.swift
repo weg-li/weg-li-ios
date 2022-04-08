@@ -4,6 +4,8 @@ import L10n
 import SwiftUI
 
 public struct Widget<Content: View>: View {
+  @Environment(\.accessibilityReduceMotion) var reduceMotion
+  
   public init(
     title: Text,
     isCompleted: Bool,
@@ -26,7 +28,7 @@ public struct Widget<Content: View>: View {
         title.fontWeight(.bold)
         Spacer()
         Button(action: {
-          withAnimation(.easeOut(duration: 0.2)) {
+          withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
             self.showDetail.toggle()
           }
         }) {

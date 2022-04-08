@@ -49,7 +49,7 @@ public struct LocationView: View {
         selection: viewStore.binding(
           get: \.locationOption,
           send: LocationViewAction.setLocationOption
-        ).animation(),
+        ),
         label: Text("")
       ) {
         ForEach(LocationOption.allCases, id: \.self) { selection in

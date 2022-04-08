@@ -16,7 +16,7 @@ public struct CompletionIndicator: View {
       Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
         .foregroundColor(isValid ? .green : .orange)
         .rotationEffect(.degrees(isValid ? 4 : 0))
-        .animation(.easeOut(duration: 0.2), value: isValid)
+        .accessibleAnimation(.easeOut(duration: 0.2), value: isValid)
         .accessibility(label: Text(a11yLabel))
     }
   }

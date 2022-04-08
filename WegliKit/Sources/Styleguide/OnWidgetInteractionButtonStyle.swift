@@ -15,7 +15,7 @@ public struct OnWidgetInteractionButtonStyle: ButtonStyle {
           ? (reduceTransparency ? Color(.systemGray6) : Color(.systemGray6).opacity(0.3))
           : (reduceTransparency ? Color(.systemGray3) : Color(.systemGray3).opacity(0.7))
       )
-      .animation(.easeOut, value: configuration.isPressed)
+      .accessibleAnimation(.easeOut, value: configuration.isPressed)
       .clipShape(Circle())
   }
 }
