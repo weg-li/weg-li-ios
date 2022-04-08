@@ -119,7 +119,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       struct FavoritedId: Hashable {}
       return .merge(
         Effect(value: .sortFavoritedCharges)
-          .debounce(id: FavoritedId(), for: 1.5, scheduler: environment.mainQueue),
+          .debounce(id: FavoritedId(), for: 1, scheduler: environment.mainQueue),
         environment.fileClient.saveFavoriteCharges(
           state.charges.filter(\.isFavorite).map(\.id),
           on: environment.backgroundQueue
