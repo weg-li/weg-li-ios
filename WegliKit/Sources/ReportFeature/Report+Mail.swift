@@ -6,7 +6,7 @@ public extension Report {
   // swiftlint:disable:next function_body_length
   func createMailBody() -> String {
     """
-    Sehr geehrte Damen und Herren,
+    Hallo,
     
     hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
     
