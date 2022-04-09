@@ -36,7 +36,7 @@ class ReportMailTests: XCTestCase {
         ),
         blockedOthers: true
       ),
-      location: .init(userLocationState: .init(isRequestingCurrentLocation: true, region: nil)),
+      location: .init(isRequestingCurrentLocation: true),
       mail: .init(
         mailComposeResult: nil,
         mail: .init(

@@ -41,7 +41,7 @@ class LocationStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: LocationViewState(userLocationState: .init()),
+      initialState: LocationViewState(),
       reducer: locationReducer,
       environment: env
     )
@@ -63,30 +63,152 @@ class LocationStoreTests: XCTestCase {
       $0.locationOption = .currentLocation
     }
     store.receive(.locationRequested) {
-      $0.userLocationState.isRequestingCurrentLocation = true
+      $0.isRequestingCurrentLocation = true
     }
     XCTAssertTrue(didRequestInUseAuthorization)
     // Simulate being given authorized to access location
     locationManagerSubject.send(.didChangeAuthorization(.authorizedAlways))
     
-    store.receive(.userLocationAction(.didChangeAuthorization(.authorizedAlways)))
+    store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
     XCTAssertTrue(didRequestLocation)
     // Simulate finding the user's current location
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
-    store.receive(.userLocationAction(.didUpdateLocations([currentLocation]))) {
-      $0.userLocationState.isRequestingCurrentLocation = false
-      $0.userLocationState.region = CoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 10, longitude: 20)
+    store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
+      $0.isRequestingCurrentLocation = false
+      $0.region = CoordinateRegion(
+        center: currentLocation.coordinate
       )
     }
-    store.receive(.resolveLocation(CLLocationCoordinate2D(latitude: 10, longitude: 20))) {
+    store.receive(.resolveLocation(currentLocation.coordinate)) {
       $0.isResolvingAddress = true
     }
     store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }
+    
+    let locationWithVeryLittleDistanceChangeFromFirst = Location(
+      altitude: 0,
+      coordinate: CLLocationCoordinate2D(latitude: 10.00000000001, longitude: 20.000000004),
+      course: 0,
+      horizontalAccuracy: 0,
+      speed: 0,
+      timestamp: Date(timeIntervalSince1970: 1_234_567_890),
+      verticalAccuracy: 0
+    )
+    locationManagerSubject.send(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst]))
+    
+    store.receive(.locationManager(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst]))) {
+      $0.isRequestingCurrentLocation = false
+    }
+    
+    
+    setSubject.send(completion: .finished)
+    locationManagerSubject.send(completion: .finished)
+    
+    
+  }
+  
+  /// if location service enabled, test that locationOption selection triggers location request and address resolve
+  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve_whenANewLocationIsFurtherAway() {
+    var didRequestInUseAuthorization = false
+    var didRequestLocation = false
+    let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
+    let setSubject = PassthroughSubject<Never, Never>()
+    
+    let expectedAddress = Address(
+      street: Contact.preview.address.street,
+      postalCode: Contact.preview.address.postalCode,
+      city: Contact.preview.address.city
+    )
+    
+    let env = LocationViewEnvironment(
+      locationManager: .unimplemented(
+        authorizationStatus: { .notDetermined },
+        create: { _ in locationManagerSubject.eraseToEffect() },
+        locationServicesEnabled: { true },
+        requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
+        requestWhenInUseAuthorization: { _ in
+            .fireAndForget { didRequestInUseAuthorization = true }
+        },
+        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+      ),
+      placeService: PlacesServiceClient(placemarks: { _ in Effect(value: [expectedAddress]) }),
+      uiApplicationClient: .noop, mainRunLoop: .immediate
+    )
+    
+    let store = TestStore(
+      initialState: LocationViewState(),
+      reducer: locationReducer,
+      environment: env
+    )
+    
+    let currentLocation = Location(
+      altitude: 0,
+      coordinate: CLLocationCoordinate2D(latitude: 10, longitude: 20),
+      course: 0,
+      horizontalAccuracy: 0,
+      speed: 0,
+      timestamp: Date(timeIntervalSince1970: 1_234_567_890),
+      verticalAccuracy: 0
+    )
+    
+    store.send(.onAppear)
+    // simulate user decision of segmented control
+    store.send(.setLocationOption(.currentLocation)) {
+      $0.isResolvingAddress = true
+      $0.locationOption = .currentLocation
+    }
+    store.receive(.locationRequested) {
+      $0.isRequestingCurrentLocation = true
+    }
+    XCTAssertTrue(didRequestInUseAuthorization)
+    // Simulate being given authorized to access location
+    locationManagerSubject.send(.didChangeAuthorization(.authorizedAlways))
+    
+    store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
+    XCTAssertTrue(didRequestLocation)
+    // Simulate finding the user's current location
+    locationManagerSubject.send(.didUpdateLocations([currentLocation]))
+    
+    store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
+      $0.isRequestingCurrentLocation = false
+      $0.region = CoordinateRegion(
+        center: currentLocation.coordinate
+      )
+    }
+    store.receive(.resolveLocation(currentLocation.coordinate)) {
+      $0.isResolvingAddress = true
+    }
+    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+      $0.isResolvingAddress = false
+      $0.resolvedAddress = expectedAddress
+    }
+    
+    let locationWithBiggerDistanceChangeFromFirst = Location(
+      altitude: 0,
+      coordinate: CLLocationCoordinate2D(latitude: 10.02, longitude: 20.03),
+      course: 0,
+      horizontalAccuracy: 0,
+      speed: 0,
+      timestamp: Date(timeIntervalSince1970: 1_234_567_890),
+      verticalAccuracy: 0
+    )
+    locationManagerSubject.send(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))
+    
+    store.receive(.locationManager(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))) {
+      $0.isRequestingCurrentLocation = false
+      $0.region = .init(center: locationWithBiggerDistanceChangeFromFirst.coordinate)
+    }
+    store.receive(.resolveLocation(locationWithBiggerDistanceChangeFromFirst.coordinate)) {
+      $0.isResolvingAddress = true
+    }
+    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+      $0.isResolvingAddress = false
+      $0.resolvedAddress = expectedAddress
+    }
+    
     
     setSubject.send(completion: .finished)
     locationManagerSubject.send(completion: .finished)
@@ -110,7 +232,7 @@ class LocationStoreTests: XCTestCase {
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
     let store = TestStore(
-      initialState: LocationViewState(userLocationState: .init()),
+      initialState: LocationViewState(),
       reducer: locationReducer,
       environment: env
     )
@@ -123,7 +245,7 @@ class LocationStoreTests: XCTestCase {
       $0.locationOption = .currentLocation
     }
     store.receive(.locationRequested) {
-      $0.userLocationState.isRequestingCurrentLocation = false
+      $0.isRequestingCurrentLocation = false
       $0.alert = .servicesOff
     }
     setSubject.send(completion: .finished)
@@ -150,7 +272,7 @@ class LocationStoreTests: XCTestCase {
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
     let store = TestStore(
-      initialState: LocationViewState(userLocationState: .init()),
+      initialState: LocationViewState(),
       reducer: locationReducer,
       environment: env
     )
@@ -161,15 +283,15 @@ class LocationStoreTests: XCTestCase {
       $0.locationOption = .currentLocation
     }
     store.receive(.locationRequested) {
-      $0.userLocationState.isRequestingCurrentLocation = true
+      $0.isRequestingCurrentLocation = true
     }
     XCTAssertTrue(didRequestInUseAuthorization)
     // Simulate being given authorized to access location
     locationManagerSubject.send(.didChangeAuthorization(.denied))
     
-    store.receive(.userLocationAction(.didChangeAuthorization(.denied))) {
+    store.receive(.locationManager(.didChangeAuthorization(.denied))) {
       $0.alert = .provideAuth
-      $0.userLocationState.isRequestingCurrentLocation = false
+      $0.isRequestingCurrentLocation = false
     }
     
     setSubject.send(completion: .finished)
@@ -183,8 +305,7 @@ class LocationStoreTests: XCTestCase {
         locationOption: .manual,
         isMapExpanded: false,
         isResolvingAddress: false,
-        resolvedAddress: .init(address: .init()),
-        userLocationState: .init()
+        resolvedAddress: .init(address: .init())
       ),
       reducer: locationReducer,
       environment: LocationViewEnvironment(
@@ -228,8 +349,7 @@ class LocationStoreTests: XCTestCase {
         locationOption: .manual,
         isMapExpanded: false,
         isResolvingAddress: false,
-        resolvedAddress: .init(address: .init()),
-        userLocationState: .init()
+        resolvedAddress: .init(address: .init())
       ),
       reducer: locationReducer,
       environment: LocationViewEnvironment(

@@ -21,10 +21,10 @@ public struct LocationView: View {
     
     public init(state: LocationViewState) {
       self.locationOption = state.locationOption
-      self.region = state.userLocationState.region
+      self.region = state.region
       self.isMapExpanded = state.isMapExpanded
       self.address = state.resolvedAddress
-      self.showActivityIndicator = state.userLocationState.isRequestingCurrentLocation
+      self.showActivityIndicator = state.isRequestingCurrentLocation
       || state.isResolvingAddress
       self.pinCoordinate = state.pinCoordinate
     }
@@ -161,10 +161,8 @@ struct Location_Previews: PreviewProvider {
           initialState: .init(
             locationOption: .currentLocation,
             isMapExpanded: false,
-            userLocationState: UserLocationState(
-              isRequestingCurrentLocation: true,
-              region: nil
-            )
+            isRequestingCurrentLocation: true,
+            region: nil
           ),
           reducer: .empty,
           environment: ()

@@ -173,7 +173,7 @@ class ReportStoreTests: XCTestCase {
       $0.images.storedPhotos = [StorableImage(uiImage: image)!]
     }
     store.send(.images(.setResolvedCoordinate(coordinate))) {
-      $0.location.userLocationState.region = CoordinateRegion(center: coordinate)
+      $0.location.region = CoordinateRegion(center: coordinate)
       $0.location.pinCoordinate = coordinate
     }
     store.receive(.location(.resolveLocation(coordinate))) {
@@ -215,8 +215,7 @@ class ReportStoreTests: XCTestCase {
             street: Report.preview.contactState.contact.address.street,
             postalCode: Report.preview.contactState.contact.address.postalCode,
             city: Report.preview.contactState.contact.address.city
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,
@@ -318,8 +317,7 @@ class ReportStoreTests: XCTestCase {
           resolvedAddress: .init(
             street: "",
             postalCode: "1243", city: ""
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,
@@ -373,8 +371,7 @@ class ReportStoreTests: XCTestCase {
           resolvedAddress: .init(
             street: "",
             postalCode: "1243", city: "Berlin"
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,
@@ -434,8 +431,7 @@ class ReportStoreTests: XCTestCase {
             street: "TestStrasse 3",
             postalCode: "1243",
             city: "Berlin"
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,
@@ -471,8 +467,7 @@ class ReportStoreTests: XCTestCase {
           resolvedAddress: .init(
             street: "TestStrasse 3",
             postalCode: "1243", city: "Berlin"
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,
@@ -508,8 +503,7 @@ class ReportStoreTests: XCTestCase {
           resolvedAddress: .init(
             street: "TestStrasse 3",
             postalCode: "1243", city: "Berlin"
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,
@@ -545,8 +539,7 @@ class ReportStoreTests: XCTestCase {
           resolvedAddress: .init(
             street: "TestStrasse 3",
             postalCode: "1243", city: "Berlin"
-          ),
-          userLocationState: .init()
+          )
         )
       ),
       reducer: reportReducer,

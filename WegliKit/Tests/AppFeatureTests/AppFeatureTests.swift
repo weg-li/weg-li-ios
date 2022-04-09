@@ -33,7 +33,7 @@ class AppStoreTests: XCTestCase {
       district: nil,
       date: fixedDate,
       description: .init(),
-      location: .init(userLocationState: .init()),
+      location: .init(),
       mail: .init()
     )
     userDefaults = UserDefaults(suiteName: #file)

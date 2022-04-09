@@ -182,7 +182,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           images: .init(),
           contactState: state.settings.contact,
           date: Date.init,
-          location: .init(userLocationState: .init())
+          location: .init()
         )
         return .none
       default:
