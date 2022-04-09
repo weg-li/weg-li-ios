@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		733BEEEE2801B14200FD2166 /* Berlin:Germany.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 733BEEED2801B14200FD2166 /* Berlin:Germany.gpx */; };
 		733DA61327FC41BB001910E8 /* DescriptionFeatureAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733DA61227FC41BB001910E8 /* DescriptionFeatureAppApp.swift */; };
 		733DA61727FC41BB001910E8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 733DA61627FC41BB001910E8 /* Assets.xcassets */; };
 		733DA61A27FC41BB001910E8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 733DA61927FC41BB001910E8 /* Preview Assets.xcassets */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		733BEEED2801B14200FD2166 /* Berlin:Germany.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Berlin:Germany.gpx"; sourceTree = "<group>"; };
 		733DA61027FC41BB001910E8 /* DescriptionFeatureApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DescriptionFeatureApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		733DA61227FC41BB001910E8 /* DescriptionFeatureAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionFeatureAppApp.swift; sourceTree = "<group>"; };
 		733DA61627FC41BB001910E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				73774AB027B0567A00BAE36F /* WegliKit */,
 				73719BA5261F137D005E09A3 /* Settings.bundle */,
 				9FB7509324878FDB00193948 /* README.md */,
+				733BEEED2801B14200FD2166 /* Berlin:Germany.gpx */,
 				F834758C234C61CE00244D6F /* weg-li */,
 				733DA61127FC41BB001910E8 /* DescriptionFeatureApp */,
 				F834758B234C61CE00244D6F /* Products */,
@@ -249,6 +252,7 @@
 				9FB7509424878FDB00193948 /* README.md in Resources */,
 				734BED492618F12600CCA2ED /* Localizable.strings in Resources */,
 				F8347594234C61CF00244D6F /* Assets.xcassets in Resources */,
+				733BEEEE2801B14200FD2166 /* Berlin:Germany.gpx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
