@@ -9,6 +9,7 @@
     }
   ],
   "defaultOptions" : {
+    "language" : "de",
     "region" : "DE"
   },
   "testTargets" : [

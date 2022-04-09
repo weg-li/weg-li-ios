@@ -18,7 +18,7 @@ public extension Report {
     Farbe: \(DescriptionState.colors[description.selectedColor].value)
     
     Adresse:
-    \(contactState.contact.address.humanReadableAddress)
+    \(location.resolvedAddress.humanReadableAddress)
     
     Verstoß: \(description.selectedCharge?.text ?? "")
     

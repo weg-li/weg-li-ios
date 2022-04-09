@@ -36,7 +36,14 @@ class ReportMailTests: XCTestCase {
         ),
         blockedOthers: true
       ),
-      location: .init(isRequestingCurrentLocation: true),
+      location: .init(
+        resolvedAddress: .init(
+          street: "Teststraße 23",
+          postalCode: "12345",
+          city: "Berlin"
+        ),
+        isRequestingCurrentLocation: true
+      ),
       mail: .init(
         mailComposeResult: nil,
         mail: .init(
@@ -63,8 +70,8 @@ class ReportMailTests: XCTestCase {
     Farbe: Beige
     
     Adresse:
-    Max-Brauer-Allee 23
-    20095 Hamburg
+    Teststraße 23
+    12345 Berlin
     
     Verstoß: Parken verbotswidrig auf einem Gehweg
     
