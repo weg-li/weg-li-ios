@@ -5,17 +5,19 @@ import Foundation
 public extension DateFormatter {
   static let dateFormatterWithoutTimeMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.locale = 🇩🇪
     formatter.timeStyle = .none
     formatter.dateStyle = .medium
+    formatter.locale = 🇩🇪
+    formatter.timeZone = berlin
     return formatter
   }()
   
   static let dateFormatterMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.locale = 🇩🇪
     formatter.timeStyle = .long
     formatter.dateStyle = .medium
+    formatter.locale = 🇩🇪
+    formatter.timeZone = berlin
     return formatter
   }()
 }
@@ -26,6 +28,7 @@ public extension DateIntervalFormatter {
     formatter.dateStyle = .none
     formatter.timeStyle = .medium
     formatter.locale = 🇩🇪
+    formatter.timeZone = berlin
     return formatter
   }()
 }
@@ -41,3 +44,4 @@ public extension Date {
 }
 
 let 🇩🇪 = Locale(identifier: "de_DE")
+let berlin = TimeZone(identifier: "Europe/Berlin")!
