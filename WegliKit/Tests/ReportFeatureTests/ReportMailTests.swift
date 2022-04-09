@@ -1,3 +1,4 @@
+import CustomDump
 import ReportFeature
 import XCTest
 
@@ -111,6 +112,6 @@ class ReportMailTests: XCTestCase {
     Max Mustermann
     """
     
-    XCTAssertEqual(expectedBody, mailBody)
+    XCTAssertNoDifference(expectedBody, mailBody)
   }
 }

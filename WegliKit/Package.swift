@@ -51,6 +51,7 @@ let package = Package(
       url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
       .upToNextMajor(from: "1.8.2")
     ),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0"))
   ],
   targets: [
     .target(
@@ -289,6 +290,7 @@ package.targets.append(
         "MailFeature",
         "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "CustomDump", package: "swift-custom-dump")
       ]
     ),
     .testTarget(
@@ -300,6 +302,7 @@ package.targets.append(
         "ReportFeature",
         "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "CustomDump", package: "swift-custom-dump")
       ]
     ),
     .testTarget(
