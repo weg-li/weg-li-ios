@@ -30,3 +30,11 @@ jobs:
 
     - name: Run tests
       run: bundle exec fastlane test
+
+    - name: Archive test artifacts
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: test-artifacts
+        path: |
+          ./fastlane/test_output/*.xcresult
