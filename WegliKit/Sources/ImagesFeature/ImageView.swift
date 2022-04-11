@@ -8,6 +8,8 @@ import SwiftUI
 public struct ImageView: View {
   @Environment(\.accessibilityReduceMotion) var reduceMotion
   
+  @State private var showImageView = false
+  
   let store: Store<ImageState, ImageAction>
   @ObservedObject private var viewStore: ViewStore<ImageState, ImageAction>
   
@@ -21,25 +23,27 @@ public struct ImageView: View {
       AsyncThumbnailView(url: url)
         .gridModifier
         .padding(4)
-        .overlay(deleteButton, alignment: .center)
-    } else if let image = viewStore.image.asUIImage {
-      Image(uiImage: image)
-        .gridModifier
-        .padding(4)
-        .overlay(deleteButton, alignment: .center)
+        .contextMenu {
+          Button {
+            showImageView.toggle()
+          } label: {
+            Label("Ansehen", systemImage: "eye")
+          }
+          
+          Button {
+            viewStore.send(.removePhoto, animation: .easeOut(duration: 0.2))
+          } label: {
+            Label("Löschen", systemImage: "trash")
+          }
+        }
+        .popover(isPresented: $showImageView) {
+          AsyncThumbnailView(url: url)
+            .edgesIgnoringSafeArea(.bottom)
+        }
+        
     } else {
       ActivityIndicator(style: .medium)
     }
-  }
-  
-  var deleteButton: some View {
-    Button(
-      action: { viewStore.send(.removePhoto, animation: .easeOut(duration: 0.2)) },
-      label: { Image(systemName: "trash") }
-    )
-      .foregroundColor(.red)
-      .buttonStyle(OnWidgetInteractionButtonStyle())
-      .padding(4)
   }
 }
 

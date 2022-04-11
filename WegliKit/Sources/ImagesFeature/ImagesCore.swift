@@ -47,7 +47,7 @@ public struct ImagesViewState: Equatable, Codable {
 }
 
 public enum ImagesViewAction: Equatable {
-  case addPhotos([StorableImage?])
+  case setPhotos([StorableImage?])
   case addPhotosButtonTapped
   case setShowImagePicker(Bool)
   case requestPhotoLibraryAccess
@@ -112,7 +112,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       return .none
     }
   
-  case let .addPhotos(photos):
+  case let .setPhotos(photos):
     state.storedPhotos = photos
     return .none
   
@@ -138,8 +138,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       let photos = state.storedPhotos
         .compactMap { $0 }
         .filter { $0.id != id }
-      state.storedPhotos = photos
-      return .none
+      return Effect(value: .setPhotos(photos))
     }
   
   case .dismissAlert:

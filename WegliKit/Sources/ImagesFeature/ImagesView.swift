@@ -36,7 +36,7 @@ public struct ImagesView: View {
           ),
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
-            send: ImagesViewAction.addPhotos
+            send: ImagesViewAction.setPhotos
           ),
           coordinate: viewStore.binding(
             get: \.coordinateFromImagePicker,
