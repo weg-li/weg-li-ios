@@ -29,7 +29,7 @@ public struct ImageGrid: View {
         content: ImageView.init
       )
     }
-    .transition(.opacity)
+    .transition(.opacity.combined(with: .move(edge: .bottom)))
   }
 }
 

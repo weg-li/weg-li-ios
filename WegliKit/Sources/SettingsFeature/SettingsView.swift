@@ -85,25 +85,36 @@ public struct SettingsView: View {
   }
   
   var githubView: some View {
-    HStack(alignment: .top) {
-      VStack(alignment: .leading) {
-        Text("weg-li ist open source")
-          .font(.system(.headline, design: .monospaced))
-          .foregroundColor(.white)
+    VStack {
+      HStack(alignment: .top) {
         VStack(alignment: .leading) {
-          Text("Dir fehlt ein feature oder du willst einen bug fixen?")
-            .font(.system(.body, design: .monospaced))
-            .foregroundColor(.gitHubBannerForeground)
+          Text("weg-li ist open source")
+            .font(.system(.headline, design: .monospaced))
+            .foregroundColor(.white)
+            .padding(.bottom, 4)
+          VStack(alignment: .leading) {
+            Text("Dir fehlt ein feature oder du willst einen bug fixen?")
+              .font(.system(.body, design: .monospaced))
+              .foregroundColor(.gitHubBannerForeground)
+          }
         }
-        .padding(.top, 4)
+        Spacer()
+        // swiftlint:disable:next force_unwrapping
+        Image(uiImage: UIImage(named: "GitHub")!)
+          .resizable()
+          .frame(maxWidth: 32, maxHeight: 32)
+          .colorInvert()
+          .padding(.leading, 6)
       }
-      Spacer()
-      // swiftlint:disable:next force_unwrapping
-      Image(uiImage: UIImage(named: "GitHub")!)
-        .resizable()
-        .frame(maxWidth: 32, maxHeight: 32)
-        .colorInvert()
-        .padding(.leading, 6)
+      
+      HStack {
+        Text("Projekt anzeigen")
+        Spacer()
+        Image(systemName: "arrow.up.right")
+      }
+      .padding(.top, 4)
+      .font(.system(.body, design: .monospaced))
+      .foregroundColor(.yellow)
     }
     .padding([.top, .bottom], 4)
     .background(

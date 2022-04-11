@@ -41,7 +41,7 @@ struct MapView: UIViewRepresentable {
     mapView.showsUserLocation = showsLocation
       
     if let region = self.region {
-      mapView.setRegion(region.asMKCoordinateRegion, animated: false)
+      mapView.setRegion(region.asMKCoordinateRegion, animated: true)
     }
     
     if let pinCoordinate = pinCoordinate {
@@ -63,13 +63,6 @@ struct MapView: UIViewRepresentable {
     var parent: MapView
     init(_ parent: MapView) {
       self.parent = parent
-    }
-    
-    func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
-      parent.region = CoordinateRegion(
-        center: .init(mapView.region.center),
-        span: .init(mapView.region.span) 
-      )
     }
     
     @objc func addPinBasedOnGesture(_ gestureRecognizer:UIGestureRecognizer) {

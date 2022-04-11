@@ -25,7 +25,7 @@ public extension CoordinateRegion {
   ///   - span: Zoom level with a default value of 0.02
   init(
     center: CLLocationCoordinate2D,
-    defaultSpan: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+    defaultSpan: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
   ) {
     self.center = .init(center)
     self.span = .init(defaultSpan)
