@@ -18,7 +18,7 @@ import FileClient
 
 // MARK: - Report Core
 
-public struct Report: Codable {
+public struct Report: Codable, Equatable {
   public var id: String
   public var images: ImagesViewState
   public var contactState: ContactState
@@ -34,6 +34,15 @@ public struct Report: Codable {
   public var showEditDescription = false
   public var showEditContact = false
   
+  public var isPhotosValid: Bool { !images.storedPhotos.isEmpty }
+  public var isContactValid: Bool { contactState.isValid }
+  public var isDescriptionValid: Bool { description.isValid }
+  public var isLocationValid: Bool { location.resolvedAddress.isValid }
+  public var isResetButtonDisabled: Bool {
+    location.resolvedAddress == .init()
+      && images.storedPhotos.isEmpty
+      && description == .init()
+  }
   public init(
     uuid: UUID = UUID(),
     images: ImagesViewState,
@@ -59,15 +68,6 @@ public struct Report: Codable {
   }
 }
 
-extension Report: Equatable {
-  public static func == (lhs: Report, rhs: Report) -> Bool {
-    lhs.contactState == rhs.contactState
-    && lhs.district == rhs.district
-    && lhs.description == rhs.description
-    && lhs.location == rhs.location
-  }
-}
-
 public enum ReportAction: Equatable {
   case images(ImagesViewAction)
   case contact(ContactStateAction)
@@ -81,6 +81,7 @@ public enum ReportAction: Equatable {
   case setShowEditDescription(Bool)
   case setShowEditContact(Bool)
   case dismissAlert
+  case setDate(Date)
 }
 
 public struct ReportEnvironment {
@@ -208,6 +209,16 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
           state.location.resolvedAddress = .init()
         }
         return .none
+        
+      case let .setResolvedDate(date):
+        // set report date from selected photos
+        state.date = date ?? Date()
+        return .none
+      
+        // Handle single image remove action to reset map annotations and reset valid state.
+      case .image:
+        return .none
+        
       default:
         return .none
       }
@@ -287,6 +298,10 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     case .dismissAlert:
       state.alert = nil
       return .none
+      
+    case let .setDate(date):
+      state.date = date
+      return .none
     }
   }
 )
@@ -359,7 +374,7 @@ public extension FileClient {
   func loadReports() -> Effect<Result<[Report], NSError>, Never> {
     self.load([Report].self, from: reportsFileName)
   }
-
+  
   func saveReports(
     _ reports: [Report], on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<Never, Never> {

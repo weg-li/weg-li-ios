@@ -11,35 +11,38 @@ import Styleguide
 import SwiftUI
 
 public struct ReportView: View {
-  public struct ViewState: Equatable {
-    public let isPhotosValid: Bool
-    public let isContactValid: Bool
-    public let isDescriptionValid: Bool
-    public let isLocationValid: Bool
-    public let isResetButtonDisabled: Bool
-    
-    public init(state: Report) {
-      isPhotosValid = !state.images.storedPhotos.isEmpty
-      isContactValid = state.contactState.isValid
-      isDescriptionValid = state.description.isValid
-      isLocationValid = state.location.resolvedAddress.isValid
-      isResetButtonDisabled = state.location.resolvedAddress == .init()
-      && state.images.storedPhotos.isEmpty
-      && state.description == .init()
-    }
-  }
-  
   private let store: Store<Report, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
-  
+  @ObservedObject private var viewStore: ViewStore<Report, ReportAction>
+    
   public init(store: Store<Report, ReportAction>) {
     self.store = store
-    viewStore = ViewStore(store.scope(state: ViewState.init))
+    viewStore = ViewStore(store)
   }
   
   public var body: some View {
     ScrollView {
       VStack {
+        Widget(
+          title: Text("Datum"),
+          isCompleted: true
+        ) {
+          VStack(alignment: .leading) {
+            DatePicker(
+              "Datum",
+              selection: viewStore.binding(
+                get: \.date,
+                send: ReportAction.setDate
+              )
+            )
+            .labelsHidden()
+            .padding(.bottom)
+            
+            Text("Beim auswählen eines Fotos wird das Datum aus den Metadaten ausgelesen")
+              .multilineTextAlignment(.leading)
+              .foregroundColor(Color(.secondaryLabel))
+              .font(.callout)
+          }
+        }
         // Photos
         Widget(
           title: Text(L10n.Photos.widgetTitle),

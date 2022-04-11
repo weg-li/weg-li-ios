@@ -11,6 +11,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
   @Binding var isPresented: Bool
   @Binding var pickerResult: [StorableImage?]
   @Binding var coordinate: CLLocationCoordinate2D?
+  @Binding var date: Date?
   
   public class Coordinator: NSObject, PHPickerViewControllerDelegate {
     let parent: ImagePicker
@@ -64,6 +65,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
           let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
           DispatchQueue.main.async { [weak self] in
             self?.parent.coordinate = assetResults.firstObject?.location?.coordinate
+            self?.parent.date = assetResults.firstObject?.creationDate
           }
         }
       }

@@ -38,6 +38,27 @@ class ReportStoreTests: XCTestCase {
     )
   }
   
+  func test_updateDate_shouldUpdateState() {
+    let store = TestStore(
+      initialState: report,
+      reducer: reportReducer,
+      environment: ReportEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        locationManager: LocationManager.unimplemented(),
+        placeService: .noop,
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
+      )
+    )
+    
+    let newDate = Date(timeIntervalSinceReferenceDate: 0)
+    
+    store.send(.setDate(newDate)) {
+      $0.date = newDate
+    }
+  }
+  
   // MARK: - Reducer integration tests
   
   func test_updateContact_shouldUpdateState_andWriteContactToFile() {

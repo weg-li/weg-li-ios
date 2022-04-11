@@ -14,23 +14,27 @@ public struct ImagesViewState: Equatable, Codable {
     alert: AlertState<ImagesViewAction>? = nil,
     showImagePicker: Bool = false,
     storedPhotos: [StorableImage?] = [],
-    coordinateFromImagePicker: CLLocationCoordinate2D? = nil
+    coordinateFromImagePicker: CLLocationCoordinate2D? = nil,
+    dateFromImagePicker: Date? = nil
   ) {
     self.alert = alert
     self.showImagePicker = showImagePicker
     self.storedPhotos = storedPhotos
     self.coordinateFromImagePicker = coordinateFromImagePicker
+    self.dateFromImagePicker = dateFromImagePicker
   }
   
   public var alert: AlertState<ImagesViewAction>?
   public var showImagePicker: Bool
   public var storedPhotos: [StorableImage?]
   public var coordinateFromImagePicker: CLLocationCoordinate2D?
+  public var dateFromImagePicker: Date?
   
   enum CodingKeys: String, CodingKey {
     case showImagePicker
     case storedPhotos
     case coordinateFromImagePicker
+    case dateFromImagePicker
   }
   
   public var imageStates: IdentifiedArrayOf<ImageState> {
@@ -53,6 +57,7 @@ public enum ImagesViewAction: Equatable {
   case requestPhotoLibraryAccess
   case requestPhotoLibraryAccessResult(PhotoLibraryAuthorizationStatus)
   case setResolvedCoordinate(CLLocationCoordinate2D?)
+  case setResolvedDate(Date?)
   case dismissAlert
   case image(id: String, action: ImageAction)
 }
@@ -129,6 +134,10 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     }
     
     state.coordinateFromImagePicker = coordinate
+    return .none
+    
+  case let .setResolvedDate(date):
+    state.dateFromImagePicker = date
     return .none
   
   case let .image(id, imageAction):
