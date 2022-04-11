@@ -7,7 +7,7 @@ class ReportMailTests: XCTestCase {
     let date = Date(timeIntervalSinceReferenceDate: 0)
     
     let report = Report(
-      uuid: .init(),
+      uuid: { UUID(uuidString: "de71ce00-dead-beef-dead-beefdeadbeef")! },
       images: .init(
         alert: nil,
         showImagePicker: false,

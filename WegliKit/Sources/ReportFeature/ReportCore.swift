@@ -43,17 +43,25 @@ public struct Report: Codable, Equatable {
       && images.storedPhotos.isEmpty
       && description == .init()
   }
+  
+  public func isModified() -> Bool {
+    district != nil
+    || isPhotosValid
+    || contactState.isValid
+    || location != .init()
+  }
+  
   public init(
-    uuid: UUID = UUID(),
+    uuid: @escaping () -> UUID,
     images: ImagesViewState,
     contactState: ContactState,
     district: District? = nil,
-    date: () -> Date = Date.init,
+    date: () -> Date,
     description: DescriptionState = DescriptionState(),
     location: LocationViewState = LocationViewState(),
     mail: MailViewState = MailViewState()
   ) {
-    id = uuid.uuidString
+    id = uuid().uuidString
     self.images = images
     self.contactState = contactState
     self.district = district
@@ -110,6 +118,8 @@ public struct ReportEnvironment {
   public var placeService: PlacesServiceClient
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
   public let fileClient: FileClient
+  
+  public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
   
   let debounce = 0.5
   let postalCodeMinumimCharacters = 5
@@ -261,20 +271,24 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       }
       
       // Compose mail when send mail button was tapped.
-    case let .mail(mailAction):
-      if MailViewAction.submitButtonTapped == mailAction {
-        guard let district = state.district else {
-          return .none
-        }
-        state.mail.mail.address = district.email
-        state.mail.mail.body = state.createMailBody()
-        state.mail.mail.attachmentData = state.images.storedPhotos
-          .compactMap { $0?.imageUrl }
-          .compactMap { try? Data(contentsOf: $0) }
-        return Effect(value: ReportAction.mail(.presentMailContentView(true)))
-      } else {
+    case .mail(.submitButtonTapped):
+      guard environment.canSendMail() else {
+        state.alert = .noMailAccount
         return .none
       }
+      
+      guard let district = state.district else {
+        return .none
+      }
+      state.mail.mail.address = district.email
+      state.mail.mail.body = state.createMailBody()
+      state.mail.mail.attachmentData = state.images.storedPhotos
+        .compactMap { $0?.imageUrl }
+        .compactMap { try? Data(contentsOf: $0) }
+      return Effect(value: ReportAction.mail(.presentMailContentView(true)))
+  
+    case .mail:
+      return .none
       
     case .contact, .description:
       return .none
@@ -318,7 +332,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
 public extension Report {
   static var preview: Report {
     Report(
-      uuid: UUID(),
+      uuid: UUID.init,
       images: .init(
         showImagePicker: false,
         storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
@@ -356,6 +370,25 @@ public extension AlertState where Action == ReportAction {
       .init(L10n.cancel),
       action: .send(.dismissAlert)
     )
+  )
+  
+  static let noMailAccount = Self(
+    title: TextState("Fehler"),
+    message: TextState("Mail kann nicht gesendet werden, da kein Account gefunden werden konnte"),
+    buttons: [
+      .default(
+        .init("Anzeige kopieren"),
+        action: .send(.mail(.copyMailBody))
+      ),
+      .default(
+        .init("Addresse kopieren"),
+        action: .send(.mail(.copyMailToAddress))
+      ),
+      .cancel(
+        .init(L10n.cancel),
+        action: .send(.dismissAlert)
+      )
+    ]
   )
   
   static let noPhotoCoordinate = Self(

@@ -23,18 +23,12 @@ public struct AppState: Equatable {
   public var reports: [Report]
   
   /// Holds a report that has not been stored or sent via mail
-  var _storedReport: Report?
-  public var reportDraft: Report {
-    get {
-      guard let report = _storedReport else {
-        return Report(images: .init(), contactState: settings.contact, date: Date.init)
-      }
-      return report
-    }
-    set {
-      _storedReport = newValue
-    }
-  }
+  public var reportDraft: Report = .init(
+    uuid: UUID.init,
+    images: .init(),
+    contactState: .empty,
+    date: Date.init
+  )
   
   var showReportWizard = false
   
@@ -69,16 +63,23 @@ public struct AppEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
     backgroundQueue: AnySchedulerOf<DispatchQueue>,
-    fileClient: FileClient
+    fileClient: FileClient,
+    date: @escaping () -> Date = Date.init,
+    uuid: @escaping () -> UUID = UUID.init
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
     self.fileClient = fileClient
+    self.date = date
+    self.uuid = uuid
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
   public var backgroundQueue: AnySchedulerOf<DispatchQueue>
   public var fileClient: FileClient
+  
+  public var date: () -> Date
+  public var uuid: () -> UUID
 }
 
 public extension AppEnvironment {
@@ -135,74 +136,77 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.reports = reports
       return .none
       
-      // restore state from userdefaults
     case .onAppear:
       return .none
       
     case .settings:
       return .none
       
-    // After the emailResult reports the mail has been sent the report will be stored.
-    case let .report(reportAction):
-      switch reportAction {
-      case let .mail(mailAction):
-        switch mailAction {
-        case let .setMailResult(result):
-          guard let mailComposerResult = result else {
-            return .none
-          }
-          switch mailComposerResult {
-          case .sent:
-            state.reportDraft.images.storedPhotos.forEach { image in
-              _ = try? image?.imageUrl.flatMap { safeUrl in
-                try FileManager.default.removeItem(at: safeUrl)
-              }
-            }
-            state.reportDraft.images.storedPhotos.removeAll()
-            state.reports.append(state.reportDraft)
-            
-            return Effect.concatenate(
-              environment.fileClient
-                .saveReports(state.reports, on: environment.backgroundQueue)
-                .fireAndForget(),
-              Effect(value: AppAction.reportSaved)
-            )
-          default:
-            return .none
-          }
-        default:
-          return .none
+      // After the emailResult reports the mail has been sent the report will be stored.
+    case .report(.mail(.setMailResult(.sent))):
+      state.reportDraft.images.storedPhotos.forEach { image in
+        _ = try? image?.imageUrl.flatMap { safeUrl in
+          try FileManager.default.removeItem(at: safeUrl)
         }
-      case .contact:
-        // sync contact with draftReport contact
-        state.settings.contact = state.reportDraft.contactState
-        return .none
-      case .resetConfirmButtonTapped:
-        state.reportDraft = Report(
+      }
+      state.reportDraft.images.storedPhotos.removeAll()
+      state.reports.append(state.reportDraft)
+
+      state.showReportWizard = false
+      
+      return Effect.merge(
+        environment.fileClient
+          .saveReports(state.reports, on: environment.backgroundQueue)
+          .fireAndForget(),
+        Effect(value: AppAction.reportSaved)
+      )
+      
+    case .report(.resetConfirmButtonTapped):
+      state.reportDraft = Report(
+        uuid: environment.uuid,
+        images: .init(),
+        contactState: state.settings.contact,
+        date: environment.date, 
+        location: .init()
+      )
+      return .none
+    
+    case .report:
+      return .none
+  
+    case let .showReportWizard(value):
+      if !state.reportDraft.isModified() {
+        state.reportDraft = .init(
+          uuid: environment.uuid,
           images: .init(),
           contactState: state.settings.contact,
-          date: Date.init,
-          location: .init()
+          date: environment.date
         )
-        return .none
-      default:
-        return .none
       }
-    case let .showReportWizard(value):
       state.showReportWizard = value
       return .none
       
     case .reportSaved:
       // Reset report draft after it was saved
       state.reportDraft = Report(
+        uuid: environment.uuid,
         images: .init(),
         contactState: state.settings.contact,
-        date: Date.init
+        date: environment.date
       )
       return .none
     }
   }
 )
+.onChange(of: \.reportDraft.contactState.contact) { contact, state, _, environment in
+  struct SaveDebounceId: Hashable {}
+  state.settings.contact.contact = contact
+
+  return environment.fileClient
+    .saveContactSettings(contact, on: environment.backgroundQueue)
+    .fireAndForget()
+    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+}
 .onChange(of: \.settings.contact) { contact, state, _, environment in
   struct SaveDebounceId: Hashable {}
   state.reportDraft.contactState = contact

@@ -11,9 +11,14 @@ import ReportFeature
 import SharedModels
 import XCTest
 
+extension UUID {
+  public static let ReportId = Self(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!
+}
+
+
 class AppStoreTests: XCTestCase {
-  let fixedUUID = { UUID() }
-  let fixedDate = { Date() }
+  let fixedUUID = { UUID.ReportId }
+  let fixedDate = { Date(timeIntervalSinceReferenceDate: 0) }
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   var userDefaults: UserDefaults!
   
@@ -23,7 +28,7 @@ class AppStoreTests: XCTestCase {
     super.setUp()
     
     report = Report(
-      uuid: fixedUUID(),
+      uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
         storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
@@ -47,7 +52,9 @@ class AppStoreTests: XCTestCase {
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
-        fileClient: .noop
+        fileClient: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
       )
     )
     
@@ -72,7 +79,9 @@ class AppStoreTests: XCTestCase {
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
-        fileClient: .noop
+        fileClient: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
       )
     )
     
@@ -94,7 +103,7 @@ class AppStoreTests: XCTestCase {
     var didWriteReports = false
     var fileCient = FileClient.noop
     fileCient.save = { key, _ in
-      didWriteReports = key == "reports"
+      didWriteReports = true
       return .none
     }
     
@@ -102,19 +111,30 @@ class AppStoreTests: XCTestCase {
       initialState: AppState(reportDraft: report),
       reducer: appReducer,
       environment: AppEnvironment(
-        mainQueue: scheduler.eraseToAnyScheduler(),
-        backgroundQueue: scheduler.eraseToAnyScheduler(),
-        fileClient: fileCient
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        fileClient: fileCient,
+        date: fixedDate,
+        uuid: fixedUUID
       )
     )
-    
-    store.send(.report(.mail(.setMailResult(MFMailComposeResult(rawValue: 2))))) {
-      $0.reports = [self.report]
+        
+    let result = MFMailComposeResult.sent
+    store.send(.report(.mail(.setMailResult(result)))) {
+      var report = $0.reportDraft
+      report.images.storedPhotos.removeAll()
+      report.mail.mailComposeResult = result
+      
+      $0.reports = [report]
+      $0.reportDraft = report
+      $0.reportDraft.mail.mailComposeResult = result
     }
     store.receive(.reportSaved) {
       $0.reportDraft = Report(
+        uuid: self.fixedUUID,
         images: .init(),
-        contactState: .init(contact: .empty, alert: nil)
+        contactState: .init(contact: .empty, alert: nil),
+        date: self.fixedDate
       )
     }
     XCTAssertTrue(didWriteReports)
@@ -130,12 +150,15 @@ class AppStoreTests: XCTestCase {
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
-        fileClient: .noop
+        fileClient: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
       )
     )
     
     store.send(.report(.resetConfirmButtonTapped)) {
       $0.reportDraft = Report(
+        uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(
           contact: AppState.settings.contact.contact,

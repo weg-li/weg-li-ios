@@ -113,6 +113,7 @@ struct MailContentView_Previews: PreviewProvider {
     MailContentView(
       store: .init(
         initialState: .init(
+          uuid: UUID.init,
           images: .init(),
           contactState: .preview,
           date: Date.init

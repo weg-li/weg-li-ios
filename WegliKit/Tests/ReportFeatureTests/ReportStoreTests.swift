@@ -14,7 +14,7 @@ import SharedModels
 import XCTest
 
 class ReportStoreTests: XCTestCase {
-  let fixedUUID = { UUID() }
+  let fixedUUID = { UUID(uuidString: "de71ce00-dead-beef-dead-beefdeadbeef")! }
   let fixedDate = { Date() }
   
   let districs = DistrictFixtures.districts
@@ -25,7 +25,7 @@ class ReportStoreTests: XCTestCase {
     super.setUp()
     
     report = Report(
-      uuid: fixedUUID(),
+      uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
         storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
@@ -189,13 +189,14 @@ class ReportStoreTests: XCTestCase {
         fileClient: .noop
       )
     )
-    
-    store.send(.images(.addPhotos([StorableImage(uiImage: image)]))) {
-      $0.images.storedPhotos = [StorableImage(uiImage: image)!]
+    let storedImage = StorableImage(uiImage: image)
+    store.send(.images(.setPhotos([storedImage]))) {
+      $0.images.storedPhotos = [storedImage!]
     }
     store.send(.images(.setResolvedCoordinate(coordinate))) {
       $0.location.region = CoordinateRegion(center: coordinate)
       $0.location.pinCoordinate = coordinate
+      $0.images.coordinateFromImagePicker = coordinate
     }
     store.receive(.location(.resolveLocation(coordinate))) {
       $0.location.isResolvingAddress = true
@@ -218,7 +219,7 @@ class ReportStoreTests: XCTestCase {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
           storedPhotos: [StorableImage(uiImage: image)!],
@@ -249,10 +250,56 @@ class ReportStoreTests: XCTestCase {
         fileClient: .noop
       )
     )
+    store.environment.canSendMail = { true }
     
-    store.send(ReportAction.mail(.submitButtonTapped))
+    store.send(ReportAction.mail(.submitButtonTapped)) {
+      $0.mail.mail.address = "Anzeige@bowi.berlin.de"
+      $0.mail.mail.body = $0.createMailBody()
+    }
     store.receive(ReportAction.mail(.presentMailContentView(true))) {
       $0.mail.isPresentingMailContent = true
+    }
+  }
+  
+  func test_submitButtonTap_createsMail_butShowsError() {
+    let image = UIImage(systemName: "pencil")!
+    let store = TestStore(
+      initialState: Report(
+        uuid: fixedUUID,
+        images: ImagesViewState(
+          showImagePicker: false,
+          storedPhotos: [StorableImage(uiImage: image)!],
+          coordinateFromImagePicker: .zero
+        ),
+        contactState: .empty,
+        district: districs[0],
+        date: fixedDate,
+        description: .init(),
+        location: LocationViewState(
+          locationOption: .currentLocation,
+          isMapExpanded: false,
+          isResolvingAddress: false,
+          resolvedAddress: .init(
+            street: Report.preview.contactState.contact.address.street,
+            postalCode: Report.preview.contactState.contact.address.postalCode,
+            city: Report.preview.contactState.contact.address.city
+          )
+        )
+      ),
+      reducer: reportReducer,
+      environment: ReportEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        locationManager: LocationManager.unimplemented(),
+        placeService: .noop,
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
+      )
+    )
+    store.environment.canSendMail = { false }
+    
+    store.send(ReportAction.mail(.submitButtonTapped)) {
+      $0.alert = .noMailAccount
     }
   }
   
@@ -321,7 +368,7 @@ class ReportStoreTests: XCTestCase {
   func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() {
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
           storedPhotos: [],
@@ -375,7 +422,7 @@ class ReportStoreTests: XCTestCase {
   func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() {
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
           storedPhotos: [],
@@ -426,7 +473,7 @@ class ReportStoreTests: XCTestCase {
   func test_removeImage_shouldSetResolvedCoordinateToNil_whenPhotosIsEmptyAfterDelete() {
     let images = [
       StorableImage(
-        id: fixedUUID().uuidString,
+        id: "123",
         uiImage: UIImage(systemName: "pencil")!
       )
     ]
@@ -434,7 +481,7 @@ class ReportStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
           storedPhotos: images,
@@ -466,7 +513,9 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.images(.image(id: fixedUUID().uuidString, action: .removePhoto))) {
+    store.send(.images(.image(id: "123", action: .removePhoto)))
+    store.receive(.images(.setPhotos([]))) {
+      $0.location.resolvedAddress = .init()
       $0.images.storedPhotos = []
       $0.images.coordinateFromImagePicker = nil
     }
@@ -475,7 +524,7 @@ class ReportStoreTests: XCTestCase {
   func test_resetDataButtonTap_shouldPresentAnAlert() {
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
         district: nil,
@@ -511,7 +560,7 @@ class ReportStoreTests: XCTestCase {
   func test_setShowContact_shouldPresentAnAlert() {
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
         district: nil,
@@ -547,7 +596,7 @@ class ReportStoreTests: XCTestCase {
   func test_setShowDescription_shouldPresentAnAlert() {
     let store = TestStore(
       initialState: Report(
-        uuid: fixedUUID(),
+        uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
         district: nil,

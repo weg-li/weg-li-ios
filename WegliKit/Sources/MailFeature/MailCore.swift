@@ -24,6 +24,9 @@ public enum MailViewAction: Equatable {
   case submitButtonTapped
   case presentMailContentView(Bool)
   case setMailResult(MFMailComposeResult?)
+
+  case copyMailToAddress
+  case copyMailBody
 }
 
 public struct MailViewEnvironment {
@@ -40,6 +43,14 @@ public let mailViewReducer = Reducer<MailViewState, MailViewAction, MailViewEnvi
     return .none
   case let .setMailResult(value):
     state.mailComposeResult = value
+    return .none
+    
+  case .copyMailBody:
+    UIPasteboard.general.string = state.mail.body
+    return .none
+  
+  case .copyMailToAddress:
+    UIPasteboard.general.string = state.mail.address
     return .none
   }
 }

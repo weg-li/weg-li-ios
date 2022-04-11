@@ -28,7 +28,7 @@ class ImagesStoreTests: XCTestCase {
     
     let pencilImage = StorableImage(uiImage: UIImage(systemName: "pencil")!)!
     let trashImage = StorableImage(uiImage: UIImage(systemName: "trash")!)!
-    store.send(.addPhotos([pencilImage, trashImage])) {
+    store.send(.setPhotos([pencilImage, trashImage])) {
       $0.storedPhotos = [
         pencilImage,
         trashImage,
@@ -53,12 +53,13 @@ class ImagesStoreTests: XCTestCase {
       ),
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
+        mainQueue: .immediate,
         photoLibraryAccessClient: .noop
       )
     )
     
-    store.send(.image(id: id1, action: .removePhoto)) {
+    store.send(.image(id: id1, action: .removePhoto))
+    store.receive(.setPhotos([storableImage2])) {
       $0.storedPhotos = [storableImage2]
     }
   }
@@ -83,7 +84,7 @@ class ImagesStoreTests: XCTestCase {
     let pencilImage = StorableImage(uiImage: pencil)!
     let trashImage = StorableImage(uiImage: trash)!
     
-    store.send(.addPhotos([pencilImage, trashImage])) {
+    store.send(.setPhotos([pencilImage, trashImage])) {
       $0.storedPhotos = [pencilImage, trashImage]
     }
     store.send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {
@@ -111,7 +112,7 @@ class ImagesStoreTests: XCTestCase {
     let pencilImage = StorableImage(uiImage: pencil)!
     let trashImage = StorableImage(uiImage: trash)!
     
-    store.send(.addPhotos([pencilImage, trashImage])) {
+    store.send(.setPhotos([pencilImage, trashImage])) {
       $0.storedPhotos = [pencilImage, trashImage]
     }
     store.send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {

@@ -108,6 +108,7 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
         DescriptionView(
           store: .init(
             initialState: Report(
+              uuid: UUID.init,
               images: ImagesViewState(),
               contactState: .preview,
               date: Date.init
