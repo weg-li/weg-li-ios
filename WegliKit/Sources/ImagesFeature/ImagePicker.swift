@@ -62,7 +62,9 @@ public struct ImagePicker: UIViewControllerRepresentable {
         // hopefully the selected images are from one location 🤞
         if let assetId = result.assetIdentifier {
           let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-          parent.coordinate = assetResults.firstObject?.location?.coordinate
+          DispatchQueue.main.async { [weak self] in
+            self?.parent.coordinate = assetResults.firstObject?.location?.coordinate
+          }
         }
       }
       parent.isPresented = false
