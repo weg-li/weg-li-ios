@@ -32,9 +32,11 @@ public struct ImagesViewState: Equatable, Codable {
   public var dateFromImagePicker: Date?
   
   public var presentTextConfirmationDialog = false
-  public var recognizedTexts: [String] = []
+  public var recognizedTextItems: [TextItem] = []
   
-  public var licensePlates = OrderedSet<String>()
+  public var licensePlates = OrderedSet<TextItem>()
+  
+  public var isRecognizingTexts = false
   
   enum CodingKeys: String, CodingKey {
     case showImagePicker
@@ -66,7 +68,7 @@ public enum ImagesViewAction: Equatable {
   case setResolvedDate(Date?)
   case dismissAlert
   case textRecognitionCompleted(Result<[TextItem], VisionError>)
-  case selectedText(String)
+  case selectedText(TextItem)
   case image(id: String, action: ImageAction)
   case setConfimationDialog(Bool)
 }
@@ -137,11 +139,13 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     
     guard !photos.isEmpty else {
       state.licensePlates.removeAll()
-      state.recognizedTexts.removeAll()
+      state.recognizedTextItems.removeAll()
       return .none
     }
     
     let images = photos.compactMap { $0 }
+    
+    state.isRecognizingTexts = true
     return .merge(
       images.map { image in
         env.textRecognitionClient
@@ -155,17 +159,18 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     )
     
   case let .textRecognitionCompleted(.success(items)):
-    state.recognizedTexts.append(contentsOf: items.map(\.text))
+    state.isRecognizingTexts = false
+    state.recognizedTextItems.append(contentsOf: items)
     
     let licensePlates = items
-      .lazy
-      .map(\.text)
-      .filter { isMatches(germanLicensePlateRegex, $0) }
+      .filter { isMatches(germanLicensePlateRegex, $0.text) }
     state.licensePlates.append(contentsOf: licensePlates)
     
     return .none
     
   case let .textRecognitionCompleted(.failure(error)):
+    state.isRecognizingTexts = false
+    
     debugPrint(error.localizedDescription)
     return .none
     
@@ -197,7 +202,16 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     let photos = state.storedPhotos
       .compactMap { $0 }
       .filter { $0.id != id }
-    return Effect(value: .setPhotos(photos))
+    state.storedPhotos = photos
+    
+    let filterTextItems = state.recognizedTextItems
+      .compactMap{ $0 }
+      .filter({ $0.id != id })
+    state.recognizedTextItems = filterTextItems
+
+    state.licensePlates.removeAll(where: { $0.id == id })
+    
+    return .none
     
   case let .image(id, .recognizeText):
     let unwrappedPhotos = state.storedPhotos.compactMap { $0 }

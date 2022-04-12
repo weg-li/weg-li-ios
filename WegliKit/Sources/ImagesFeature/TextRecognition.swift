@@ -3,7 +3,7 @@ import SwiftUI
 import Vision
 import SharedModels
 
-public struct TextItem: Identifiable, Equatable {
+public struct TextItem: Identifiable, Hashable {
   public var id: String = UUID().uuidString
   public var text: String = ""
   
@@ -16,6 +16,10 @@ public struct TextItem: Identifiable, Equatable {
 public struct TextRecognitionClient {
   public var recognizeText: (StorableImage) -> Effect<[TextItem], VisionError>
   
+  public init(recognizeText: @escaping (StorableImage) -> Effect<[TextItem], VisionError>) {
+    self.recognizeText = recognizeText
+  }
+
   public func recognizeText(
     in image: StorableImage,
     on queue: AnySchedulerOf<DispatchQueue>
@@ -31,7 +35,7 @@ public extension TextRecognitionClient {
     recognizeText: { image in
         .future { callback in
           guard let cgImage = image.asUIImage?.cgImage else {
-            callback(.failure(.init(message: "Can not find cgImage for image")))
+            callback(.failure(.missingCGImage))
             return
           }
           
@@ -72,4 +76,6 @@ public struct VisionError: Equatable, Error {
   }
   
   public var message = ""
+  
+  public static let missingCGImage = Self(message: "Can not find cgImage for image")
 }

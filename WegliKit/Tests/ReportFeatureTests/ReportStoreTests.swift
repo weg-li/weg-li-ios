@@ -191,7 +191,11 @@ class ReportStoreTests: XCTestCase {
     )
     let storedImage = StorableImage(uiImage: image)
     store.send(.images(.setPhotos([storedImage]))) {
+      $0.images.isRecognizingTexts = true
       $0.images.storedPhotos = [storedImage!]
+    }
+    store.receive(.images(.textRecognitionCompleted(.failure(.missingCGImage)))) {
+      $0.images.isRecognizingTexts = false
     }
     store.send(.images(.setResolvedCoordinate(coordinate))) {
       $0.location.region = CoordinateRegion(center: coordinate)

@@ -215,11 +215,6 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
         
       case .setPhotos:
-        if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
-          state.images.coordinateFromImagePicker = nil
-          state.location.pinCoordinate = nil
-          state.location.resolvedAddress = .init()
-        }
         return .none
         
       case let .setResolvedDate(date):
@@ -228,11 +223,16 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         return .none
       
         // Handle single image remove action to reset map annotations and reset valid state.
-      case .image:
+      case .image(_ , .removePhoto):
+        if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
+          state.images.coordinateFromImagePicker = nil
+          state.location.pinCoordinate = nil
+          state.location.resolvedAddress = .init()
+        }
         return .none
         
-      case let .selectedText(text):
-        state.description.licensePlateNumber = text
+      case let .selectedText(textItem):
+        state.description.licensePlateNumber = textItem.text
         return .none
         
       default:

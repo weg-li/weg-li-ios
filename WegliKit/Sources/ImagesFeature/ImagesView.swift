@@ -29,10 +29,15 @@ public struct ImagesView: View {
       Divider()
       
       VStack(alignment: .center) {
-        Label("Erkannte Nummernschilder", systemImage: "text.magnifyingglass")
-          .font(.subheadline)
-          .foregroundColor(Color(.label))
-          .padding(.bottom, 4)
+        HStack {
+          Label("Erkannte Nummernschilder", systemImage: "text.magnifyingglass")
+            .font(.subheadline)
+            .foregroundColor(Color(.label))
+            .padding(.bottom, 4)
+          if viewStore.isRecognizingTexts {
+            ActivityIndicator(style: .medium)
+          }
+        }
         if viewStore.state.licensePlates.isEmpty {
           Text("Keine")
             .italic()
@@ -47,14 +52,14 @@ public struct ImagesView: View {
                   Button(
                     action: { viewStore.send(.selectedText(item)) },
                     label: {
-                      Text(item)
+                      Text(item.text)
                         .font(.custom("Menlo", size: 18, relativeTo: .headline))
                         .foregroundColor(Color(.label))
                         .textCase(.uppercase)
                     }
                   )
                   .font(.body)
-                  .foregroundColor(.white)
+                  .foregroundColor(Color(.label))
                   .padding(8)
                   .background(.background)
                   .clipShape(
@@ -74,7 +79,7 @@ public struct ImagesView: View {
               .foregroundColor(Color(.secondaryLabel))
               .font(.footnote)
           }
-          .animation(.easeOut, value: viewStore.recognizedTexts.isEmpty)
+          .animation(.easeOut, value: viewStore.recognizedTextItems.isEmpty)
           .transition(.opacity)
         }
       }

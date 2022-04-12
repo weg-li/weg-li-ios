@@ -13,6 +13,18 @@ class ImagesStoreTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   
   func test_addPhoto_shouldUpdateState() {
+    let pencilImage = StorableImage(uiImage: UIImage(systemName: "pencil")!)!
+    let trashImage = StorableImage(uiImage: UIImage(systemName: "trash")!)!
+    let heartImage = StorableImage(uiImage: UIImage(systemName: "heart")!)!
+    
+    var textItems = [
+      TextItem(id: pencilImage.id, text: "HH TV 3000"),
+      TextItem(id: trashImage.id, text: "Trash"),
+      TextItem(id: heartImage.id, text: "B-MB 1985"),
+      TextItem(id: trashImage.id, text: "Trash"),
+      TextItem(id: heartImage.id, text: "B-MB 1985"),
+    ]
+    
     let store = TestStore(
       initialState: ImagesViewState(
         showImagePicker: false,
@@ -24,16 +36,57 @@ class ImagesStoreTests: XCTestCase {
         mainQueue: scheduler,
         backgroundQueue: .immediate,
         photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
+        textRecognitionClient: .init(recognizeText: { _ in
+          Just([textItems.removeFirst()])
+            .ignoreFailure(setFailureType: VisionError.self)
+            .eraseToEffect()
+        })
       )
     )
     
-    let pencilImage = StorableImage(uiImage: UIImage(systemName: "pencil")!)!
-    let trashImage = StorableImage(uiImage: UIImage(systemName: "trash")!)!
-    store.send(.setPhotos([pencilImage, trashImage])) {
+    
+    store.send(.setPhotos([pencilImage, trashImage, heartImage])) {
       $0.storedPhotos = [
         pencilImage,
         trashImage,
+        heartImage
+      ]
+      $0.isRecognizingTexts = true
+    }
+    store.receive(.textRecognitionCompleted(.success([TextItem(id: pencilImage.id, text: "HH TV 3000")]))) {
+      $0.isRecognizingTexts = false
+      $0.recognizedTextItems = [TextItem(id: pencilImage.id, text: "HH TV 3000")]
+      $0.licensePlates = [TextItem(id: pencilImage.id, text: "HH TV 3000")]
+    }
+    store.receive(.textRecognitionCompleted(.success([TextItem(id: trashImage.id, text: "Trash")]))) {
+      $0.recognizedTextItems = [
+        TextItem(id: pencilImage.id, text: "HH TV 3000"),
+        TextItem(id: trashImage.id, text: "Trash")
+      ]
+    }
+    store.receive(.textRecognitionCompleted(.success([TextItem(id: heartImage.id, text: "B-MB 1985")]))) {
+      $0.recognizedTextItems = [
+        TextItem(id: pencilImage.id, text: "HH TV 3000"),
+        TextItem(id: trashImage.id, text: "Trash"),
+        TextItem(id: heartImage.id, text: "B-MB 1985")
+      ]
+      $0.licensePlates = [
+        TextItem(id: pencilImage.id, text: "HH TV 3000"),
+        TextItem(id: heartImage.id, text: "B-MB 1985")
+      ]
+    }
+    
+    store.send(.image(id: pencilImage.id, action: .removePhoto)) {
+      $0.recognizedTextItems = [
+        TextItem(id: trashImage.id, text: "Trash"),
+        TextItem(id: heartImage.id, text: "B-MB 1985")
+      ]
+      $0.licensePlates = [
+        TextItem(id: heartImage.id, text: "B-MB 1985")
+      ]
+      $0.storedPhotos = [
+        trashImage,
+        heartImage
       ]
     }
   }
@@ -62,8 +115,7 @@ class ImagesStoreTests: XCTestCase {
       )
     )
     
-    store.send(.image(id: id1, action: .removePhoto))
-    store.receive(.setPhotos([storableImage2])) {
+    store.send(.image(id: id1, action: .removePhoto)) {
       $0.storedPhotos = [storableImage2]
     }
   }
@@ -91,6 +143,7 @@ class ImagesStoreTests: XCTestCase {
     let trashImage = StorableImage(uiImage: trash)!
     
     store.send(.setPhotos([pencilImage, trashImage])) {
+      $0.isRecognizingTexts = true
       $0.storedPhotos = [pencilImage, trashImage]
     }
     store.send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {
@@ -121,6 +174,7 @@ class ImagesStoreTests: XCTestCase {
     let trashImage = StorableImage(uiImage: trash)!
     
     store.send(.setPhotos([pencilImage, trashImage])) {
+      $0.isRecognizingTexts = true
       $0.storedPhotos = [pencilImage, trashImage]
     }
     store.send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {

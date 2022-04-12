@@ -42,6 +42,7 @@ struct ChargeView: View {
           .foregroundColor(.wegliBlue)
       }
     }
+    .contentShape(Rectangle())
     .onTapGesture {
       onTap()
     }
