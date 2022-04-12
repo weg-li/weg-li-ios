@@ -40,7 +40,7 @@ public struct ReportView: View {
             Text("Beim auswählen eines Fotos wird das Datum aus den Metadaten ausgelesen")
               .multilineTextAlignment(.leading)
               .foregroundColor(Color(.secondaryLabel))
-              .font(.callout)
+              .font(.footnote)
           }
         }
         // Photos

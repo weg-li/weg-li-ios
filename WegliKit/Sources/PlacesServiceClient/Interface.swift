@@ -10,7 +10,7 @@ public struct PlacesServiceClient {
     self.placemarks = placemarks
   }
   
-  public var placemarks: (CLLocation ) -> Effect<[Address], PlacesServiceError>
+  public var placemarks: (CLLocation) -> Effect<[Address], PlacesServiceError>
 }
 
 public struct PlacesServiceError: Equatable, Error {

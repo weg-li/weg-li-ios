@@ -35,12 +35,12 @@ public struct DescriptionState: Equatable {
   public var charges: IdentifiedArrayOf<Charge> = []
   
   var searchResults: IdentifiedArrayOf<Charge> {
-      if chargeTypeSearchText.isEmpty {
-        return charges
-      } else {
-        return charges.filter { $0.text.lowercased().contains(chargeTypeSearchText.lowercased()) }
-      }
+    if chargeTypeSearchText.isEmpty {
+      return charges
+    } else {
+      return charges.filter { $0.text.lowercased().contains(chargeTypeSearchText.lowercased()) }
     }
+  }  
 }
 
 public enum DescriptionAction: Equatable {

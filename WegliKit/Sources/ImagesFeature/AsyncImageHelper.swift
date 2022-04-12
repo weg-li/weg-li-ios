@@ -69,11 +69,13 @@ class AsyncImageStore: ObservableObject {
 /// it displays an error image. You must call the `load()` function to start asynchronous loading.
 struct AsyncThumbnailView: View {
   let url: URL
+  let contentMode: ContentMode
   
   @StateObject private var imageStore: AsyncImageStore
   
-  init(url: URL) {
+  init(url: URL, contentMode: ContentMode = .fill) {
     self.url = url
+    self.contentMode = contentMode
     
     // Initialize the image store with the provided URL.
     _imageStore = StateObject(wrappedValue: AsyncImageStore(url: url))
@@ -82,7 +84,7 @@ struct AsyncThumbnailView: View {
   var body: some View {
     Image(uiImage: imageStore.thumbnailImage)
       .resizable()
-      .aspectRatio(contentMode: .fill)
+      .aspectRatio(contentMode: contentMode)
       .task {                     
         await imageStore.loadThumbnail()
       }
