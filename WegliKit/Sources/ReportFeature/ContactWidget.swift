@@ -61,7 +61,8 @@ public struct ContactWidget: View {
           .padding(.top)
         Text(L10n.Contact.reportHintCopy)
           .font(.footnote)
-          .foregroundColor(.gray)
+          .foregroundColor(Color(.secondaryLabel))
+        
       }
       .fixedSize(horizontal: false, vertical: true)
     }
