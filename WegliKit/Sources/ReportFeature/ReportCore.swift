@@ -133,7 +133,9 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     environment: {
       ImagesViewEnvironment(
         mainQueue: $0.mainQueue,
-        photoLibraryAccessClient: .live()
+        backgroundQueue: $0.backgroundQueue,
+        photoLibraryAccessClient: .live(),
+        textRecognitionClient: .live
       )
     }
   ),
@@ -227,6 +229,10 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       
         // Handle single image remove action to reset map annotations and reset valid state.
       case .image:
+        return .none
+        
+      case let .selectedText(text):
+        state.description.licensePlateNumber = text
         return .none
         
       default:

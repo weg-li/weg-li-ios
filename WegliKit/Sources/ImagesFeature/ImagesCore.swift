@@ -8,6 +8,7 @@ import L10n
 import PhotoLibraryAccessClient
 import SharedModels
 import UIKit
+import OrderedCollections
 
 public struct ImagesViewState: Equatable, Codable {
   public init(
@@ -29,6 +30,11 @@ public struct ImagesViewState: Equatable, Codable {
   public var storedPhotos: [StorableImage?]
   public var coordinateFromImagePicker: CLLocationCoordinate2D?
   public var dateFromImagePicker: Date?
+  
+  public var presentTextConfirmationDialog = false
+  public var recognizedTexts: [String] = []
+  
+  public var licensePlates = OrderedSet<String>()
   
   enum CodingKeys: String, CodingKey {
     case showImagePicker
@@ -59,21 +65,30 @@ public enum ImagesViewAction: Equatable {
   case setResolvedCoordinate(CLLocationCoordinate2D?)
   case setResolvedDate(Date?)
   case dismissAlert
+  case textRecognitionCompleted(Result<[TextItem], VisionError>)
+  case selectedText(String)
   case image(id: String, action: ImageAction)
+  case setConfimationDialog(Bool)
 }
 
 public struct ImagesViewEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
-    photoLibraryAccessClient: PhotoLibraryAccessClient
+    backgroundQueue: AnySchedulerOf<DispatchQueue>,
+    photoLibraryAccessClient: PhotoLibraryAccessClient,
+    textRecognitionClient: TextRecognitionClient
   ) {
     self.mainQueue = mainQueue
+    self.backgroundQueue = backgroundQueue
     self.photoLibraryAccessClient = photoLibraryAccessClient
+    self.textRecognitionClient = textRecognitionClient
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
-  public let distanceFilter: Double = 50
+  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
   public let photoLibraryAccessClient: PhotoLibraryAccessClient
+  public let textRecognitionClient: TextRecognitionClient
+  public let distanceFilter: Double = 50
 }
 
 /// Reducer handling actions from ImagesView combined with the single Image reducer.
@@ -102,7 +117,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       .receive(on: env.mainQueue)
       .map(ImagesViewAction.requestPhotoLibraryAccessResult)
       .eraseToEffect()
-  
+    
   case let .requestPhotoLibraryAccessResult(status):
     switch status {
     case .authorized, .limited:
@@ -116,12 +131,49 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     default:
       return .none
     }
-  
+    
   case let .setPhotos(photos):
     state.storedPhotos = photos
+    
+    guard !photos.isEmpty else {
+      state.licensePlates.removeAll()
+      state.recognizedTexts.removeAll()
+      return .none
+    }
+    
+    let images = photos.compactMap { $0 }
+    return .merge(
+      images.map { image in
+        env.textRecognitionClient
+          .recognizeText(in: image, on: env.backgroundQueue)
+          .receive(on: env.mainQueue)
+          .catchToEffect()
+          .delay(for: 0.2, scheduler: env.mainQueue)
+          .map(ImagesViewAction.textRecognitionCompleted)
+          .eraseToEffect()
+      }
+    )
+    
+  case let .textRecognitionCompleted(.success(items)):
+    state.recognizedTexts.append(contentsOf: items.map(\.text))
+    
+    let licensePlates = items
+      .lazy
+      .map(\.text)
+      .filter { isMatches(germanLicensePlateRegex, $0) }
+    state.licensePlates.append(contentsOf: licensePlates)
+    
     return .none
-  
-  // set photo coordinate from selected photos first element.
+    
+  case let .textRecognitionCompleted(.failure(error)):
+    debugPrint(error.localizedDescription)
+    return .none
+    
+  case let .selectedText(licensePlate):
+    debugPrint(licensePlate)
+    return .none
+    
+    // set photo coordinate from selected photos first element.
   case let .setResolvedCoordinate(coordinate):
     guard let coordinate = coordinate, let resolvedCoordinate = state.coordinateFromImagePicker else {
       return .none
@@ -139,19 +191,52 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
   case let .setResolvedDate(date):
     state.dateFromImagePicker = date
     return .none
-  
-  case let .image(id, imageAction):
-    switch imageAction {
+    
+  case let .image(id, .removePhoto):
     // filter storedPhotos by image ID which removes the selected one.
-    case .removePhoto:
-      let photos = state.storedPhotos
-        .compactMap { $0 }
-        .filter { $0.id != id }
-      return Effect(value: .setPhotos(photos))
+    let photos = state.storedPhotos
+      .compactMap { $0 }
+      .filter { $0.id != id }
+    return Effect(value: .setPhotos(photos))
+    
+  case let .image(id, .recognizeText):
+    let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
+    guard
+      let image = unwrappedPhotos.first(where: { $0.id == id }) else {
+      debugPrint("image can not be found")
+      return .none
     }
-  
+    return env.textRecognitionClient
+      .recognizeText(in: image, on: env.backgroundQueue)
+      .receive(on: env.mainQueue)
+      .catchToEffect()
+      .map(ImagesViewAction.textRecognitionCompleted)
+      .eraseToEffect()
+    
+  case .image:
+    return .none
+    
+  case let .setConfimationDialog(value):
+    state.presentTextConfirmationDialog = value
+    return .none
+    
   case .dismissAlert:
     state.alert = nil
     return .none
   }
 }
+
+private func isMatches(_ regex: String, _ string: String) -> Bool {
+  do {
+    let regex = try NSRegularExpression(pattern: regex)
+    
+    let matches = regex.matches(in: string, range: NSRange(location: 0, length: string.count))
+    return matches.count != 0
+  } catch {
+    print("Something went wrong! Error: \(error.localizedDescription)")
+  }
+  
+  return false
+}
+
+private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}$"

@@ -16,11 +16,68 @@ public struct ImagesView: View {
     viewStore = ViewStore(store)
   }
   
+  let rows = [GridItem(.fixed(25))]
+  
   public var body: some View {
-    VStack(alignment: .leading, spacing: 20.0) {
+    VStack(alignment: .center, spacing: 20.0) {
       ImageGrid(store: store)
+      
       importButton
         .buttonStyle(EditButtonStyle())
+        .padding(.bottom, 4)
+      
+      Divider()
+      
+      VStack(alignment: .center) {
+        Label("Erkannte Nummernschilder", systemImage: "text.magnifyingglass")
+          .font(.subheadline)
+          .foregroundColor(Color(.label))
+          .padding(.bottom, 4)
+        if viewStore.state.licensePlates.isEmpty {
+          Text("Keine")
+            .italic()
+            .font(.callout)
+            .foregroundColor(Color(.secondaryLabel))
+        } else {
+          VStack {
+            ScrollView(.horizontal) {
+              Spacer(minLength: 4)
+              LazyHGrid(rows: rows, alignment: .center) {
+                ForEach(viewStore.state.licensePlates, id: \.self) { item in
+                  Button(
+                    action: { viewStore.send(.selectedText(item)) },
+                    label: {
+                      Text(item)
+                        .font(.custom("Menlo", size: 18, relativeTo: .headline))
+                        .foregroundColor(Color(.label))
+                        .textCase(.uppercase)
+                    }
+                  )
+                  .font(.body)
+                  .foregroundColor(.white)
+                  .padding(8)
+                  .background(.background)
+                  .clipShape(
+                    RoundedRectangle(cornerRadius: 8, style: .circular)
+                  )
+                  .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                      .stroke(Color(.label), lineWidth: 2)
+                  )
+                  .padding(.horizontal, 2)
+                }
+              }
+              .frame(height: 50)
+            }
+            Text("Selektieren um es in der Beschreibung zu verwenden")
+              .multilineTextAlignment(.leading)
+              .foregroundColor(Color(.secondaryLabel))
+              .font(.footnote)
+          }
+          .animation(.easeOut, value: viewStore.recognizedTexts.isEmpty)
+          .transition(.opacity)
+        }
+      }
     }
     .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
     .sheet(

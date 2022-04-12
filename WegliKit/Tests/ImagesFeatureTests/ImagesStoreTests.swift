@@ -22,7 +22,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: .noop
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: .noop,
+        textRecognitionClient: .noop
       )
     )
     
@@ -54,7 +56,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: .immediate,
-        photoLibraryAccessClient: .noop
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: .noop,
+        textRecognitionClient: .noop
       )
     )
     
@@ -74,7 +78,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: .noop
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: .noop,
+        textRecognitionClient: .noop
       )
     )
     
@@ -102,7 +108,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: .noop
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: .noop,
+        textRecognitionClient: .noop
       )
     )
     
@@ -141,7 +149,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: accessClient
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: accessClient,
+        textRecognitionClient: .noop
       )
     )
     
@@ -172,7 +182,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: accessClient
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: accessClient,
+        textRecognitionClient: .noop
       )
     )
     
@@ -203,7 +215,9 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: accessClient
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: accessClient,
+        textRecognitionClient: .noop
       )
     )
     
@@ -226,12 +240,46 @@ class ImagesStoreTests: XCTestCase {
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
-        photoLibraryAccessClient: .noop
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: .noop,
+        textRecognitionClient: .noop
       )
     )
     
     store.send(.dismissAlert) {
       $0.alert = nil
     }
+  }
+  
+  func test_addPhotosButtonTapped_() {
+    let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.denied)
+    let accessClient = PhotoLibraryAccessClient(
+      requestAuthorization: {
+        Effect(subject)
+      },
+      authorizationStatus: { .notDetermined }
+    )
+    
+    let store = TestStore(
+      initialState: ImagesViewState(
+        showImagePicker: false,
+        storedPhotos: [],
+        coordinateFromImagePicker: .zero
+      ),
+      reducer: imagesReducer,
+      environment: ImagesViewEnvironment(
+        mainQueue: scheduler,
+        backgroundQueue: .immediate,
+        photoLibraryAccessClient: accessClient,
+        textRecognitionClient: .noop
+      )
+    )
+    
+    store.send(.addPhotosButtonTapped)
+    store.receive(.requestPhotoLibraryAccess)
+    store.receive(.requestPhotoLibraryAccessResult(.denied)) {
+      $0.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
+    }
+    subject.send(completion: .finished)
   }
 }

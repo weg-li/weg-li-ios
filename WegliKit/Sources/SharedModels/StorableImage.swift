@@ -15,7 +15,11 @@ public struct StorableImage: Hashable, Identifiable, Codable {
   }
   
   public var asUIImage: UIImage? {
-    self.data.flatMap(UIImage.init)
+    guard let imageUrl = imageUrl else {
+      return nil
+    }
+    guard let data = try? Data(contentsOf: imageUrl) else { return nil }
+    return UIImage(data: data)
   }
 }
 
