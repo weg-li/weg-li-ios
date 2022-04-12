@@ -356,7 +356,7 @@ public extension Report {
       description: .init(
         licensePlateNumber: "HH-ST-PAULI",
         selectedColor: 3,
-        selectedBrand: 5,
+        selectedBrand: .init("Opel"),
         selectedDuration: 5,
         selectedCharge: .init(id: "1", text: "Parken auf dem Radweg", isFavorite: true, isSelected: false),
         blockedOthers: true

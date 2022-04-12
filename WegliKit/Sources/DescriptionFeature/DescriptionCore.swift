@@ -11,7 +11,7 @@ public struct DescriptionState: Equatable {
   public init(
     licensePlateNumber: String = "",
     selectedColor: Int = 0,
-    selectedBrand: Int = 0,
+    selectedBrand: CarBrand? = nil,
     selectedDuration: Int = 0,
     selectedCharge: Charge? = nil,
     blockedOthers: Bool = false
@@ -26,15 +26,24 @@ public struct DescriptionState: Equatable {
   
   public var licensePlateNumber: String
   public var selectedColor: Int
-  public var selectedBrand: Int
+  public var selectedBrand: CarBrand?
   public var selectedDuration: Int
   public var selectedCharge: Charge?
   public var blockedOthers: Bool
   public var chargeTypeSearchText = ""
+  public var carBrandSearchText = ""
   
   public var charges: IdentifiedArrayOf<Charge> = []
   
-  var searchResults: IdentifiedArrayOf<Charge> {
+  var carBrandSearchResults: IdentifiedArrayOf<CarBrand> {
+    if carBrandSearchText.isEmpty {
+      return Self.brands
+    } else {
+      return Self.brands.filter { $0.title.lowercased().contains(carBrandSearchText.lowercased()) }
+    }
+  }
+  
+  var chargesSearchResults: IdentifiedArrayOf<Charge> {
     if chargeTypeSearchText.isEmpty {
       return charges
     } else {
@@ -46,12 +55,13 @@ public struct DescriptionState: Equatable {
 public enum DescriptionAction: Equatable {
   case onAppear
   case setLicensePlateNumber(String)
-  case setBrand(Int)
+  case setBrand(CarBrand)
   case setColor(Int)
   case toggleBlockedOthers
   case setCharge(Charge)
   case setDuraration(Int)
   case setChargeTypeSearchText(String)
+  case setCarBrandSearchText(String)
   case toggleChargeFavorite(Charge)
   case sortFavoritedCharges
   case favoriteChargesLoaded(Result<[String], NSError>)
@@ -108,6 +118,10 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       state.chargeTypeSearchText = query
       return .none
       
+    case let .setCarBrandSearchText(query):
+      state.carBrandSearchText = query
+      return .none
+      
     case let .toggleChargeFavorite(charge):
       var charge = charge
       charge.isFavorite.toggle()
@@ -154,7 +168,7 @@ public extension DescriptionState {
     let arguments = [
       !licensePlateNumber.isEmpty,
       selectedColor != 0,
-      selectedBrand != 0,
+      selectedBrand != nil,
       selectedDuration != 0,
       selectedCharge != nil
     ]
@@ -187,10 +201,10 @@ public extension DescriptionState {
     return all
   }()
   
-  static let brands: [String] = {
-    var all = bundle.decode([String].self, from: "brands.json")
-    all.insert("", at: 0) // insert empty object for picker to start without initial selection
-    return all
+  static let brands: IdentifiedArrayOf<CarBrand> = {
+    let all = bundle.decode([String].self, from: "brands.json")
+    let carBrands = all.map(CarBrand.init)
+    return IdentifiedArray(uniqueElements: carBrands, id: \.id)
   }()
   
   static let times = Times.allCases
@@ -202,5 +216,15 @@ public extension DescriptionState {
       return time
     }
     return "\(time) (\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!))"  
+  }
+}
+
+
+public struct CarBrand: Identifiable, Equatable, Codable {
+  public var id: String = UUID().uuidString
+  public let title: String
+
+  public init(_ brand: String) {
+    self.title = brand
   }
 }

@@ -21,7 +21,7 @@ public struct ReportCellView: View {
               .font(.title2)
               .accessibility(hidden: true)
             VStack(alignment: .leading, spacing: 4) {
-              Text("\(DescriptionState.brands[report.description.selectedBrand]), \(DescriptionState.colors[report.description.selectedColor].value)")
+              Text("\(report.description.selectedBrand?.title ?? ""), \(DescriptionState.colors[report.description.selectedColor].value)")
               Text(verbatim: report.description.licensePlateNumber)
             }
             .font(.body)

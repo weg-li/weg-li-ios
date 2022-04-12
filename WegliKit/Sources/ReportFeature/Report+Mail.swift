@@ -13,7 +13,7 @@ public extension Report {
     
     Kennzeichen: \(description.licensePlateNumber)
     
-    Marke: \(DescriptionState.brands[description.selectedBrand])
+    Marke: \(description.selectedBrand?.title ?? "")
     
     Farbe: \(DescriptionState.colors[description.selectedColor].value)
     

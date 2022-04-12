@@ -58,19 +58,46 @@ public struct EditDescriptionView: View {
   }
   
   var carBrandView: some View {
-    Picker(
-      L10n.Description.Row.carType,
-      selection: viewStore.binding(
-        get: \.selectedBrand,
-        send: DescriptionAction.setBrand
-      )
-    ) {
-      ForEach(1..<DescriptionState.brands.count, id: \.self) {
-        Text(DescriptionState.brands[$0])
-          .tag($0)
-          .foregroundColor(Color(.label))
+    NavigationLink(
+      destination: {
+        List {
+          ForEach(viewStore.state.carBrandSearchResults, id: \.id) { brand in
+            HStack {
+              Text(brand.title)
+                .foregroundColor(Color(.label))
+                .multilineTextAlignment(.leading)
+              Spacer()
+              if viewStore.state.selectedBrand == brand {
+                Image(systemName: "checkmark")
+                  .resizable()
+                  .frame(width: 15, height: 15)
+                  .foregroundColor(.wegliBlue)
+              }
+            }
+            .contentShape(Rectangle())
+            .padding(4)
+            .onTapGesture {
+              viewStore.send(.setBrand(brand))
+            }
+          }
+        }.searchable(
+          text: viewStore.binding(
+            get: \.carBrandSearchText,
+            send: DescriptionAction.setCarBrandSearchText
+          ),
+          placement: .navigationBarDrawer(displayMode: .always)
+        )
+      },
+      label: {
+        HStack {
+          Text(L10n.Description.Row.carType)
+          if let brand = viewStore.state.selectedBrand {
+            Spacer()
+            Text(brand.title)
+          }
+        }
       }
-    }
+    )
   }
   
   var carColorView: some View {
@@ -93,7 +120,7 @@ public struct EditDescriptionView: View {
     NavigationLink(
       destination: {
         List {
-          ForEach(viewStore.searchResults, id: \.id) { charge in
+          ForEach(viewStore.chargesSearchResults, id: \.id) { charge in
             ChargeView(
               text: charge.text,
               isSelected: viewStore.selectedCharge == charge,

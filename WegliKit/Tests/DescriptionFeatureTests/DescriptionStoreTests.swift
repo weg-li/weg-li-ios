@@ -7,6 +7,8 @@ import FileClient
 import XCTest
 
 class DescriptionStoreTests: XCTestCase {
+  let brand: CarBrand = .init("Opel")
+  
   func test_setCarColor_shouldUpdateState() {
     let store = TestStore(
       initialState: DescriptionState(),
@@ -28,10 +30,8 @@ class DescriptionStoreTests: XCTestCase {
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setBrand(1)) { state in
-      state.selectedBrand = 1
-      
-      XCTAssertEqual(DescriptionState.brands[1], "Abarth")
+    store.send(.setBrand(brand)) { state in
+      state.selectedBrand = self.brand
     }
   }
   
@@ -40,7 +40,7 @@ class DescriptionStoreTests: XCTestCase {
       initialState: DescriptionState(
         licensePlateNumber: "",
         selectedColor: 1,
-        selectedBrand: 1
+        selectedBrand: brand
       ),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
@@ -56,7 +56,7 @@ class DescriptionStoreTests: XCTestCase {
       initialState: DescriptionState(
         licensePlateNumber: "",
         selectedColor: 1,
-        selectedBrand: 1
+        selectedBrand: brand
       ),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
@@ -73,7 +73,7 @@ class DescriptionStoreTests: XCTestCase {
       initialState: DescriptionState(
         licensePlateNumber: "",
         selectedColor: 1,
-        selectedBrand: 1
+        selectedBrand: brand
       ),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
@@ -89,7 +89,7 @@ class DescriptionStoreTests: XCTestCase {
       initialState: DescriptionState(
         licensePlateNumber: "",
         selectedColor: 1,
-        selectedBrand: 1
+        selectedBrand: brand
       ),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
@@ -108,7 +108,7 @@ class DescriptionStoreTests: XCTestCase {
       initialState: DescriptionState(
         licensePlateNumber: "",
         selectedColor: 1,
-        selectedBrand: 1,
+        selectedBrand: brand,
         selectedDuration: 3,
         selectedCharge: .init(id: "12", text: "213", isFavorite: false, isSelected: false),
         blockedOthers: false
@@ -128,7 +128,7 @@ class DescriptionStoreTests: XCTestCase {
     let state = DescriptionState(
       licensePlateNumber: "",
       selectedColor: 1,
-      selectedBrand: 1
+      selectedBrand: brand
     )
     
     let store = TestStore(
@@ -157,7 +157,7 @@ class DescriptionStoreTests: XCTestCase {
     let state = DescriptionState(
       licensePlateNumber: "",
       selectedColor: 1,
-      selectedBrand: 1
+      selectedBrand: brand
     )
     
     let store = TestStore(
@@ -199,7 +199,7 @@ class DescriptionStoreTests: XCTestCase {
     var state = DescriptionState(
       licensePlateNumber: "",
       selectedColor: 1,
-      selectedBrand: 1
+      selectedBrand: brand
     )
     let charge1 = Charge(id: "1", text: "Text", isFavorite: false, isSelected: false)
     let charge2 = Charge(id: "2", text: "Text", isFavorite: false, isSelected: false)

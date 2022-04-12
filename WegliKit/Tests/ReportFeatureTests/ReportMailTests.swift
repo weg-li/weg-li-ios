@@ -27,7 +27,7 @@ class ReportMailTests: XCTestCase {
       description: .init(
         licensePlateNumber: "B-HH-123",
         selectedColor: 1,
-        selectedBrand: 1,
+        selectedBrand: .init("Opel"),
         selectedDuration: 4,
         selectedCharge: .init(
           id: "112402",
@@ -66,7 +66,7 @@ class ReportMailTests: XCTestCase {
     
     Kennzeichen: B-HH-123
     
-    Marke: Abarth
+    Marke: Opel
     
     Farbe: Beige
     

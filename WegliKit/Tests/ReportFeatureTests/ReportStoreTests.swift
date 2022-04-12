@@ -115,12 +115,12 @@ class ReportStoreTests: XCTestCase {
     )
     
     let color = 1
-    let type = 2
+    let brand = CarBrand("Opel")
     store.send(.description(.setColor(color))) {
       $0.description.selectedColor = color
     }
-    store.send(.description(.setBrand(type))) {
-      $0.description.selectedBrand = type
+    store.send(.description(.setBrand(brand))) {
+      $0.description.selectedBrand = brand
     }
     
   }
@@ -517,10 +517,9 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.images(.image(id: "123", action: .removePhoto)))
-    store.receive(.images(.setPhotos([]))) {
-      $0.location.resolvedAddress = .init()
+    store.send(.images(.image(id: "123", action: .removePhoto))) {
       $0.images.storedPhotos = []
+      $0.location.resolvedAddress = .init()
       $0.images.coordinateFromImagePicker = nil
     }
   }
