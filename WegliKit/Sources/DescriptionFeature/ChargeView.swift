@@ -6,7 +6,7 @@ public struct Charge: Hashable, Codable, Identifiable {
   public let text: String
   public var isFavorite: Bool
   public var isSelected: Bool
-
+  
   public init(id: String, text: String, isFavorite: Bool, isSelected: Bool) {
     self.id = id
     self.text = text
@@ -20,6 +20,8 @@ struct ChargeView: View {
   let text: String
   let isSelected: Bool
   let isFavorite: Bool
+  let onTap: () -> Void
+  let onSwipe: () -> Void
   
   var body: some View {
     HStack {
@@ -39,6 +41,20 @@ struct ChargeView: View {
           .frame(width: 15, height: 15)
           .foregroundColor(.wegliBlue)
       }
+    }
+    .onTapGesture {
+      onTap()
+    }
+    .swipeActions {
+      Button(
+        action: {
+          onSwipe()
+        },
+        label: {
+          Image(systemName: "star.fill")
+        }
+      )
+      .tint(.yellow)
     }
   }
 }

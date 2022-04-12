@@ -97,22 +97,10 @@ public struct EditDescriptionView: View {
             ChargeView(
               text: charge.text,
               isSelected: viewStore.selectedCharge == charge,
-              isFavorite: charge.isFavorite
+              isFavorite: charge.isFavorite,
+              onTap: { viewStore.send(.setCharge(charge)) },
+              onSwipe: { viewStore.send(.toggleChargeFavorite(charge)) }
             )
-              .onTapGesture {
-                viewStore.send(.setCharge(charge))
-              }
-              .swipeActions {
-                Button(
-                  action: {
-                    viewStore.send(.toggleChargeFavorite(charge))
-                  },
-                  label: {
-                    Image(systemName: "star.fill")
-                  }
-                )
-                  .tint(.yellow)
-              }
           }
         }.searchable(
           text: viewStore.binding(
