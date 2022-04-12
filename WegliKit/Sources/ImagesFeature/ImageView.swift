@@ -31,13 +31,19 @@ public struct ImageView: View {
           }
           
           Button {
+            viewStore.send(.recognizeText)
+          } label: {
+            Label("Nummernschild erkennen", systemImage: "text.magnifyingglass")
+          }
+          
+          Button {
             viewStore.send(.removePhoto, animation: .easeOut(duration: 0.2))
           } label: {
             Label("Löschen", systemImage: "trash")
           }
         }
         .popover(isPresented: $showImageView) {
-          AsyncThumbnailView(url: url)
+          AsyncThumbnailView(url: url, contentMode: .fit)
             .edgesIgnoringSafeArea(.bottom)
         }
         

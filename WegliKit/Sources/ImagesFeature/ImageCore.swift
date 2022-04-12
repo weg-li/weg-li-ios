@@ -15,6 +15,7 @@ public struct ImageState: Equatable, Identifiable {
 
 public enum ImageAction: Equatable {
   case removePhoto
+  case recognizeText
 }
 
 public struct ImageEnvironment {}
@@ -23,6 +24,9 @@ public struct ImageEnvironment {}
 public let imageReducer = Reducer<ImageState, ImageAction, ImageEnvironment> { _, action, _ in
   switch action {
   case .removePhoto:
+    return .none
+    
+  case .recognizeText:
     return .none
   }
 }
