@@ -3,6 +3,7 @@
 import AppFeature
 import ComposableArchitecture
 import CoreLocation
+import Styleguide
 import SwiftUI
 import UIKit
 
@@ -11,7 +12,9 @@ struct WegliApp: App {
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
   @Environment(\.scenePhase) var scenePhase
   
-  init() {}
+  init() {
+    Styleguide.registerFonts()
+  }
   
   var body: some Scene {
     WindowGroup {

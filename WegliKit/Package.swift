@@ -213,7 +213,8 @@ let package = Package(
       dependencies: [
         "L10n",
         "Helper"
-      ]
+      ],
+      resources: [.process("Resources")]
     ),
     .target(
       name: "UIApplicationClient",

@@ -16,7 +16,7 @@ public struct ImagesView: View {
     viewStore = ViewStore(store)
   }
   
-  let rows = [GridItem(.fixed(25))]
+  let rows = [GridItem(.flexible(minimum: 30, maximum: 60))]
   
   public var body: some View {
     VStack(alignment: .center, spacing: 20.0) {
@@ -48,31 +48,11 @@ public struct ImagesView: View {
             ScrollView(.horizontal) {
               Spacer(minLength: .grid(1))
               LazyHGrid(rows: rows, alignment: .center) {
-                ForEach(viewStore.state.licensePlates, id: \.self) { item in
-                  Button(
-                    action: { viewStore.send(.selectedText(item)) },
-                    label: {
-                      Text(item.text)
-                        .font(.custom("Menlo", size: 18, relativeTo: .headline))
-                        .foregroundColor(Color(.label))
-                        .textCase(.uppercase)
-                    }
-                  )
-                  .font(.body)
-                  .foregroundColor(Color(.label))
-                  .padding(8)
-                  .background(.background)
-                  .clipShape(
-                    RoundedRectangle(cornerRadius: 8, style: .circular)
-                  )
-                  .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                      .stroke(Color(.label), lineWidth: 2)
-                  )
-                  .padding(.horizontal, 2)
+                ForEach(viewStore.state.licensePlates, id: \.id) { item in
+                  licensePlateView(item: item)
                 }
               }
-              .frame(height: 50)
+              .frame(minHeight: 50)
             }
             Text("Selektieren um es in der Beschreibung zu verwenden")
               .multilineTextAlignment(.leading)
@@ -83,6 +63,7 @@ public struct ImagesView: View {
           .transition(.opacity)
         }
       }
+      .accessibilityElement(children: .contain)
     }
     .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
     .sheet(
@@ -111,6 +92,30 @@ public struct ImagesView: View {
         )
       }
     )
+  }
+  
+  @ViewBuilder private func licensePlateView(item: TextItem) -> some View {
+    Button(
+      action: { viewStore.send(.selectedTextItem(item)) },
+      label: {
+        Text(item.text)
+          .font(.custom(FontName.nummernschild.rawValue, size: 24, relativeTo: .headline))
+          .foregroundColor(Color(.label))
+          .textCase(.uppercase)
+      }
+    )
+      .font(.body)
+      .foregroundColor(Color(.label))
+      .padding(.grid(2))
+      .background(.background)
+      .clipShape(
+        RoundedRectangle(cornerRadius: 8, style: .circular)
+      )
+      .overlay(
+        RoundedRectangle(cornerRadius: 8)
+          .stroke(Color(.label), lineWidth: 2)
+      )
+      .padding(.horizontal, 2)
   }
   
   private var importButton: some View {
