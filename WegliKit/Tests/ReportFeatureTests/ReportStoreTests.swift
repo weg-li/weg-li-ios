@@ -630,4 +630,40 @@ class ReportStoreTests: XCTestCase {
       $0.showEditDescription = true
     }
   }
+  
+  func test_selectedLicensePlate_shouldSetDescriptionState() {
+    let store = TestStore(
+      initialState: Report(
+        uuid: fixedUUID,
+        images: .init(),
+        contactState: .empty,
+        district: nil,
+        date: fixedDate,
+        description: .init(),
+        location: .init(
+          locationOption: .fromPhotos,
+          isMapExpanded: false,
+          isResolvingAddress: false,
+          resolvedAddress: .init(
+            street: "TestStrasse 3",
+            postalCode: "1243", city: "Berlin"
+          )
+        )
+      ),
+      reducer: reportReducer,
+      environment: ReportEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        locationManager: LocationManager.unimplemented(),
+        placeService: .noop,
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop
+      )
+    )
+    
+    let item = TextItem.init(id: "123", text: "B-MB 3000")
+    store.send(.images(.selectedTextItem(item))) {
+      $0.description.licensePlateNumber = item.text
+    }
+  }
 }
