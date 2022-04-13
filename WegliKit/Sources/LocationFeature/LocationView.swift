@@ -106,7 +106,7 @@ public struct LocationView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .frame(height: viewStore.isMapExpanded ? 300 : 150)
           expandMapButton
-            .padding(4)
+            .padding(.grid(1))
             .accessibility(label: Text(L10n.Location.A11y.expandButtonLabel))
         }
       }

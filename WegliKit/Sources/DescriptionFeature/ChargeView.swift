@@ -1,4 +1,5 @@
 import Foundation
+import Styleguide
 import SwiftUI
 
 public struct Charge: Hashable, Codable, Identifiable {
@@ -28,7 +29,7 @@ struct ChargeView: View {
       if isFavorite {
         Image(systemName: "star.fill")
           .resizable()
-          .frame(width: 15, height: 15)
+          .frame(width: .grid(4), height: .grid(4))
           .foregroundColor(.yellow)
       }
       Text(text)
@@ -38,10 +39,11 @@ struct ChargeView: View {
       if isSelected {
         Image(systemName: "checkmark")
           .resizable()
-          .frame(width: 15, height: 15)
+          .frame(width: .grid(4), height: .grid(4))
           .foregroundColor(.wegliBlue)
       }
     }
+    .padding(.vertical, .grid(1))
     .contentShape(Rectangle())
     .onTapGesture {
       onTap()

@@ -15,12 +15,12 @@ public struct ReportCellView: View {
           Text(report.date.humandReadableDate)
             .fontWeight(.bold)
             .font(.title)
-            .padding(.bottom, 4)
-          HStack(spacing: 12) {
+            .padding(.bottom, .grid(1))
+          HStack(spacing: .grid(3)) {
             Image(systemName: "car")
               .font(.title2)
               .accessibility(hidden: true)
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: .grid(1)) {
               Text("\(report.description.selectedBrand?.title ?? ""), \(DescriptionState.colors[report.description.selectedColor].value)")
               Text(verbatim: report.description.licensePlateNumber)
             }
@@ -28,12 +28,12 @@ public struct ReportCellView: View {
           }
           .accessibility(label: Text("Vehicle info"))
           .accessibilityElement()
-          .padding(.bottom, 6)
-          HStack(spacing: 12) {
+          .padding(.bottom, .grid(2))
+          HStack(spacing: .grid(3)) {
             Image(systemName: "exclamationmark.triangle")
               .font(.title2)
               .accessibility(hidden: true)
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: .grid(1)) {
               Text(report.description.time)
               Text(report.description.selectedCharge?.text ?? "")
             }

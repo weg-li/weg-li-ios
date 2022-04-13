@@ -29,7 +29,7 @@ public struct EditDescriptionView: View {
 
           carColorView
         }
-        .padding(.top, 4)
+        .padding(.top, .grid(1))
         .textFieldStyle(PlainTextFieldStyle())
         
         Section(header: Text(L10n.Description.Section.Violation.copy)) {
@@ -75,7 +75,7 @@ public struct EditDescriptionView: View {
               }
             }
             .contentShape(Rectangle())
-            .padding(4)
+            .padding(.grid(1))
             .onTapGesture {
               viewStore.send(.setBrand(brand))
             }

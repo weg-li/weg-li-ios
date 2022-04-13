@@ -22,7 +22,7 @@ public struct ImageView: View {
     if let url = viewStore.image.imageUrl {
       AsyncThumbnailView(url: url)
         .gridModifier
-        .padding(4)
+        .padding(.grid(1))
         .contextMenu {
           Button {
             showImageView.toggle()

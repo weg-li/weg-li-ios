@@ -24,7 +24,7 @@ public struct ImagesView: View {
       
       importButton
         .buttonStyle(EditButtonStyle())
-        .padding(.bottom, 4)
+        .padding(.bottom, .grid(1))
       
       Divider()
       
@@ -33,7 +33,7 @@ public struct ImagesView: View {
           Label("Erkannte Nummernschilder", systemImage: "text.magnifyingglass")
             .font(.subheadline)
             .foregroundColor(Color(.label))
-            .padding(.bottom, 4)
+            .padding(.bottom, .grid(1))
           if viewStore.isRecognizingTexts {
             ActivityIndicator(style: .medium)
           }
@@ -46,7 +46,7 @@ public struct ImagesView: View {
         } else {
           VStack {
             ScrollView(.horizontal) {
-              Spacer(minLength: 4)
+              Spacer(minLength: .grid(1))
               LazyHGrid(rows: rows, alignment: .center) {
                 ForEach(viewStore.state.licensePlates, id: \.self) { item in
                   Button(

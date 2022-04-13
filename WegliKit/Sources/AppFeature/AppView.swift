@@ -32,7 +32,7 @@ public struct AppView: View {
           }
         }
         addReportButton
-          .padding(24)
+          .padding(.grid(6))
       }
       .navigationViewStyle(StackNavigationViewStyle())
       .navigationBarTitle(L10n.Home.navigationBarTitle)

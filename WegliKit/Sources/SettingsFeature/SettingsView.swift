@@ -91,7 +91,7 @@ public struct SettingsView: View {
           Text("weg-li ist open source")
             .font(.system(.headline, design: .monospaced))
             .foregroundColor(.white)
-            .padding(.bottom, 4)
+            .padding(.bottom, .grid(1))
           VStack(alignment: .leading) {
             Text("Dir fehlt ein feature oder du willst einen bug fixen?")
               .font(.system(.body, design: .monospaced))
@@ -104,7 +104,7 @@ public struct SettingsView: View {
           .resizable()
           .frame(maxWidth: 32, maxHeight: 32)
           .colorInvert()
-          .padding(.leading, 6)
+          .padding(.leading, .grid(2))
       }
       
       HStack {
@@ -112,11 +112,11 @@ public struct SettingsView: View {
         Spacer()
         Image(systemName: "arrow.up.right")
       }
-      .padding(.top, 4)
+      .padding(.top, .grid(1))
       .font(.system(.body, design: .monospaced))
       .foregroundColor(.yellow)
     }
-    .padding([.top, .bottom], 4)
+    .padding([.top, .bottom], .grid(1))
     .background(
       Color.gitHubBannerBackground
         .padding(-20)
