@@ -49,10 +49,12 @@ public extension TextRecognitionClient {
               return
             }
             let textItems = observations
-              .compactMap { $0.topCandidates(1).first?.string }
-              .map { TextItem(id: image.id, text: $0) }
+              .compactMap { $0.topCandidates(1).first }
+              .map { TextItem(id: image.id, text: $0.string) }
             callback(.success(textItems))
           }
+          
+          request.recognitionLevel = .accurate
           
           do {
             try requestHandler.perform([request])
