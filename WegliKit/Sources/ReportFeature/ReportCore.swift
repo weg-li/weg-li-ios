@@ -231,7 +231,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         }
         return .none
         
-      case let .selectedText(textItem):
+      case let .selectedTextItem(textItem):
         state.description.licensePlateNumber = textItem.text
         return .none
         

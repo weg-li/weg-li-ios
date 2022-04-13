@@ -31,7 +31,6 @@ public struct ImagesViewState: Equatable, Codable {
   public var coordinateFromImagePicker: CLLocationCoordinate2D?
   public var dateFromImagePicker: Date?
   
-  public var presentTextConfirmationDialog = false
   public var recognizedTextItems: [TextItem] = []
   
   public var licensePlates = OrderedSet<TextItem>()
@@ -68,9 +67,8 @@ public enum ImagesViewAction: Equatable {
   case setResolvedDate(Date?)
   case dismissAlert
   case textRecognitionCompleted(Result<[TextItem], VisionError>)
-  case selectedText(TextItem)
+  case selectedTextItem(TextItem)
   case image(id: String, action: ImageAction)
-  case setConfimationDialog(Bool)
 }
 
 public struct ImagesViewEnvironment {
@@ -174,7 +172,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     debugPrint(error.localizedDescription)
     return .none
     
-  case let .selectedText(licensePlate):
+  case let .selectedTextItem(licensePlate):
     debugPrint(licensePlate)
     return .none
     
@@ -228,10 +226,6 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       .eraseToEffect()
     
   case .image:
-    return .none
-    
-  case let .setConfimationDialog(value):
-    state.presentTextConfirmationDialog = value
     return .none
     
   case .dismissAlert:
