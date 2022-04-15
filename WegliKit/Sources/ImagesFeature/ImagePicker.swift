@@ -50,7 +50,6 @@ public struct ImagePicker: UIViewControllerRepresentable {
               withSubDirectory: "wegli"
             )
             
-            
             DispatchQueue.main.async {
               self?.parent.pickerResult.append(.init(imageUrl: destinationUrl))
             }

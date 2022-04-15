@@ -96,14 +96,15 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     .pullback(
       state: \.reportDraft,
       action: /AppAction.report,
-      environment: { environment in
+      environment: {
         ReportEnvironment(
-          mainQueue: environment.mainQueue,
-          backgroundQueue: environment.backgroundQueue,
+          mainQueue: $0.mainQueue,
+          backgroundQueue: $0.backgroundQueue,
           locationManager: .live,
           placeService: .live,
           regulatoryOfficeMapper: .live(),
-          fileClient: environment.fileClient
+          fileClient: $0.fileClient,
+          date: $0.date
         )
       }
     ),
