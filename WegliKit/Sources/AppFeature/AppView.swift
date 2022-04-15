@@ -11,6 +11,7 @@ import SwiftUI
 public struct AppView: View {
   private let store: Store<AppState, AppAction>
   @ObservedObject private var viewStore: ViewStore<AppState, AppAction>
+  @Environment(\.horizontalSizeClass) var horizontalSizeClass
   
   public init(store: Store<AppState, AppAction>) {
     self.store = store
@@ -19,20 +20,29 @@ public struct AppView: View {
   
   public var body: some View {
     NavigationView {
-      ZStack(alignment: .bottomTrailing) {
-        if viewStore.reports.isEmpty {
-          emptyStateView
-            .padding(.horizontal)
+      Group {
+        if horizontalSizeClass == .compact {
+          ZStack(alignment: .bottomTrailing) {
+            reportsView()
+            
+            addReportButton
+              .padding(.grid(6))
+          }
         } else {
-          ScrollView {
-            ForEach(viewStore.reports, id: \.id) { report in
-              ReportCellView(report: report)
-            }
-            .padding()
+          HStack {
+            reportsView()
+              .frame(width: 300)
+            
+            Divider()
+            
+            ReportView(
+              store: store.scope(
+                state: \.reportDraft,
+                action: AppAction.report
+              )
+            )
           }
         }
-        addReportButton
-          .padding(.grid(6))
       }
       .navigationViewStyle(StackNavigationViewStyle())
       .navigationBarTitle(L10n.Home.navigationBarTitle)
@@ -40,6 +50,20 @@ public struct AppView: View {
       .onAppear { viewStore.send(.onAppear) }
     }
     .navigationViewStyle(StackNavigationViewStyle())
+  }
+  
+  @ViewBuilder private func reportsView() -> some View {
+    if viewStore.reports.isEmpty {
+      emptyStateView
+        .padding(.horizontal)
+    } else {
+      ScrollView {
+        ForEach(viewStore.reports, id: \.id) { report in
+          ReportCellView(report: report)
+        }
+        .padding()
+      }
+    }
   }
   
   private var emptyStateView: some View {
@@ -123,5 +147,15 @@ struct WelcomeView: View {
       .font(.largeTitle)
     Text("📸 📝 ✊")
       .font(/*@START_MENU_TOKEN@*/ .title/*@END_MENU_TOKEN@*/)
+  }
+}
+
+extension UIDevice {
+  static var isIPad: Bool {
+    UIDevice.current.userInterfaceIdiom == .pad
+  }
+  
+  static var isIPhone: Bool {
+    UIDevice.current.userInterfaceIdiom == .phone
   }
 }
