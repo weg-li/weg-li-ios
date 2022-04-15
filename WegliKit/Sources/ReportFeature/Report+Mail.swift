@@ -18,7 +18,7 @@ public extension Report {
     Farbe: \(DescriptionState.colors[description.selectedColor].value)
     
     Adresse:
-    \(location.resolvedAddress.humanReadableAddress)
+    \(location.resolvedAddress.humanReadableAddress())
     
     Verstoß: \(description.selectedCharge?.text ?? "")
     
@@ -35,7 +35,7 @@ public extension Report {
     \(contactState.contact.humanReadableContact)
     
     Anschrift:
-    \(contactState.contact.address.humanReadableAddress)
+    \(contactState.contact.address.humanReadableAddress())
     
     Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
     Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.

@@ -28,11 +28,13 @@ public extension Address {
     city = address.city
   }
   
-  var humanReadableAddress: String {
-    """
-    \(street)
-    \(postalCode) \(city)
-    """
+  @StringBuilder func humanReadableAddress() -> String {
+    if !street.isEmpty {
+      street
+    }
+    if !postalCode.isEmpty, !city.isEmpty {
+      "\(postalCode) \(city)"
+    }
   }
     
   var humanReadableCity: String {
@@ -48,5 +50,18 @@ public extension Address {
   var isValid: Bool {
     [street, city, postalCode]
       .allSatisfy { !$0.isEmpty }
+  }
+}
+
+@resultBuilder
+struct StringBuilder {
+  
+  static func buildBlock(_ components: String...) -> String {
+    let filtered = components.filter { $0 != "" }
+    return filtered.joined(separator: "\n")
+  }
+  
+  static func buildOptional(_ component: String?) -> String {
+    return component ?? ""
   }
 }
