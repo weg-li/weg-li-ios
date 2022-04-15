@@ -158,11 +158,18 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     
   case let .textRecognitionCompleted(.success(items)):
     state.isRecognizingTexts = false
-    state.recognizedTextItems.append(contentsOf: items)
+        
+    var licensePlates = items
+    for index in licensePlates.indices {
+      let replaced = licensePlates[index].text.replacingOccurrences(of: ".", with: "")
+      licensePlates[index].text = replaced
+    }
     
-    let licensePlates = items
-      .filter { isMatches(germanLicensePlateRegex, $0.text) }
-    state.licensePlates.append(contentsOf: licensePlates)
+    let filteredLicensePlates = licensePlates
+      .filter { textItem in
+        isMatches(germanLicensePlateRegex, textItem.text)
+      }
+    state.licensePlates.append(contentsOf: filteredLicensePlates)
     
     return .none
     
@@ -218,10 +225,12 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       debugPrint("image can not be found")
       return .none
     }
+    
     return env.textRecognitionClient
       .recognizeText(in: image, on: env.backgroundQueue)
       .receive(on: env.mainQueue)
       .catchToEffect()
+      .delay(for: 0.2, scheduler: env.mainQueue)
       .map(ImagesViewAction.textRecognitionCompleted)
       .eraseToEffect()
     
@@ -241,10 +250,10 @@ private func isMatches(_ regex: String, _ string: String) -> Bool {
     let matches = regex.matches(in: string, range: NSRange(location: 0, length: string.count))
     return matches.count != 0
   } catch {
-    print("Something went wrong! Error: \(error.localizedDescription)")
+    debugPrint("Something went wrong! Error: \(error.localizedDescription)")
   }
   
   return false
 }
 
-private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}$"
+private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$"

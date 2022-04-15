@@ -48,7 +48,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -79,7 +80,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: fileClient
+        fileClient: fileClient,
+        date: Date.init
       )
     )
     
@@ -110,7 +112,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -135,7 +138,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -186,7 +190,8 @@ class ReportStoreTests: XCTestCase {
           placemarks: { _ in Effect(value: [expectedAddress]) }
         ),
         regulatoryOfficeMapper: .live(),
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     let storedImage = StorableImage(uiImage: image)
@@ -251,7 +256,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     store.environment.canSendMail = { true }
@@ -297,7 +303,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     store.environment.canSendMail = { false }
@@ -318,7 +325,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -349,7 +357,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -400,7 +409,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -454,7 +464,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -482,6 +493,7 @@ class ReportStoreTests: XCTestCase {
       )
     ]
     let coordinate = CLLocationCoordinate2D(latitude: 23.21, longitude: 67.76)
+    let fixedDate = { Date(timeIntervalSinceNow: 0) }
     
     let store = TestStore(
       initialState: Report(
@@ -513,11 +525,13 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
-        fileClient: .noop
+        fileClient: .noop,
+        date: fixedDate
       )
     )
     
     store.send(.images(.image(id: "123", action: .removePhoto))) {
+      $0.date = fixedDate()
       $0.images.storedPhotos = []
       $0.location.resolvedAddress = .init()
       $0.images.coordinateFromImagePicker = nil
@@ -550,7 +564,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -586,7 +601,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -622,7 +638,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     
@@ -657,7 +674,8 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop
+        fileClient: .noop,
+        date: Date.init
       )
     )
     

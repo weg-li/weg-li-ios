@@ -100,7 +100,8 @@ public struct ReportEnvironment {
     locationManager: LocationManager,
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
-    fileClient: FileClient
+    fileClient: FileClient,
+    date: @escaping () -> Date
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
@@ -109,6 +110,7 @@ public struct ReportEnvironment {
     self.placeService = placeService
     self.regulatoryOfficeMapper = regulatoryOfficeMapper
     self.fileClient = fileClient
+    self.date = date
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
@@ -118,6 +120,8 @@ public struct ReportEnvironment {
   public var placeService: PlacesServiceClient
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
   public let fileClient: FileClient
+  
+  public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
   
@@ -228,6 +232,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
           state.images.coordinateFromImagePicker = nil
           state.location.pinCoordinate = nil
           state.location.resolvedAddress = .init()
+          state.date = environment.date()
         }
         return .none
         
