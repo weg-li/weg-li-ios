@@ -59,6 +59,10 @@ public struct EditDescriptionView: View {
   
   var carBrandView: some View {
     NavigationLink(
+      isActive: viewStore.binding(
+        get: \.presentCarBrandSelection,
+        send: DescriptionAction.presentBrandSelectionView
+      ),
       destination: {
         List {
           ForEach(viewStore.state.carBrandSearchResults, id: \.id) { brand in
@@ -96,6 +100,10 @@ public struct EditDescriptionView: View {
             Text(brand.title)
           }
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+          viewStore.send(.presentBrandSelectionView(true))
+        }
       }
     )
   }
@@ -118,6 +126,10 @@ public struct EditDescriptionView: View {
   
   var chargeTypeView: some View {
     NavigationLink(
+      isActive: viewStore.binding(
+        get: \.presentChargeSelection,
+        send: DescriptionAction.presentCargeSelectionView
+      ),
       destination: {
         List {
           ForEach(viewStore.chargesSearchResults, id: \.id) { charge in
@@ -144,6 +156,10 @@ public struct EditDescriptionView: View {
             Spacer()
             Text(charge.text)
           }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+          viewStore.send(.presentCargeSelectionView(true))
         }
       }
     )

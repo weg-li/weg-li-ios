@@ -33,6 +33,9 @@ public struct DescriptionState: Equatable {
   public var chargeTypeSearchText = ""
   public var carBrandSearchText = ""
   
+  public var presentChargeSelection = false
+  public var presentCarBrandSelection = false
+  
   public var charges: IdentifiedArrayOf<Charge> = []
   
   var carBrandSearchResults: IdentifiedArrayOf<CarBrand> {
@@ -65,6 +68,8 @@ public enum DescriptionAction: Equatable {
   case toggleChargeFavorite(Charge)
   case sortFavoritedCharges
   case favoriteChargesLoaded(Result<[String], NSError>)
+  case presentCargeSelectionView(Bool)
+  case presentBrandSelectionView(Bool)
 }
 
 public struct DescriptionEnvironment {
@@ -96,6 +101,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       
     case let .setBrand(value):
       state.selectedBrand = value
+      state.presentCarBrandSelection = false
       return .none
       
     case let .setColor(value):
@@ -108,6 +114,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       
     case let .setCharge(value):
       state.selectedCharge = value
+      state.presentChargeSelection = false
       return .none
       
     case let .setDuraration(value):
@@ -158,6 +165,14 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
       
       return Effect(value: .sortFavoritedCharges)
+      
+    case let .presentCargeSelectionView(value):
+      state.presentChargeSelection = value
+      return .none
+      
+    case let .presentBrandSelectionView(value):
+      state.presentCarBrandSelection = value
+      return .none
     }
 }
 
