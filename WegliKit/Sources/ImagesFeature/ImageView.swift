@@ -1,6 +1,7 @@
 // Created for weg-li in 2021.
 
 import ComposableArchitecture
+import L10n
 import SharedModels
 import Styleguide
 import SwiftUI
@@ -43,10 +44,14 @@ public struct ImageView: View {
           }
         }
         .popover(isPresented: $showImageView) {
-          AsyncThumbnailView(url: url, contentMode: .fit)
-            .edgesIgnoringSafeArea(.bottom)
+          if let image = viewStore.state.image.asUIImage {
+            Image(uiImage: image)
+              .edgesIgnoringSafeArea(.all)
+          } else {
+            ActivityIndicator(style: .medium)
+          }
         }
-        
+      
     } else {
       ActivityIndicator(style: .medium)
     }
