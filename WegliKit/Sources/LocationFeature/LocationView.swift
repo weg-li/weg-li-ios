@@ -56,6 +56,7 @@ public struct LocationView: View {
           Text(selection.title).tag(selection)
         }
       }.pickerStyle(SegmentedPickerStyle())
+      .accessibilityHint("Setzt die Adresse an der Anzeige")
       
       if LocationOption.manual == viewStore.locationOption {
         VStack(spacing: 8) {
@@ -124,7 +125,7 @@ public struct LocationView: View {
   }
   
   @ViewBuilder var addressView: some View {
-    HStack(spacing: 4) {
+    HStack(spacing: .grid(1)) {
       if viewStore.showActivityIndicator {
         ActivityIndicator(style: .medium)
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
@@ -132,7 +133,7 @@ public struct LocationView: View {
       } else {
         Image(systemName: "location.fill")
           .accessibility(hidden: true)
-        Text(viewStore.address.humanReadableAddress)
+        Text(viewStore.address.humanReadableAddress())
           .lineLimit(2)
       }
     }

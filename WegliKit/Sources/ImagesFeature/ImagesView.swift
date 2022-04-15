@@ -50,8 +50,10 @@ public struct ImagesView: View {
               LazyHGrid(rows: rows, alignment: .center) {
                 ForEach(viewStore.state.licensePlates, id: \.id) { item in
                   licensePlateView(item: item)
+                    .accessibilityElement()
                 }
               }
+              .accessibilityElement()
               .frame(minHeight: 50)
             }
             Text("Selektieren um es in der Beschreibung zu verwenden")
@@ -63,7 +65,7 @@ public struct ImagesView: View {
           .transition(.opacity)
         }
       }
-      .accessibilityElement(children: .contain)
+      .accessibilityElement(children: .combine)
     }
     .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
     .sheet(
@@ -116,17 +118,15 @@ public struct ImagesView: View {
           .stroke(Color(.label), lineWidth: 2)
       )
       .padding(.horizontal, 2)
+      .accessibility(value: Text(item.text))
   }
   
   private var importButton: some View {
     Button(action: {
       viewStore.send(.addPhotosButtonTapped)
     }) {
-      HStack {
-        Image(systemName: "photo.fill.on.rectangle.fill")
-        Text(L10n.Photos.ImportButton.copy)
-      }
-      .frame(maxWidth: .infinity)
+      Label(L10n.Photos.ImportButton.copy, systemImage: "photo.fill.on.rectangle.fill")
+        .frame(maxWidth: .infinity)
     }
   }
 }

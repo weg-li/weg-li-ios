@@ -33,30 +33,30 @@ public struct ContactWidget: View {
   }
   
   public var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      row(callout: L10n.Contact.Row.nameCopy, content: viewStore.fullName)
-      row(callout: L10n.Contact.Row.streetCopy, content: viewStore.contact.address.street)
-      row(callout: L10n.Contact.Row.cityCopy, content: viewStore.city)
-      if !viewStore.contact.phone.isEmpty {
-        row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.contact.phone)
+    VStack(alignment: .leading, spacing: .grid(2)) {
+      VStack(alignment: .leading, spacing: .grid(2)) {
+        row(callout: L10n.Contact.Row.nameCopy, content: viewStore.fullName)
+        row(callout: L10n.Contact.Row.streetCopy, content: viewStore.contact.address.street)
+        row(callout: L10n.Contact.Row.cityCopy, content: viewStore.city)
+        if !viewStore.contact.phone.isEmpty {
+          row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.contact.phone)
+        }
+        if !viewStore.contact.dateOfBirth.isEmpty {
+          row(callout: L10n.Contact.Row.dateOfBirth, content: viewStore.contact.dateOfBirth)
+        }
+        if !viewStore.contact.address.addition.isEmpty {
+          row(callout: L10n.Contact.Row.addressAddition, content: viewStore.contact.address.addition)
+        }
       }
-      if !viewStore.contact.dateOfBirth.isEmpty {
-        row(callout: L10n.Contact.Row.dateOfBirth, content: viewStore.contact.dateOfBirth)
-      }
-      if !viewStore.contact.address.addition.isEmpty {
-        row(callout: L10n.Contact.Row.addressAddition, content: viewStore.contact.address.addition)
-      }
-      VStack(spacing: 8.0) {
+      VStack(spacing: .grid(2)) {
         Button(
           action: { viewStore.send(.setShowEditContact(true)) },
           label: {
-            HStack {
-              Image(systemName: "pencil")
-              Text(L10n.Contact.editButtonCopy)
-            }
-            .frame(maxWidth: .infinity)
+            Label(L10n.Contact.editButtonCopy, systemImage: "pencil")
+              .frame(maxWidth: .infinity)
           }
         )
+          .accessibilitySortPriority(3)
           .buttonStyle(EditButtonStyle())
           .padding(.top)
         Text(L10n.Contact.reportHintCopy)
@@ -112,11 +112,14 @@ public struct ContactWidget: View {
       Text(callout)
         .foregroundColor(Color(.secondaryLabel))
         .font(.callout)
-      Spacer()
-      Text(content)
-        .foregroundColor(Color(.label))
-        .font(.body)
+      if !content.isEmpty {
+        Spacer()
+        Text(content)
+          .foregroundColor(Color(.label))
+          .font(.body)
+      }
     }
+    .accessibilityElement(children: .combine)
   }
 }
 

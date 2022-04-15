@@ -31,16 +31,19 @@ struct ChargeView: View {
           .resizable()
           .frame(width: .grid(4), height: .grid(4))
           .foregroundColor(.yellow)
+          .accessibilityHidden(true)
       }
       Text(text)
         .foregroundColor(Color(.label))
         .multilineTextAlignment(.leading)
+        .accessibilityValue(Text("\(isFavorite ? "favorisiert" : ""), \(isSelected ? "ausgewählt" : "")"))
       Spacer()
       if isSelected {
         Image(systemName: "checkmark")
           .resizable()
           .frame(width: .grid(4), height: .grid(4))
           .foregroundColor(.wegliBlue)
+          .accessibilityValue(Text("ausgewählt"))
       }
     }
     .padding(.vertical, .grid(1))

@@ -25,7 +25,14 @@ public struct Widget<Content: View>: View {
     VStack(alignment: .leading) {
       HStack {
         CompletionIndicator(isValid: isCompleted)
+          .accessibilityHidden(true)
         title.fontWeight(.bold)
+          .accessibilitySortPriority(3)
+          .accessibilityValue(
+            isCompleted
+            ? L10n.Widget.A11y.CompletionIndicatorLabel.isValid
+            : L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid
+          )
         Spacer()
         Button(action: {
           withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
@@ -43,8 +50,10 @@ public struct Widget<Content: View>: View {
       .padding(.bottom)
       if showDetail {
         content().transition(.opacity)
+          .accessibilitySortPriority(1)
       }
     }
+    .accessibilityElement(children: .contain)
     .padding()
     .background(Color(.secondarySystemFill))
     .clipShape(RoundedRectangle(cornerRadius: 10))

@@ -57,15 +57,16 @@ public struct DescriptionView: View {
       Button(
         action: { viewStore.send(.setShowEditDescription(true)) },
         label: {
-          HStack {
-            Image(systemName: "pencil")
-            Text(L10n.Description.EditButton.copy)
-          }
-          .frame(maxWidth: .infinity)
+          Label(L10n.Description.EditButton.copy, systemImage: "pencil")
+            .contentShape(Rectangle())
+            .frame(maxWidth: .infinity)
         }
       )
         .buttonStyle(EditButtonStyle())
         .padding(.top)
+        .accessibilityAction {
+          viewStore.send(.setShowEditDescription(true))
+        }
     }
     .contentShape(Rectangle())
     .onTapGesture {
@@ -95,6 +96,7 @@ public struct DescriptionView: View {
         .foregroundColor(.primary)
         .font(.body)
     }
+    .accessibilityElement(children: .combine)
   }
 }
 
