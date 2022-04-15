@@ -493,7 +493,7 @@ class ReportStoreTests: XCTestCase {
       )
     ]
     let coordinate = CLLocationCoordinate2D(latitude: 23.21, longitude: 67.76)
-    let fixedDate = { Date(timeIntervalSinceNow: 0) }
+    let testDate = { Date(timeIntervalSinceReferenceDate: 0) }
     
     let store = TestStore(
       initialState: Report(
@@ -505,7 +505,7 @@ class ReportStoreTests: XCTestCase {
         ),
         contactState: .empty,
         district: nil,
-        date: fixedDate,
+        date: testDate,
         description: .init(),
         location: .init(
           locationOption: .fromPhotos,
@@ -526,12 +526,12 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        date: fixedDate
+        date: testDate
       )
     )
     
     store.send(.images(.image(id: "123", action: .removePhoto))) {
-      $0.date = fixedDate()
+      $0.date = testDate()
       $0.images.storedPhotos = []
       $0.location.resolvedAddress = .init()
       $0.images.coordinateFromImagePicker = nil
