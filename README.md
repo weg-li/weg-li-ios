@@ -7,6 +7,25 @@ With [weg-li](https://www.weg-li.de) you can easily report wrong parking cars.
 
 * Install latest Xcode version via macOS App Store
 
+### Project Setup
+
+The App uses Apple's `Combine.framework` for operation scheduling. The UI-Layer is built with [`The Composable Architecture`](https://github.com/pointfreeco/swift-composable-architecture) and `SwiftUI`.
+Minimum platform requirements are: iOS 15.0
+
+### Modularization
+
+The application is built in a hyper-modularized style. This allows to work on features without building the entire application, which improves compile times and SwiftUI preview stability. Every feature is its own target which makes it also possible to build mini-apps to run in the simulator for preview.
+
+### Getting Started
+
+1. Grab the code:
+    ```sh
+    git clone https://github.com/weg-li/weg-li-ios.git
+    cd weg-li
+    ```
+2. Open the Xcode project `weg-li.xcodeproj`.
+3. To run the client locally, select the `weg-li` target in Xcode and run (`⌘R`).
+
 ### Dependencies
 
 The project is using some tools like fastlane, swiftlint and others.
