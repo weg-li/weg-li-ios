@@ -70,14 +70,15 @@ public struct EditDescriptionView: View {
               Text(brand.title)
                 .foregroundColor(Color(.label))
                 .multilineTextAlignment(.leading)
-              Spacer()
               if viewStore.state.selectedBrand == brand {
+                Spacer()
                 Image(systemName: "checkmark")
                   .resizable()
-                  .frame(width: 15, height: 15)
+                  .frame(width: .grid(5), height: .grid(5))
                   .foregroundColor(.wegliBlue)
               }
             }
+            .accessibilityValue(Text(viewStore.state.selectedBrand == brand ? "ausgewählt" : ""))
             .contentShape(Rectangle())
             .padding(.grid(1))
             .onTapGesture {
@@ -135,13 +136,15 @@ public struct EditDescriptionView: View {
           ForEach(viewStore.chargesSearchResults, id: \.id) { charge in
             ChargeView(
               text: charge.text,
-              isSelected: viewStore.selectedCharge == charge,
+              isSelected: viewStore.selectedCharge?.id == charge.id,
               isFavorite: charge.isFavorite,
               onTap: { viewStore.send(.setCharge(charge)) },
               onSwipe: { viewStore.send(.toggleChargeFavorite(charge)) }
             )
           }
-        }.searchable(
+        }
+        .animation(.default, value: viewStore.chargesSearchResults)
+        .searchable(
           text: viewStore.binding(
             get: \.chargeTypeSearchText,
             send: DescriptionAction.setChargeTypeSearchText

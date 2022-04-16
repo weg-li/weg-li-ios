@@ -4,6 +4,7 @@ import ComposableArchitecture
 import Combine
 import L10n
 import SharedModels
+import Styleguide
 import SwiftUI
 
 public struct ContactDetailsView: View {
@@ -99,13 +100,15 @@ public struct ContactDetailsView: View {
               .focused($focusedField, equals: .addressAddition)
           }
         }
-        Section(header: Image(systemName: "info.circle").font(.body)) {
-          VStack(spacing: 16) {
+        Section {
+          VStack(spacing: .grid(3)) {
+            Image(systemName: "info.circle").font(.body)
+            Text(L10n.Contact.reportHintCopy)
             Text(L10n.Contact.mailInfo)
-              .multilineTextAlignment(.center)
             Text(L10n.Contact.isSavedInAppHintCopy)
-              .multilineTextAlignment(.center)
           }
+          .multilineTextAlignment(.center)
+          .foregroundColor(Color(.secondaryLabel))
           .font(.callout)
         }
       }
@@ -172,9 +175,9 @@ public struct ContactView: View {
     return Button(
       action: { viewStore.send(.resetContactDataButtonTapped) },
       label: {
-        Text(L10n.Contact.Alert.reset)
-          .foregroundColor(isButtonDisabled ? Color.red.opacity(0.6) : .red)
-          .accessibility(hidden: true)
+        Image(systemName: "arrow.counterclockwise")
+          .foregroundColor(isButtonDisabled ? .gray : .red)
+          .accessibilityLabel(Text(L10n.Button.reset))
       }
     )
       .disabled(isButtonDisabled)

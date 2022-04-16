@@ -59,10 +59,6 @@ public struct ContactWidget: View {
           .accessibilitySortPriority(3)
           .buttonStyle(EditButtonStyle())
           .padding(.top)
-        Text(L10n.Contact.reportHintCopy)
-          .font(.footnote)
-          .foregroundColor(Color(.secondaryLabel))
-        
       }
       .fixedSize(horizontal: false, vertical: true)
     }

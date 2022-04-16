@@ -48,7 +48,7 @@ public struct ImagesView: View {
             ScrollView(.horizontal) {
               Spacer(minLength: .grid(1))
               LazyHGrid(rows: rows, alignment: .center) {
-                ForEach(viewStore.state.licensePlates, id: \.id) { item in
+                ForEach(viewStore.state.licensePlates, id: \.self) { item in
                   licensePlateView(item: item)
                     .accessibilityElement()
                 }

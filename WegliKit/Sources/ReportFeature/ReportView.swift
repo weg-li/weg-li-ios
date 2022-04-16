@@ -97,7 +97,7 @@ public struct ReportView: View {
       label: {
         Image(systemName: "arrow.counterclockwise")
           .foregroundColor(viewStore.isResetButtonDisabled ? .gray : .red)
-          .accessibilityLabel(Text("Zurücksetzen"))
+          .accessibilityLabel(Text(L10n.Button.reset))
       }
     )
       .disabled(viewStore.isResetButtonDisabled)

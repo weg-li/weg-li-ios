@@ -179,5 +179,7 @@
 
 "button.close" = "Schließen";
 
+"button.reset" = "Zurücksetzen";
+
 // General
 "cancel" = "Cancel";

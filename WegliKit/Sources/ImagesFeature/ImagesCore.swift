@@ -31,6 +31,8 @@ public struct ImagesViewState: Equatable, Codable {
   public var coordinateFromImagePicker: CLLocationCoordinate2D?
   public var dateFromImagePicker: Date?
   
+  public var showsAllTextRecognitionResults = false
+  
   public var recognizedTextItems: [TextItem] = []
   
   public var licensePlates = OrderedSet<TextItem>()
@@ -158,18 +160,21 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     
   case let .textRecognitionCompleted(.success(items)):
     state.isRecognizingTexts = false
-        
-    var licensePlates = items
-    for index in licensePlates.indices {
-      let replaced = licensePlates[index].text.replacingOccurrences(of: ".", with: "")
-      licensePlates[index].text = replaced
-    }
-    
-    let filteredLicensePlates = licensePlates
-      .filter { textItem in
+            
+    if state.showsAllTextRecognitionResults {
+      state.licensePlates.append(contentsOf: items)
+    } else {
+      var licensePlates = items
+      for index in licensePlates.indices {
+        let replaced = licensePlates[index].text.replacingOccurrences(of: ".", with: "")
+        licensePlates[index].text = replaced
+      }
+      
+      let filteredLicensePlates = licensePlates.filter { textItem in
         isMatches(germanLicensePlateRegex, textItem.text)
       }
-    state.licensePlates.append(contentsOf: filteredLicensePlates)
+      state.licensePlates.append(contentsOf: filteredLicensePlates)
+    }
     
     return .none
     
@@ -257,3 +262,16 @@ private func isMatches(_ regex: String, _ string: String) -> Bool {
 }
 
 private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$"
+//
+//public extension OrderedSet where Element == TextItem {
+//  static func filteredWithRegex(_ collection: inout Self) -> OrderedSet<Element> {
+//    for index in collection.indices {
+//      let replaced = collection[index].text.replacingOccurrences(of: ".", with: "")
+//      collection[index].text = replaced
+//    }
+//
+//    return collection.filter { textItem in
+//      isMatches(germanLicensePlateRegex, textItem.text)
+//    }
+//  }
+//}

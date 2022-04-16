@@ -37,11 +37,11 @@ public struct DescriptionView: View {
   public var body: some View {
     VStack(alignment: .leading) {
       VStack(alignment: .leading, spacing: 12) {
+        row(title: L10n.Description.Row.licenseplateNumber, content: viewStore.description.licensePlateNumber)
         row(title: L10n.Description.Row.carType, content: viewStore.brand)
         row(title: L10n.Description.Row.carColor, content: viewStore.color)
-        row(title: L10n.Description.Row.licenseplateNumber, content: viewStore.description.licensePlateNumber)
-        row(title: L10n.Description.Row.length, content: viewStore.description.time)
         row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)
+        row(title: L10n.Description.Row.length, content: viewStore.description.time)
         if viewStore.description.blockedOthers {
           HStack {
             Text(L10n.Description.Row.didBlockOthers)

@@ -6,7 +6,9 @@ import ComposableCoreLocation
 import Contacts
 import FileClient
 import Foundation
+import ImagesFeature
 import MapKit
+import OrderedCollections
 import PlacesServiceClient
 import ReportFeature
 import SettingsFeature
@@ -33,7 +35,7 @@ public struct AppState: Equatable {
   var showReportWizard = false
   
   public init(
-    settings: SettingsState = .init(contact: .empty),
+    settings: SettingsState = .init(contact: .empty, userSettings: .init(showsAllTextRecognitionSettings: false)),
     reports: [Report] = [],
     showReportWizard: Bool = false
   ) {
@@ -50,6 +52,7 @@ public enum AppAction: Equatable {
   case appDelegate(AppDelegateAction)
   case contactSettingsLoaded(Result<Contact, NSError>)
   case storedReportsLoaded(Result<[Report], NSError>)
+  case userSettingsLoaded(Result<UserSettings, NSError>)
   case settings(SettingsAction)
   case report(ReportAction)
   case showReportWizard(Bool)
@@ -121,20 +124,25 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           environment.fileClient.loadContactSettings()
             .map(AppAction.contactSettingsLoaded),
           environment.fileClient.loadReports()
-            .map(AppAction.storedReportsLoaded)
+            .map(AppAction.storedReportsLoaded),
+          environment.fileClient.loadUserSettings()
+            .map(AppAction.userSettingsLoaded)
         )
       )
       
     case let .contactSettingsLoaded(result):
       let contact = (try? result.get()) ?? .init()
-      state.settings = SettingsState(
-        contact: .init(contact: contact, alert: nil)
-      )
+      state.settings.contact = .init(contact: contact, alert: nil)
       return .none
       
     case let .storedReportsLoaded(result):
       let reports = (try? result.get()) ?? []
       state.reports = reports
+      return .none
+      
+    case let .userSettingsLoaded(result):
+      let userSettings = (try? result.get()) ?? UserSettings(showsAllTextRecognitionSettings: false)
+      state.settings.userSettings = userSettings
       return .none
       
     case .onAppear:
@@ -214,6 +222,15 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 
   return environment.fileClient
     .saveContactSettings(contact.contact, on: environment.backgroundQueue)
+    .fireAndForget()
+    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+}
+.onChange(of: \.settings.userSettings) { settings, state, _, environment in
+  struct SaveDebounceId: Hashable {}
+  state.reportDraft.images.showsAllTextRecognitionResults = settings.showsAllTextRecognitionSettings
+  
+  return environment.fileClient
+    .saveUserSettings(settings, on: environment.backgroundQueue)
     .fireAndForget()
     .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
 }

@@ -53,7 +53,18 @@ public extension FileClient {
   ) -> Effect<Never, Never> {
     self.save(favorites, to: favoriteChargesIdsFileName, on: queue)
   }
+  
+  func loadUserSettings() -> Effect<Result<UserSettings, NSError>, Never> {
+    self.load(UserSettings.self, from: userSettingsFilenName)
+  }
+  
+  func saveUserSettings(
+    _ settings: UserSettings, on queue: AnySchedulerOf<DispatchQueue>
+  ) -> Effect<Never, Never> {
+    self.save(settings, to: userSettingsFilenName, on: queue)
+  }
 }
 
 let contactSettingsFileName = "contact-settings"
 let favoriteChargesIdsFileName = "favorite-charge-Ids"
+let userSettingsFilenName = "user-settings"

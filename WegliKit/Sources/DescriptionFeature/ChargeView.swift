@@ -29,7 +29,7 @@ struct ChargeView: View {
       if isFavorite {
         Image(systemName: "star.fill")
           .resizable()
-          .frame(width: .grid(4), height: .grid(4))
+          .frame(width: .grid(5), height: .grid(5))
           .foregroundColor(.yellow)
           .accessibilityHidden(true)
       }
@@ -41,7 +41,7 @@ struct ChargeView: View {
       if isSelected {
         Image(systemName: "checkmark")
           .resizable()
-          .frame(width: .grid(4), height: .grid(4))
+          .frame(width: .grid(5), height: .grid(5))
           .foregroundColor(.wegliBlue)
           .accessibilityValue(Text("ausgewählt"))
       }
@@ -51,7 +51,7 @@ struct ChargeView: View {
     .onTapGesture {
       onTap()
     }
-    .swipeActions {
+    .swipeActions(allowsFullSwipe: false) {
       Button(
         action: {
           onSwipe()

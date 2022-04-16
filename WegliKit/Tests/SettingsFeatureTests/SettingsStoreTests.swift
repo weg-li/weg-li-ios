@@ -24,7 +24,7 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview),
+      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
       reducer: settingsReducer,
       environment: env
     )
@@ -43,7 +43,7 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview),
+      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
       reducer: settingsReducer,
       environment: env
     )
@@ -62,7 +62,7 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview),
+      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
       reducer: settingsReducer,
       environment: env
     )
@@ -81,7 +81,7 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview),
+      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
       reducer: settingsReducer,
       environment: env
     )

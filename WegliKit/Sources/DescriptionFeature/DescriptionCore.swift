@@ -132,19 +132,21 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     case let .toggleChargeFavorite(charge):
       var charge = charge
       charge.isFavorite.toggle()
+      charge.isSelected = charge.id == state.selectedCharge?.id
       guard let index = state.charges.firstIndex(where: { $0.id == charge.id }) else {
         return .none
       }
       state.charges.update(charge, at: index)
       
       struct FavoritedId: Hashable {}
-      return .merge(
-        Effect(value: .sortFavoritedCharges)
-          .debounce(id: FavoritedId(), for: 1, scheduler: environment.mainQueue),
+      return .concatenate(
         environment.fileClient.saveFavoriteCharges(
           state.charges.filter(\.isFavorite).map(\.id),
           on: environment.backgroundQueue
-        ).fireAndForget()
+        ).fireAndForget(),
+        Effect(value: .sortFavoritedCharges)
+          .delay(for: .seconds(0.7), scheduler: environment.mainQueue)
+          .eraseToEffect()
       )
       
     case .sortFavoritedCharges:

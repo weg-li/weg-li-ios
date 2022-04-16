@@ -74,6 +74,7 @@ let package = Package(
       dependencies:[
         "L10n",
         "SharedModels",
+        "Styleguide",
         .product(
           name: "ComposableArchitecture",
           package: "swift-composable-architecture"

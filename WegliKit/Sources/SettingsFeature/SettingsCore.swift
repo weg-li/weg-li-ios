@@ -8,15 +8,21 @@ import UIApplicationClient
 import UIKit
 
 public struct SettingsState: Equatable {
-  public init(contact: ContactState) {
+  public init(
+    contact: ContactState,
+    userSettings: UserSettings
+  ) {
     self.contact = contact
+    self.userSettings = userSettings
   }
   
   public var contact: ContactState
+  public var userSettings: UserSettings
 }
 
 public enum SettingsAction: Equatable {
   case contact(ContactStateAction)
+  case userSettings(UserSettingsAction)
   case openLicensesRowTapped
   case openImprintTapped
   case donateTapped
@@ -43,6 +49,11 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     action: /SettingsAction.contact,
     environment: { _ in ContactEnvironment() }
   ),
+  userSettingsReducer.pullback(
+    state: \.userSettings,
+    action: /SettingsAction.userSettings,
+    environment: { _ in UserSettingsEnvironment() }
+  ),
   Reducer { _, action, env in
     switch action {
     case .openLicensesRowTapped:
@@ -61,8 +72,23 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     case .donateTapped:
       return env.uiApplicationClient.open(env.donateLink, [:])
         .fireAndForget()
-    case .contact:
+    case .contact, .userSettings:
       return .none
     }
   }
 )
+
+
+public enum UserSettingsAction: Equatable {
+  case setShowsAllTextRecognitionResults(Bool)
+}
+
+public struct UserSettingsEnvironment {}
+
+public let userSettingsReducer = Reducer<UserSettings, UserSettingsAction, UserSettingsEnvironment> { state, action, _ in
+  switch action {
+  case let .setShowsAllTextRecognitionResults(value):
+    state.showsAllTextRecognitionSettings = value
+    return .none
+  }
+}

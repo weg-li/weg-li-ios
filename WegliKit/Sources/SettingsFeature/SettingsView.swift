@@ -35,6 +35,12 @@ public struct SettingsView: View {
             }
           }
         )
+        
+        Toggle(
+          "Alle Ergebnisse der Nummernschild Erkennung anzeigen",
+          isOn: viewStore.binding(
+            get: { $0.userSettings.showsAllTextRecognitionSettings },
+            send: { SettingsAction.userSettings(.setShowsAllTextRecognitionResults($0)) }))
       }
       Section {
         Button(
@@ -141,7 +147,10 @@ struct SettingsView_Previews: PreviewProvider {
       NavigationView {
         SettingsView(
           store: .init(
-            initialState: .init(contact: .preview),
+            initialState: .init(
+              contact: .preview,
+              userSettings: .init(showsAllTextRecognitionSettings: false)
+            ),
             reducer: .empty,
             environment: SettingsEnvironment(uiApplicationClient: .live)
           )

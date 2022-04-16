@@ -16,6 +16,8 @@ public enum L10n {
   public enum Button {
     /// Schließen
     public static let close = L10n.tr("Localizable", "button.close")
+    /// Zurücksetzen
+    public static let reset = L10n.tr("Localizable", "button.reset")
     public enum Submit {
       /// Bezirk: %@
       public static func district(_ p1: Any) -> String {
