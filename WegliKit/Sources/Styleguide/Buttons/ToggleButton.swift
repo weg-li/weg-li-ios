@@ -14,12 +14,12 @@ public struct ToggleButton: View {
       if isOn {
         Image(systemName: "checkmark.circle.fill")
           .resizable()
-          .frame(width: 35, height: 35)
+          .frame(width: .grid(7), height: .grid(7))
           .foregroundColor(.green)
       } else {
         Image(systemName: "checkmark.circle.fill")
           .hidden()
-          .frame(width: 35, height: 35)
+          .frame(width: .grid(7), height: .grid(7))
           .overlay(
             Circle()
               .strokeBorder(Color.gray, lineWidth: 1)

@@ -67,7 +67,7 @@ public struct ImagesView: View {
       }
       .accessibilityElement(children: .combine)
     }
-    .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
+    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .sheet(
       isPresented: viewStore.binding(
         get: \.showImagePicker,

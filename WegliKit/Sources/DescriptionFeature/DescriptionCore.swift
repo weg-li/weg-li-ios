@@ -169,10 +169,12 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       return Effect(value: .sortFavoritedCharges)
       
     case let .presentCargeSelectionView(value):
+      state.chargeTypeSearchText = ""
       state.presentChargeSelection = value
       return .none
       
     case let .presentBrandSelectionView(value):
+      state.carBrandSearchText = ""
       state.presentCarBrandSelection = value
       return .none
     }

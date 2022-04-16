@@ -70,8 +70,8 @@ public struct EditDescriptionView: View {
               Text(brand.title)
                 .foregroundColor(Color(.label))
                 .multilineTextAlignment(.leading)
+              Spacer()
               if viewStore.state.selectedBrand == brand {
-                Spacer()
                 Image(systemName: "checkmark")
                   .resizable()
                   .frame(width: .grid(5), height: .grid(5))
@@ -79,8 +79,8 @@ public struct EditDescriptionView: View {
               }
             }
             .accessibilityValue(Text(viewStore.state.selectedBrand == brand ? "ausgewählt" : ""))
-            .contentShape(Rectangle())
             .padding(.grid(1))
+            .contentShape(Rectangle())
             .onTapGesture {
               viewStore.send(.setBrand(brand))
             }
@@ -119,6 +119,7 @@ public struct EditDescriptionView: View {
     ) {
       ForEach(1..<DescriptionState.colors.count, id: \.self) {
         Text(DescriptionState.colors[$0].value)
+          .contentShape(Rectangle())
           .tag($0)
           .foregroundColor(Color(.label))
       }
@@ -178,6 +179,7 @@ public struct EditDescriptionView: View {
     ) {
       ForEach(1..<Times.allCases.count, id: \.self) {
         Text(Times.allCases[$0].description)
+          .contentShape(Rectangle())
           .foregroundColor(Color(.label))
       }
     }

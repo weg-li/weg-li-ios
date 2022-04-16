@@ -49,6 +49,7 @@ public struct Report: Codable, Equatable {
     || isPhotosValid
     || contactState.isValid
     || location != .init()
+    || description != .init()
   }
   
   public init(

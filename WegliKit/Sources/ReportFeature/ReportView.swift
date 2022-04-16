@@ -86,7 +86,7 @@ public struct ReportView: View {
           .padding()
       }
     }
-    .alert(store.scope(state: { $0.alert }), dismiss: .dismissAlert)
+    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .navigationBarItems(trailing: resetButton)
     .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
   }
