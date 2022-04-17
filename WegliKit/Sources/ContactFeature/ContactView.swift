@@ -180,8 +180,9 @@ public struct ContactView: View {
           .accessibilityLabel(Text(L10n.Button.reset))
       }
     )
-      .disabled(isButtonDisabled)
-      .accessibility(label: Text(L10n.Report.Alert.reset))
+    .contentShape(Rectangle())
+    .disabled(isButtonDisabled)
+    .accessibility(label: Text(L10n.Report.Alert.reset))
   }
 }
 

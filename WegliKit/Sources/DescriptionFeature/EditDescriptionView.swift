@@ -49,7 +49,7 @@ public struct EditDescriptionView: View {
   
   var licensePlateView: some View {
     TextField(
-      "\(L10n.Description.Row.licenseplateNumber) *",
+      L10n.Description.Row.licenseplateNumber,
       text: viewStore.binding(
         get: \.licensePlateNumber,
         send: DescriptionAction.setLicensePlateNumber

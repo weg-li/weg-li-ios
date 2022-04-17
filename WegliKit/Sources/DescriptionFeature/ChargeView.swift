@@ -36,7 +36,7 @@ struct ChargeView: View {
       Text(text)
         .foregroundColor(Color(.label))
         .multilineTextAlignment(.leading)
-        .accessibilityValue(Text("\(isFavorite ? "favorisiert" : ""), \(isSelected ? "ausgewählt" : "")"))
+        .accessibilityValue(Text("\(isFavorite ? "favorisiert" : "")"))
       Spacer()
       if isSelected {
         Image(systemName: "checkmark")
@@ -46,6 +46,9 @@ struct ChargeView: View {
           .accessibilityValue(Text("ausgewählt"))
       }
     }
+    .accessibilityAction(named: Text("auswählen")) { onTap() }
+    .accessibilityAction(named: Text("favorisieren")) { onSwipe() }
+    .accessibilityAddTraits(isSelected ? .isSelected : [])
     .padding(.vertical, .grid(1))
     .contentShape(Rectangle())
     .onTapGesture {

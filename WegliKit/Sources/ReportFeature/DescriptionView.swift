@@ -54,6 +54,8 @@ public struct DescriptionView: View {
           }
         }
       }
+      .accessibilitySortPriority(1)
+      .accessibilityElement(children: .combine)
       Button(
         action: { viewStore.send(.setShowEditDescription(true)) },
         label: {
@@ -62,11 +64,12 @@ public struct DescriptionView: View {
             .frame(maxWidth: .infinity)
         }
       )
-        .buttonStyle(EditButtonStyle())
-        .padding(.top)
-        .accessibilityAction {
-          viewStore.send(.setShowEditDescription(true))
-        }
+      .accessibilitySortPriority(2)
+      .buttonStyle(EditButtonStyle())
+      .padding(.top)
+      .accessibilityAction {
+        viewStore.send(.setShowEditDescription(true))
+      }
     }
     .contentShape(Rectangle())
     .onTapGesture {
@@ -83,12 +86,13 @@ public struct DescriptionView: View {
             action: ReportAction.description
           )
         )
+        .accessibilityAddTraits([.isModal])
       }
     )
   }
   
   private func row(title: String, content: String) -> some View {
-    VStack(alignment: .leading, spacing: 4.0) {
+    VStack(alignment: .leading, spacing: .grid(1)) {
       Text(title)
         .foregroundColor(.secondary)
         .font(.callout)

@@ -97,10 +97,12 @@ public struct ReportView: View {
       label: {
         Image(systemName: "arrow.counterclockwise")
           .foregroundColor(viewStore.isResetButtonDisabled ? .gray : .red)
-          .accessibilityLabel(Text(L10n.Button.reset))
       }
     )
-      .disabled(viewStore.isResetButtonDisabled)
+    .accessibilityLabel(Text(L10n.Button.reset))
+    .accessibilityValue(viewStore.isResetButtonDisabled ? "deaktiviert" : "aktiviert")
+    .contentShape(Rectangle())
+    .disabled(viewStore.isResetButtonDisabled)
   }
 }
 

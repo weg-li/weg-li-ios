@@ -48,6 +48,7 @@ public struct ContactWidget: View {
           row(callout: L10n.Contact.Row.addressAddition, content: viewStore.contact.address.addition)
         }
       }
+      .accessibilityElement(children: .combine)
       VStack(spacing: .grid(2)) {
         Button(
           action: { viewStore.send(.setShowEditContact(true)) },
@@ -78,12 +79,13 @@ public struct ContactWidget: View {
               action: ReportAction.contact
             )
           )
-            .navigationBarItems(
-              leading: Button(
-                action: { viewStore.send(.setShowEditContact(false)) },
-                label: { Text(L10n.Button.close) }
-              )
+          .accessibilityAddTraits([.isModal])
+          .navigationBarItems(
+            leading: Button(
+              action: { viewStore.send(.setShowEditContact(false)) },
+              label: { Text(L10n.Button.close) }
             )
+          )
         }
       }
     )

@@ -51,6 +51,8 @@ struct MailContentView: View {
       ) {
         viewStore.send(.mail(.submitButtonTapped))
       }
+      .accessibilityValue(viewStore.isSubmitButtonDisabled ? "deaktviert" : "aktiviert")
+      .accessibilityHint(viewStore.isSubmitButtonDisabled ? L10n.Mail.readyToSubmitErrorCopy : "")
       .padding(.bottom, .grid(2))
       .disabled(viewStore.isSubmitButtonDisabled)
       VStack(spacing: .grid(2)) {
@@ -78,6 +80,7 @@ struct MailContentView: View {
           }
         }
       }
+      .accessibilityElement(children: .combine)
       .foregroundColor(.red)
       .font(.callout)
       .multilineTextAlignment(.center)

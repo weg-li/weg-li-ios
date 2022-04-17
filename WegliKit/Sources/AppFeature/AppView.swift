@@ -44,6 +44,9 @@ public struct AppView: View {
           }
         }
       }
+      .accessibilityAction(.magicTap) {
+        viewStore.send(.showReportWizard(true))
+      }
       .navigationViewStyle(StackNavigationViewStyle())
       .navigationBarTitle(L10n.Home.navigationBarTitle)
       .navigationBarItems(trailing: contactData)
@@ -119,6 +122,7 @@ public struct AppView: View {
       label: {
         Image(systemName: "gearshape")
           .font(Font.system(.body).bold())
+          .contentShape(Rectangle())
       }
     )
       .accessibility(label: Text(L10n.Settings.title))

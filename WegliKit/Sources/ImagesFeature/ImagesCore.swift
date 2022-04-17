@@ -264,16 +264,3 @@ private func isMatches(_ regex: String, _ string: String) -> Bool {
 }
 
 private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$"
-//
-//public extension OrderedSet where Element == TextItem {
-//  static func filteredWithRegex(_ collection: inout Self) -> OrderedSet<Element> {
-//    for index in collection.indices {
-//      let replaced = collection[index].text.replacingOccurrences(of: ".", with: "")
-//      collection[index].text = replaced
-//    }
-//
-//    return collection.filter { textItem in
-//      isMatches(germanLicensePlateRegex, textItem.text)
-//    }
-//  }
-//}

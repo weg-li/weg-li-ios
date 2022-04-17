@@ -60,6 +60,7 @@ public struct ImageView: View {
                     .frame(width: .grid(8), height: .grid(8))
                 }
               )
+              .accessibilityLabel(Text(L10n.Button.close))
               .padding()
             }
           } else {

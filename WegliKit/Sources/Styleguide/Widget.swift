@@ -19,7 +19,7 @@ public struct Widget<Content: View>: View {
   public let title: Text
   public var isCompleted: Bool
   public let content: () -> Content
-  @State private var showDetail: Bool = true
+  @State private var showContent: Bool = true
   
   public var body: some View {
     VStack(alignment: .leading) {
@@ -36,19 +36,24 @@ public struct Widget<Content: View>: View {
         Spacer()
         Button(action: {
           withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
-            self.showDetail.toggle()
+            self.showContent.toggle()
           }
         }) {
           Image(systemName: "chevron.right.circle")
-            .rotationEffect(.degrees(showDetail ? 90 : 0))
-            .scaleEffect(showDetail ? 1.1 : 1)
+            .rotationEffect(.degrees(showContent ? 90 : 0))
+            .scaleEffect(showContent ? 1.1 : 1)
         }
+        .contentShape(Rectangle())
         .accessibility(label: Text(L10n.Widget.A11y.toggleCollapseButtonLabel))
+        .accessibilityHidden(true)
         .foregroundColor(.secondary)
+      }
+      .accessibilityAction(named: Text(L10n.Widget.A11y.toggleCollapseButtonLabel)) {
+        self.showContent.toggle()
       }
       .font(.title)
       .padding(.bottom)
-      if showDetail {
+      if showContent {
         content().transition(.opacity)
           .accessibilitySortPriority(1)
       }
@@ -71,6 +76,5 @@ struct Widget_Previews: PreviewProvider {
         Widget(title: Text("Fotos"), isCompleted: true) { Text("Turnip greens yarrow ricebean rutabaga endive cauliflower sea lettuce kohlrabi amaranth water spinach avocado daikon napa cabbage asparagus winter purslane kale. Celery potato scallion desert raisin horseradish spinach carrot soko. Lotus root water spinach fennel kombu maize bamboo shoot green bean swiss chard seakale pumpkin onion chickpea gram corn pea. Brussels sprout coriander water chestnut gourd swiss chard wakame kohlrabi beetroot carrot watercress. Corn amaranth salsify bunya nuts nori azuki bean chickweed potato bell pepper artichoke.") }
       }
     }
-    //        .environment(\.colorScheme, .dark)
   }
 }
