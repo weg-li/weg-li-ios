@@ -143,6 +143,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .userSettingsLoaded(result):
       let userSettings = (try? result.get()) ?? UserSettings(showsAllTextRecognitionSettings: false)
       state.settings.userSettings = userSettings
+      state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
       return .none
       
     case .onAppear:
@@ -185,9 +186,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
   
     case let .showReportWizard(value):
       if !state.reportDraft.isModified() {
+        var imagesState: ImagesViewState = .init()
+        imagesState.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
         state.reportDraft = .init(
           uuid: environment.uuid,
-          images: .init(),
+          images: imagesState,
           contactState: state.settings.contact,
           date: environment.date
         )
