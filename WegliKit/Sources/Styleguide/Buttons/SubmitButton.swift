@@ -32,13 +32,16 @@ public struct ReadySubmitButton: View {
   var disabled: Bool = false
   
   public var body: some View {
-    HStack {
+    HStack(spacing: .grid(4)) {
       Image(systemName: "envelope.fill")
         .font(.title2)
-      VStack(alignment: .leading) {
-        Text(L10n.Button.Submit.title).font(.headline)
-        if let amt = district {
-          Text(L10n.Button.Submit.district(amt)).font(.caption)
+      VStack(alignment: .leading, spacing: .grid(1)) {
+        Text(L10n.Button.Submit.title)
+          .font(.headline)
+        if let district = district {
+          Label(L10n.Button.Submit.district(district), systemImage: "mappin.and.ellipse")
+            .labelStyle(.titleOnly)
+            .font(.subheadline)
         }
       }
     }

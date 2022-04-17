@@ -82,25 +82,11 @@ public struct ContactWidget: View {
               leading: Button(
                 action: { viewStore.send(.setShowEditContact(false)) },
                 label: { Text(L10n.Button.close) }
-              ),
-              trailing: resetButton
+              )
             )
         }
       }
     )
-  }
-  
-  private var resetButton: some View {
-    Button(
-      action: { viewStore.send(.contact(.resetContactDataButtonTapped)) },
-      label: {
-        Image(systemName: "arrow.counterclockwise")
-          .foregroundColor(viewStore.isResetButtonDisabled ? Color.red.opacity(0.6) : .red)
-          .accessibilityHidden(true)
-      }
-    )
-      .disabled(viewStore.isResetButtonDisabled)
-      .accessibility(label: Text(L10n.Report.Alert.reset))
   }
   
   private func row(callout: String, content: String) -> some View {

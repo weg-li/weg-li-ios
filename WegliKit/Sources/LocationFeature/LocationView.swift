@@ -125,13 +125,13 @@ public struct LocationView: View {
   }
   
   @ViewBuilder var addressView: some View {
-    HStack(spacing: .grid(1)) {
+    HStack(spacing: .grid(2)) {
       if viewStore.showActivityIndicator {
         ActivityIndicator(style: .medium)
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
         EmptyView()
       } else {
-        Image(systemName: "location.fill")
+        Image(systemName: "location.magnifyingglass")
           .accessibility(hidden: true)
         Text(viewStore.address.humanReadableAddress())
           .lineLimit(2)

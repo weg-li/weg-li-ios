@@ -40,16 +40,11 @@ struct MailContentView: View {
   
   init(store: Store<Report, ReportAction>) {
     self.store = store
-    viewStore = ViewStore(
-      store.scope(
-        state: ViewState.init,
-        action: { $0 }
-      )
-    )
+    viewStore = ViewStore(store.scope(state: ViewState.init))
   }
   
   var body: some View {
-    VStack(spacing: 6) {
+    VStack(spacing: .grid(2)) {
       SubmitButton(
         state: .readyToSubmit(district: viewStore.districtName),
         disabled: viewStore.isSubmitButtonDisabled
