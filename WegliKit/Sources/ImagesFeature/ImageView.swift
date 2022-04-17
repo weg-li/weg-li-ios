@@ -10,6 +10,7 @@ public struct ImageView: View {
   @Environment(\.accessibilityReduceMotion) var reduceMotion
   
   @State private var showImageView = false
+  @State private var scale: CGFloat = 1
   
   let store: Store<ImageState, ImageAction>
   @ObservedObject private var viewStore: ViewStore<ImageState, ImageAction>
@@ -45,8 +46,22 @@ public struct ImageView: View {
         }
         .popover(isPresented: $showImageView) {
           if let image = viewStore.state.image.asUIImage {
-            Image(uiImage: image)
+            ZStack(alignment: .topTrailing) {
+              ZoomableScrollView {
+                Image(uiImage: image)
+              }
               .edgesIgnoringSafeArea(.all)
+              
+              Button(
+                action: { showImageView = false },
+                label: {
+                  Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .frame(width: .grid(8), height: .grid(8))
+                }
+              )
+              .padding()
+            }
           } else {
             ActivityIndicator(style: .medium)
           }
