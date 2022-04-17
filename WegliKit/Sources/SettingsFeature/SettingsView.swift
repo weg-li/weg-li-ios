@@ -99,9 +99,11 @@ public struct SettingsView: View {
             .foregroundColor(.white)
             .padding(.bottom, .grid(1))
           VStack(alignment: .leading) {
-            Text("Dir fehlt ein feature oder du willst einen bug fixen?")
+            Text("Dir fehlt ein _feature_ oder du willst einen _bug_ fixen?")
+              .multilineTextAlignment(.leading)
               .font(.system(.body, design: .monospaced))
               .foregroundColor(.gitHubBannerForeground)
+              .fixedSize(horizontal: false, vertical: true)
           }
         }
         Spacer()
@@ -120,11 +122,12 @@ public struct SettingsView: View {
       }
       .padding(.top, .grid(1))
       .font(.system(.body, design: .monospaced))
-      .foregroundColor(.yellow)
+      .foregroundColor(Color(.hex(0xffffc7)))
     }
     .padding([.top, .bottom], .grid(1))
     .background(
-      Color.gitHubBannerBackground
+      LinearGradient(
+        gradient: Gradient(colors: [Color.gitHubBannerBackground, Color(.hex(0x2d1c3d))]), startPoint: .top, endPoint: .bottom)
         .padding(-20)
     )
   }
@@ -136,8 +139,8 @@ public struct SettingsView: View {
   }
   
   var linkIcon: some View {
-    Image(systemName: "link.circle.fill")
-      .font(.title)
+    Image(systemName: "arrow.up.right")
+      .font(.body)
   }
 }
 

@@ -19,7 +19,7 @@ extension UIColor {
   static var gitHubBannerBackground: Self { Self.hex(0x483C46) }
 }
 
-extension UIColor {
+public extension UIColor {
   static func hex(_ hex: UInt, alpha: CGFloat = 1) -> Self {
     Self(
       red: CGFloat((hex & 0xff0000) >> 16) / 255,
