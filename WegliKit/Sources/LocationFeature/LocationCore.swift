@@ -150,11 +150,13 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     state.locationOption = value
     switch value {
     case .fromPhotos:
+      state.isResolvingAddress = false
       return .none
     case .currentLocation:
       state.isResolvingAddress = true
       return Effect(value: .locationRequested)
     case .manual:
+      state.isResolvingAddress = false
       return .none
     }
     
