@@ -54,6 +54,7 @@ public extension TextRecognitionClient {
             callback(.success(textItems))
           }
           
+          request.recognitionLanguages = ["de", "en"]
           request.recognitionLevel = .accurate
           
           do {
