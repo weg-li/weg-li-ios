@@ -231,6 +231,8 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       return .none
     }
     
+    state.isRecognizingTexts = true
+    
     return env.textRecognitionClient
       .recognizeText(in: image, on: env.backgroundQueue)
       .receive(on: env.mainQueue)
