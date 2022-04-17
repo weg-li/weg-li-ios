@@ -52,7 +52,7 @@ public struct ContactWidget: View {
         Button(
           action: { viewStore.send(.setShowEditContact(true)) },
           label: {
-            Label(L10n.Contact.editButtonCopy, systemImage: "pencil")
+            Label(L10n.Contact.editButtonCopy, systemImage: "square.and.pencil")
               .frame(maxWidth: .infinity)
           }
         )

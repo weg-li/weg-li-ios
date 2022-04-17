@@ -57,7 +57,7 @@ public struct DescriptionView: View {
       Button(
         action: { viewStore.send(.setShowEditDescription(true)) },
         label: {
-          Label(L10n.Description.EditButton.copy, systemImage: "pencil")
+          Label(L10n.Description.EditButton.copy, systemImage: "square.and.pencil")
             .contentShape(Rectangle())
             .frame(maxWidth: .infinity)
         }

@@ -122,12 +122,13 @@ public struct ImagesView: View {
   }
   
   private var importButton: some View {
-    Button(action: {
-      viewStore.send(.addPhotosButtonTapped)
-    }) {
-      Label(L10n.Photos.ImportButton.copy, systemImage: "photo.fill.on.rectangle.fill")
-        .frame(maxWidth: .infinity)
-    }
+    Button(
+      action: { viewStore.send(.addPhotosButtonTapped) },
+      label: {
+        Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
+          .frame(maxWidth: .infinity)
+      }
+    )
   }
 }
 
