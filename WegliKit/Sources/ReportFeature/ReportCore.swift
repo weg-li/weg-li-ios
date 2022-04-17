@@ -238,7 +238,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         return .none
         
       case let .selectedTextItem(textItem):
-        state.description.licensePlateNumber = textItem.text
+        state.description.licensePlateNumber = textItem.text.uppercased()
         return .none
         
       default:
@@ -247,12 +247,14 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       
     case let .location(locationAction):
       switch locationAction {
+        
         // Trigger district mapping after address is resolved.
       case let .resolveAddressFinished(.success(resolvedAddresses)):
         guard let address = resolvedAddresses.first else {
           return .none
         }
         return Effect(value: ReportAction.mapAddressToDistrict(address))
+        
       case let .resolveAddressFinished(.failure(error)):
         debugPrint(error.localizedDescription)
         return .none

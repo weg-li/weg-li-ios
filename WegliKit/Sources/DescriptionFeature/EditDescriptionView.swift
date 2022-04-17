@@ -55,6 +55,8 @@ public struct EditDescriptionView: View {
         send: DescriptionAction.setLicensePlateNumber
       )
     )
+    .disableAutocorrection(true)
+    .textInputAutocapitalization(.characters)
   }
   
   var carBrandView: some View {
