@@ -11,8 +11,7 @@ public struct CompletionIndicator: View {
   public var isValid: Bool
   
   public var body: some View {
-    let a11yLabel = isValid ? L10n.Widget.A11y.CompletionIndicatorLabel.isValid : L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid
-    return VStack {
+    VStack {
       Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
         .foregroundColor(isValid ? .green : .orange)
         .rotationEffect(.degrees(isValid ? 4 : 0))
