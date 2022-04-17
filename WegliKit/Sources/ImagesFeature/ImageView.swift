@@ -46,9 +46,11 @@ public struct ImageView: View {
         }
         .popover(isPresented: $showImageView) {
           if let image = viewStore.state.image.asUIImage {
-            ZStack(alignment: .topTrailing) {
+            ZStack(alignment: .topLeading) {
               ZoomableScrollView {
                 Image(uiImage: image)
+                  .resizable()
+                  .aspectRatio(contentMode: .fit)
               }
               .edgesIgnoringSafeArea(.all)
               

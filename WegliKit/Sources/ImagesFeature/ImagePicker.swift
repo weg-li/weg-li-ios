@@ -68,7 +68,9 @@ public struct ImagePicker: UIViewControllerRepresentable {
           }
         }
       }
-      parent.isPresented = false
+      DispatchQueue.main.async { [weak self] in
+        self?.parent.isPresented = false
+      }
     }
   }
   
