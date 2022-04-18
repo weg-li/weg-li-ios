@@ -1,4 +1,6 @@
 [![CI](https://github.com/weg-li/weg-li-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/weg-li/weg-li-ios/actions/workflows/ci.yml)
+<a title="Join TestFlight" target="_blank" href="https://testflight.apple.com/join/3SCoUsnL"><img src="https://img.shields.io/badge/Join-TestFlight-blue.svg" alt="Join TestFlight" />
+
 # 🚲 weg-li iOS App
 
 With [weg-li](https://www.weg-li.de) you can easily report wrong parking cars.  
