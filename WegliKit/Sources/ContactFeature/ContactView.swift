@@ -166,7 +166,11 @@ public struct ContactView: View {
     .textFieldStyle(PlainTextFieldStyle())
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
-    .navigationBarItems(trailing: resetButton)
+    .toolbar {
+      ToolbarItem(placement: .destructiveAction) {
+        resetButton
+      }
+    }
     .onDisappear { viewStore.send(.onDisappear) }
   }
   

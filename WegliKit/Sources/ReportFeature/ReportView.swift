@@ -87,7 +87,11 @@ public struct ReportView: View {
       }
     }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
-    .navigationBarItems(trailing: resetButton)
+    .toolbar {
+      ToolbarItem(placement: .destructiveAction) {
+        resetButton
+      }
+    }
     .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
   }
   
