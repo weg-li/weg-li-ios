@@ -131,7 +131,7 @@ public struct LocationView: View {
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
         EmptyView()
       } else {
-        Image(systemName: "location.magnifyingglass")
+        Image(systemName: "location.fill")
           .accessibility(hidden: true)
         Text(viewStore.address.humanReadableAddress())
           .lineLimit(2)

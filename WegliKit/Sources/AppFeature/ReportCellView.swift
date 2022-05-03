@@ -61,6 +61,7 @@ public struct ReportCellView: View {
       }
       .accessibility(hidden: true)
     }
+    .accessibilityElement(children: .combine)
     .clipShape(RoundedRectangle(cornerRadius: 10))
   }
 }
