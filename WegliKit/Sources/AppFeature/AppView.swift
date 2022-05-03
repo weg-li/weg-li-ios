@@ -49,7 +49,7 @@ public struct AppView: View {
       }
       .navigationViewStyle(StackNavigationViewStyle())
       .navigationBarTitle(L10n.Home.navigationBarTitle)
-      .navigationBarItems(trailing: contactData)
+      .navigationBarItems(trailing: settings)
       .onAppear { viewStore.send(.onAppear) }
     }
     .navigationViewStyle(StackNavigationViewStyle())
@@ -111,7 +111,7 @@ public struct AppView: View {
     }
   }
   
-  private var contactData: some View {
+  var settings: some View {
     NavigationLink(
       destination: SettingsView(
         store: store.scope(
