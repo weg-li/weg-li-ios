@@ -166,8 +166,10 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     } else {
       var licensePlates = items
       for index in licensePlates.indices {
-        let replaced = licensePlates[index].text.replacingOccurrences(of: ".", with: "")
-        licensePlates[index].text = replaced
+        let cleanText = licensePlates[index].text
+          .filter { !$0.isLowercase }
+          .withReplacedCharacters("-.,:; ", by: " ")
+        licensePlates[index].text = cleanText
       }
       
       let filteredLicensePlates = licensePlates.filter { textItem in
@@ -264,3 +266,12 @@ private func isMatches(_ regex: String, _ string: String) -> Bool {
 }
 
 private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$"
+
+extension String {
+  func withReplacedCharacters(_ characters: String, by separator: String) -> String {
+    let characterSet = CharacterSet(charactersIn: characters)
+    let components = components(separatedBy: characterSet)
+      .filter { !$0.isEmpty }
+    return components.joined(separator: separator)
+  }
+}

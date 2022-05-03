@@ -18,7 +18,7 @@ class ImagesStoreTests: XCTestCase {
     let heartImage = StorableImage(uiImage: UIImage(systemName: "heart")!)!
     
     var textItems = [
-      TextItem(id: pencilImage.id, text: "HH TV 3000"),
+      TextItem(id: pencilImage.id, text: "HH.TV 3000"),
       TextItem(id: trashImage.id, text: "Trash"),
       TextItem(id: heartImage.id, text: "B-MB 1985"),
       TextItem(id: trashImage.id, text: "Trash"),
@@ -53,7 +53,7 @@ class ImagesStoreTests: XCTestCase {
       ]
       $0.isRecognizingTexts = true
     }
-    store.receive(.textRecognitionCompleted(.success([TextItem(id: pencilImage.id, text: "HH TV 3000")]))) {
+    store.receive(.textRecognitionCompleted(.success([TextItem(id: pencilImage.id, text: "HH.TV 3000")]))) {
       $0.isRecognizingTexts = false
       $0.licensePlates = [TextItem(id: pencilImage.id, text: "HH TV 3000")]
     }
@@ -61,13 +61,13 @@ class ImagesStoreTests: XCTestCase {
     store.receive(.textRecognitionCompleted(.success([TextItem(id: heartImage.id, text: "B-MB 1985")]))) {
       $0.licensePlates = [
         TextItem(id: pencilImage.id, text: "HH TV 3000"),
-        TextItem(id: heartImage.id, text: "B-MB 1985")
+        TextItem(id: heartImage.id, text: "B MB 1985")
       ]
     }
     
     store.send(.image(id: pencilImage.id, action: .removePhoto)) {
       $0.licensePlates = [
-        TextItem(id: heartImage.id, text: "B-MB 1985")
+        TextItem(id: heartImage.id, text: "B MB 1985")
       ]
       $0.storedPhotos = [
         trashImage,
