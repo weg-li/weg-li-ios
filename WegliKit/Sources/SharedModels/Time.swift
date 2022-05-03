@@ -46,12 +46,8 @@ public enum Times: CaseIterable {
       return ""
     case .one:
       return L10n.Times.Description.upTo3
-    case .three, .five, .ten, .fifteen, .thirty, .fourtyfive:
+    default:
       return L10n.Times.Description.longerThenNMinutes(value)
-    case .sixty:
-      return L10n.Times.Description.longerThenNStunde(value)
-    case .hundredEighty:
-      return L10n.Times.Description.longerThenNStunden(value)
     }
   }
 }
