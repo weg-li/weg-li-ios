@@ -10,6 +10,7 @@ import LocationFeature
 import ImagesFeature
 import MailFeature
 import MessageUI
+import PathMonitorClient
 import PlacesServiceClient
 import RegulatoryOfficeMapper
 import SharedModels
@@ -43,6 +44,7 @@ public struct Report: Codable, Equatable {
       && images.storedPhotos.isEmpty
       && description == .init()
   }
+  public var isInternetConnectionAvailable = true
   
   public func isModified() -> Bool {
     district != nil
@@ -78,6 +80,7 @@ public struct Report: Codable, Equatable {
 }
 
 public enum ReportAction: Equatable {
+  case onAppear
   case images(ImagesViewAction)
   case contact(ContactStateAction)
   case description(DescriptionAction)
@@ -91,6 +94,8 @@ public enum ReportAction: Equatable {
   case setShowEditContact(Bool)
   case dismissAlert
   case setDate(Date)
+  case observeConnection
+  case observeConnectionResponse(NetworkPath)
 }
 
 public struct ReportEnvironment {
@@ -102,7 +107,8 @@ public struct ReportEnvironment {
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
     fileClient: FileClient,
-    date: @escaping () -> Date
+    date: @escaping () -> Date,
+    pathMonitorClient: PathMonitorClient = .live(queue: .main)
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
@@ -112,6 +118,7 @@ public struct ReportEnvironment {
     self.regulatoryOfficeMapper = regulatoryOfficeMapper
     self.fileClient = fileClient
     self.date = date
+    self.pathMonitorClient = pathMonitorClient
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
@@ -121,7 +128,7 @@ public struct ReportEnvironment {
   public var placeService: PlacesServiceClient
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
   public let fileClient: FileClient
-  
+  public let pathMonitorClient: PathMonitorClient
   public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
@@ -129,6 +136,8 @@ public struct ReportEnvironment {
   let debounce = 0.5
   let postalCodeMinumimCharacters = 5
 }
+
+struct ObserveConnectionIdentifier: Hashable {}
 
 /// Combined reducer that is used in the ReportView and combing descending reducers.
 public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
@@ -182,6 +191,9 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     struct DebounceID: Hashable {}
     
     switch action {
+    case .onAppear:
+      return Effect(value: .observeConnection)
+  
       // Triggers district mapping after geoAddress is stored.
     case let .mapAddressToDistrict(input):
       return environment.regulatoryOfficeMapper
@@ -209,13 +221,26 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       switch imageViewAction {
         // After the images coordinate was set trigger resolve location and map to district.
       case let .setImageCoordinate(coordinate):
-        guard let coordinate = coordinate, coordinate != state.location.region?.center.asCLLocationCoordinate2D else {
+        guard let coordinate = coordinate else {
           state.alert = .noPhotoCoordinate
           return .none
         }
+        
         state.location.region = CoordinateRegion(center: coordinate)
         state.images.pickerResultCoordinate = coordinate
         state.location.pinCoordinate = coordinate
+        
+        guard state.isInternetConnectionAvailable else {
+          state.alert = .init(
+            title: .init("Keine Internetverbindung"),
+            message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
+            buttons: [
+              .cancel(.init(L10n.cancel)),
+              .default(.init("Wiederholen"), action: .send(.location(.resolveLocation(state.location.pinCoordinate!))))
+            ]
+          )
+          return .none
+        }
         
         return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
         
@@ -257,6 +282,10 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         
       case let .resolveAddressFinished(.failure(error)):
         debugPrint(error.localizedDescription)
+        state.alert = .init(
+          title: .init("Addresse konnte nicht ermittelt werden"),
+          message: .init(error.localizedDescription),
+          buttons: [.cancel(.init(L10n.cancel))])
         return .none
         
         // Handle manual address entering to trigger district mapping.
@@ -329,6 +358,17 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       
     case let .setDate(date):
       state.date = date
+      return .none
+      
+    case .observeConnection:
+      return Effect(environment.pathMonitorClient.networkPathPublisher)
+        .receive(on: environment.mainQueue)
+        .eraseToEffect()
+        .map(ReportAction.observeConnectionResponse)
+        .cancellable(id: ObserveConnectionIdentifier())
+      
+    case let .observeConnectionResponse(networkPath):
+      state.isInternetConnectionAvailable = networkPath.status == .satisfied
       return .none
     }
   }

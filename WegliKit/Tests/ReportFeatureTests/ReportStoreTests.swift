@@ -355,7 +355,51 @@ class ReportStoreTests: XCTestCase {
     store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }
+  }
+  
+  func test_locationOptionCurrentLocation_shouldPresentOfflineError_whenClientHasNoInternetConnection() {
+    let coordinate = CLLocationCoordinate2D(latitude: 31.31, longitude: 12.12)
     
+    var state = report
+    state?.isInternetConnectionAvailable = false
+    state?.location.pinCoordinate = coordinate
+    
+    let store = TestStore(
+      initialState: state!,
+      reducer: reportReducer,
+      environment: ReportEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        mapAddressQueue: .immediate,
+        locationManager: LocationManager.unimplemented(),
+        placeService: .noop,
+        regulatoryOfficeMapper: .live(districs),
+        fileClient: .noop,
+        date: Date.init
+      )
+    )
+        
+    store.send(.images(.setImageCoordinate(coordinate))) {
+      $0.images.pickerResultCoordinate = coordinate
+      $0.location.pinCoordinate = coordinate
+      $0.location.region = .init(center: .init(coordinate), span: .init(latitudeDelta: 0.005, longitudeDelta: 0.005))
+      
+      $0.alert = .init(
+        title: .init("Keine Internetverbindung"),
+        message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
+        buttons: [
+          .cancel(.init("Abbrechen")),
+          .default(.init("Wiederholen"), action: .send(.location(.resolveLocation((state?.location.pinCoordinate!)!))))
+        ]
+      )
+    }
+//    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+//      $0.location.resolvedAddress = expectedAddress
+//    }
+//    store.receive(.mapAddressToDistrict(expectedAddress))
+//    store.receive(.mapDistrictFinished(.success(districs[0]))) {
+//      $0.district = self.districs[0]
+//    }
   }
   
   func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() {

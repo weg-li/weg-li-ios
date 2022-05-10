@@ -86,6 +86,7 @@ public struct ReportView: View {
           .padding()
       }
     }
+    .onAppear { viewStore.send(.onAppear) }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .toolbar {
       ToolbarItem(placement: .destructiveAction) {
