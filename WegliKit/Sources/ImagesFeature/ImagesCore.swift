@@ -32,11 +32,8 @@ public struct ImagesViewState: Equatable, Codable {
   public var pickerResultDate: Date?
   
   public var showsAllTextRecognitionResults = false
-  
   public var recognizedTextItems: [TextItem] = []
-  
   public var licensePlates = OrderedSet<TextItem>()
-  
   public var isRecognizingTexts = false
   
   enum CodingKeys: String, CodingKey {
@@ -74,6 +71,12 @@ public enum ImagesViewAction: Equatable {
 }
 
 public struct ImagesViewEnvironment {
+  public var mainQueue: AnySchedulerOf<DispatchQueue>
+  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
+  public let photoLibraryAccessClient: PhotoLibraryAccessClient
+  public let textRecognitionClient: TextRecognitionClient
+  public let distanceFilter: Double = 50
+  
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
     backgroundQueue: AnySchedulerOf<DispatchQueue>,
@@ -85,12 +88,6 @@ public struct ImagesViewEnvironment {
     self.photoLibraryAccessClient = photoLibraryAccessClient
     self.textRecognitionClient = textRecognitionClient
   }
-  
-  public var mainQueue: AnySchedulerOf<DispatchQueue>
-  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
-  public let photoLibraryAccessClient: PhotoLibraryAccessClient
-  public let textRecognitionClient: TextRecognitionClient
-  public let distanceFilter: Double = 50
 }
 
 /// Reducer handling actions from ImagesView combined with the single Image reducer.
