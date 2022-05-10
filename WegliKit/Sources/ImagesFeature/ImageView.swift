@@ -95,7 +95,7 @@ struct ImageView_Previews: PreviewProvider {
       store: Store<ImageState, ImageAction>(
         initialState: .init(
           id: .init(),
-          image: StorableImage(uiImage: UIImage(systemName: "pencil")!)! // swiftlint:disable:this force_unwrapping
+          image: PickerImageResult(uiImage: UIImage(systemName: "pencil")!)! // swiftlint:disable:this force_unwrapping
         ),
         reducer: .empty,
         environment: ImageEnvironment()

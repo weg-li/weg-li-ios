@@ -82,14 +82,6 @@ public struct ImagesView: View {
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
             send: ImagesViewAction.setPhotos
-          ),
-          coordinate: viewStore.binding(
-            get: \.coordinateFromImagePicker,
-            send: ImagesViewAction.setResolvedCoordinate
-          ),
-          date: viewStore.binding(
-            get: \.dateFromImagePicker,
-            send: ImagesViewAction.setResolvedDate
           )
         )
       }

@@ -5,12 +5,12 @@ import Foundation
 import SharedModels
 
 public struct ImageState: Equatable, Identifiable {
-  public init(id: String = UUID().uuidString, image: StorableImage) {
+  public init(id: String = UUID().uuidString, image: PickerImageResult) {
     self.id = id
     self.image = image
   }
   public let id: String
-  public let image: StorableImage
+  public let image: PickerImageResult
 }
 
 public enum ImageAction: Equatable {

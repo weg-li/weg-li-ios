@@ -31,7 +31,7 @@ class AppStoreTests: XCTestCase {
       uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
-        storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
+        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!)!],
         coordinateFromImagePicker: .zero
       ),
       contactState: .preview,

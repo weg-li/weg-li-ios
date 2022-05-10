@@ -13,9 +13,30 @@ class ImagesStoreTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   
   func test_addPhoto_shouldUpdateState() {
-    let pencilImage = StorableImage(uiImage: UIImage(systemName: "pencil")!)!
-    let trashImage = StorableImage(uiImage: UIImage(systemName: "trash")!)!
-    let heartImage = StorableImage(uiImage: UIImage(systemName: "heart")!)!
+    let creationDate: Date = .init(timeIntervalSince1970: 0)
+    let coordinate: CoordinateRegion.Coordinate = .init(latitude: 23.32, longitude: 13.31)
+    
+    let pencilImage = PickerImageResult(
+      id: "pencil",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate: coordinate,
+      creationDate: creationDate
+    )
+    let trashImage = PickerImageResult(
+      id: "trash",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate: coordinate,
+      creationDate: creationDate
+    )
+    let heartImage = PickerImageResult(
+      id: "heart",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate: coordinate,
+      creationDate: creationDate
+    )
     
     var textItems = [
       TextItem(id: pencilImage.id, text: "HH.TV 3000"),
@@ -53,6 +74,12 @@ class ImagesStoreTests: XCTestCase {
       ]
       $0.isRecognizingTexts = true
     }
+    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
+      $0.pickerResultCoordinate = coordinate.asCLLocationCoordinate2D
+    }
+    store.receive(.setImageCreationDate(creationDate)) {
+      $0.pickerResultDate = creationDate
+    }
     store.receive(.textRecognitionCompleted(.success([TextItem(id: pencilImage.id, text: "HH.TV 3000")]))) {
       $0.isRecognizingTexts = false
       $0.licensePlates = [TextItem(id: pencilImage.id, text: "HH TV 3000")]
@@ -79,11 +106,11 @@ class ImagesStoreTests: XCTestCase {
   func test_removePhoto_shouldUpdateState() {
     let image1 = UIImage(systemName: "pencil")!
     let id1 = UUID().uuidString
-    let storableImage1 = StorableImage(id: id1, uiImage: image1)
+    let storableImage1 = PickerImageResult(id: id1, uiImage: image1)
     
     let image2 = UIImage(systemName: "pencil")!
     let id2 = UUID().uuidString
-    let storableImage2 = StorableImage(id: id2, uiImage: image2)
+    let storableImage2 = PickerImageResult(id: id2, uiImage: image2)
     
     let store = TestStore(
       initialState: ImagesViewState(
@@ -120,19 +147,34 @@ class ImagesStoreTests: XCTestCase {
         textRecognitionClient: .noop
       )
     )
-    
-    let pencil = UIImage(systemName: "pencil")!
-    let trash = UIImage(systemName: "trash")!
-    
-    let pencilImage = StorableImage(uiImage: pencil)!
-    let trashImage = StorableImage(uiImage: trash)!
+      
+    let creationDate: Date = .init(timeIntervalSince1970: 0)
+    let coordinate: CoordinateRegion.Coordinate = .init(latitude: 23.32, longitude: 13.31)
+
+    let pencilImage = PickerImageResult(
+      id: "pencil",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate: coordinate,
+      creationDate: creationDate
+    )
+    let trashImage = PickerImageResult(
+      id: "trash",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate:.init(latitude: 36.32, longitude: 0.31),
+      creationDate: creationDate
+    )
     
     store.send(.setPhotos([pencilImage, trashImage])) {
       $0.isRecognizingTexts = true
       $0.storedPhotos = [pencilImage, trashImage]
     }
-    store.send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {
-      $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
+    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
+      $0.pickerResultCoordinate = coordinate.asCLLocationCoordinate2D
+    }
+    store.receive(.setImageCreationDate(creationDate)) {
+      $0.pickerResultDate = creationDate
     }
   }
   
@@ -152,21 +194,33 @@ class ImagesStoreTests: XCTestCase {
       )
     )
     
-    let pencil = UIImage(systemName: "pencil")!
-    let trash = UIImage(systemName: "trash")!
+    let creationDate: Date = .init(timeIntervalSince1970: 0)
+    let coordinate: CoordinateRegion.Coordinate = .init(latitude: 23.32, longitude: 13.31)
     
-    let pencilImage = StorableImage(uiImage: pencil)!
-    let trashImage = StorableImage(uiImage: trash)!
+    let pencilImage = PickerImageResult(
+      id: "pencil",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate: coordinate,
+      creationDate: creationDate
+    )
+    let trashImage = PickerImageResult(
+      id: "trash",
+      data: "".data(using: .utf8)!,
+      imageUrl: .init(string: ""),
+      coordinate:.init(latitude: 36.32, longitude: 0.31),
+      creationDate: creationDate
+    )
     
     store.send(.setPhotos([pencilImage, trashImage])) {
       $0.isRecognizingTexts = true
       $0.storedPhotos = [pencilImage, trashImage]
     }
-    store.send(.setResolvedCoordinate(.init(latitude: 23.32, longitude: 13.31))) {
-      $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
+    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
+      $0.pickerResultCoordinate = coordinate.asCLLocationCoordinate2D
     }
-    store.send(.setResolvedCoordinate(.init(latitude: 23.3200000001, longitude: 13.3100000001))) {
-      $0.coordinateFromImagePicker = .init(latitude: 23.32, longitude: 13.31)
+    store.receive(.setImageCreationDate(creationDate)) {
+      $0.pickerResultDate = creationDate
     }
   }
   

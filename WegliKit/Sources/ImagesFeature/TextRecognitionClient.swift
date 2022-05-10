@@ -14,14 +14,14 @@ public struct TextItem: Identifiable, Hashable {
 }
 
 public struct TextRecognitionClient {
-  public var recognizeText: (StorableImage) -> Effect<[TextItem], VisionError>
+  public var recognizeText: (PickerImageResult) -> Effect<[TextItem], VisionError>
   
-  public init(recognizeText: @escaping (StorableImage) -> Effect<[TextItem], VisionError>) {
+  public init(recognizeText: @escaping (PickerImageResult) -> Effect<[TextItem], VisionError>) {
     self.recognizeText = recognizeText
   }
 
   public func recognizeText(
-    in image: StorableImage,
+    in image: PickerImageResult,
     on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<[TextItem], VisionError> {
     self.recognizeText(image)

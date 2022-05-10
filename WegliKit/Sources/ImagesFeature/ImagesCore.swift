@@ -14,22 +14,22 @@ public struct ImagesViewState: Equatable, Codable {
   public init(
     alert: AlertState<ImagesViewAction>? = nil,
     showImagePicker: Bool = false,
-    storedPhotos: [StorableImage?] = [],
+    storedPhotos: [PickerImageResult?] = [],
     coordinateFromImagePicker: CLLocationCoordinate2D? = nil,
     dateFromImagePicker: Date? = nil
   ) {
     self.alert = alert
     self.showImagePicker = showImagePicker
     self.storedPhotos = storedPhotos
-    self.coordinateFromImagePicker = coordinateFromImagePicker
-    self.dateFromImagePicker = dateFromImagePicker
+    self.pickerResultCoordinate = coordinateFromImagePicker
+    self.pickerResultDate = dateFromImagePicker
   }
   
   public var alert: AlertState<ImagesViewAction>?
   public var showImagePicker: Bool
-  public var storedPhotos: [StorableImage?]
-  public var coordinateFromImagePicker: CLLocationCoordinate2D?
-  public var dateFromImagePicker: Date?
+  public var storedPhotos: [PickerImageResult?]
+  public var pickerResultCoordinate: CLLocationCoordinate2D?
+  public var pickerResultDate: Date?
   
   public var showsAllTextRecognitionResults = false
   
@@ -42,8 +42,8 @@ public struct ImagesViewState: Equatable, Codable {
   enum CodingKeys: String, CodingKey {
     case showImagePicker
     case storedPhotos
-    case coordinateFromImagePicker
-    case dateFromImagePicker
+    case pickerResultCoordinate
+    case pickerResultDate
   }
   
   public var imageStates: IdentifiedArrayOf<ImageState> {
@@ -60,13 +60,13 @@ public struct ImagesViewState: Equatable, Codable {
 }
 
 public enum ImagesViewAction: Equatable {
-  case setPhotos([StorableImage?])
+  case setPhotos([PickerImageResult?])
   case addPhotosButtonTapped
   case setShowImagePicker(Bool)
   case requestPhotoLibraryAccess
   case requestPhotoLibraryAccessResult(PhotoLibraryAuthorizationStatus)
-  case setResolvedCoordinate(CLLocationCoordinate2D?)
-  case setResolvedDate(Date?)
+  case setImageCoordinate(CLLocationCoordinate2D?)
+  case setImageCreationDate(Date?)
   case dismissAlert
   case textRecognitionCompleted(Result<[TextItem], VisionError>)
   case selectedTextItem(TextItem)
@@ -136,7 +136,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     
   case let .setPhotos(photos):
     state.storedPhotos = photos
-    
+  
     guard !photos.isEmpty else {
       state.licensePlates.removeAll()
       state.recognizedTextItems.removeAll()
@@ -144,18 +144,22 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     }
     
     let images = photos.compactMap { $0 }
-    
     state.isRecognizingTexts = true
+    
     return .merge(
-      images.map { image in
-        env.textRecognitionClient
-          .recognizeText(in: image, on: env.backgroundQueue)
-          .receive(on: env.mainQueue)
-          .catchToEffect()
-          .delay(for: 0.2, scheduler: env.mainQueue)
-          .map(ImagesViewAction.textRecognitionCompleted)
-          .eraseToEffect()
-      }
+      Effect(value: .setImageCoordinate(images.first?.coordinate?.asCLLocationCoordinate2D)),
+      Effect(value: .setImageCreationDate(images.first?.creationDate)),
+      .merge(
+        images.map { image in
+          env.textRecognitionClient
+            .recognizeText(in: image, on: env.backgroundQueue)
+            .receive(on: env.mainQueue)
+            .catchToEffect()
+            .delay(for: 0.2, scheduler: env.mainQueue)
+            .map(ImagesViewAction.textRecognitionCompleted)
+            .eraseToEffect()
+        }
+      )
     )
     
   case let .textRecognitionCompleted(.success(items)):
@@ -191,8 +195,8 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .none
     
     // set photo coordinate from selected photos first element.
-  case let .setResolvedCoordinate(coordinate):
-    guard let coordinate = coordinate, let resolvedCoordinate = state.coordinateFromImagePicker else {
+  case let .setImageCoordinate(coordinate):
+    guard let coordinate = coordinate, let resolvedCoordinate = state.pickerResultCoordinate else {
       return .none
     }
     let resolved = CLLocation(from: resolvedCoordinate)
@@ -202,11 +206,11 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       return .none
     }
     
-    state.coordinateFromImagePicker = coordinate
+    state.pickerResultCoordinate = coordinate
     return .none
     
-  case let .setResolvedDate(date):
-    state.dateFromImagePicker = date
+  case let .setImageCreationDate(date):
+    state.pickerResultDate = date
     return .none
     
   case let .image(id, .removePhoto):

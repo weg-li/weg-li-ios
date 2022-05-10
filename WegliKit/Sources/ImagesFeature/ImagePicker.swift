@@ -9,9 +9,7 @@ import SwiftUI
 
 public struct ImagePicker: UIViewControllerRepresentable {
   @Binding var isPresented: Bool
-  @Binding var pickerResult: [StorableImage?]
-  @Binding var coordinate: CLLocationCoordinate2D?
-  @Binding var date: Date?
+  @Binding var pickerResult: [PickerImageResult?]
   
   public class Coordinator: NSObject, PHPickerViewControllerDelegate {
     let parent: ImagePicker
@@ -51,20 +49,25 @@ public struct ImagePicker: UIViewControllerRepresentable {
             )
             
             DispatchQueue.main.async {
-              self?.parent.pickerResult.append(.init(imageUrl: destinationUrl))
+              var assetCoordinate: CoordinateRegion.Coordinate?
+              var creationDate: Date?
+              if let assetId = result.assetIdentifier {
+                let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
+                if let coordinate = assetResults.firstObject?.location?.coordinate {
+                  assetCoordinate = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                }
+                creationDate = assetResults.firstObject?.creationDate
+              }
+              self?.parent.pickerResult.append(
+                .init(
+                  imageUrl: destinationUrl,
+                  coordinate: assetCoordinate,
+                  creationDate: creationDate
+                )
+              )
             }
           } catch {
             debugPrint(error.localizedDescription)
-          }
-        }
-        
-        // get the location from the first image because
-        // hopefully the selected images are from one location 🤞
-        if let assetId = result.assetIdentifier {
-          let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-          DispatchQueue.main.async { [weak self] in
-            self?.parent.coordinate = assetResults.firstObject?.location?.coordinate
-            self?.parent.date = assetResults.firstObject?.creationDate
           }
         }
       }

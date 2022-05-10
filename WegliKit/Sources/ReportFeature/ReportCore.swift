@@ -208,13 +208,13 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     case let .images(imageViewAction):
       switch imageViewAction {
         // After the images coordinate was set trigger resolve location and map to district.
-      case let .setResolvedCoordinate(coordinate):
+      case let .setImageCoordinate(coordinate):
         guard let coordinate = coordinate, coordinate != state.location.region?.center.asCLLocationCoordinate2D else {
           state.alert = .noPhotoCoordinate
           return .none
         }
         state.location.region = CoordinateRegion(center: coordinate)
-        state.images.coordinateFromImagePicker = coordinate
+        state.images.pickerResultCoordinate = coordinate
         state.location.pinCoordinate = coordinate
         
         return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
@@ -222,7 +222,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       case .setPhotos:
         return .none
         
-      case let .setResolvedDate(date):
+      case let .setImageCreationDate(date):
         // set report date from selected photos
         state.date = date ?? Date()
         return .none
@@ -230,7 +230,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         // Handle single image remove action to reset map annotations and reset valid state.
       case .image(_ , .removePhoto):
         if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
-          state.images.coordinateFromImagePicker = nil
+          state.images.pickerResultCoordinate = nil
           state.location.pinCoordinate = nil
           state.location.resolvedAddress = .init()
           state.date = environment.date()
@@ -270,7 +270,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         return Effect(value: ReportAction.mapAddressToDistrict(state.location.resolvedAddress))
         
       case let .setLocationOption(option) where option == .fromPhotos:
-        if !state.images.storedPhotos.isEmpty, let coordinate = state.images.coordinateFromImagePicker {
+        if !state.images.storedPhotos.isEmpty, let coordinate = state.images.pickerResultCoordinate {
           return Effect(value: .location(.resolveLocation(coordinate)))
         } else {
           return .none
@@ -349,7 +349,7 @@ public extension Report {
       uuid: UUID.init,
       images: .init(
         showImagePicker: false,
-        storedPhotos: [StorableImage(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
+        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
       ),
       contactState: .preview,
       district: District(

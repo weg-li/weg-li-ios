@@ -28,7 +28,7 @@ class ReportStoreTests: XCTestCase {
       uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
-        storedPhotos: [StorableImage(uiImage: UIImage(systemName: "pencil")!)!],
+        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!)!],
         coordinateFromImagePicker: .zero
       ),
       contactState: .preview,
@@ -194,18 +194,30 @@ class ReportStoreTests: XCTestCase {
         date: Date.init
       )
     )
-    let storedImage = StorableImage(uiImage: image)
+    
+    let creationDate: Date = .init(timeIntervalSince1970: 0)
+    
+    var storedImage = PickerImageResult(uiImage: image)
+    storedImage?.coordinate = .init(coordinate)
+    storedImage?.creationDate = creationDate
+    
     store.send(.images(.setPhotos([storedImage]))) {
       $0.images.isRecognizingTexts = true
       $0.images.storedPhotos = [storedImage!]
     }
-    store.receive(.images(.textRecognitionCompleted(.failure(.missingCGImage)))) {
-      $0.images.isRecognizingTexts = false
-    }
-    store.send(.images(.setResolvedCoordinate(coordinate))) {
+    store.receive(.images(.setImageCoordinate(coordinate))) {
+      $0.images.pickerResultCoordinate = coordinate
+      
       $0.location.region = CoordinateRegion(center: coordinate)
       $0.location.pinCoordinate = coordinate
-      $0.images.coordinateFromImagePicker = coordinate
+      $0.images.pickerResultCoordinate = coordinate
+    }
+    store.receive(.images(.setImageCreationDate(creationDate))) {
+      $0.images.pickerResultDate = creationDate
+      $0.date = creationDate
+    }
+    store.receive(.images(.textRecognitionCompleted(.failure(.missingCGImage)))) {
+      $0.images.isRecognizingTexts = false
     }
     store.receive(.location(.resolveLocation(coordinate))) {
       $0.location.isResolvingAddress = true
@@ -231,7 +243,7 @@ class ReportStoreTests: XCTestCase {
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
-          storedPhotos: [StorableImage(uiImage: image)!],
+          storedPhotos: [PickerImageResult(uiImage: image)!],
           coordinateFromImagePicker: .zero
         ),
         contactState: .empty,
@@ -278,7 +290,7 @@ class ReportStoreTests: XCTestCase {
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
-          storedPhotos: [StorableImage(uiImage: image)!],
+          storedPhotos: [PickerImageResult(uiImage: image)!],
           coordinateFromImagePicker: .zero
         ),
         contactState: .empty,
@@ -487,7 +499,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_removeImage_shouldSetResolvedCoordinateToNil_whenPhotosIsEmptyAfterDelete() {
     let images = [
-      StorableImage(
+      PickerImageResult(
         id: "123",
         uiImage: UIImage(systemName: "pencil")!
       )
@@ -534,7 +546,7 @@ class ReportStoreTests: XCTestCase {
       $0.date = testDate()
       $0.images.storedPhotos = []
       $0.location.resolvedAddress = .init()
-      $0.images.coordinateFromImagePicker = nil
+      $0.images.pickerResultCoordinate = nil
     }
   }
   
