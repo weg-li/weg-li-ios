@@ -149,6 +149,12 @@ let package = Package(
       ]
     ),
     .target(
+      name: "PathMonitorClient",
+      dependencies: [
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+      ]
+    ),
+    .target(
       name: "PhotoLibraryAccessClient",
       dependencies: [
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -180,6 +186,7 @@ let package = Package(
         "L10n",
         "LocationFeature",
         "MailFeature",
+        "PathMonitorClient",
         "PlacesServiceClient",
         "RegulatoryOfficeMapper",
         "SharedModels",
