@@ -2,15 +2,17 @@ name: combine-schedulers, nameSpecified: combine-schedulers, owner: pointfreeco,
 
 name: composable-core-location, nameSpecified: composable-core-location, owner: pointfreeco, version: 0.1.0
 
-name: swift-case-paths, nameSpecified: swift-case-paths, owner: pointfreeco, version: 0.7.0
+name: swift-case-paths, nameSpecified: swift-case-paths, owner: pointfreeco, version: 0.8.0
 
-name: swift-collections, nameSpecified: swift-collections, owner: apple, version: 1.0.1
+name: swift-collections, nameSpecified: swift-collections, owner: apple, version: 1.0.2
 
-name: swift-composable-architecture, nameSpecified: swift-composable-architecture, owner: pointfreeco, version: 0.28.1
+name: swift-composable-architecture, nameSpecified: swift-composable-architecture, owner: pointfreeco, version: 0.33.1
 
-name: swift-custom-dump, nameSpecified: swift-custom-dump, owner: pointfreeco, version: 0.2.1
+name: swift-custom-dump, nameSpecified: swift-custom-dump, owner: pointfreeco, version: 0.3.0
 
 name: swift-identified-collections, nameSpecified: swift-identified-collections, owner: pointfreeco, version: 0.3.2
+
+name: swift-snapshot-testing, nameSpecified: SnapshotTesting, owner: pointfreeco, version: 1.9.0
 
 name: xctest-dynamic-overlay, nameSpecified: xctest-dynamic-overlay, owner: pointfreeco, version: 0.2.1
 
