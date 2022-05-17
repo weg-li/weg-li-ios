@@ -15,6 +15,7 @@ public struct AccountSettings: Equatable {
 
 // MARK: State
 public struct AccountSettingsState: Equatable {
+  public let userLink = URL(string: "https://www.weg.li/user")!
   public var accountSettings: AccountSettings
   
   public init(accountSettings: AccountSettings) {
@@ -25,6 +26,7 @@ public struct AccountSettingsState: Equatable {
 // MARK: Actions
 public enum AccountSettingsAction: Equatable {
   case setApiKey(String)
+  case openUserSettings
 }
 
 // MARK: Environment
@@ -45,6 +47,11 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
     case let .setApiKey(apiKey):
       state.accountSettings.apiKey = apiKey
       return .none
+      
+    case .openUserSettings:
+      return environment.uiApplicationClient
+        .open(state.userLink, [:])
+        .fireAndForget()
     }
   }
 )
@@ -72,7 +79,7 @@ public struct AccountSettingsView: View {
             .padding(.bottom, .grid(1))
           
           Button(
-            action: { /* open link to account */ },
+            action: { viewStore.send(.openUserSettings) },
             label: {
               Label("Account öffnen", systemImage: "arrow.up.right")
             }

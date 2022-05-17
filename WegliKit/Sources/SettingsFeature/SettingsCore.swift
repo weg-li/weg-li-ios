@@ -89,13 +89,16 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
         }
       ?? .none
     case .openImprintTapped:
-      return env.uiApplicationClient.open(env.imprintLink, [:])
+      return env.uiApplicationClient
+        .open(env.imprintLink, [:])
         .fireAndForget()
     case .openGitHubProjectTapped:
-      return env.uiApplicationClient.open(env.gitHubProjectLink, [:])
+      return env.uiApplicationClient
+        .open(env.gitHubProjectLink, [:])
         .fireAndForget()
     case .donateTapped:
-      return env.uiApplicationClient.open(env.donateLink, [:])
+      return env.uiApplicationClient
+        .open(env.donateLink, [:])
         .fireAndForget()
     case .contact, .userSettings:
       return .none
