@@ -15,11 +15,6 @@ public struct NetworkDispatcher {
     return urlSession()
       .dataTaskPublisher(for: request)
       .tryMap({ data, response in
-        
-        print(response)
-        print(String(data: data, encoding: .utf8) ?? "NO DATA")
-        
-        
         // If the response is invalid, throw an error
         if let response = response as? HTTPURLResponse,
            !(200...299).contains(response.statusCode) {

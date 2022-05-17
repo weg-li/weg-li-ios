@@ -50,6 +50,7 @@ public struct AccountSettingsState: Equatable {
   public var accountSettings: AccountSettings
   
   public var isNetworkRequestInProgress = false
+  public var apiTestRequestResult: Bool?
   
   public init(accountSettings: AccountSettings) {
     self.accountSettings = accountSettings
@@ -99,9 +100,15 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
     case .fetchNotices:
       let endpoint = Endpoint(
         baseUrl: Endpoints.wegliAPIEndpoint,
-        path: "/api/notices/\(state.accountSettings.apiKey)"
+        path: "/api/notices"
       )
-      let request = GetNoticesRequest(endpoint: endpoint)
+      let request = GetNoticesRequest(
+        endpoint: endpoint,
+        headers: [
+          "application/json": "Content-Type",
+          state.accountSettings.apiKey: "X-API-KEY"
+        ]
+      )
       state.isNetworkRequestInProgress = true
       
       return environment.apiClient.dispatch(request)
@@ -116,13 +123,13 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
         .eraseToEffect()
       
     case let .fetchNoticesFinished(.success(val)):
-      print(val)
       state.isNetworkRequestInProgress = false
+      state.apiTestRequestResult = true
       return .none
       
     case let .fetchNoticesFinished(.failure(error)):
-      print(error)
       state.isNetworkRequestInProgress = false
+      state.apiTestRequestResult = false
       return .none
     }
   }
@@ -140,11 +147,14 @@ public struct AccountSettingsView: View {
     self.store = store
     self.viewStore = ViewStore(store)
   }
+  
+  let description: AttributedString? = try? AttributedString(markdown: "Hier kannst du deinen API-Token hinzufügen um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über [weg.li](https://www.weg.li) zu versenden.")
+  
   public var body: some View {
     Form {
       Section(header: Text("API-Token")) {
         VStack(alignment: .leading) {
-          Text("Hier kannst du deinen API-Token von `weg.li\\user` hinzufügen um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über `weg.li` zu versenden.")
+          Text(description!)
             .multilineTextAlignment(.leading)
             .foregroundColor(Color(.label))
             .font(.body)
@@ -158,9 +168,9 @@ public struct AccountSettingsView: View {
           )
           .buttonStyle(.bordered)
           .accessibilityAddTraits([.isLink])
-          .padding(.bottom, .grid(3))
+          .padding(.bottom, .grid(4))
            
-          VStack {
+          VStack(alignment: .leading, spacing: .grid(2)) {
             TextField(
               "API-Token",
               text: viewStore.binding(
@@ -174,22 +184,31 @@ public struct AccountSettingsView: View {
             .submitLabel(.done)
             .textFieldStyle(.roundedBorder)
 
-            Button(
-              action: { viewStore.send(.fetchNotices) },
-              label: {
-                HStack {
-                  if viewStore.isNetworkRequestInProgress {
-                    ActivityIndicator(style: .medium)
-                  } else {
-                    Text("Test API-Token")
+            HStack {
+              Button(
+                action: { viewStore.send(.fetchNotices) },
+                label: {
+                  HStack {
+                    if viewStore.isNetworkRequestInProgress {
+                      ActivityIndicator(style: .medium)
+                    } else {
+                      Text("API-Token testen")
+                    }
                   }
                 }
+              )
+              .disabled(viewStore.accountSettings.apiKey.isEmpty)
+              .buttonStyle(.bordered)
+
+              if let result = viewStore.apiTestRequestResult {
+                Image(systemName: result ? "checkmark.circle" : "x.circle")
+                  .font(.body)
+                  .foregroundColor(result ? .green : .red)
               }
-            )
-            .disabled(viewStore.accountSettings.apiKey.isEmpty)
-            .buttonStyle(.bordered)
+            }
+            .padding(.bottom, .grid(2))
             
-            Text("`weg.li\\user`")
+            Text("Ruft `weg.li\\api\\notices` vom Server ab")
               .multilineTextAlignment(.leading)
               .foregroundColor(Color(.secondaryLabel))
               .font(.footnote)
