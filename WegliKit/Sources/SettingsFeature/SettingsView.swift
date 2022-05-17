@@ -180,7 +180,7 @@ struct SettingsView_Previews: PreviewProvider {
         SettingsView(
           store: .init(
             initialState: .init(
-              accountSettingsState: .init(accountSettings: .init(apiKey: "")),
+              accountSettingsState: .init(accountSettings: .init(apiToken: "")),
               contact: .preview,
               userSettings: .init(showsAllTextRecognitionSettings: false)
             ),

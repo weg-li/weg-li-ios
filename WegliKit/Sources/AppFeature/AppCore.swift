@@ -27,6 +27,8 @@ public struct AppState: Equatable {
   /// Reports a user has sent
   public var reports: [Report]
   
+  public var notices: [NoticeResponse]
+  
   /// Holds a report that has not been stored or sent via mail
   public var reportDraft: Report = .init(
     uuid: UUID.init,
@@ -36,18 +38,21 @@ public struct AppState: Equatable {
   )
   
   var showReportWizard = false
+  var isFetchingNotices = false
   
   public init(
     settings: SettingsState = .init(
-      accountSettingsState: .init(accountSettings: .init(apiKey: "")),
+      accountSettingsState: .init(accountSettings: .init(apiToken: "")),
       contact: .empty,
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
     reports: [Report] = [],
+    notices: [NoticeResponse] = [],
     showReportWizard: Bool = false
   ) {
     self.settings = settings
     self.reports = reports
+    self.notices = notices
     self.showReportWizard = showReportWizard
   }
   
@@ -64,6 +69,8 @@ public enum AppAction: Equatable {
   case settings(SettingsAction)
   case report(ReportAction)
   case showReportWizard(Bool)
+  case fetchNotices
+  case fetchNoticesResponse(Result<[NoticeResponse], NSError>)
   case reportSaved
   case onAppear
 }
@@ -77,6 +84,7 @@ public struct AppEnvironment {
     fileClient: FileClient,
     keychainClient: KeychainClient,
     apiClient: APIClient,
+    noticesService: NoticesService,
     date: @escaping () -> Date = Date.init,
     uuid: @escaping () -> UUID = UUID.init
   ) {
@@ -85,6 +93,7 @@ public struct AppEnvironment {
     self.fileClient = fileClient
     self.keychainClient = keychainClient
     self.apiClient = apiClient
+    self.noticesService = noticesService
     self.date = date
     self.uuid = uuid
   }
@@ -94,6 +103,7 @@ public struct AppEnvironment {
   public let fileClient: FileClient
   public let keychainClient: KeychainClient
   public var apiClient: APIClient
+  public let noticesService: NoticesService
   
   public var date: () -> Date
   public var uuid: () -> UUID
@@ -105,7 +115,8 @@ public extension AppEnvironment {
     backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
     fileClient: .live,
     keychainClient: .live(),
-    apiClient: .live
+    apiClient: .live,
+    noticesService: .live()
   )
 }
 
@@ -155,6 +166,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         )
       )
       
+    case .onAppear:
+      guard !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty else {
+        return .none
+      }
+      return Effect(value: .fetchNotices)
+    
+      
     case let .contactSettingsLoaded(result):
       let contact = (try? result.get()) ?? .init()
       state.settings.contact = .init(contact: contact, alert: nil)
@@ -167,16 +185,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .storedApiTokenLoaded(result):
       let apiToken = (try? result.get()) ?? ""
-      state.settings.accountSettingsState.accountSettings.apiKey = apiToken
+      state.settings.accountSettingsState.accountSettings.apiToken = apiToken
       return .none
       
     case let .userSettingsLoaded(result):
       let userSettings = (try? result.get()) ?? UserSettings(showsAllTextRecognitionSettings: false)
       state.settings.userSettings = userSettings
       state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
-      return .none
-      
-    case .onAppear:
       return .none
       
     case .settings:
@@ -226,6 +241,23 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         )
       }
       state.showReportWizard = value
+      return .none
+      
+    case .fetchNotices:
+      let apiToken = state.settings.accountSettingsState.accountSettings.apiToken
+      
+      state.isFetchingNotices = true
+      
+      return environment.noticesService.getNotices(apiToken)
+        .receive(on: environment.mainQueue)
+        .catchToEffect()
+        .map(AppAction.fetchNoticesResponse)
+      
+    case let .fetchNoticesResponse(.success(notices)):
+      state.isFetchingNotices = false
+      return .none
+    case let .fetchNoticesResponse(.failure(error)):
+      state.isFetchingNotices = false
       return .none
       
     case .reportSaved:

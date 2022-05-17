@@ -111,7 +111,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     }
   }
 )
-  .onChange(of: \.accountSettingsState.accountSettings.apiKey) { key, state, _, environment in
+  .onChange(of: \.accountSettingsState.accountSettings.apiToken) { key, state, _, environment in
     struct SaveDebounceId: Hashable {}
     
     return environment.keychainClient

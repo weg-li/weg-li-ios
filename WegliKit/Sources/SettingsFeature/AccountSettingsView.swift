@@ -6,41 +6,12 @@ import Styleguide
 import SwiftUI
 import UIApplicationClient
 
-public struct GetNoticesRequest: APIRequest {
-  public var queryItems: [URLQueryItem] = []
-  public typealias ResponseDataType = [NoticeResponse]
-  public let endpoint: Endpoint
-  public let headers: HTTPHeaders?
-  public let httpMethod: HTTPMethod
-  public var body: Data?
-  
-  public init(
-    endpoint: Endpoint,
-    headers: HTTPHeaders? = .contentTypeApplicationJSON,
-    httpMethod: HTTPMethod = .get,
-    body: Data? = nil
-  ) {
-    self.endpoint = endpoint
-    self.headers = headers
-    self.httpMethod = httpMethod
-    self.body = body
-  }
-  
-  public var decoder: JSONDecoder {
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    decoder.dateDecodingStrategy = .iso8601
-    return decoder
-  }
-}
-
-
 public struct AccountSettings: Equatable {
   @BindableState
-  public var apiKey: String
+  public var apiToken: String
   
-  public init(apiKey: String) {
-    self.apiKey = apiKey
+  public init(apiToken: String) {
+    self.apiToken = apiToken
   }
 }
 
@@ -89,7 +60,7 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
     state, action, environment in
     switch action {
     case let .setApiKey(apiKey):
-      state.accountSettings.apiKey = apiKey
+      state.accountSettings.apiToken = apiKey
       return .none
       
     case .openUserSettings:
@@ -98,15 +69,10 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
         .fireAndForget()
       
     case .fetchNotices:
-      let endpoint = Endpoint(
-        baseUrl: Endpoints.wegliAPIEndpoint,
-        path: "/api/notices"
-      )
       let request = GetNoticesRequest(
-        endpoint: endpoint,
         headers: [
           "application/json": "Content-Type",
-          state.accountSettings.apiKey: "X-API-KEY"
+          state.accountSettings.apiToken: "X-API-KEY"
         ]
       )
       state.isNetworkRequestInProgress = true
@@ -174,7 +140,7 @@ public struct AccountSettingsView: View {
             TextField(
               "API-Token",
               text: viewStore.binding(
-                get: \.accountSettings.apiKey,
+                get: \.accountSettings.apiToken,
                 send: AccountSettingsAction.setApiKey
               )
             )
@@ -197,7 +163,7 @@ public struct AccountSettingsView: View {
                   }
                 }
               )
-              .disabled(viewStore.accountSettings.apiKey.isEmpty)
+              .disabled(viewStore.accountSettings.apiToken.isEmpty)
               .buttonStyle(.bordered)
 
               if let result = viewStore.apiTestRequestResult {
@@ -226,7 +192,7 @@ struct AccountSettingsView_Previews: PreviewProvider {
   static var previews: some View {
     AccountSettingsView(
       store: .init(
-        initialState: .init(accountSettings: .init(apiKey: "")),
+        initialState: .init(accountSettings: .init(apiToken: "")),
         reducer: accountSettingsReducer,
         environment: .init(
           uiApplicationClient: .noop,

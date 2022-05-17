@@ -10,3 +10,10 @@ public struct Endpoint {
     self.path = path
   }
 }
+
+public extension Endpoint {
+  static let notices = Self(
+    baseUrl: Endpoints.wegliAPIEndpoint,
+    path: "/api/notices"
+  )
+}

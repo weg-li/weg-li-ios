@@ -80,3 +80,27 @@ public struct NoticePhoto: Equatable, Codable {
   public let fileName: String
   public let url: String
 }
+
+public extension NoticeResponse {
+  static let mock = Self(
+    token: "",
+    status: "",
+    street: "",
+    city: "",
+    zip: "",
+    latitude: 0,
+    longitude: 0,
+    registration: "",
+    brand: "",
+    color: "",
+    charge: "",
+    date: .distantFuture,
+    duration: 0,
+    severity: "",
+    note: "",
+    createdAt: .distantFuture,
+    updatedAt: .distantFuture,
+    sentAt: .distantFuture,
+    photos: []
+  )
+}
