@@ -7,6 +7,7 @@ import Contacts
 import FileClient
 import Foundation
 import ImagesFeature
+import KeychainClient
 import MapKit
 import OrderedCollections
 import PlacesServiceClient
@@ -57,6 +58,7 @@ public enum AppAction: Equatable {
   case contactSettingsLoaded(Result<Contact, NSError>)
   case storedReportsLoaded(Result<[Report], NSError>)
   case userSettingsLoaded(Result<UserSettings, NSError>)
+  case storedApiTokenLoaded(Result<String?, NSError>)
   case settings(SettingsAction)
   case report(ReportAction)
   case showReportWizard(Bool)
@@ -71,19 +73,22 @@ public struct AppEnvironment {
     mainQueue: AnySchedulerOf<DispatchQueue>,
     backgroundQueue: AnySchedulerOf<DispatchQueue>,
     fileClient: FileClient,
+    keychainClient: KeychainClient,
     date: @escaping () -> Date = Date.init,
     uuid: @escaping () -> UUID = UUID.init
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
     self.fileClient = fileClient
+    self.keychainClient = keychainClient
     self.date = date
     self.uuid = uuid
   }
   
-  public var mainQueue: AnySchedulerOf<DispatchQueue>
-  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
-  public var fileClient: FileClient
+  public let mainQueue: AnySchedulerOf<DispatchQueue>
+  public let backgroundQueue: AnySchedulerOf<DispatchQueue>
+  public let fileClient: FileClient
+  public let keychainClient: KeychainClient
   
   public var date: () -> Date
   public var uuid: () -> UUID
@@ -93,7 +98,8 @@ public extension AppEnvironment {
   static let live = Self(
     mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
     backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
-    fileClient: .live
+    fileClient: .live,
+    keychainClient: .live()
   )
 }
 
@@ -121,7 +127,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     environment: { parent in
       SettingsEnvironment(
         uiApplicationClient: .live,
-        keychainClient: .live(),
+        keychainClient: parent.keychainClient,
         mainQueue: parent.mainQueue
       )
     }
@@ -136,7 +142,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           environment.fileClient.loadReports()
             .map(AppAction.storedReportsLoaded),
           environment.fileClient.loadUserSettings()
-            .map(AppAction.userSettingsLoaded)
+            .map(AppAction.userSettingsLoaded),
+          environment.keychainClient.getApiToken()
+            .map(AppAction.storedApiTokenLoaded)
         )
       )
       
@@ -148,6 +156,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .storedReportsLoaded(result):
       let reports = (try? result.get()) ?? []
       state.reports = reports
+      return .none
+      
+    case let .storedApiTokenLoaded(result):
+      let apiToken = (try? result.get()) ?? ""
+      state.settings.accountSettingsState.accountSettings.apiKey = apiToken
       return .none
       
     case let .userSettingsLoaded(result):

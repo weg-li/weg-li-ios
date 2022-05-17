@@ -1,8 +1,39 @@
+import ApiClient
 import ComposableArchitecture
 import Foundation
+import SharedModels
 import Styleguide
 import SwiftUI
 import UIApplicationClient
+
+public struct GetNoticesRequest: APIRequest {
+  public var queryItems: [URLQueryItem] = []
+  public typealias ResponseDataType = [NoticeResponse]
+  public let endpoint: Endpoint
+  public let headers: HTTPHeaders?
+  public let httpMethod: HTTPMethod
+  public var body: Data?
+  
+  public init(
+    endpoint: Endpoint,
+    headers: HTTPHeaders? = .contentTypeApplicationJSON,
+    httpMethod: HTTPMethod = .get,
+    body: Data? = nil
+  ) {
+    self.endpoint = endpoint
+    self.headers = headers
+    self.httpMethod = httpMethod
+    self.body = body
+  }
+  
+  public var decoder: JSONDecoder {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    decoder.dateDecodingStrategy = .iso8601
+    return decoder
+  }
+}
+
 
 public struct AccountSettings: Equatable {
   @BindableState
@@ -18,6 +49,8 @@ public struct AccountSettingsState: Equatable {
   public let userLink = URL(string: "https://www.weg.li/user")!
   public var accountSettings: AccountSettings
   
+  public var isNetworkRequestInProgress = false
+  
   public init(accountSettings: AccountSettings) {
     self.accountSettings = accountSettings
   }
@@ -27,15 +60,25 @@ public struct AccountSettingsState: Equatable {
 public enum AccountSettingsAction: Equatable {
   case setApiKey(String)
   case openUserSettings
+  case fetchNotices
+  case fetchNoticesFinished(Result<[NoticeResponse], NetworkRequestError>)
 }
 
 // MARK: Environment
 public struct AccountSettingsEnvironment {
-  public init(uiApplicationClient: UIApplicationClient) {
+  public init(
+    uiApplicationClient: UIApplicationClient,
+    apiClient: APIClient = .live,
+    mainQueue: AnySchedulerOf<DispatchQueue>
+  ) {
     self.uiApplicationClient = uiApplicationClient
+    self.apiClient = apiClient
+    self.mainQueue = mainQueue
   }
 
+  public let apiClient: APIClient
   public let uiApplicationClient: UIApplicationClient
+  public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
 // MARK: Reducer
@@ -52,6 +95,35 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
       return environment.uiApplicationClient
         .open(state.userLink, [:])
         .fireAndForget()
+      
+    case .fetchNotices:
+      let endpoint = Endpoint(
+        baseUrl: Endpoints.wegliAPIEndpoint,
+        path: "/api/notices/\(state.accountSettings.apiKey)"
+      )
+      let request = GetNoticesRequest(endpoint: endpoint)
+      state.isNetworkRequestInProgress = true
+      
+      return environment.apiClient.dispatch(request)
+        .decode(
+          type: GetNoticesRequest.ResponseDataType.self,
+          decoder: request.decoder
+        )
+        .mapError { $0 as! NetworkRequestError }
+        .receive(on: environment.mainQueue)
+        .catchToEffect()
+        .map(AccountSettingsAction.fetchNoticesFinished)
+        .eraseToEffect()
+      
+    case let .fetchNoticesFinished(.success(val)):
+      print(val)
+      state.isNetworkRequestInProgress = false
+      return .none
+      
+    case let .fetchNoticesFinished(.failure(error)):
+      print(error)
+      state.isNetworkRequestInProgress = false
+      return .none
     }
   }
 )
@@ -103,10 +175,14 @@ public struct AccountSettingsView: View {
             .textFieldStyle(.roundedBorder)
 
             Button(
-              action: {},
+              action: { viewStore.send(.fetchNotices) },
               label: {
                 HStack {
-                  Text("Test API-Token")
+                  if viewStore.isNetworkRequestInProgress {
+                    ActivityIndicator(style: .medium)
+                  } else {
+                    Text("Test API-Token")
+                  }
                 }
               }
             )
@@ -122,6 +198,7 @@ public struct AccountSettingsView: View {
       }
       .headerProminence(.increased)
     }
+    .navigationBarTitleDisplayMode(.inline)
   }
 }
 
@@ -132,7 +209,10 @@ struct AccountSettingsView_Previews: PreviewProvider {
       store: .init(
         initialState: .init(accountSettings: .init(apiKey: "")),
         reducer: accountSettingsReducer,
-        environment: .init(uiApplicationClient: .noop)
+        environment: .init(
+          uiApplicationClient: .noop,
+          mainQueue: .failing
+        )
       )
     )
   }

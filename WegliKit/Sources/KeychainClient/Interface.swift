@@ -24,8 +24,10 @@ public struct KeychainClient {
     setString(token, tokenKey, nil)
   }
   
-  public func getApiToken() -> Effect<String?, Never> {
+  public func getApiToken() -> Effect<Result<String?, NSError>, Never> {
     getString(tokenKey)
+      .setFailureType(to: NSError.self)
+      .catchToEffect()
   }
 }
 

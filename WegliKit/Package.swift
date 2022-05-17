@@ -56,9 +56,17 @@ let package = Package(
   ],
   targets: [
     .target(
+      name: "ApiClient",
+      dependencies:[
+        "SharedModels",
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+      ]
+    ),
+    .target(
       name: "AppFeature",
       dependencies: [
         "FileClient",
+        "KeychainClient",
         "L10n",
         "ReportFeature",
         "SettingsFeature",
@@ -208,6 +216,7 @@ let package = Package(
     .target(
       name: "SettingsFeature",
       dependencies: [
+        "ApiClient",
         "ContactFeature",
         "Helper",
         "KeychainClient",

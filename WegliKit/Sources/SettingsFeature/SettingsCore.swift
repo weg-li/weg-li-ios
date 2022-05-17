@@ -62,7 +62,8 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     action: /SettingsAction.accountSettings,
     environment: { parent in
       AccountSettingsEnvironment(
-        uiApplicationClient: parent.uiApplicationClient
+        uiApplicationClient: parent.uiApplicationClient,
+        mainQueue: parent.mainQueue
       )
     }
   ),

@@ -1,0 +1,12 @@
+import Foundation
+
+/// A structure to define an endpoint on the Critical Maps API
+public struct Endpoint {
+  public let baseUrl: String
+  public let path: String?
+  
+  public init(baseUrl: String = Endpoints.wegliAPIEndpoint, path: String? = nil) {
+    self.baseUrl = baseUrl
+    self.path = path
+  }
+}
