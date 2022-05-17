@@ -33,7 +33,7 @@ public enum AccountSettingsAction: Equatable {
   case setApiKey(String)
   case openUserSettings
   case fetchNotices
-  case fetchNoticesFinished(Result<[NoticeResponse], NetworkRequestError>)
+  case fetchNoticesResponse(Result<[NoticeResponse], NSError>)
 }
 
 // MARK: Environment
@@ -41,14 +41,17 @@ public struct AccountSettingsEnvironment {
   public init(
     uiApplicationClient: UIApplicationClient,
     apiClient: APIClient = .live,
+    noticesService: NoticesService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
     self.apiClient = apiClient
+    self.noticesService = noticesService
     self.mainQueue = mainQueue
   }
 
   public let apiClient: APIClient
+  public let noticesService: NoticesService
   public let uiApplicationClient: UIApplicationClient
   public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
@@ -69,31 +72,21 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
         .fireAndForget()
       
     case .fetchNotices:
-      let request = GetNoticesRequest(
-        headers: [
-          "application/json": "Content-Type",
-          state.accountSettings.apiToken: "X-API-KEY"
-        ]
-      )
       state.isNetworkRequestInProgress = true
       
-      return environment.apiClient.dispatch(request)
-        .decode(
-          type: GetNoticesRequest.ResponseDataType.self,
-          decoder: request.decoder
-        )
-        .mapError { $0 as! NetworkRequestError }
+      return environment.noticesService.getNotices(state.accountSettings.apiToken)
         .receive(on: environment.mainQueue)
         .catchToEffect()
-        .map(AccountSettingsAction.fetchNoticesFinished)
+        .map(AccountSettingsAction.fetchNoticesResponse)
         .eraseToEffect()
       
-    case let .fetchNoticesFinished(.success(val)):
+    case let .fetchNoticesResponse(.success(val)):
       state.isNetworkRequestInProgress = false
       state.apiTestRequestResult = true
       return .none
       
-    case let .fetchNoticesFinished(.failure(error)):
+    case let .fetchNoticesResponse(.failure(error)):
+      print(error)
       state.isNetworkRequestInProgress = false
       state.apiTestRequestResult = false
       return .none
@@ -196,6 +189,7 @@ struct AccountSettingsView_Previews: PreviewProvider {
         reducer: accountSettingsReducer,
         environment: .init(
           uiApplicationClient: .noop,
+          noticesService: .noop,
           mainQueue: .failing
         )
       )

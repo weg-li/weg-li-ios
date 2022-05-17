@@ -16,4 +16,9 @@ public extension Endpoint {
     baseUrl: Endpoints.wegliAPIEndpoint,
     path: "/api/notices"
   )
+  
+  static let submitNotice = Self(
+    baseUrl: Endpoints.wegliAPIEndpoint,
+    path: "/api/notices/mail"
+  )
 }

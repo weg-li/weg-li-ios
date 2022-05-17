@@ -40,11 +40,13 @@ public struct SettingsEnvironment {
     uiApplicationClient: UIApplicationClient,
     keychainClient: KeychainClient,
     apiClient: APIClient,
+    noticesService: NoticesService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
     self.keychainClient = keychainClient
     self.apiClient = apiClient
+    self.noticesService = noticesService
     self.mainQueue = mainQueue
   }
   
@@ -56,6 +58,7 @@ public struct SettingsEnvironment {
   public let uiApplicationClient: UIApplicationClient
   public let keychainClient: KeychainClient
   public let apiClient: APIClient
+  public let noticesService: NoticesService
   public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
@@ -68,6 +71,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
       AccountSettingsEnvironment(
         uiApplicationClient: parent.uiApplicationClient,
         apiClient: parent.apiClient,
+        noticesService: parent.noticesService,
         mainQueue: parent.mainQueue
       )
     }

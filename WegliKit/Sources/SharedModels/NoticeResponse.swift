@@ -77,7 +77,7 @@ public struct NoticeResponse: Codable, Equatable {
 }
 
 public struct NoticePhoto: Equatable, Codable {
-  public let fileName: String
+  public let filename: String
   public let url: String
 }
 

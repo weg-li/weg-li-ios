@@ -146,6 +146,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         uiApplicationClient: .live,
         keychainClient: parent.keychainClient,
         apiClient: parent.apiClient,
+        noticesService: parent.noticesService,
         mainQueue: parent.mainQueue
       )
     }

@@ -3,7 +3,7 @@ import Foundation
 import SharedModels
 
 // Interface
-/// A Service to send and fetch locations and chat messages from the Criticl Maps API
+/// A Service to send a single notice and all persisted notices from the weg-li API
 public struct NoticesService {
   public var getNotices: (String) -> AnyPublisher<[NoticeResponse], NSError>
   public var submitNotice: (String, Data?) -> AnyPublisher<[NoticeResponse], NSError>
@@ -21,12 +21,7 @@ public extension NoticesService {
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
       getNotices: { apiToken in
-        let request = GetNoticesRequest(
-          headers: [
-            "application/json": "Content-Type",
-            apiToken: "X-API-KEY"
-          ]
-        )
+        let request = GetNoticesRequest(apiToken: apiToken)
         
         return apiClient.dispatch(request)
           .decode(
@@ -38,10 +33,7 @@ public extension NoticesService {
       },
       submitNotice: { apiToken, data in
         let request = SubmitNoticeRequest(
-          headers: [
-            "application/json": "Content-Type",
-            apiToken: "X-API-KEY"
-          ],
+          apiToken: apiToken,
           body: data
         )
         
@@ -83,9 +75,32 @@ public extension NoticesService {
   )
 }
 
-let decoder: JSONDecoder = {
+public extension ISO8601DateFormatter {
+  static let internetDateTimeWithFractionalSeconds: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [
+      .withInternetDateTime,
+      .withFractionalSeconds
+    ]
+    return formatter
+  }()
+}
+
+public extension JSONDecoder.DateDecodingStrategy {
+  static let iso8601withFractionalSeconds = custom { decoder in
+    let container = try decoder.singleValueContainer()
+    let dateString = try container.decode(String.self)
+    
+    guard let date = ISO8601DateFormatter.internetDateTimeWithFractionalSeconds.date(from: dateString)  else {
+      throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date: \(dateString)")
+    }
+    return date
+  }
+}
+
+private let decoder: JSONDecoder = {
   let decoder = JSONDecoder()
   decoder.keyDecodingStrategy = .convertFromSnakeCase
-  decoder.dateDecodingStrategy = .iso8601
+  decoder.dateDecodingStrategy = .iso8601withFractionalSeconds
   return decoder
 }()
