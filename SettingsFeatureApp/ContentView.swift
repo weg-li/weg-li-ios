@@ -12,7 +12,9 @@ struct ContentView: View {
           ),
           reducer: settingsReducer,
           environment: .init(
-            uiApplicationClient: .live
+            uiApplicationClient: .live,
+            keychainClient: .live(keychainPrefix: "weg-li"),
+            mainQueue: .main
           )
         )
       )

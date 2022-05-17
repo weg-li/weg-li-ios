@@ -51,7 +51,8 @@ let package = Package(
       url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
       .upToNextMajor(from: "1.8.2")
     ),
-    .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0"))
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
+    .package(name: "KeychainSwift", url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))
   ],
   targets: [
     .target(
@@ -116,6 +117,13 @@ let package = Package(
         "SharedModels",
         "Styleguide",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+      ]
+    ),
+    .target(
+      name: "KeychainClient",
+      dependencies: [
+        .product(name: "KeychainSwift", package: "KeychainSwift"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -202,6 +210,7 @@ let package = Package(
       dependencies: [
         "ContactFeature",
         "Helper",
+        "KeychainClient",
         "L10n",
         "SharedModels",
         "Styleguide",

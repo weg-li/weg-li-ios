@@ -3,6 +3,7 @@
 import ComposableArchitecture
 import ContactFeature
 import Foundation
+import KeychainClient
 import SharedModels
 import UIApplicationClient
 import UIKit
@@ -34,8 +35,14 @@ public enum SettingsAction: Equatable {
 }
 
 public struct SettingsEnvironment {
-  public init(uiApplicationClient: UIApplicationClient) {
+  public init(
+    uiApplicationClient: UIApplicationClient,
+    keychainClient: KeychainClient,
+    mainQueue: AnySchedulerOf<DispatchQueue>
+  ) {
     self.uiApplicationClient = uiApplicationClient
+    self.keychainClient = keychainClient
+    self.mainQueue = mainQueue
   }
   
   // swiftlint:disable force_unwrapping
@@ -43,7 +50,9 @@ public struct SettingsEnvironment {
   public let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
   public let donateLink = URL(string: "https://www.weg.li/donate")!
   // swiftlint:enable force_unwrapping
-  public var uiApplicationClient: UIApplicationClient
+  public let uiApplicationClient: UIApplicationClient
+  public let keychainClient: KeychainClient
+  public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
 /// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
@@ -51,7 +60,11 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
   accountSettingsReducer.pullback(
     state: \.accountSettingsState,
     action: /SettingsAction.accountSettings,
-    environment: { _ in AccountSettingsEnvironment() }
+    environment: { parent in
+      AccountSettingsEnvironment(
+        uiApplicationClient: parent.uiApplicationClient
+      )
+    }
   ),
   contactViewReducer.pullback(
     state: \.contact,
@@ -89,6 +102,14 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     }
   }
 )
+  .onChange(of: \.accountSettingsState.accountSettings.apiKey) { key, state, _, environment in
+    struct SaveDebounceId: Hashable {}
+    
+    return environment.keychainClient
+      .setApiToken(key)
+      .fireAndForget()
+      .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+  }
 
 
 public enum UserSettingsAction: Equatable {

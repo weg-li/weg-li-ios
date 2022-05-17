@@ -35,7 +35,11 @@ public struct AppState: Equatable {
   var showReportWizard = false
   
   public init(
-    settings: SettingsState = .init(contact: .empty, userSettings: .init(showsAllTextRecognitionSettings: false)),
+    settings: SettingsState = .init(
+      accountSettingsState: .init(accountSettings: .init(apiKey: "")),
+      contact: .empty,
+      userSettings: .init(showsAllTextRecognitionSettings: false)
+    ),
     reports: [Report] = [],
     showReportWizard: Bool = false
   ) {
@@ -114,7 +118,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
   settingsReducer.pullback(
     state: \.settings,
     action: /AppAction.settings,
-    environment: { _ in SettingsEnvironment(uiApplicationClient: .live) }
+    environment: { parent in
+      SettingsEnvironment(
+        uiApplicationClient: .live,
+        keychainClient: .live(),
+        mainQueue: parent.mainQueue
+      )
+    }
   ),
   Reducer { state, action, environment in
     switch action {

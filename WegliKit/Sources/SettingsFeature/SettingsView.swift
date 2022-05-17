@@ -80,6 +80,7 @@ public struct SettingsView: View {
             }
           }
         )
+        .accessibilityAddTraits([.isLink])
         
         Button(
           action: { viewStore.send(.donateTapped) },
@@ -91,6 +92,7 @@ public struct SettingsView: View {
             }
           }
         )
+        .accessibilityAddTraits([.isLink])
         
         Button(
           action: { viewStore.send(.openLicensesRowTapped) },
@@ -183,7 +185,11 @@ struct SettingsView_Previews: PreviewProvider {
               userSettings: .init(showsAllTextRecognitionSettings: false)
             ),
             reducer: .empty,
-            environment: SettingsEnvironment(uiApplicationClient: .live)
+            environment: SettingsEnvironment(
+              uiApplicationClient: .live,
+              keychainClient: .noop,
+              mainQueue: .failing
+            )
           )
         )
       }

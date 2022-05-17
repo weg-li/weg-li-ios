@@ -1,7 +1,8 @@
-import Foundation
-
-import SwiftUI
 import ComposableArchitecture
+import Foundation
+import Styleguide
+import SwiftUI
+import UIApplicationClient
 
 public struct AccountSettings: Equatable {
   @BindableState
@@ -28,7 +29,11 @@ public enum AccountSettingsAction: Equatable {
 
 // MARK: Environment
 public struct AccountSettingsEnvironment {
-  public init() {}
+  public init(uiApplicationClient: UIApplicationClient) {
+    self.uiApplicationClient = uiApplicationClient
+  }
+
+  public let uiApplicationClient: UIApplicationClient
 }
 
 // MARK: Reducer
@@ -58,20 +63,57 @@ public struct AccountSettingsView: View {
   }
   public var body: some View {
     Form {
-      Section {
-        TextField(
-          "API KEY",
-          text: viewStore.binding(
-            get: \.accountSettings.apiKey,
-            send: AccountSettingsAction.setApiKey
+      Section(header: Text("API-Token")) {
+        VStack(alignment: .leading) {
+          Text("Hier kannst du deinen API-Token von `weg.li\\user` hinzufügen um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über `weg.li` zu versenden.")
+            .multilineTextAlignment(.leading)
+            .foregroundColor(Color(.label))
+            .font(.body)
+            .padding(.bottom, .grid(1))
+          
+          Button(
+            action: { /* open link to account */ },
+            label: {
+              Label("Account öffnen", systemImage: "arrow.up.right")
+            }
           )
-        )
-        .multilineTextAlignment(.leading)
-        .keyboardType(.default)
-        .disableAutocorrection(true)
-        .submitLabel(.done)
-        .textFieldStyle(.plain)
+          .buttonStyle(.bordered)
+          .accessibilityAddTraits([.isLink])
+          .padding(.bottom, .grid(3))
+           
+          VStack {
+            TextField(
+              "API-Token",
+              text: viewStore.binding(
+                get: \.accountSettings.apiKey,
+                send: AccountSettingsAction.setApiKey
+              )
+            )
+            .multilineTextAlignment(.leading)
+            .keyboardType(.default)
+            .disableAutocorrection(true)
+            .submitLabel(.done)
+            .textFieldStyle(.roundedBorder)
+
+            Button(
+              action: {},
+              label: {
+                HStack {
+                  Text("Test API-Token")
+                }
+              }
+            )
+            .disabled(viewStore.accountSettings.apiKey.isEmpty)
+            .buttonStyle(.bordered)
+            
+            Text("`weg.li\\user`")
+              .multilineTextAlignment(.leading)
+              .foregroundColor(Color(.secondaryLabel))
+              .font(.footnote)
+          }
+        }
       }
+      .headerProminence(.increased)
     }
   }
 }
@@ -83,7 +125,7 @@ struct AccountSettingsView_Previews: PreviewProvider {
       store: .init(
         initialState: .init(accountSettings: .init(apiKey: "")),
         reducer: accountSettingsReducer,
-        environment: .init()
+        environment: .init(uiApplicationClient: .noop)
       )
     )
   }
