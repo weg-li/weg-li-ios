@@ -6,6 +6,7 @@ import ComposableArchitecture
 import ComposableCoreLocation
 import Contacts
 import FileClient
+import Helper
 import Foundation
 import ImagesFeature
 import KeychainClient
@@ -27,7 +28,7 @@ public struct AppState: Equatable {
   /// Reports a user has sent
   public var reports: [Report]
   
-  public var notices: [NoticeResponse]
+  public var notices: ContentState<[NoticeResponse]>
   
   /// Holds a report that has not been stored or sent via mail
   public var reportDraft: Report = .init(
@@ -47,7 +48,7 @@ public struct AppState: Equatable {
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
     reports: [Report] = [],
-    notices: [NoticeResponse] = [],
+    notices: ContentState<[NoticeResponse]> = .loading([]),
     showReportWizard: Bool = false
   ) {
     self.settings = settings
@@ -247,7 +248,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case .fetchNotices:
       let apiToken = state.settings.accountSettingsState.accountSettings.apiToken
       
-      state.isFetchingNotices = true
+      state.notices = .loading([])
       
       return environment.noticesService.getNotices(apiToken)
         .receive(on: environment.mainQueue)
@@ -256,9 +257,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.success(notices)):
       state.isFetchingNotices = false
+      state.notices = .results(notices)
       return .none
     case let .fetchNoticesResponse(.failure(error)):
       state.isFetchingNotices = false
+      state.notices = .error(.init(title: "Fehler", body: error.localizedDescription))
       return .none
       
     case .reportSaved:

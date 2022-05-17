@@ -1,6 +1,8 @@
 import Foundation
 
-public struct NoticeResponse: Codable, Equatable {
+public struct NoticeResponse: Codable, Equatable, Identifiable {
+  public var id: String { token }
+  
   public let token: String
   public let status: String
   public let street: String
@@ -24,6 +26,18 @@ public struct NoticeResponse: Codable, Equatable {
   public var expiredTuv: Bool = false
   public var expiredEco: Bool = false
   public let photos: [NoticePhoto]
+  
+  public var time: Times {
+    guard let duration = Times(rawValue: duration) else {
+      preconditionFailure()
+    }
+    return duration
+  }
+  
+  public var interval: String? {
+    guard let interval = time.interval(from: date) else { return nil }
+    return DateIntervalFormatter.reportTimeFormatter.string(from: interval)
+  }
   
   public init(
     token: String,

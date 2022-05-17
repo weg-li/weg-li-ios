@@ -1,10 +1,12 @@
 // Created for weg-li in 2021.
 
 import ComposableArchitecture
+import DescriptionFeature
 import L10n
 import Helper
 import ReportFeature
 import SettingsFeature
+import SharedModels
 import Styleguide
 import SwiftUI
 
@@ -23,14 +25,14 @@ public struct AppView: View {
       Group {
         if horizontalSizeClass == .compact {
           ZStack(alignment: .bottomTrailing) {
-            reportsView()
+            noticesView()
             
             addReportButton
               .padding(.grid(6))
           }
         } else {
           HStack {
-            reportsView()
+            noticesView()
               .frame(width: 300)
             
             Divider()
@@ -55,17 +57,31 @@ public struct AppView: View {
     .navigationViewStyle(StackNavigationViewStyle())
   }
   
-  @ViewBuilder private func reportsView() -> some View {
-    if viewStore.reports.isEmpty {
-      emptyStateView
-        .padding(.horizontal)
-    } else {
+  @ViewBuilder private func noticesView() -> some View {
+    switch viewStore.notices {
+    case .loading:
+      ActivityIndicator(style: .medium)
+    case let .results(notices):
       ScrollView {
-        ForEach(viewStore.reports, id: \.id) { report in
-          ReportCellView(report: report)
+        ForEach(notices, id: \.id) { notice in
+          NoticeView(
+            createdAt: notice.createdAt,
+            brand: notice.brand,
+            color: notice.displayColor,
+            licensePlateNumber: notice.registration,
+            duration: notice.time.description,
+            interval: notice.interval,
+            charge: notice.charge,
+            status: notice.status
+          )
         }
         .padding()
       }
+    case .empty:
+      emptyStateView
+        .padding(.horizontal)
+    case let .error(errorState):
+      Text(errorState.title)
     }
   }
   
@@ -161,5 +177,13 @@ extension UIDevice {
   
   static var isIPhone: Bool {
     UIDevice.current.userInterfaceIdiom == .phone
+  }
+}
+
+extension NoticeResponse {
+  var displayColor: String? {
+    DescriptionState.colors.first { color in
+      color.key.lowercased() == self.color.lowercased()
+    }?.value
   }
 }

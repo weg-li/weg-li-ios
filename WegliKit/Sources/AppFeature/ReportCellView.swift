@@ -16,10 +16,12 @@ public struct ReportCellView: View {
             .fontWeight(.bold)
             .font(.title)
             .padding(.bottom, .grid(1))
+          
           HStack(spacing: .grid(3)) {
             Image(systemName: "car")
               .font(.title2)
               .accessibility(hidden: true)
+            
             VStack(alignment: .leading, spacing: .grid(1)) {
               Text("\(report.description.selectedBrand?.title ?? ""), \(DescriptionState.colors[report.description.selectedColor].value)")
               Text(verbatim: report.description.licensePlateNumber)
@@ -29,10 +31,12 @@ public struct ReportCellView: View {
           .accessibility(label: Text("Vehicle info"))
           .accessibilityElement()
           .padding(.bottom, .grid(2))
+          
           HStack(spacing: .grid(3)) {
             Image(systemName: "exclamationmark.triangle")
               .font(.title2)
               .accessibility(hidden: true)
+          
             VStack(alignment: .leading, spacing: .grid(1)) {
               Text(report.description.time)
               Text(report.description.selectedCharge?.text ?? "")
@@ -45,8 +49,11 @@ public struct ReportCellView: View {
         .padding()
         Spacer()
       }
-      .background(Color(.systemGray6))
       .padding(.bottom)
+      .background(
+        Color(.systemGray6)
+          .clipShape(RoundedRectangle(cornerRadius: 10))
+      )
       // Design attempt :D
       VStack {
         HStack {
