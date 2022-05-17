@@ -53,6 +53,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
         fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        noticesService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -80,6 +83,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
         fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        noticesService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -114,6 +120,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         fileClient: fileCient,
+        keychainClient: .noop,
+        apiClient: .noop,
+        noticesService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -151,6 +160,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
         fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        noticesService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )

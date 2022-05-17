@@ -9,7 +9,11 @@ class SettingsStoreTests: XCTestCase {
     uiApplicationClient: .init(
       open: { _, _ in .none },
       openSettingsURLString: { "" }
-    )
+    ),
+    keychainClient: .noop,
+    apiClient: .noop,
+    noticesService: .noop,
+    mainQueue: .immediate
   )
   
   func test_setOpenLicensesRow_shouldCallURL() {
@@ -24,7 +28,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
@@ -43,7 +51,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
@@ -62,7 +74,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
@@ -81,7 +97,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )

@@ -55,11 +55,11 @@ public struct SettingsEnvironment {
   public let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
   public let donateLink = URL(string: "https://www.weg.li/donate")!
   // swiftlint:enable force_unwrapping
-  public let uiApplicationClient: UIApplicationClient
-  public let keychainClient: KeychainClient
-  public let apiClient: APIClient
-  public let noticesService: NoticesService
-  public let mainQueue: AnySchedulerOf<DispatchQueue>
+  public var uiApplicationClient: UIApplicationClient
+  public var keychainClient: KeychainClient
+  public var apiClient: APIClient
+  public var noticesService: NoticesService
+  public var mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
 /// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
