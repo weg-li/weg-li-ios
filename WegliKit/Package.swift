@@ -65,6 +65,7 @@ let package = Package(
     .target(
       name: "AppFeature",
       dependencies: [
+        "ApiClient",
         "FileClient",
         "KeychainClient",
         "L10n",

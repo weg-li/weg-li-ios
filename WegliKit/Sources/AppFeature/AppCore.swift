@@ -1,5 +1,6 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -15,6 +16,7 @@ import ReportFeature
 import SettingsFeature
 import SharedModels
 import UIKit
+import Network
 
 // MARK: - AppState
 
@@ -74,6 +76,7 @@ public struct AppEnvironment {
     backgroundQueue: AnySchedulerOf<DispatchQueue>,
     fileClient: FileClient,
     keychainClient: KeychainClient,
+    apiClient: APIClient,
     date: @escaping () -> Date = Date.init,
     uuid: @escaping () -> UUID = UUID.init
   ) {
@@ -81,6 +84,7 @@ public struct AppEnvironment {
     self.backgroundQueue = backgroundQueue
     self.fileClient = fileClient
     self.keychainClient = keychainClient
+    self.apiClient = apiClient
     self.date = date
     self.uuid = uuid
   }
@@ -89,6 +93,7 @@ public struct AppEnvironment {
   public let backgroundQueue: AnySchedulerOf<DispatchQueue>
   public let fileClient: FileClient
   public let keychainClient: KeychainClient
+  public var apiClient: APIClient
   
   public var date: () -> Date
   public var uuid: () -> UUID
@@ -99,7 +104,8 @@ public extension AppEnvironment {
     mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
     backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
     fileClient: .live,
-    keychainClient: .live()
+    keychainClient: .live(),
+    apiClient: .live
   )
 }
 
@@ -128,6 +134,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       SettingsEnvironment(
         uiApplicationClient: .live,
         keychainClient: parent.keychainClient,
+        apiClient: parent.apiClient,
         mainQueue: parent.mainQueue
       )
     }

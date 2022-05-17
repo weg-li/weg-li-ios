@@ -1,5 +1,6 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import ComposableArchitecture
 import ContactFeature
 import Foundation
@@ -38,10 +39,12 @@ public struct SettingsEnvironment {
   public init(
     uiApplicationClient: UIApplicationClient,
     keychainClient: KeychainClient,
+    apiClient: APIClient,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
     self.keychainClient = keychainClient
+    self.apiClient = apiClient
     self.mainQueue = mainQueue
   }
   
@@ -52,6 +55,7 @@ public struct SettingsEnvironment {
   // swiftlint:enable force_unwrapping
   public let uiApplicationClient: UIApplicationClient
   public let keychainClient: KeychainClient
+  public let apiClient: APIClient
   public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
@@ -63,6 +67,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     environment: { parent in
       AccountSettingsEnvironment(
         uiApplicationClient: parent.uiApplicationClient,
+        apiClient: parent.apiClient,
         mainQueue: parent.mainQueue
       )
     }
