@@ -9,18 +9,22 @@ import UIKit
 
 public struct SettingsState: Equatable {
   public init(
+    accountSettingsState: AccountSettingsState,
     contact: ContactState,
     userSettings: UserSettings
   ) {
+    self.accountSettingsState = accountSettingsState
     self.contact = contact
     self.userSettings = userSettings
   }
   
+  public var accountSettingsState: AccountSettingsState
   public var contact: ContactState
   public var userSettings: UserSettings
 }
 
 public enum SettingsAction: Equatable {
+  case accountSettings(AccountSettingsAction)
   case contact(ContactStateAction)
   case userSettings(UserSettingsAction)
   case openLicensesRowTapped
@@ -44,6 +48,11 @@ public struct SettingsEnvironment {
 
 /// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
 public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment>.combine(
+  accountSettingsReducer.pullback(
+    state: \.accountSettingsState,
+    action: /SettingsAction.accountSettings,
+    environment: { _ in AccountSettingsEnvironment() }
+  ),
   contactViewReducer.pullback(
     state: \.contact,
     action: /SettingsAction.contact,
@@ -56,6 +65,9 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
   ),
   Reducer { _, action, env in
     switch action {
+    case .accountSettings:
+      return .none
+      
     case .openLicensesRowTapped:
       return URL(string: env.uiApplicationClient.openSettingsURLString())
         .map {

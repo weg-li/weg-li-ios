@@ -22,6 +22,23 @@ public struct SettingsView: View {
     Form {
       Section {
         NavigationLink(
+          destination: AccountSettingsView(
+            store: store.scope(
+              state: \.accountSettingsState,
+              action: SettingsAction.accountSettings
+            )
+          ),
+          label: {
+            HStack {
+              Label("Account", systemImage: "person.circle")
+              Spacer()
+            }
+          }
+        )
+      }
+      
+      Section(header: Label("Allgemein", systemImage: "hammer.fill")) {
+        NavigationLink(
           destination: ContactView(
             store: store.scope(
               state: \.contact,
@@ -30,19 +47,29 @@ public struct SettingsView: View {
           ),
           label: {
             HStack {
-              Text(L10n.Contact.widgetTitle)
+              Label(L10n.Contact.widgetTitle, systemImage: "person.fill")
+                .labelStyle(.titleOnly)
               Spacer()
             }
           }
         )
         
         Toggle(
-          "Alle Ergebnisse der Nummernschild Erkennung anzeigen",
           isOn: viewStore.binding(
             get: { $0.userSettings.showsAllTextRecognitionSettings },
-            send: { SettingsAction.userSettings(.setShowsAllTextRecognitionResults($0)) }))
+            send: { SettingsAction.userSettings(.setShowsAllTextRecognitionResults($0)) }
+          ),
+          label: {
+            Label("Alle Ergebnisse der Nummernschild Erkennung anzeigen", systemImage: "text.magnifyingglass")
+              .labelStyle(.titleOnly)
+          }
+        )
       }
-      Section {
+      .headerProminence(.increased)
+      
+      Section(
+        header: Label(L10n.Settings.Section.projectTitle, systemImage: "chevron.left.forwardslash.chevron.right")
+      ) {
         Button(
           action: { viewStore.send(.openImprintTapped) },
           label: {
@@ -53,6 +80,7 @@ public struct SettingsView: View {
             }
           }
         )
+        
         Button(
           action: { viewStore.send(.donateTapped) },
           label: {
@@ -63,10 +91,7 @@ public struct SettingsView: View {
             }
           }
         )
-      }
-      Section(
-        header: Text(L10n.Settings.Section.projectTitle)
-      ) {
+        
         Button(
           action: { viewStore.send(.openLicensesRowTapped) },
           label: {
@@ -78,6 +103,8 @@ public struct SettingsView: View {
           }
         )
       }
+      .headerProminence(.increased)
+      
       Section {
         Button(
           action: { viewStore.send(.openGitHubProjectTapped) },
@@ -151,6 +178,7 @@ struct SettingsView_Previews: PreviewProvider {
         SettingsView(
           store: .init(
             initialState: .init(
+              accountSettingsState: .init(accountSettings: .init(apiKey: "")),
               contact: .preview,
               userSettings: .init(showsAllTextRecognitionSettings: false)
             ),
