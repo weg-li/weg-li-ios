@@ -15,7 +15,7 @@ public struct ContactWidget: View {
     let fullName: String
     let city: String
     
-    init(state: Report) {
+    init(state: ReportState) {
       self.isResetButtonDisabled = state.contactState == .empty
       self.contact = state.contactState.contact
       self.showEditScreen = state.showEditContact
@@ -24,10 +24,10 @@ public struct ContactWidget: View {
     }
   }
   
-  public let store: Store<Report, ReportAction>
+  public let store: Store<ReportState, ReportAction>
   @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
   
-  public init(store: Store<Report, ReportAction>) {
+  public init(store: Store<ReportState, ReportAction>) {
     self.store = store
     viewStore = ViewStore(store.scope(state: ViewState.init))
   }

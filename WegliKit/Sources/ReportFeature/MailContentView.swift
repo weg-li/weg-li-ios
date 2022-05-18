@@ -19,7 +19,7 @@ struct MailContentView: View {
     let isDescriptionValid: Bool
     let isContactValid: Bool
     
-    init(state: Report) {
+    init(state: ReportState) {
       districtName = state.district?.name
       isImagesValid = state.images.isValid
       isLocationValid = state.location.resolvedAddress.isValid
@@ -36,9 +36,9 @@ struct MailContentView: View {
   }
   
   @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
-  let store: Store<Report, ReportAction>
+  let store: Store<ReportState, ReportAction>
   
-  init(store: Store<Report, ReportAction>) {
+  init(store: Store<ReportState, ReportAction>) {
     self.store = store
     viewStore = ViewStore(store.scope(state: ViewState.init))
   }

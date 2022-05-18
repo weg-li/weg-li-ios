@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NoticeResponse: Codable, Equatable, Identifiable {
+public struct Notice: Codable, Equatable, Identifiable {
   public var id: String { token }
   
   public let token: String
@@ -93,9 +93,14 @@ public struct NoticeResponse: Codable, Equatable, Identifiable {
 public struct NoticePhoto: Equatable, Codable {
   public let filename: String
   public let url: String
+  
+  public init(filename: String, url: String) {
+    self.filename = filename
+    self.url = url
+  }
 }
 
-public extension NoticeResponse {
+public extension Notice {
   static let mock = Self(
     token: "",
     status: "",

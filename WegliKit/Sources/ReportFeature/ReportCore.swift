@@ -19,7 +19,7 @@ import FileClient
 
 // MARK: - Report Core
 
-public struct Report: Codable, Equatable {
+public struct ReportState: Equatable {
   public var id: String
   public var images: ImagesViewState
   public var contactState: ContactState
@@ -72,10 +72,6 @@ public struct Report: Codable, Equatable {
     self.description = description
     self.location = location
     self.mail = mail
-  }
-  
-  private enum CodingKeys: String, CodingKey {
-    case id, images, contactState, district, date, description, location, mail
   }
 }
 
@@ -383,9 +379,9 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
 }
 
 // MARK: - Helper
-public extension Report {
-  static var preview: Report {
-    Report(
+public extension ReportState {
+  static var preview: ReportState {
+    ReportState(
       uuid: UUID.init,
       images: .init(
         showImagePicker: false,
@@ -458,15 +454,41 @@ public let mapperQueue = DispatchQueue(
 
 
 public extension FileClient {
-  func loadReports() -> Effect<Result<[Report], NSError>, Never> {
-    self.load([Report].self, from: reportsFileName)
+  func loadNotices() -> Effect<Result<[Notice], NSError>, Never> {
+    self.load([Notice].self, from: reportsFileName)
   }
   
-  func saveReports(
-    _ reports: [Report], on queue: AnySchedulerOf<DispatchQueue>
-  ) -> Effect<Never, Never> {
+  func saveNotices(_ reports: [Notice], on queue: AnySchedulerOf<DispatchQueue>) -> Effect<Never, Never> {
     self.save(reports, to: reportsFileName, on: queue)
   }
 }
 
-let reportsFileName = "reports"
+let reportsFileName = "notices"
+
+public extension SharedModels.Notice {
+  init(_ reportState: ReportState) {
+    self.init(
+      token: reportState.id,
+      status: "open",
+      street: reportState.location.resolvedAddress.street,
+      city: reportState.location.resolvedAddress.city,
+      zip: reportState.location.resolvedAddress.postalCode,
+      latitude: reportState.location.pinCoordinate?.latitude ?? 0,
+      longitude: reportState.location.pinCoordinate?.longitude ?? 0,
+      registration: reportState.description.licensePlateNumber,
+      brand: reportState.description.selectedBrand?.title ?? "",
+      color: DescriptionState.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.selectedCharge?.text ?? "",
+      date: reportState.date,
+      duration: Int64(reportState.description.selectedDuration),
+      severity: "",
+      note: "",
+      createdAt: .now,
+      updatedAt: .now,
+      sentAt: .now,
+      photos: reportState.images.storedPhotos
+        .compactMap { $0 }
+        .map { NoticePhoto(filename: $0.id, url: $0.imageUrl?.path ?? "") }
+    )
+  }
+}

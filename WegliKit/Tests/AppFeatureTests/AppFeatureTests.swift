@@ -22,12 +22,12 @@ class AppStoreTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   var userDefaults: UserDefaults!
   
-  var report: Report!
+  var report: ReportState!
   
   override func setUp() {
     super.setUp()
     
-    report = Report(
+    report = ReportState(
       uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
@@ -139,7 +139,7 @@ class AppStoreTests: XCTestCase {
       $0.reportDraft.mail.mailComposeResult = result
     }
     store.receive(.reportSaved) {
-      $0.reportDraft = Report(
+      $0.reportDraft = ReportState(
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(contact: .empty, alert: nil),
@@ -169,7 +169,7 @@ class AppStoreTests: XCTestCase {
     )
     
     store.send(.report(.resetConfirmButtonTapped)) {
-      $0.reportDraft = Report(
+      $0.reportDraft = ReportState(
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(
@@ -184,7 +184,7 @@ class AppStoreTests: XCTestCase {
 }
 
 extension AppState {
-  init(reportDraft: Report) {
+  init(reportDraft: ReportState) {
     self.init()
     self.reportDraft = reportDraft
   }

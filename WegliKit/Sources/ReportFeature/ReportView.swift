@@ -11,10 +11,10 @@ import Styleguide
 import SwiftUI
 
 public struct ReportView: View {
-  private let store: Store<Report, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<Report, ReportAction>
+  private let store: Store<ReportState, ReportAction>
+  @ObservedObject private var viewStore: ViewStore<ReportState, ReportAction>
     
-  public init(store: Store<Report, ReportAction>) {
+  public init(store: Store<ReportState, ReportAction>) {
     self.store = store
     viewStore = ViewStore(store)
   }

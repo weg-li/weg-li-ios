@@ -180,7 +180,7 @@ extension UIDevice {
   }
 }
 
-extension NoticeResponse {
+extension Notice {
   var displayColor: String? {
     DescriptionState.colors.first { color in
       color.key.lowercased() == self.color.lowercased()

@@ -19,12 +19,12 @@ class ReportStoreTests: XCTestCase {
   
   let districs = DistrictFixtures.districts
   
-  var report: Report!
+  var report: ReportState!
   
   override func setUp() {
     super.setUp()
     
-    report = Report(
+    report = ReportState(
       uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
@@ -239,7 +239,7 @@ class ReportStoreTests: XCTestCase {
   func test_submitButtonTap_createsMail_andPresentsMailView() {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -255,9 +255,9 @@ class ReportStoreTests: XCTestCase {
           isMapExpanded: false,
           isResolvingAddress: false,
           resolvedAddress: .init(
-            street: Report.preview.contactState.contact.address.street,
-            postalCode: Report.preview.contactState.contact.address.postalCode,
-            city: Report.preview.contactState.contact.address.city
+            street: ReportState.preview.contactState.contact.address.street,
+            postalCode: ReportState.preview.contactState.contact.address.postalCode,
+            city: ReportState.preview.contactState.contact.address.city
           )
         )
       ),
@@ -286,7 +286,7 @@ class ReportStoreTests: XCTestCase {
   func test_submitButtonTap_createsMail_butShowsError() {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -302,9 +302,9 @@ class ReportStoreTests: XCTestCase {
           isMapExpanded: false,
           isResolvingAddress: false,
           resolvedAddress: .init(
-            street: Report.preview.contactState.contact.address.street,
-            postalCode: Report.preview.contactState.contact.address.postalCode,
-            city: Report.preview.contactState.contact.address.city
+            street: ReportState.preview.contactState.contact.address.street,
+            postalCode: ReportState.preview.contactState.contact.address.postalCode,
+            city: ReportState.preview.contactState.contact.address.city
           )
         )
       ),
@@ -436,7 +436,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -491,7 +491,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -552,7 +552,7 @@ class ReportStoreTests: XCTestCase {
     let testDate = { Date(timeIntervalSinceReferenceDate: 0) }
     
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -596,7 +596,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_resetDataButtonTap_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -633,7 +633,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_setShowContact_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -670,7 +670,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_setShowDescription_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -706,7 +706,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_selectedLicensePlate_shouldSetDescriptionState() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,

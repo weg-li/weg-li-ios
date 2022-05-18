@@ -5,12 +5,12 @@ import SharedModels
 // Interface
 /// A Service to send a single notice and all persisted notices from the weg-li API
 public struct NoticesService {
-  public var getNotices: (String) -> AnyPublisher<[NoticeResponse], NSError>
-  public var submitNotice: (String, Data?) -> AnyPublisher<[NoticeResponse], NSError>
+  public var getNotices: (String) -> AnyPublisher<[Notice], NSError>
+  public var submitNotice: (String, Data?) -> AnyPublisher<[Notice], NSError>
 
   public init(
-    getNotices: @escaping (String) -> AnyPublisher<[NoticeResponse], NSError>,
-    submitNotice: @escaping (String, Data?) -> AnyPublisher<[NoticeResponse], NSError>
+    getNotices: @escaping (String) -> AnyPublisher<[Notice], NSError>,
+    submitNotice: @escaping (String, Data?) -> AnyPublisher<[Notice], NSError>
   ) {
     self.getNotices = getNotices
     self.submitNotice = submitNotice
@@ -52,12 +52,12 @@ public extension NoticesService {
 public extension NoticesService {
   static let noop = Self(
     getNotices: { _ in
-      Just([NoticeResponse.mock])
+      Just([Notice.mock])
         .setFailureType(to: NSError.self)
         .eraseToAnyPublisher()
     },
     submitNotice: { _, _ in
-      Just([NoticeResponse.mock])
+      Just([Notice.mock])
         .setFailureType(to: NSError.self)
         .eraseToAnyPublisher()
     }

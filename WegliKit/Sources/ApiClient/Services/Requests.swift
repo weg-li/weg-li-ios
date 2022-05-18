@@ -3,7 +3,7 @@ import SharedModels
 
 public struct SubmitNoticeRequest: APIRequest {
   public var queryItems: [URLQueryItem] = []
-  public typealias ResponseDataType = [NoticeResponse]
+  public typealias ResponseDataType = [Notice]
   public let endpoint: Endpoint
   public var headers: HTTPHeaders? = .contentTypeApplicationJSON
   public let httpMethod: HTTPMethod
@@ -24,7 +24,7 @@ public struct SubmitNoticeRequest: APIRequest {
 
 public struct GetNoticesRequest: APIRequest {
   public var queryItems: [URLQueryItem] = []
-  public typealias ResponseDataType = [NoticeResponse]
+  public typealias ResponseDataType = [Notice]
   public let endpoint: Endpoint
   public var headers: HTTPHeaders? = .contentTypeApplicationJSON
   public let httpMethod: HTTPMethod

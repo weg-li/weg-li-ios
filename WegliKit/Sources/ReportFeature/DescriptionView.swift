@@ -17,7 +17,7 @@ public struct DescriptionView: View {
     let color: String
     let showEditScreen: Bool
     
-    init(state: Report) {
+    init(state: ReportState) {
       self.description = state.description
       self.brand = state.description.selectedBrand?.title ?? ""
       self.color = DescriptionState.colors[state.description.selectedColor].value
@@ -26,10 +26,10 @@ public struct DescriptionView: View {
     }
   }
   
-  let store: Store<Report, ReportAction>
+  let store: Store<ReportState, ReportAction>
   @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
   
-  public init(store: Store<Report, ReportAction>) {
+  public init(store: Store<ReportState, ReportAction>) {
     self.store = store
     viewStore = ViewStore(store.scope(state: ViewState.init))
   }
@@ -113,7 +113,7 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
       ) {
         DescriptionView(
           store: .init(
-            initialState: Report(
+            initialState: ReportState(
               uuid: UUID.init,
               images: ImagesViewState(),
               contactState: .preview,

@@ -195,6 +195,7 @@ let package = Package(
     .target(
       name: "ReportFeature",
       dependencies: [
+        "ApiClient",
         "ContactFeature",
         "DescriptionFeature",
         "FileClient",

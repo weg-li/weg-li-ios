@@ -26,12 +26,12 @@ public struct AppState: Equatable {
   public var settings: SettingsState
   
   /// Reports a user has sent
-  public var reports: [Report]
+  public var reports: [ReportState]
   
-  public var notices: ContentState<[NoticeResponse]>
+  public var notices: ContentState<[Notice]>
   
   /// Holds a report that has not been stored or sent via mail
-  public var reportDraft: Report = .init(
+  public var reportDraft: ReportState = .init(
     uuid: UUID.init,
     images: .init(),
     contactState: .empty,
@@ -47,8 +47,8 @@ public struct AppState: Equatable {
       contact: .empty,
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    reports: [Report] = [],
-    notices: ContentState<[NoticeResponse]> = .loading([]),
+    reports: [ReportState] = [],
+    notices: ContentState<[Notice]> = .loading([]),
     showReportWizard: Bool = false
   ) {
     self.settings = settings
@@ -64,14 +64,14 @@ public struct AppState: Equatable {
 public enum AppAction: Equatable {
   case appDelegate(AppDelegateAction)
   case contactSettingsLoaded(Result<Contact, NSError>)
-  case storedReportsLoaded(Result<[Report], NSError>)
+  case storedNoticesLoaded(Result<[Notice], NSError>)
   case userSettingsLoaded(Result<UserSettings, NSError>)
   case storedApiTokenLoaded(Result<String?, NSError>)
   case settings(SettingsAction)
   case report(ReportAction)
   case showReportWizard(Bool)
   case fetchNotices
-  case fetchNoticesResponse(Result<[NoticeResponse], NSError>)
+  case fetchNoticesResponse(Result<[Notice], NSError>)
   case reportSaved
   case onAppear
 }
@@ -159,8 +159,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         .concatenate(
           environment.fileClient.loadContactSettings()
             .map(AppAction.contactSettingsLoaded),
-          environment.fileClient.loadReports()
-            .map(AppAction.storedReportsLoaded),
           environment.fileClient.loadUserSettings()
             .map(AppAction.userSettingsLoaded),
           environment.keychainClient.getApiToken()
@@ -170,6 +168,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case .onAppear:
       guard !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty else {
+        state.notices = .error(
+          .init(title: "Fehler", body: "Füge deinen API-Token hinzu.")
+        )
         return .none
       }
       return Effect(value: .fetchNotices)
@@ -180,9 +181,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.settings.contact = .init(contact: contact, alert: nil)
       return .none
       
-    case let .storedReportsLoaded(result):
-      let reports = (try? result.get()) ?? []
-      state.reports = reports
+    case let .storedNoticesLoaded(result):
+      let notices = (try? result.get()) ?? []
+      state.notices = .results(notices)
       return .none
       
     case let .storedApiTokenLoaded(result):
@@ -213,13 +214,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
       return Effect.merge(
         environment.fileClient
-          .saveReports(state.reports, on: environment.backgroundQueue)
+          .saveNotices(state.reports.map(Notice.init), on: environment.backgroundQueue)
           .fireAndForget(),
         Effect(value: AppAction.reportSaved)
       )
       
     case .report(.resetConfirmButtonTapped):
-      state.reportDraft = Report(
+      state.reportDraft = ReportState(
         uuid: environment.uuid,
         images: .init(),
         contactState: state.settings.contact,
@@ -258,15 +259,20 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .fetchNoticesResponse(.success(notices)):
       state.isFetchingNotices = false
       state.notices = .results(notices)
-      return .none
+      return environment.fileClient
+        .saveNotices(notices, on: environment.backgroundQueue)
+        .fireAndForget()
+      
     case let .fetchNoticesResponse(.failure(error)):
       state.isFetchingNotices = false
       state.notices = .error(.init(title: "Fehler", body: error.localizedDescription))
       return .none
+//      return environment.fileClient.loadNotices()
+//        .map(AppAction.storedNoticesLoaded)
       
     case .reportSaved:
       // Reset report draft after it was saved
-      state.reportDraft = Report(
+      state.reportDraft = ReportState(
         uuid: environment.uuid,
         images: .init(),
         contactState: state.settings.contact,
@@ -303,6 +309,10 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     .fireAndForget()
     .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
 }
+.onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, environment in
+  state.reportDraft.apiToken = accountSettings.apiToken
+  return .none
+}
 
 
 // MARK: Helper
@@ -310,7 +320,7 @@ extension AppState {
   static let preview = AppState()
   
   // init for previews
-  init(reports: [Report]) {
+  init(reports: [ReportState]) {
     self.init()
     self.reports = reports
   }
