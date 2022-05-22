@@ -77,8 +77,6 @@ public struct UploadImageRequest: APIRequest {
   }
 }
 
-private let apiTokenKey = "X-API-KEY"
-
 extension String {
   var MD5: String {
     let computed = Insecure.MD5.hash(data: self.data(using: .utf8)!)

@@ -27,7 +27,7 @@ public struct APIClient {
       .eraseToAnyPublisher()
     }
     if let token = tokenStore().getToken() {
-      urlRequest.addValue(token, forHTTPHeaderField: "X-API-KEY")
+      urlRequest.addValue(token, forHTTPHeaderField: apiTokenKey)
     }
     
     return networkDispatcher()
@@ -43,7 +43,7 @@ public struct APIClient {
       throw NetworkRequestError.badRequest
     }
     if let token = tokenStore().getToken() {
-      urlRequest.addValue(token, forHTTPHeaderField: "X-API-KEY")
+      urlRequest.addValue(token, forHTTPHeaderField: apiTokenKey)
     }
     
     return try await networkDispatcher().dispatch(request: urlRequest)
@@ -54,3 +54,5 @@ public extension APIClient {
   static let live = Self(networkDispatcher: { .live }, tokenStore: { .live() })
   static let noop = Self(networkDispatcher: { .noop }, tokenStore: { .noop })
 }
+
+private let apiTokenKey = "X-API-KEY"
