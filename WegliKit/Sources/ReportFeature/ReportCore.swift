@@ -1,9 +1,11 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import ComposableArchitecture
 import ComposableCoreLocation
 import ContactFeature
 import DescriptionFeature
+import FileClient
 import Helper
 import L10n
 import LocationFeature
@@ -15,7 +17,6 @@ import PlacesServiceClient
 import RegulatoryOfficeMapper
 import SharedModels
 import SwiftUI
-import FileClient
 
 // MARK: - Report Core
 
@@ -35,6 +36,10 @@ public struct ReportState: Equatable {
   public var showEditDescription = false
   public var showEditContact = false
   
+  public var apiToken: String?
+  
+  public var uploadedImagesIds: [String] = []
+  
   public var isPhotosValid: Bool { !images.storedPhotos.isEmpty }
   public var isContactValid: Bool { contactState.isValid }
   public var isDescriptionValid: Bool { description.isValid }
@@ -45,6 +50,7 @@ public struct ReportState: Equatable {
       && description == .init()
   }
   public var isInternetConnectionAvailable = true
+  public var isUploadingNotice = false
   
   public func isModified() -> Bool {
     district != nil
@@ -52,6 +58,13 @@ public struct ReportState: Equatable {
     || contactState.isValid
     || location != .init()
     || description != .init()
+  }
+  
+  public var isReportValid: Bool {
+    images.isValid
+    && contactState.isValid
+    && description.isValid
+    && location.resolvedAddress.isValid
   }
   
   public init(
@@ -92,6 +105,10 @@ public enum ReportAction: Equatable {
   case setDate(Date)
   case observeConnection
   case observeConnectionResponse(NetworkPath)
+  case uploadImages
+  case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
+  case composeNoticeAndSend
+  case composeNoticeResponse(Result<Notice, NSError>)
 }
 
 public struct ReportEnvironment {
@@ -103,8 +120,10 @@ public struct ReportEnvironment {
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
     fileClient: FileClient,
+    noticesService: NoticesService,
     date: @escaping () -> Date,
-    pathMonitorClient: PathMonitorClient = .live(queue: .main)
+    pathMonitorClient: PathMonitorClient = .live(queue: .main),
+    imagesUploadClient: ImagesUploadClient = .live()
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
@@ -113,8 +132,11 @@ public struct ReportEnvironment {
     self.placeService = placeService
     self.regulatoryOfficeMapper = regulatoryOfficeMapper
     self.fileClient = fileClient
-    self.date = date
     self.pathMonitorClient = pathMonitorClient
+    self.imagesUploadClient = imagesUploadClient
+    self.noticesService = noticesService
+    
+    self.date = date
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
@@ -125,6 +147,8 @@ public struct ReportEnvironment {
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
   public let fileClient: FileClient
   public let pathMonitorClient: PathMonitorClient
+  public let imagesUploadClient: ImagesUploadClient
+  public let noticesService: NoticesService
   public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
@@ -136,7 +160,7 @@ public struct ReportEnvironment {
 struct ObserveConnectionIdentifier: Hashable {}
 
 /// Combined reducer that is used in the ReportView and combing descending reducers.
-public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
+public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>.combine(
   imagesReducer.pullback(
     state: \.images,
     action: /ReportAction.images,
@@ -217,7 +241,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       switch imageViewAction {
         // After the images coordinate was set trigger resolve location and map to district.
       case let .setImageCoordinate(coordinate):
-        guard let coordinate = coordinate else {
+        guard let coordinate = coordinate, !state.images.storedPhotos.isEmpty else {
           state.alert = .noPhotoCoordinate
           return .none
         }
@@ -366,6 +390,61 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     case let .observeConnectionResponse(networkPath):
       state.isInternetConnectionAvailable = networkPath.status == .satisfied
       return .none
+      
+    case .uploadImages:
+      let imageUploadRequests = state.images.imageStates.map {
+        UploadImageRequest(pickerResult: $0.image)
+      }
+      
+      state.isUploadingNotice = true
+      
+      return environment.imagesUploadClient.uploadImages(imageUploadRequests)
+        .receive(on: environment.mainQueue)
+        .map(ReportAction.uploadImagesResponse)
+        .eraseToEffect()
+      
+    case let .uploadImagesResponse(.success(imageInputFromUpload)):
+      state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
+      
+      return Effect(value: .composeNoticeAndSend)
+      
+    case let .uploadImagesResponse(.failure(error)):
+      state.isUploadingNotice = false
+      debugPrint(error)
+      return .none
+      
+    case .composeNoticeAndSend:
+      var notice = NoticeInput(state)
+      notice.photos = state.uploadedImagesIds
+      
+      let postBody = try? JSONEncoder.noticeEncoder.encode(notice)
+      
+      state.isUploadingNotice = true
+      
+      return environment.noticesService.postNotice(postBody)
+        .receive(on: environment.mainQueue)
+        .map(ReportAction.composeNoticeResponse)
+        .eraseToEffect()
+      
+    case let .composeNoticeResponse(.success(response)):
+      state.isUploadingNotice = false
+      state.alert = .init(
+        title: .init("Anzeige gesendet"),
+        buttons: [.default(.init(verbatim: "Ok"))]
+      )
+      return .none
+    case let .composeNoticeResponse(.failure(error)):
+      debugPrint("🐛", error)
+      state.isUploadingNotice = false
+      state.alert = .init(
+        title: .init("Fehler"),
+        message: .init("Anzeige konnte nicht gesendet werden. Fehler: \(error.localizedDescription)"),
+        buttons: [
+          .default(.init(verbatim: "Erneut sendern"), action: .send(.composeNoticeAndSend)),
+          .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
+        ]
+      )
+      return .none
     }
   }
 )
@@ -454,16 +533,49 @@ public let mapperQueue = DispatchQueue(
 
 
 public extension FileClient {
-  func loadNotices() -> Effect<Result<[Notice], NSError>, Never> {
-    self.load([Notice].self, from: reportsFileName)
+  func loadNotices(decoder: JSONDecoder = .noticeDecoder) -> Effect<Result<[Notice], NSError>, Never> {
+    self.load([Notice].self, from: reportsFileName, with: decoder)
   }
   
-  func saveNotices(_ reports: [Notice], on queue: AnySchedulerOf<DispatchQueue>) -> Effect<Never, Never> {
-    self.save(reports, to: reportsFileName, on: queue)
+  func saveNotices(
+    _ notices: [Notice]?,
+    on queue: AnySchedulerOf<DispatchQueue>,
+    encoder: JSONEncoder = .noticeEncoder
+  ) -> Effect<Never, Never> {
+    guard let notices = notices else {
+      return .none
+    }
+    return self.save(notices, to: reportsFileName, on: queue, with: encoder)
   }
 }
 
 let reportsFileName = "notices"
+
+public extension SharedModels.NoticeInput {
+  init(_ reportState: ReportState) {
+    self.init(
+      token: reportState.id,
+      status: "open",
+      street: reportState.location.resolvedAddress.street,
+      city: reportState.location.resolvedAddress.city,
+      zip: reportState.location.resolvedAddress.postalCode,
+      latitude: reportState.location.pinCoordinate?.latitude ?? 0,
+      longitude: reportState.location.pinCoordinate?.longitude ?? 0,
+      registration: reportState.description.licensePlateNumber,
+      brand: reportState.description.selectedBrand?.title ?? "",
+      color: DescriptionState.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.selectedCharge?.text ?? "",
+      date: reportState.date,
+      duration: Int64(reportState.description.selectedDuration),
+      severity: nil,
+      note: "",
+      createdAt: .now,
+      updatedAt: .now,
+      sentAt: .now,
+      photos: []
+    )
+  }
+}
 
 public extension SharedModels.Notice {
   init(_ reportState: ReportState) {
@@ -481,14 +593,14 @@ public extension SharedModels.Notice {
       charge: reportState.description.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
-      severity: "",
+      severity: nil,
       note: "",
       createdAt: .now,
       updatedAt: .now,
       sentAt: .now,
-      photos: reportState.images.storedPhotos
-        .compactMap { $0 }
-        .map { NoticePhoto(filename: $0.id, url: $0.imageUrl?.path ?? "") }
+      photos: []
     )
   }
+  
+  static let placeholder = Self.init(.preview)
 }
