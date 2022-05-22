@@ -82,8 +82,54 @@ public struct ReportView: View {
         ) { ContactWidget(store: store.scope(state: { $0 })) }
         
         // Mail
-        MailContentView(store: store)
-          .padding()
+        VStack {
+          if viewStore.apiToken != nil {
+            Button(
+              action: { viewStore.send(.uploadImages) },
+              label: {
+                HStack {
+                  if viewStore.isUploadingNotice {
+                    ActivityIndicator(style: .medium, color: .white)
+                      .foregroundColor(.white)
+                  } else {
+                    Text("Anzeige senden")
+                  }
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+              }
+            )
+            .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
+            .padding()
+          } else {
+            MailContentView(store: store)
+              .padding()
+          }
+          
+          if !viewStore.state.isReportValid {
+            VStack(spacing: .grid(2)) {
+              Text(L10n.Mail.readyToSubmitErrorCopy)
+                .fontWeight(.semibold)
+              VStack(spacing: .grid(1)) {
+                if !viewStore.state.images.isValid {
+                  Text(L10n.Report.Error.images.asBulletPoint)
+                }
+                if !viewStore.state.location.resolvedAddress.isValid {
+                  Text(L10n.Report.Error.location.asBulletPoint)
+                }
+                if !viewStore.state.description.isValid {
+                  Text(L10n.Report.Error.description.asBulletPoint)
+                }
+                if !viewStore.state.contactState.isValid {
+                  Text(L10n.Report.Error.contact.asBulletPoint)
+                }
+              }
+            }
+            .accessibilityElement(children: .combine)
+            .foregroundColor(.red)
+            .font(.callout)
+            .multilineTextAlignment(.center)
+          }
+        }
       }
     }
     .onAppear { viewStore.send(.onAppear) }
@@ -122,5 +168,11 @@ struct ReportForm_Previews: PreviewProvider {
         )
       )
     }
+  }
+}
+
+private extension String {
+  var asBulletPoint: Self {
+    "\u{2022} \(self)"
   }
 }
