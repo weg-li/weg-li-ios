@@ -58,6 +58,8 @@ let package = Package(
     .target(
       name: "ApiClient",
       dependencies:[
+        "Helper",
+        "KeychainClient",
         "SharedModels",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ]
