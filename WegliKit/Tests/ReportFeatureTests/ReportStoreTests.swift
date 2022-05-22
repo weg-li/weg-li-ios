@@ -49,6 +49,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -81,6 +82,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -113,6 +115,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -139,6 +142,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -191,6 +195,7 @@ class ReportStoreTests: XCTestCase {
         ),
         regulatoryOfficeMapper: .live(),
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -269,6 +274,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -316,6 +322,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -338,6 +345,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -375,6 +383,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -414,6 +423,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -466,6 +476,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -521,6 +532,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -582,6 +594,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        noticesService: .noop,
         date: testDate
       )
     )
@@ -621,6 +634,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -658,6 +672,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -695,6 +710,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )
@@ -731,6 +747,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        noticesService: .noop,
         date: Date.init
       )
     )

@@ -134,7 +134,7 @@ class AppStoreTests: XCTestCase {
       report.images.storedPhotos.removeAll()
       report.mail.mailComposeResult = result
       
-      $0.reports = [report]
+//      $0.reports = [report]
       $0.reportDraft = report
       $0.reportDraft.mail.mailComposeResult = result
     }
