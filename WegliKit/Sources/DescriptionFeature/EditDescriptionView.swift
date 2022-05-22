@@ -35,7 +35,7 @@ public struct EditDescriptionView: View {
         Section(header: Text(L10n.Description.Section.Violation.copy)) {
           chargeTypeView
 
-          chargeLengthView
+          chargeDurationView
 
           blockedOthersView
         }
@@ -171,7 +171,7 @@ public struct EditDescriptionView: View {
     )
   }
   
-  var chargeLengthView: some View {
+  var chargeDurationView: some View {
     Picker(
       L10n.Description.Row.length,
       selection: viewStore.binding(
