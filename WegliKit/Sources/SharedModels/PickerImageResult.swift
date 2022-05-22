@@ -3,7 +3,7 @@
 import Foundation
 import UIKit
 
-public struct PickerImageResult: Equatable, Identifiable, Codable {
+public struct PickerImageResult: Hashable, Identifiable, Codable {
   public let id: String
   public let data: Data?
   public var imageUrl: URL?
@@ -22,6 +22,12 @@ public struct PickerImageResult: Equatable, Identifiable, Codable {
     self.imageUrl = imageUrl
     self.coordinate = coordinate
     self.creationDate = creationDate
+  }
+  
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+    hasher.combine(imageUrl)
+    hasher.combine(creationDate)
   }
   
   public var asUIImage: UIImage? {
