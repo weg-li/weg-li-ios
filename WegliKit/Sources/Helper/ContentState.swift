@@ -3,7 +3,7 @@ import UIKit
 
 /// Wrapper type to represent the state of a loadable object. Typically from a network request
 public enum ContentState<T: Equatable>: Equatable {
-  case loading(T)
+  case loading
   case results(T)
   case empty(EmptyState)
   case error(ErrorState)

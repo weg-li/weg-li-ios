@@ -33,6 +33,17 @@ public extension DateIntervalFormatter {
   }()
 }
 
+public extension ISO8601DateFormatter {
+  static let internetDateTimeWithFractionalSeconds: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [
+      .withInternetDateTime,
+      .withFractionalSeconds
+    ]
+    return formatter
+  }()
+}
+
 public extension Date {
   var humandReadableDate: String {
     DateFormatter.dateFormatterWithoutTimeMediumStyle.string(from: self)
