@@ -127,7 +127,7 @@ public struct LocationView: View {
   @ViewBuilder var addressView: some View {
     HStack(spacing: .grid(2)) {
       if viewStore.showActivityIndicator {
-        ActivityIndicator(style: .medium)
+        ActivityIndicator(style: .medium, color: .gray)
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
         EmptyView()
       } else {
