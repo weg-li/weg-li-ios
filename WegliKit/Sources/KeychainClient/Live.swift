@@ -20,7 +20,8 @@ public extension KeychainClient {
       },
       clear: {
         Effect(Just(keychain.clear()))
-      }
+      },
+      getToken: { keychain.get(tokenKey) }
     )
   }
 }

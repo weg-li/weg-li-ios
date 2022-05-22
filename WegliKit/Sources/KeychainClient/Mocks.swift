@@ -6,6 +6,7 @@ public extension KeychainClient {
     getString: { _ in return .none },
     setString: { _, _, _ in return .none },
     delete: { _ in return .none },
-    clear: { return .none }
+    clear: { return .none },
+    getToken: { nil }
   )
 }
