@@ -12,13 +12,6 @@ public struct Endpoint {
 }
 
 public extension Endpoint {
-  static let notices = Self(
-    baseUrl: Endpoints.wegliAPIEndpoint,
-    path: "/api/notices"
-  )
-  
-  static let submitNotice = Self(
-    baseUrl: Endpoints.wegliAPIEndpoint,
-    path: "/api/notices/mail"
-  )
+  static let notices = Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/notices")
+  static let uploads = Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/uploads")
 }

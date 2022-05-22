@@ -12,18 +12,33 @@ public struct NetworkDispatcher {
   /// - Parameter request: URLRequest
   /// - Returns: A publisher with the provided decoded data or an error
   func dispatch(request: URLRequest) -> AnyPublisher<Data, NetworkRequestError> {
-    return urlSession()
-      .dataTaskPublisher(for: request)
+    return urlSession().dataTaskPublisher(for: request)
       .tryMap({ data, response in
         // If the response is invalid, throw an error
         if let response = response as? HTTPURLResponse,
            !(200...299).contains(response.statusCode) {
           throw httpError(response.statusCode)
         }
+        #if DEBUG
+        print("Response data: ", String(data: data, encoding: .utf8)!)
+        #endif
         return data
       })
-      .mapError { error in handleError(error) }
+      .mapError(handleError)
+      .print("API")
       .eraseToAnyPublisher()
+  }
+  
+  /// Dispatches an URLRequest and returns a publisher
+  /// - Parameter request: URLRequest
+  /// - Returns: A publisher with the provided decoded data or an error
+  func dispatch(request: URLRequest) async throws -> Data {
+    let (data, response) = try await urlSession().data(for: request)
+    if let response = response as? HTTPURLResponse,
+       !(200...299).contains(response.statusCode) {
+      throw httpError(response.statusCode)
+    }
+    return data
   }
 }
 

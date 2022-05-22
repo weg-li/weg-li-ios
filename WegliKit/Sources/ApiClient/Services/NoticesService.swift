@@ -1,49 +1,49 @@
 import Combine
+import ComposableArchitecture
 import Foundation
+import Helper
 import SharedModels
 
 // Interface
 /// A Service to send a single notice and all persisted notices from the weg-li API
 public struct NoticesService {
-  public var getNotices: (String) -> AnyPublisher<[Notice], NSError>
-  public var submitNotice: (String, Data?) -> AnyPublisher<[Notice], NSError>
+  public var getNotices: () -> Effect<[Notice], NSError>
+  public var postNotice: (Data?) -> Effect<Result<Notice, NSError>, Never>
 
   public init(
-    getNotices: @escaping (String) -> AnyPublisher<[Notice], NSError>,
-    submitNotice: @escaping (String, Data?) -> AnyPublisher<[Notice], NSError>
+    getNotices: @escaping () -> Effect<[Notice], NSError>,
+    postNotice: @escaping (Data?) -> Effect<Result<Notice, NSError>, Never>
   ) {
     self.getNotices = getNotices
-    self.submitNotice = submitNotice
+    self.postNotice = postNotice
   }
 }
 
 public extension NoticesService {
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
-      getNotices: { apiToken in
-        let request = GetNoticesRequest(apiToken: apiToken)
+      getNotices: {
+        let request = GetNoticesRequest()
         
         return apiClient.dispatch(request)
           .decode(
             type: GetNoticesRequest.ResponseDataType.self,
-            decoder: decoder
+            decoder: JSONDecoder.noticeDecoder
           )
           .mapError { $0 as NSError }
-          .eraseToAnyPublisher()
+          .eraseToEffect()
       },
-      submitNotice: { apiToken, data in
-        let request = SubmitNoticeRequest(
-          apiToken: apiToken,
-          body: data
-        )
+      postNotice: { data in
+        let request = SubmitNoticeRequest(body: data)
         
         return apiClient.dispatch(request)
           .decode(
             type: SubmitNoticeRequest.ResponseDataType.self,
-            decoder: decoder
+            decoder: JSONDecoder.noticeDecoder
           )
           .mapError { $0 as NSError }
-          .eraseToAnyPublisher()
+          .catchToEffect()
+          .eraseToEffect()
       }
     )
   }
@@ -51,56 +51,28 @@ public extension NoticesService {
 
 public extension NoticesService {
   static let noop = Self(
-    getNotices: { _ in
+    getNotices: {
       Just([Notice.mock])
         .setFailureType(to: NSError.self)
-        .eraseToAnyPublisher()
+        .eraseToEffect()
     },
-    submitNotice: { _, _ in
-      Just([Notice.mock])
+    postNotice: { _ in
+      Just(.mock)
         .setFailureType(to: NSError.self)
-        .eraseToAnyPublisher()
+        .catchToEffect()
+        .eraseToEffect()
     }
   )
   
   static let failing = Self(
-    getNotices: { _ in
+    getNotices: {
       Fail(error: NSError(domain: "", code: 1))
-        .eraseToAnyPublisher()
+        .eraseToEffect()
     },
-    submitNotice: { _, _ in
+    postNotice: { _ in
       Fail(error: NSError(domain: "", code: 1))
-        .eraseToAnyPublisher()
+        .catchToEffect()
+        .eraseToEffect()
     }
   )
 }
-
-public extension ISO8601DateFormatter {
-  static let internetDateTimeWithFractionalSeconds: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [
-      .withInternetDateTime,
-      .withFractionalSeconds
-    ]
-    return formatter
-  }()
-}
-
-public extension JSONDecoder.DateDecodingStrategy {
-  static let iso8601withFractionalSeconds = custom { decoder in
-    let container = try decoder.singleValueContainer()
-    let dateString = try container.decode(String.self)
-    
-    guard let date = ISO8601DateFormatter.internetDateTimeWithFractionalSeconds.date(from: dateString)  else {
-      throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date: \(dateString)")
-    }
-    return date
-  }
-}
-
-private let decoder: JSONDecoder = {
-  let decoder = JSONDecoder()
-  decoder.keyDecodingStrategy = .convertFromSnakeCase
-  decoder.dateDecodingStrategy = .iso8601withFractionalSeconds
-  return decoder
-}()
