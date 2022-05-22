@@ -73,6 +73,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
       }
       DispatchQueue.main.async { [weak self] in
         self?.parent.isPresented = false
+        self?.parent.pickerResult.removeAll()
       }
     }
   }

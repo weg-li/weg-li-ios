@@ -2,6 +2,7 @@
 
 import ComposableArchitecture
 import CoreLocation
+import OrderedCollections
 import Foundation
 import Helper
 import L10n
@@ -44,8 +45,9 @@ public struct ImagesViewState: Equatable, Codable {
   }
   
   public var imageStates: IdentifiedArrayOf<ImageState> {
-    IdentifiedArray(
-      uniqueElements: storedPhotos
+    let imagesSet = OrderedSet(storedPhotos)
+    return IdentifiedArray(
+      uniqueElements: imagesSet.elements
         .compactMap { $0 }
         .map { ImageState(id: $0.id, image: $0) }
     )
@@ -132,7 +134,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     }
     
   case let .setPhotos(photos):
-    state.storedPhotos = photos
+    state.storedPhotos.append(contentsOf: photos)
   
     guard !photos.isEmpty else {
       state.licensePlates.removeAll()
@@ -144,12 +146,11 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     state.isRecognizingTexts = true
     
     return .merge(
-      Effect(value: .setImageCoordinate(images.first?.coordinate?.asCLLocationCoordinate2D)),
-      Effect(value: .setImageCreationDate(images.first?.creationDate)),
+      Effect(value: .setImageCoordinate(images.imageCoordinates.first)),
+      Effect(value: .setImageCreationDate(images.imageCreationDates.first)),
       .merge(
         images.map { image in
-          env.textRecognitionClient
-            .recognizeText(in: image, on: env.backgroundQueue)
+          env.textRecognitionClient.recognizeText(in: image, on: env.backgroundQueue)
             .receive(on: env.mainQueue)
             .catchToEffect()
             .delay(for: 0.2, scheduler: env.mainQueue)
@@ -224,7 +225,21 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
 
     state.licensePlates.removeAll(where: { $0.id == id })
     
-    return .none
+    var effects: [Effect<ImagesViewAction, Never>] = []
+    
+    let imageCoordinates = state.storedPhotos.compactMap({ $0 }).imageCoordinates
+    if !imageCoordinates.isEmpty, let firstCoordinate = imageCoordinates.first {
+      effects.append(
+        Effect(value: .setImageCoordinate(firstCoordinate))
+      )
+    }
+    let imageCreationDates = state.storedPhotos.compactMap({ $0 }).imageCreationDates
+    if !imageCreationDates.isEmpty, let firstDate = imageCreationDates.first {
+      effects.append(
+        Effect(value: .setImageCreationDate(firstDate))
+      )
+    }
+    return .merge(effects)
     
   case let .image(id, .recognizeText):
     let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
@@ -274,5 +289,15 @@ extension String {
     let components = components(separatedBy: characterSet)
       .filter { !$0.isEmpty }
     return components.joined(separator: separator)
+  }
+}
+
+extension Array where Element == PickerImageResult {
+  var imageCoordinates: [CLLocationCoordinate2D] {
+    self.compactMap { $0.coordinate?.asCLLocationCoordinate2D }
+  }
+  
+  var imageCreationDates: [Date] {
+    self.compactMap { $0.creationDate }
   }
 }

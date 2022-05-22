@@ -4,13 +4,17 @@ import ComposableArchitecture
 import Foundation
 import SharedModels
 
-public struct ImageState: Equatable, Identifiable {
+public struct ImageState: Hashable, Identifiable {
   public init(id: String = UUID().uuidString, image: PickerImageResult) {
     self.id = id
     self.image = image
   }
   public let id: String
   public let image: PickerImageResult
+  
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
 }
 
 public enum ImageAction: Equatable {

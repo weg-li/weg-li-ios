@@ -35,7 +35,7 @@ public struct ImagesView: View {
             .foregroundColor(Color(.label))
             .padding(.bottom, .grid(1))
           if viewStore.isRecognizingTexts {
-            ActivityIndicator(style: .medium)
+            ActivityIndicator(style: .medium, color: .gray)
           }
         }
         if viewStore.state.licensePlates.isEmpty {

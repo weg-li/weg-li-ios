@@ -66,12 +66,12 @@ public struct ImageView: View {
               .padding()
             }
           } else {
-            ActivityIndicator(style: .medium)
+            ActivityIndicator(style: .medium, color: .gray)
           }
         }
       
     } else {
-      ActivityIndicator(style: .medium)
+      ActivityIndicator(style: .medium, color: .gray)
     }
   }
 }
