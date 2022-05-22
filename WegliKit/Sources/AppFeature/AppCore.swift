@@ -25,9 +25,6 @@ public struct AppState: Equatable {
   /// Settings
   public var settings: SettingsState
   
-  /// Reports a user has sent
-  public var reports: [ReportState]
-  
   public var notices: ContentState<[Notice]>
   
   /// Holds a report that has not been stored or sent via mail
@@ -47,12 +44,10 @@ public struct AppState: Equatable {
       contact: .empty,
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    reports: [ReportState] = [],
-    notices: ContentState<[Notice]> = .loading([]),
+    notices: ContentState<[Notice]> = .loading,
     showReportWizard: Bool = false
   ) {
     self.settings = settings
-    self.reports = reports
     self.notices = notices
     self.showReportWizard = showReportWizard
   }
@@ -135,6 +130,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           placeService: .live,
           regulatoryOfficeMapper: .live(),
           fileClient: $0.fileClient,
+          noticesService: $0.noticesService,
           date: $0.date
         )
       }
@@ -168,10 +164,8 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case .onAppear:
       guard !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty else {
-        state.notices = .error(
-          .init(title: "Fehler", body: "Füge deinen API-Token hinzu.")
-        )
-        return .none
+        return environment.fileClient.loadNotices()
+          .map(AppAction.storedNoticesLoaded)
       }
       return Effect(value: .fetchNotices)
     
@@ -208,16 +202,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         }
       }
       state.reportDraft.images.storedPhotos.removeAll()
-      state.reports.append(state.reportDraft)
-
       state.showReportWizard = false
       
-      return Effect.merge(
-        environment.fileClient
-          .saveNotices(state.reports.map(Notice.init), on: environment.backgroundQueue)
-          .fireAndForget(),
-        Effect(value: AppAction.reportSaved)
-      )
+      return Effect(value: AppAction.reportSaved)
       
     case .report(.resetConfirmButtonTapped):
       state.reportDraft = ReportState(
@@ -249,9 +236,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case .fetchNotices:
       let apiToken = state.settings.accountSettingsState.accountSettings.apiToken
       
-      state.notices = .loading([])
+      state.notices = .loading
       
-      return environment.noticesService.getNotices(apiToken)
+      return environment.noticesService.getNotices()
         .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(AppAction.fetchNoticesResponse)
@@ -261,14 +248,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.notices = .results(notices)
       return environment.fileClient
         .saveNotices(notices, on: environment.backgroundQueue)
+        .receive(on: environment.mainQueue)
         .fireAndForget()
       
     case let .fetchNoticesResponse(.failure(error)):
       state.isFetchingNotices = false
       state.notices = .error(.init(title: "Fehler", body: error.localizedDescription))
       return .none
-//      return environment.fileClient.loadNotices()
-//        .map(AppAction.storedNoticesLoaded)
       
     case .reportSaved:
       // Reset report draft after it was saved
@@ -318,10 +304,23 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 // MARK: Helper
 extension AppState {
   static let preview = AppState()
-  
-  // init for previews
-  init(reports: [ReportState]) {
-    self.init()
-    self.reports = reports
-  }
+}
+
+public extension Array where Element == Notice {
+  static let placeholder: [Element] = Array(repeating: Notice(ReportState.preview), count: 6)
+}
+
+extension Store where State == AppState, Action == AppAction {
+  static let placeholder = Store(
+    initialState: .init(
+      settings: .init(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init()),
+      notices: .results(.placeholder),
+      showReportWizard: false
+    ),
+    reducer: .empty,
+    environment: ()
+  )
 }
