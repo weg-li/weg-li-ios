@@ -31,6 +31,7 @@ public struct SettingsView: View {
           label: {
             HStack {
               Label("Account", systemImage: "person.circle")
+                .labelStyle(.titleOnly)
               Spacer()
             }
           }
@@ -145,7 +146,7 @@ public struct SettingsView: View {
       }
       
       HStack {
-        Text("Projekt anzeigen")
+        Text("Projekt auf GitHub anzeigen")
         Spacer()
         Image(systemName: "arrow.up.right")
       }

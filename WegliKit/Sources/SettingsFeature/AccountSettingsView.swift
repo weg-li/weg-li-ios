@@ -74,7 +74,7 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
     case .fetchNotices:
       state.isNetworkRequestInProgress = true
       
-      return environment.noticesService.getNotices(state.accountSettings.apiToken)
+      return environment.noticesService.getNotices()
         .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(AccountSettingsAction.fetchNoticesResponse)
@@ -107,77 +107,115 @@ public struct AccountSettingsView: View {
     self.viewStore = ViewStore(store)
   }
   
-  let description: AttributedString? = try? AttributedString(markdown: "Hier kannst du deinen API-Token hinzufügen um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über [weg.li](https://www.weg.li) zu versenden.")
+  let description: AttributedString? = try? AttributedString(markdown: "Füge Deinen API-Token hinzu um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über [weg.li](https://www.weg.li) zu versenden. Du findest den API-Token in deinem Profil")
   
   public var body: some View {
-    Form {
-      Section(header: Text("API-Token")) {
+    UITextField.appearance().clearButtonMode = .whileEditing
+    return Form {
+      Section(header: Label("API-Token", systemImage: "bolt.fill")) {
         VStack(alignment: .leading) {
-          Text(description!)
-            .multilineTextAlignment(.leading)
-            .foregroundColor(Color(.label))
-            .font(.body)
-            .padding(.bottom, .grid(1))
-          
-          Button(
-            action: { viewStore.send(.openUserSettings) },
-            label: {
-              Label("Account öffnen", systemImage: "arrow.up.right")
-            }
-          )
-          .buttonStyle(.bordered)
-          .accessibilityAddTraits([.isLink])
-          .padding(.bottom, .grid(4))
+          VStack(alignment: .leading) {
+            Text(description!)
+              .multilineTextAlignment(.leading)
+              .foregroundColor(Color(.secondaryLabel))
+              .font(.subheadline)
+              .padding(.vertical, .grid(1))
+          }
+          .padding(.vertical, .grid(2))
            
-          VStack(alignment: .leading, spacing: .grid(2)) {
+          VStack(alignment: .leading, spacing: .grid(3)) {
             TextField(
-              "API-Token",
+              "",
               text: viewStore.binding(
                 get: \.accountSettings.apiToken,
                 send: AccountSettingsAction.setApiKey
               )
             )
-            .multilineTextAlignment(.leading)
+            .placeholder(when: viewStore.state.accountSettings.apiToken.isEmpty, placeholder: {
+              Text("API-Token")
+                .italic()
+                .foregroundColor(Color(.lightGray))
+            })
+            .lineLimit(1)
+            .font(.body.monospaced())
             .keyboardType(.default)
+            .foregroundColor(.white)
+            .padding(.grid(3))
+            .background(Color.gitHubBannerBackground)
+            .accentColor(Color.green)
+            .clipShape(RoundedRectangle(
+              cornerRadius: .grid(2), style: .circular)
+            )
+            .overlay(
+              RoundedRectangle(cornerRadius: .grid(2))
+                .stroke(Color(.label), lineWidth: 2)
+            )
             .disableAutocorrection(true)
             .submitLabel(.done)
-            .textFieldStyle(.roundedBorder)
+            .padding(.bottom, .grid(5))
 
+            Button(
+              action: { viewStore.send(.openUserSettings) },
+              label: {
+                Label("Profil öffnen", systemImage: "arrow.up.right")
+                  .frame(maxWidth: .infinity, minHeight: 44)
+              }
+            )
+            .buttonStyle(.bordered)
+            .accessibilityAddTraits([.isLink])
+            .padding(.bottom, .grid(2))
+            
             HStack {
               Button(
                 action: { viewStore.send(.fetchNotices) },
                 label: {
                   HStack {
                     if viewStore.isNetworkRequestInProgress {
-                      ActivityIndicator(style: .medium)
+                      ActivityIndicator(style: .medium, color: .gray)
                     } else {
                       Text("API-Token testen")
                     }
                   }
+                  .frame(maxWidth: .infinity, minHeight: 44)
                 }
               )
               .disabled(viewStore.accountSettings.apiToken.isEmpty)
               .buttonStyle(.bordered)
-
+            }
+            
+            HStack(alignment: .center) {
+              Text("Ruft `weg.li\\api\\notices` vom Server ab")
+                .multilineTextAlignment(.leading)
+                .foregroundColor(Color(.secondaryLabel))
+                .font(.footnote)
+              
               if let result = viewStore.apiTestRequestResult {
                 Image(systemName: result ? "checkmark.circle" : "x.circle")
                   .font(.body)
                   .foregroundColor(result ? .green : .red)
               }
             }
-            .padding(.bottom, .grid(2))
-            
-            Text("Ruft `weg.li\\api\\notices` vom Server ab")
-              .multilineTextAlignment(.leading)
-              .foregroundColor(Color(.secondaryLabel))
-              .font(.footnote)
+            .padding(.vertical, .grid(2))
           }
         }
       }
       .headerProminence(.increased)
     }
-    .navigationBarTitleDisplayMode(.inline)
+    .navigationBarTitle("Account", displayMode: .inline)
   }
+}
+
+private extension View {
+  func placeholder<Content: View>(
+    when shouldShow: Bool,
+    alignment: Alignment = .leading,
+    @ViewBuilder placeholder: () -> Content) -> some View {
+      
+      ZStack(alignment: alignment) {
+        placeholder().opacity(shouldShow ? 1 : 0)
+        self
+      }
+    }
 }
 
 // MARK: Preview
