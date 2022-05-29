@@ -161,7 +161,6 @@ class ReportStoreTests: XCTestCase {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
   
-    let image = UIImage(systemName: "pencil")!
     let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
     let expectedAddress = Address(
       street: Contact.preview.address.street,
@@ -202,13 +201,19 @@ class ReportStoreTests: XCTestCase {
     
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     
-    var storedImage = PickerImageResult(uiImage: image)
-    storedImage?.coordinate = .init(coordinate)
-    storedImage?.creationDate = creationDate
-    
+    let storedImage = PickerImageResult(
+      id: "1",
+      data: nil,
+      imageUrl: nil,
+      coordinate: .init(coordinate),
+      creationDate: creationDate
+    )
+
     store.send(.images(.setPhotos([storedImage]))) {
       $0.images.isRecognizingTexts = true
-      $0.images.storedPhotos = [storedImage!]
+      var images = self.report.images.storedPhotos
+      images.append(storedImage)
+      $0.images.storedPhotos = images
     }
     store.receive(.images(.setImageCoordinate(coordinate))) {
       $0.images.pickerResultCoordinate = coordinate

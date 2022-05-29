@@ -101,6 +101,8 @@ class ImagesStoreTests: XCTestCase {
         heartImage
       ]
     }
+    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D))
+    store.receive(.setImageCreationDate(creationDate))
   }
   
   func test_removePhoto_shouldUpdateState() {

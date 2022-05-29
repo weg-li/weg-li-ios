@@ -41,7 +41,7 @@ public struct PickerImageResult: Hashable, Identifiable, Codable {
 
 public extension PickerImageResult {
   init?(id: String = UUID().uuidString, uiImage: UIImage, imageUrl: URL? = nil) {
-    guard let data = uiImage.pngData() else {
+    guard let data = uiImage.jpegData(compressionQuality: 1) else {
       return nil
     }
     self.data = data
