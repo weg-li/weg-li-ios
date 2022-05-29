@@ -37,8 +37,8 @@ public struct ImagePicker: UIViewControllerRepresentable {
             return
           }
           
-          let tempFileName = UUID().uuidString
-          
+          let tempFileName = !url.lastPathComponent.isEmpty ? url.lastPathComponent : UUID().uuidString
+                    
           do {
             let data = try Data(contentsOf: url)
             let tempFileUrl = FileManager.default.createDataTempFile(withData: data, withFileName: tempFileName)
@@ -59,7 +59,8 @@ public struct ImagePicker: UIViewControllerRepresentable {
                 creationDate = assetResults.firstObject?.creationDate
               }
               self?.parent.pickerResult.append(
-                .init(
+                PickerImageResult(
+                  id: tempFileName,
                   imageUrl: destinationUrl,
                   coordinate: assetCoordinate,
                   creationDate: creationDate
