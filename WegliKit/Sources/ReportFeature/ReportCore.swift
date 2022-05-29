@@ -410,7 +410,11 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .uploadImagesResponse(.failure(error)):
       state.isUploadingNotice = false
-      debugPrint(error)
+      state.alert = .init(
+        title: .init("Error"),
+        message: .init("Image upload failed with error: \(error.localizedDescription)"),
+        buttons: [.default(.init(verbatim: "Ok"))]
+      )
       return .none
       
     case .composeNoticeAndSend:
@@ -432,6 +436,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         title: .init("Anzeige gesendet"),
         buttons: [.default(.init(verbatim: "Ok"))]
       )
+      state.uploadedImagesIds.removeAll()
       return .none
     case let .composeNoticeResponse(.failure(error)):
       debugPrint("🐛", error)
