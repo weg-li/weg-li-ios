@@ -80,7 +80,7 @@ public struct AppEnvironment {
     fileClient: FileClient,
     keychainClient: KeychainClient,
     apiClient: APIClient,
-    noticesService: NoticesService,
+    noticesService: WegliAPIService,
     date: @escaping () -> Date = Date.init,
     uuid: @escaping () -> UUID = UUID.init
   ) {
@@ -99,7 +99,7 @@ public struct AppEnvironment {
   public let fileClient: FileClient
   public let keychainClient: KeychainClient
   public var apiClient: APIClient
-  public let noticesService: NoticesService
+  public let noticesService: WegliAPIService
   
   public var date: () -> Date
   public var uuid: () -> UUID

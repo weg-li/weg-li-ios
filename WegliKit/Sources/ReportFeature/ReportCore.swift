@@ -120,7 +120,7 @@ public struct ReportEnvironment {
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
     fileClient: FileClient,
-    noticesService: NoticesService,
+    noticesService: WegliAPIService,
     date: @escaping () -> Date,
     pathMonitorClient: PathMonitorClient = .live(queue: .main),
     imagesUploadClient: ImagesUploadClient = .live()
@@ -148,7 +148,7 @@ public struct ReportEnvironment {
   public let fileClient: FileClient
   public let pathMonitorClient: PathMonitorClient
   public let imagesUploadClient: ImagesUploadClient
-  public let noticesService: NoticesService
+  public let noticesService: WegliAPIService
   public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail

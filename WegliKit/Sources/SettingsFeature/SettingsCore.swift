@@ -40,7 +40,7 @@ public struct SettingsEnvironment {
     uiApplicationClient: UIApplicationClient,
     keychainClient: KeychainClient,
     apiClient: APIClient,
-    noticesService: NoticesService,
+    noticesService: WegliAPIService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
@@ -58,7 +58,7 @@ public struct SettingsEnvironment {
   public var uiApplicationClient: UIApplicationClient
   public var keychainClient: KeychainClient
   public var apiClient: APIClient
-  public var noticesService: NoticesService
+  public var noticesService: WegliAPIService
   public var mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
