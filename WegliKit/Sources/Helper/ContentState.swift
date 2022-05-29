@@ -19,16 +19,13 @@ public enum ContentState<T: Equatable>: Equatable {
 }
 
 public struct EmptyState: Equatable {
-  public let icon: UIImage
   public let text: String
   public var message: NSAttributedString?
 
   public init(
-    icon: UIImage,
     text: String,
     message: NSAttributedString? = nil
   ) {
-    self.icon = icon
     self.text = text
     self.message = message
   }
