@@ -12,7 +12,6 @@ public protocol APIRequest {
   var queryItems: [URLQueryItem] { get set }
   var body: Data? { get }
   func makeRequest() throws -> URLRequest
-  var decoder: JSONDecoder { get }
 }
 
 public extension APIRequest {
@@ -38,10 +37,6 @@ public extension APIRequest {
       request.httpBody = body
     }
     return request
-  }
-  
-  var decoder: JSONDecoder {
-    JSONDecoder()
   }
 }
 
