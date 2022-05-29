@@ -19,9 +19,7 @@ public struct NetworkDispatcher {
            !(200...299).contains(response.statusCode) {
           throw httpError(response.statusCode)
         }
-        #if DEBUG
-        print("Response data: ", String(data: data, encoding: .utf8)!)
-        #endif
+        debugPrint("Response data: ", String(data: data, encoding: .utf8)!)
         return data
       })
       .mapError(handleError)

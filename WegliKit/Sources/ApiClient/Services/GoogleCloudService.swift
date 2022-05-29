@@ -23,7 +23,6 @@ public extension GoogleUploadService {
           url: url,
           resolvingAgainstBaseURL: false
         )
-        dump(directUploadURLComponents)
         var directUploadURLRequest = URLRequest(url: (directUploadURLComponents?.url)!)
         directUploadURLRequest.httpBody = body
         directUploadURLRequest.httpMethod = HTTPMethod.put.rawValue

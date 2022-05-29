@@ -27,7 +27,6 @@ public extension ImagesUploadClient {
                 group.addTask {
                   let response = try await wegliService.upload(request)
                   
-                  // direct upload as PUT
                   guard let directUploadURL = URL(string: response.directUpload.url) else {
                     return response
                   }
@@ -36,6 +35,7 @@ public extension ImagesUploadClient {
                     resolvingAgainstBaseURL: false
                   )
                   
+                  // wait until direct upload to gcloud is finished
                   try await googleUploadService.upload(
                     directUploadURLComponents?.url,
                     directUploadURLComponents?.queryItems,

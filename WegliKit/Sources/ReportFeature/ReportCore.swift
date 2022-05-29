@@ -436,10 +436,10 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       debugPrint("🐛", error)
       state.isUploadingNotice = false
       state.alert = .init(
-        title: .init("Fehler"),
-        message: .init("Anzeige konnte nicht gesendet werden. Fehler: \(error.localizedDescription)"),
+        title: .init("Anzeige konnte nicht gesendet werden"),
+        message: .init("Fehler: \(error.localizedDescription)"),
         buttons: [
-          .default(.init(verbatim: "Erneut sendern"), action: .send(.composeNoticeAndSend)),
+          .default(.init(verbatim: "Erneut senden"), action: .send(.composeNoticeAndSend)),
           .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
         ]
       )

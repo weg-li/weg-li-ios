@@ -45,7 +45,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
             let destinationUrl = try FileManager.default.replaceExistingFile(
               withTempFile: tempFileUrl,
               existingFileName: tempFileName,
-              withSubDirectory: "wegli"
+              subDirectory: "wegli"
             )
             
             DispatchQueue.main.async {
@@ -143,16 +143,16 @@ extension FileManager {
   func replaceExistingFile(
     withTempFile fileURL: URL?,
     existingFileName: String,
-    withSubDirectory: String
+    subDirectory: String
   ) throws -> URL? {
     guard let fileURL = fileURL else { return nil }
     let fileManager = FileManager.default
     
     let destPath = try? fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-    guard let fullDestPath = destPath?.appendingPathComponent(withSubDirectory + "/" + existingFileName) else { return nil }
+    guard let fullDestPath = destPath?.appendingPathComponent(subDirectory + "/" + existingFileName) else { return nil }
     
     let dta = try Data(contentsOf: fileURL)
-    createDirectory(withFolderName: "\(withSubDirectory)", toDirectory: .applicationSupportDirectory)
+    createDirectory(withFolderName: "\(subDirectory)", toDirectory: .applicationSupportDirectory)
     try dta.write(to: fullDestPath, options: .atomic)
     
     return fullDestPath
