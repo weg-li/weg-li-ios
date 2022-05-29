@@ -6,20 +6,23 @@ import SharedModels
 
 // Interface
 /// A Service to send a single notice and all persisted notices from the weg-li API
-public struct NoticesService {
+public struct WegliAPIService {
   public var getNotices: () -> Effect<[Notice], NSError>
   public var postNotice: (Data?) -> Effect<Result<Notice, NSError>, Never>
+  public var upload: (UploadImageRequest) async throws -> ImageUploadResponse
 
   public init(
     getNotices: @escaping () -> Effect<[Notice], NSError>,
-    postNotice: @escaping (Data?) -> Effect<Result<Notice, NSError>, Never>
+    postNotice: @escaping (Data?) -> Effect<Result<Notice, NSError>, Never>,
+    upload: @escaping (UploadImageRequest) async throws -> ImageUploadResponse
   ) {
     self.getNotices = getNotices
     self.postNotice = postNotice
+    self.upload = upload
   }
 }
 
-public extension NoticesService {
+public extension WegliAPIService {
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
       getNotices: {
@@ -44,12 +47,16 @@ public extension NoticesService {
           .mapError { $0 as NSError }
           .catchToEffect()
           .eraseToEffect()
+      },
+      upload: {
+        let responseData = try await apiClient.dispatch($0)
+        return try JSONDecoder.noticeDecoder.decode(ImageUploadResponse.self, from: responseData)
       }
     )
   }
 }
 
-public extension NoticesService {
+public extension WegliAPIService {
   static let noop = Self(
     getNotices: {
       Just([Notice.mock])
@@ -61,6 +68,22 @@ public extension NoticesService {
         .setFailureType(to: NSError.self)
         .catchToEffect()
         .eraseToEffect()
+    },
+    upload: { _ in
+      return ImageUploadResponse(
+        id: 1,
+        key: "",
+        filename: "",
+        contentType: "",
+        byteSize: 0,
+        checksum: "",
+        createdAt: .init(timeIntervalSince1970: 0),
+        signedId: "",
+        directUpload: .init(
+          url: "",
+          headers: [:]
+        )
+      )
     }
   )
   
@@ -73,6 +96,9 @@ public extension NoticesService {
       Fail(error: NSError(domain: "", code: 1))
         .catchToEffect()
         .eraseToEffect()
+    },
+    upload: { _ in
+      throw NetworkRequestError.badRequest
     }
   )
 }
