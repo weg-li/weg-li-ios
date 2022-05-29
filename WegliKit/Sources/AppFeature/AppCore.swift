@@ -163,12 +163,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       )
       
     case .onAppear:
-      guard !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty else {
-        return environment.fileClient.loadNotices()
-          .map(AppAction.storedNoticesLoaded)
-      }
-      return Effect(value: .fetchNotices)
-    
+        return .none
       
     case let .contactSettingsLoaded(result):
       let contact = (try? result.get()) ?? .init()
@@ -177,13 +172,21 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .storedNoticesLoaded(result):
       let notices = (try? result.get()) ?? []
-      state.notices = .results(notices)
+      state.notices = notices.isEmpty
+      ? .empty(.init(text: "Keine Anzeigen", message: nil))
+      : .results(notices)
       return .none
       
     case let .storedApiTokenLoaded(result):
       let apiToken = (try? result.get()) ?? ""
       state.settings.accountSettingsState.accountSettings.apiToken = apiToken
-      return .none
+      state.reportDraft.apiToken = apiToken
+      
+      guard apiToken.isEmpty else {
+        return environment.fileClient.loadNotices()
+          .map(AppAction.storedNoticesLoaded)
+      }
+      return Effect(value: .fetchNotices)
       
     case let .userSettingsLoaded(result):
       let userSettings = (try? result.get()) ?? UserSettings(showsAllTextRecognitionSettings: false)
@@ -245,7 +248,11 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.success(notices)):
       state.isFetchingNotices = false
-      state.notices = .results(notices)
+            
+      state.notices = notices.isEmpty
+      ? .empty(.init(text: "Keine Anzeigen", message: nil))
+      : .results(notices)
+      
       return environment.fileClient
         .saveNotices(notices, on: environment.backgroundQueue)
         .receive(on: environment.mainQueue)
