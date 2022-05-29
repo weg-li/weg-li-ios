@@ -92,15 +92,19 @@ public struct ImagesView: View {
     Button(
       action: { viewStore.send(.selectedTextItem(item)) },
       label: {
-        Text(item.text)
-          .font(.custom(FontName.nummernschild.rawValue, size: 24, relativeTo: .headline))
-          .foregroundColor(Color(.label))
-          .textCase(.uppercase)
+        HStack {
+          Color.blue
+            .frame(width: 10)
+          Text(item.text)
+            .font(.custom(FontName.nummernschild.rawValue, size: 24, relativeTo: .headline))
+            .foregroundColor(Color(.label))
+            .textCase(.uppercase)
+        }
+        .padding(.trailing, .grid(1))
       }
     )
       .font(.body)
       .foregroundColor(Color(.label))
-      .padding(.grid(2))
       .background(.background)
       .clipShape(
         RoundedRectangle(cornerRadius: 8, style: .circular)
@@ -109,7 +113,7 @@ public struct ImagesView: View {
         RoundedRectangle(cornerRadius: 8)
           .stroke(Color(.label), lineWidth: 2)
       )
-      .padding(.horizontal, 2)
+      .padding(.horizontal, 4)
       .accessibility(value: Text(item.text))
   }
   
