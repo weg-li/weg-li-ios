@@ -11,7 +11,7 @@ public struct PickerImageResult: Hashable, Identifiable, Codable {
   public var creationDate: Date?
   
   public init(
-    id: String = UUID().uuidString,
+    id: String,
     data: Data? = nil,
     imageUrl: URL? = nil,
     coordinate: CoordinateRegion.Coordinate? = nil,

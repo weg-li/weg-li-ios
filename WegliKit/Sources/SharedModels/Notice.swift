@@ -5,16 +5,16 @@ public struct Notice: Codable, Equatable, Identifiable {
   
   public let token: String
   public let status: String
-  public let street: String
-  public let city: String
-  public let zip: String
-  public let latitude: Double
-  public let longitude: Double
-  public let registration: String
-  public let brand: String
-  public let color: String
+  public let street: String?
+  public let city: String?
+  public let zip: String?
+  public let latitude: Double?
+  public let longitude: Double?
+  public let registration: String?
+  public let brand: String?
+  public let color: String?
   public let charge: String
-  public let date: Date
+  public let date: Date?
   public let duration: Int64
   public let severity: String?
   public var note: String?
@@ -30,7 +30,11 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var time: Times? { Times(rawValue: duration) }
   
   public var interval: String? {
-    guard let time = time, let interval = time.interval(from: date) else { return nil }
+    guard
+      let time = self.time,
+      let date = self.date,
+      let interval = time.interval(from: date)
+    else { return nil }
     return DateIntervalFormatter.reportTimeFormatter.string(from: interval)
   }
   
@@ -166,12 +170,10 @@ public struct NoticeInput: Codable, Equatable, Identifiable {
 public struct NoticePhoto: Equatable, Codable {
   public let filename: String
   public let url: String
-  public let signedId: String
   
-  public init(filename: String, url: String, signedId: String) {
+  public init(filename: String, url: String) {
     self.filename = filename
     self.url = url
-    self.signedId = signedId
   }
 }
 
