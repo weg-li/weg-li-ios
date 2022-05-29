@@ -49,6 +49,7 @@ extension NetworkDispatcher {
   private func httpError(_ statusCode: Int) -> NetworkRequestError {
     switch statusCode {
     case 400: return .badRequest
+    case 401: return .unauthorized
     case 403: return .forbidden
     case 404: return .notFound
     case 402, 405...499: return .error4xx(statusCode)
@@ -78,3 +79,39 @@ public extension NetworkDispatcher {
   static let live = Self(urlSession: { .shared })
   static let noop = Self(urlSession: { URLSession(configuration: .default) })
 }
+
+public struct ApiError: Codable, Error, Equatable, LocalizedError {
+  public let errorDump: String
+  public let file: String
+  public let line: UInt
+  public let message: String
+
+  public init(
+    error: Error,
+    file: StaticString = #fileID,
+    line: UInt = #line
+  ) {
+    var string = ""
+    dump(error, to: &string)
+    self.errorDump = string
+    self.file = String(describing: file)
+    self.line = line
+    if let networkRequestError = error as? NetworkRequestError {
+      switch networkRequestError {
+      case .unauthorized:
+        self.message = "Unauthorized\nEnter API Token in the account settings\nYou can still send a notices via email."
+      default:
+        // TODO: separate user facing from debug facing messages?
+        self.message = networkRequestError.localizedDescription
+      }
+    } else {
+      // TODO: separate user facing from debug facing messages?
+      self.message = error.localizedDescription
+    }
+  }
+
+  public var errorDescription: String? {
+    self.message
+  }
+}
+

@@ -108,7 +108,7 @@ public enum ReportAction: Equatable {
   case uploadImages
   case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
   case composeNoticeAndSend
-  case composeNoticeResponse(Result<Notice, NSError>)
+  case composeNoticeResponse(Result<Notice, ApiError>)
 }
 
 public struct ReportEnvironment {
@@ -409,13 +409,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       return Effect(value: .composeNoticeAndSend)
       
     case let .uploadImagesResponse(.failure(error)):
-      state.isUploadingNotice = false
-      state.alert = .init(
-        title: .init("Error"),
-        message: .init("Image upload failed with error: \(error.localizedDescription)"),
-        buttons: [.default(.init(verbatim: "Ok"))]
-      )
-      return .none
+      return Effect(value: .composeNoticeResponse(.failure(ApiError(error: error))))
       
     case .composeNoticeAndSend:
       var notice = NoticeInput(state)

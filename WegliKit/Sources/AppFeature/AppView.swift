@@ -183,6 +183,7 @@ public struct NoticesView: View {
           if let body = errorState.body {
             Text(body)
               .font(.body)
+              .multilineTextAlignment(.center)
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)

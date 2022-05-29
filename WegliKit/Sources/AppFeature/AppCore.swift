@@ -66,7 +66,7 @@ public enum AppAction: Equatable {
   case report(ReportAction)
   case showReportWizard(Bool)
   case fetchNotices
-  case fetchNoticesResponse(Result<[Notice], NSError>)
+  case fetchNoticesResponse(Result<[Notice], ApiError>)
   case reportSaved
   case onAppear
 }
@@ -260,7 +260,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.failure(error)):
       state.isFetchingNotices = false
-      state.notices = .error(.init(title: "Fehler", body: error.localizedDescription))
+      state.notices = .error(.init(title: "Fehler", body: error.message))
       return .none
       
     case .reportSaved:

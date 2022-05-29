@@ -33,7 +33,7 @@ public enum AccountSettingsAction: Equatable {
   case setApiKey(String)
   case openUserSettings
   case fetchNotices
-  case fetchNoticesResponse(Result<[Notice], NSError>)
+  case fetchNoticesResponse(Result<[Notice], ApiError>)
 }
 
 // MARK: Environment
