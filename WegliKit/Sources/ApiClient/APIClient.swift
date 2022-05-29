@@ -4,7 +4,7 @@ import KeychainClient
 
 /// A Client to dispatch network calls
 public struct APIClient {
-  var networkDispatcher: () -> NetworkDispatcher
+  public var networkDispatcher: () -> NetworkDispatcher
   var tokenStore: () -> KeychainClient
   
   public init(
