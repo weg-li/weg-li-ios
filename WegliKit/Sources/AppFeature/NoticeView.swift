@@ -39,13 +39,17 @@ public struct NoticeView: View {
               .accessibility(hidden: true)
             
             VStack(alignment: .leading, spacing: .grid(1)) {
-              Text(verbatim: notice.registration)
-                .font(.custom(FontName.nummernschild.rawValue, size: 22, relativeTo: .body))
-                .foregroundColor(Color(.label))
-                .textCase(.uppercase)
+              if let registration = notice.registration {
+                Text(verbatim: registration)
+                  .font(.custom(FontName.nummernschild.rawValue, size: 22, relativeTo: .body))
+                  .foregroundColor(Color(.label))
+                  .textCase(.uppercase)
+              }
               
               VStack(alignment: .leading) {
-                Text("Marke: __\(notice.brand)__")
+                if let brand = notice.brand {
+                  Text("Marke: __\(brand)__")
+                }
                 if let color = notice.displayColor {
                   Text("Farbe: __\(color)__")
                 }
