@@ -36,7 +36,7 @@ public struct AppState: Equatable {
   )
   
   var showReportWizard = false
-  var isFetchingNotices = false
+  public var isFetchingNotices = false
   
   public init(
     settings: SettingsState = .init(
@@ -80,7 +80,7 @@ public struct AppEnvironment {
     fileClient: FileClient,
     keychainClient: KeychainClient,
     apiClient: APIClient,
-    noticesService: WegliAPIService,
+    wegliService: WegliAPIService,
     date: @escaping () -> Date = Date.init,
     uuid: @escaping () -> UUID = UUID.init
   ) {
@@ -89,7 +89,7 @@ public struct AppEnvironment {
     self.fileClient = fileClient
     self.keychainClient = keychainClient
     self.apiClient = apiClient
-    self.noticesService = noticesService
+    self.wegliService = wegliService
     self.date = date
     self.uuid = uuid
   }
@@ -99,7 +99,7 @@ public struct AppEnvironment {
   public let fileClient: FileClient
   public let keychainClient: KeychainClient
   public var apiClient: APIClient
-  public let noticesService: WegliAPIService
+  public let wegliService: WegliAPIService
   
   public var date: () -> Date
   public var uuid: () -> UUID
@@ -112,7 +112,7 @@ public extension AppEnvironment {
     fileClient: .live,
     keychainClient: .live(),
     apiClient: .live,
-    noticesService: .live()
+    wegliService: .live()
   )
 }
 
@@ -130,7 +130,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
           placeService: .live,
           regulatoryOfficeMapper: .live(),
           fileClient: $0.fileClient,
-          noticesService: $0.noticesService,
+          wegliService: $0.wegliService,
           date: $0.date
         )
       }
@@ -143,14 +143,14 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         uiApplicationClient: .live,
         keychainClient: parent.keychainClient,
         apiClient: parent.apiClient,
-        noticesService: parent.noticesService,
+        wegliService: parent.wegliService,
         mainQueue: parent.mainQueue
       )
     }
   ),
   Reducer { state, action, environment in
     switch action {
-    case let .appDelegate(appDelegateAction):
+    case .appDelegate:
       return .merge(
         .concatenate(
           environment.fileClient.loadContactSettings()
@@ -173,7 +173,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .storedNoticesLoaded(result):
       let notices = (try? result.get()) ?? []
       state.notices = notices.isEmpty
-      ? .empty(.init(text: "Keine Anzeigen", message: nil))
+      ? .empty(.emptyNotices)
       : .results(notices)
       return .none
       
@@ -181,11 +181,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       let apiToken = (try? result.get()) ?? ""
       state.settings.accountSettingsState.accountSettings.apiToken = apiToken
       state.reportDraft.apiToken = apiToken
-      
-      guard apiToken.isEmpty else {
-        return environment.fileClient.loadNotices()
-          .map(AppAction.storedNoticesLoaded)
-      }
       return Effect(value: .fetchNotices)
       
     case let .userSettingsLoaded(result):
@@ -241,7 +236,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
       state.notices = .loading
       
-      return environment.noticesService.getNotices()
+      return environment.wegliService.getNotices()
         .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(AppAction.fetchNoticesResponse)

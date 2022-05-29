@@ -94,7 +94,7 @@ struct MailContentView_Previews: PreviewProvider {
           placeService: .noop,
           regulatoryOfficeMapper: .live(),
           fileClient: .noop,
-          noticesService: .noop,
+          wegliService: .noop,
           date: Date.init
         )
       )

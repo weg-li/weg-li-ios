@@ -40,13 +40,13 @@ public struct SettingsEnvironment {
     uiApplicationClient: UIApplicationClient,
     keychainClient: KeychainClient,
     apiClient: APIClient,
-    noticesService: WegliAPIService,
+    wegliService: WegliAPIService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
     self.keychainClient = keychainClient
     self.apiClient = apiClient
-    self.noticesService = noticesService
+    self.wegliService = wegliService
     self.mainQueue = mainQueue
   }
   
@@ -58,7 +58,7 @@ public struct SettingsEnvironment {
   public var uiApplicationClient: UIApplicationClient
   public var keychainClient: KeychainClient
   public var apiClient: APIClient
-  public var noticesService: WegliAPIService
+  public var wegliService: WegliAPIService
   public var mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
@@ -71,7 +71,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
       AccountSettingsEnvironment(
         uiApplicationClient: parent.uiApplicationClient,
         apiClient: parent.apiClient,
-        noticesService: parent.noticesService,
+        wegliService: parent.wegliService,
         mainQueue: parent.mainQueue
       )
     }

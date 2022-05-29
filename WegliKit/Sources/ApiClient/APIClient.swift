@@ -15,6 +15,12 @@ public struct APIClient {
     self.tokenStore = tokenStore
   }
   
+  func addToken(to request: inout URLRequest) {
+    if let token = tokenStore().getToken() {
+      request.addValue(token, forHTTPHeaderField: apiTokenKey)
+    }
+  }
+  
   /// Dispatches a Request and returns a publisher
   /// - Parameter request: Request to Dispatch
   /// - Returns: A publisher containing decoded data or an error
@@ -26,9 +32,7 @@ public struct APIClient {
       )
       .eraseToAnyPublisher()
     }
-    if let token = tokenStore().getToken() {
-      urlRequest.addValue(token, forHTTPHeaderField: apiTokenKey)
-    }
+    addToken(to: &urlRequest)
     
     return networkDispatcher()
       .dispatch(request: urlRequest)
@@ -42,10 +46,7 @@ public struct APIClient {
     guard var urlRequest = try? request.makeRequest() else {
       throw NetworkRequestError.badRequest
     }
-    if let token = tokenStore().getToken() {
-      urlRequest.addValue(token, forHTTPHeaderField: apiTokenKey)
-    }
-    
+    addToken(to: &urlRequest)
     return try await networkDispatcher().dispatch(request: urlRequest)
   }
 }

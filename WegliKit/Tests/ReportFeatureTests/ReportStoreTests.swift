@@ -1,5 +1,6 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -49,7 +50,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -82,7 +83,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -115,7 +116,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -142,7 +143,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -194,7 +195,7 @@ class ReportStoreTests: XCTestCase {
         ),
         regulatoryOfficeMapper: .live(),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -279,7 +280,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -327,7 +328,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -350,7 +351,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -388,7 +389,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -428,7 +429,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -481,7 +482,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -537,7 +538,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -599,7 +600,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: testDate
       )
     )
@@ -639,7 +640,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -677,7 +678,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -715,7 +716,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -752,7 +753,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -760,6 +761,98 @@ class ReportStoreTests: XCTestCase {
     let item = TextItem.init(id: "123", text: "B-MB 3000")
     store.send(.images(.selectedTextItem(item))) {
       $0.description.licensePlateNumber = item.text
+    }
+  }
+  
+  func test_action_uploadImages() {
+    
+    let responses: [ImageUploadResponse] = [
+      .init(
+        id: 1,
+        key: "key",
+        filename: "filename",
+        contentType: "type",
+        byteSize: 123,
+        checksum: "wer",
+        createdAt: Date(timeIntervalSince1970: 0),
+        signedId: "111",
+        directUpload: .init(url: "123", headers: [:])
+      ),
+      .init(
+        id: 2,
+        key: "key",
+        filename: "filename",
+        contentType: "type",
+        byteSize: 123,
+        checksum: "wer",
+        createdAt: Date(timeIntervalSince1970: 0),
+        signedId: "222",
+        directUpload: .init(url: "321", headers: [:])
+      )
+    ]
+    let imagesUploadClient = ImagesUploadClient(uploadImages: { requests in
+      Just(Result.success(responses))
+        .eraseToEffect()
+    })
+    
+    var wegliService = WegliAPIService.noop
+    wegliService.postNotice = { _ in
+      Just(Result.success(Notice.mock))
+        .eraseToEffect()
+    }
+    
+    let store = TestStore(
+      initialState: ReportState(
+        uuid: fixedUUID,
+        images: .init(
+          alert: nil,
+          showImagePicker: false,
+          storedPhotos: [
+            .init(uiImage: .add),
+            .init(uiImage: .actions)
+          ],
+          coordinateFromImagePicker: nil,
+          dateFromImagePicker: nil
+        ),
+        contactState: .empty,
+        district: nil,
+        date: fixedDate,
+        description: .init(),
+        location: .init(
+          locationOption: .fromPhotos,
+          isMapExpanded: false,
+          isResolvingAddress: false,
+          resolvedAddress: .init(
+            street: "TestStrasse 3",
+            postalCode: "1243", city: "Berlin"
+          )
+        )
+      ),
+      reducer: reportReducer,
+      environment: ReportEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        locationManager: LocationManager.unimplemented(),
+        placeService: .noop,
+        regulatoryOfficeMapper: .noop,
+        fileClient: .noop,
+        wegliService: wegliService,
+        date: Date.init,
+        imagesUploadClient: imagesUploadClient
+      )
+    )
+    
+    store.send(.uploadImages) {
+      $0.isUploadingNotice = true
+    }
+    store.receive(.uploadImagesResponse(.success(responses))) {
+      $0.uploadedImagesIds = ["111", "222"]
+    }
+    store.receive(.composeNoticeAndSend)
+    store.receive(.composeNoticeResponse(.success(.mock))) {
+      $0.isUploadingNotice = false
+      $0.alert = .reportSent
+      $0.uploadedImagesIds = []
     }
   }
 }

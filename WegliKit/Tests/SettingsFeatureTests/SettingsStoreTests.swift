@@ -12,7 +12,7 @@ class SettingsStoreTests: XCTestCase {
     ),
     keychainClient: .noop,
     apiClient: .noop,
-    noticesService: .noop,
+    wegliService: .noop,
     mainQueue: .immediate
   )
   
@@ -108,5 +108,30 @@ class SettingsStoreTests: XCTestCase {
     
     store.send(.donateTapped)
     XCTAssertEqual(openedUrl, env.donateLink)
+  }
+  
+  func test_action_accountSettungs_setApiToken() {
+    var env = defaultEnvironment
+    
+    var didWriteTokenToKeyChain = false
+    env.keychainClient.setString = { _, _, _ in
+        didWriteTokenToKeyChain = true
+      return .none
+    }
+    
+    let store = TestStore(
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
+      reducer: settingsReducer,
+      environment: env
+    )
+    
+    store.send(.accountSettings(.setApiToken("TOKEN"))) {
+      $0.accountSettingsState.accountSettings.apiToken = "TOKEN"
+    }
+    XCTAssertTrue(didWriteTokenToKeyChain)
   }
 }

@@ -120,7 +120,7 @@ public struct ReportEnvironment {
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
     fileClient: FileClient,
-    noticesService: WegliAPIService,
+    wegliService: WegliAPIService,
     date: @escaping () -> Date,
     pathMonitorClient: PathMonitorClient = .live(queue: .main),
     imagesUploadClient: ImagesUploadClient = .live()
@@ -134,7 +134,7 @@ public struct ReportEnvironment {
     self.fileClient = fileClient
     self.pathMonitorClient = pathMonitorClient
     self.imagesUploadClient = imagesUploadClient
-    self.noticesService = noticesService
+    self.wegliService = wegliService
     
     self.date = date
   }
@@ -148,7 +148,7 @@ public struct ReportEnvironment {
   public let fileClient: FileClient
   public let pathMonitorClient: PathMonitorClient
   public let imagesUploadClient: ImagesUploadClient
-  public let noticesService: WegliAPIService
+  public let wegliService: WegliAPIService
   public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
@@ -419,30 +419,19 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
       state.isUploadingNotice = true
       
-      return environment.noticesService.postNotice(postBody)
+      return environment.wegliService.postNotice(postBody)
         .receive(on: environment.mainQueue)
         .map(ReportAction.composeNoticeResponse)
         .eraseToEffect()
       
     case let .composeNoticeResponse(.success(response)):
       state.isUploadingNotice = false
-      state.alert = .init(
-        title: .init("Anzeige gesendet"),
-        buttons: [.default(.init(verbatim: "Ok"))]
-      )
+      state.alert = .reportSent
       state.uploadedImagesIds.removeAll()
       return .none
     case let .composeNoticeResponse(.failure(error)):
-      debugPrint("🐛", error)
       state.isUploadingNotice = false
-      state.alert = .init(
-        title: .init("Anzeige konnte nicht gesendet werden"),
-        message: .init("Fehler: \(error.localizedDescription)"),
-        buttons: [
-          .default(.init(verbatim: "Erneut senden"), action: .send(.composeNoticeAndSend)),
-          .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
-        ]
-      )
+      state.alert = .sendNoticeFailed(error: error)
       return .none
     }
   }
@@ -500,6 +489,22 @@ public extension AlertState where Action == ReportAction {
     )
   )
   
+  static let reportSent = Self(
+    title: .init("Anzeige gesendet"),
+    buttons: [.default(.init(verbatim: "Ok"))]
+  )
+  
+  static func sendNoticeFailed(error: ApiError) -> Self {
+    Self(
+      title: .init("Anzeige konnte nicht gesendet werden"),
+      message: .init("Fehler: \(error.message)"),
+      buttons: [
+        .default(.init(verbatim: "Erneut senden"), action: .send(.composeNoticeAndSend)),
+        .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
+      ]
+    )
+  }
+  
   static let noMailAccount = Self(
     title: TextState("Fehler"),
     message: TextState("Mail kann nicht gesendet werden, da kein Account gefunden werden konnte"),
@@ -533,7 +538,7 @@ public let mapperQueue = DispatchQueue(
 
 public extension FileClient {
   func loadNotices(decoder: JSONDecoder = .noticeDecoder) -> Effect<Result<[Notice], NSError>, Never> {
-    self.load([Notice].self, from: reportsFileName, with: decoder)
+    self.load([Notice].self, from: noticesFileName, with: decoder)
   }
   
   func saveNotices(
@@ -544,11 +549,11 @@ public extension FileClient {
     guard let notices = notices else {
       return .none
     }
-    return self.save(notices, to: reportsFileName, on: queue, with: encoder)
+    return self.save(notices, to: noticesFileName, on: queue, with: encoder)
   }
 }
 
-let reportsFileName = "notices"
+let noticesFileName = "notices"
 
 public extension SharedModels.NoticeInput {
   init(_ reportState: ReportState) {

@@ -1,11 +1,14 @@
 // Created for weg-li in 2021.
 
 import AppFeature
+import ApiClient
 import ComposableArchitecture
 import ComposableCoreLocation
+import Combine
 import ContactFeature
 import FileClient
 import ImagesFeature
+import KeychainClient
 import MessageUI
 import ReportFeature
 import SharedModels
@@ -55,7 +58,7 @@ class AppStoreTests: XCTestCase {
         fileClient: .noop,
         keychainClient: .noop,
         apiClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -85,7 +88,7 @@ class AppStoreTests: XCTestCase {
         fileClient: .noop,
         keychainClient: .noop,
         apiClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -122,7 +125,7 @@ class AppStoreTests: XCTestCase {
         fileClient: fileCient,
         keychainClient: .noop,
         apiClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -162,7 +165,7 @@ class AppStoreTests: XCTestCase {
         fileClient: .noop,
         keychainClient: .noop,
         apiClient: .noop,
-        noticesService: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -180,6 +183,111 @@ class AppStoreTests: XCTestCase {
       )
     }
     store.receive(.report(.dismissAlert))
+  }
+  
+  func test_ActionStoredApiTokenLoaded() {
+    var AppState = AppState(reportDraft: report)
+    AppState.settings.contact = .preview
+    
+    let token = "API Token"
+    var keychainClient = KeychainClient.noop
+    keychainClient.getString = { _ in
+      return Just(token)
+        .eraseToEffect()
+    }
+    
+    var wegliService = WegliAPIService.noop
+    wegliService.getNotices = {
+      Just([.mock])
+        .setFailureType(to: ApiError.self)
+        .eraseToEffect()
+    }
+    
+    let store = TestStore(
+      initialState: AppState,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop,
+        keychainClient: keychainClient,
+        apiClient: .noop,
+        wegliService: wegliService,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.appDelegate(.didFinishLaunching))
+    store.receive(.storedApiTokenLoaded(.success(token))) {
+      $0.reportDraft.apiToken = token
+      $0.settings.accountSettingsState.accountSettings.apiToken = token
+    }
+    store.receive(.fetchNotices) {
+      $0.notices = .loading
+    }
+    store.receive(.fetchNoticesResponse(.success([.mock]))) {
+      $0.notices = .results([.mock])
+    }
+  }
+  
+  func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() {
+    var AppState = AppState(reportDraft: report)
+    AppState.settings.contact = .preview
+    
+    var didSaveNotices = false
+    
+    var fileClient = FileClient.noop
+    fileClient.save = { _, _ in
+      didSaveNotices = true
+      return .none
+    }
+    
+    let store = TestStore(
+      initialState: AppState,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: fileClient,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.fetchNoticesResponse(.success([]))) {
+      $0.isFetchingNotices = false
+      $0.notices = .empty(.emptyNotices)
+    }
+    XCTAssertTrue(didSaveNotices)
+  }
+  
+  func test_ActionOnAccountSettings_shouldPersistAccountsSettings() {
+    var AppState = AppState(reportDraft: report)
+    AppState.settings.contact = .preview
+    
+    let store = TestStore(
+      initialState: AppState,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
+      $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
+      $0.reportDraft.apiToken = "TOKEN"
+    }
   }
 }
 

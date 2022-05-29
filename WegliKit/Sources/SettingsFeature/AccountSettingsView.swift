@@ -30,7 +30,7 @@ public struct AccountSettingsState: Equatable {
 
 // MARK: Actions
 public enum AccountSettingsAction: Equatable {
-  case setApiKey(String)
+  case setApiToken(String)
   case openUserSettings
   case fetchNotices
   case fetchNoticesResponse(Result<[Notice], ApiError>)
@@ -41,17 +41,17 @@ public struct AccountSettingsEnvironment {
   public init(
     uiApplicationClient: UIApplicationClient,
     apiClient: APIClient = .live,
-    noticesService: WegliAPIService,
+    wegliService: WegliAPIService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
     self.apiClient = apiClient
-    self.noticesService = noticesService
+    self.wegliService = wegliService
     self.mainQueue = mainQueue
   }
 
   public let apiClient: APIClient
-  public let noticesService: WegliAPIService
+  public let wegliService: WegliAPIService
   public let uiApplicationClient: UIApplicationClient
   public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
@@ -62,8 +62,8 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
   Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
     state, action, environment in
     switch action {
-    case let .setApiKey(apiKey):
-      state.accountSettings.apiToken = apiKey
+    case let .setApiToken(token):
+      state.accountSettings.apiToken = token
       return .none
       
     case .openUserSettings:
@@ -74,7 +74,7 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
     case .fetchNotices:
       state.isNetworkRequestInProgress = true
       
-      return environment.noticesService.getNotices()
+      return environment.wegliService.getNotices()
         .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(AccountSettingsAction.fetchNoticesResponse)
@@ -119,7 +119,7 @@ public struct AccountSettingsView: View {
               "",
               text: viewStore.binding(
                 get: \.accountSettings.apiToken,
-                send: AccountSettingsAction.setApiKey
+                send: AccountSettingsAction.setApiToken
               )
             )
             .placeholder(when: viewStore.state.accountSettings.apiToken.isEmpty, placeholder: {
@@ -229,7 +229,7 @@ struct AccountSettingsView_Previews: PreviewProvider {
         reducer: accountSettingsReducer,
         environment: .init(
           uiApplicationClient: .noop,
-          noticesService: .noop,
+          wegliService: .noop,
           mainQueue: .failing
         )
       )

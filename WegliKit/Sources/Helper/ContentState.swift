@@ -31,6 +31,10 @@ public struct EmptyState: Equatable {
   }
 }
 
+public extension EmptyState {
+  static let emptyNotices = Self(text: "Keine Anzeigen", message: nil)
+}
+
 public struct ErrorState: Equatable {
   public let title: String
   public let body: String?
