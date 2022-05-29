@@ -144,8 +144,9 @@ extension UIDevice {
 
 extension Notice {
   var displayColor: String? {
-    DescriptionState.colors.first { color in
-      color.key.lowercased() == self.color.lowercased()
+    guard let safeColor = self.color else { return nil }
+    return DescriptionState.colors.first { color in
+      color.key.lowercased() == safeColor.lowercased()
     }?.value
   }
 }
