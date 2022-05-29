@@ -41,7 +41,7 @@ public struct AccountSettingsEnvironment {
   public init(
     uiApplicationClient: UIApplicationClient,
     apiClient: APIClient = .live,
-    noticesService: NoticesService,
+    noticesService: WegliAPIService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
@@ -51,7 +51,7 @@ public struct AccountSettingsEnvironment {
   }
 
   public let apiClient: APIClient
-  public let noticesService: NoticesService
+  public let noticesService: WegliAPIService
   public let uiApplicationClient: UIApplicationClient
   public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
@@ -114,15 +114,6 @@ public struct AccountSettingsView: View {
     return Form {
       Section(header: Label("API-Token", systemImage: "bolt.fill")) {
         VStack(alignment: .leading) {
-          VStack(alignment: .leading) {
-            Text(description!)
-              .multilineTextAlignment(.leading)
-              .foregroundColor(Color(.secondaryLabel))
-              .font(.subheadline)
-              .padding(.vertical, .grid(1))
-          }
-          .padding(.vertical, .grid(2))
-           
           VStack(alignment: .leading, spacing: .grid(3)) {
             TextField(
               "",
@@ -155,33 +146,20 @@ public struct AccountSettingsView: View {
             .padding(.bottom, .grid(5))
 
             Button(
-              action: { viewStore.send(.openUserSettings) },
+              action: { viewStore.send(.fetchNotices) },
               label: {
-                Label("Profil öffnen", systemImage: "arrow.up.right")
-                  .frame(maxWidth: .infinity, minHeight: 44)
+                HStack {
+                  if viewStore.isNetworkRequestInProgress {
+                    ActivityIndicator(style: .medium, color: .gray)
+                  } else {
+                    Text("API-Token testen")
+                  }
+                }
+                .frame(maxWidth: .infinity, minHeight: 44)
               }
             )
+            .disabled(viewStore.accountSettings.apiToken.isEmpty)
             .buttonStyle(.bordered)
-            .accessibilityAddTraits([.isLink])
-            .padding(.bottom, .grid(2))
-            
-            HStack {
-              Button(
-                action: { viewStore.send(.fetchNotices) },
-                label: {
-                  HStack {
-                    if viewStore.isNetworkRequestInProgress {
-                      ActivityIndicator(style: .medium, color: .gray)
-                    } else {
-                      Text("API-Token testen")
-                    }
-                  }
-                  .frame(maxWidth: .infinity, minHeight: 44)
-                }
-              )
-              .disabled(viewStore.accountSettings.apiToken.isEmpty)
-              .buttonStyle(.bordered)
-            }
             
             HStack(alignment: .center) {
               Text("Ruft `weg.li\\api\\notices` vom Server ab")
@@ -196,6 +174,30 @@ public struct AccountSettingsView: View {
               }
             }
             .padding(.vertical, .grid(2))
+            
+            VStack(alignment: .leading) {
+              Text(description!)
+                .multilineTextAlignment(.leading)
+                .foregroundColor(Color(.secondaryLabel))
+                .font(.subheadline)
+                .padding(.vertical, .grid(1))
+              
+              Button(
+                action: { viewStore.send(.openUserSettings) },
+                label: {
+                  Label("Profil öffnen", systemImage: "arrow.up.right")
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                }
+              )
+              .buttonStyle(.bordered)
+              .accessibilityAddTraits([.isLink])
+              
+            }
+            .padding(.grid(2))
+            .overlay(
+              RoundedRectangle(cornerRadius: 4)
+                .stroke(Color(.lightGray), lineWidth: 1)
+            )
           }
         }
       }
