@@ -14,7 +14,10 @@ public struct ImagesUploadClient {
 }
 
 public extension ImagesUploadClient {
-  static func live(apiClient: APIClient = .live) -> Self {
+  static func live(
+    wegliService: WegliAPIService = .live(),
+    googleUploadService: GoogleUploadService = .live()
+  ) -> Self {
     Self(
       uploadImages: { requests in
         return .task {
@@ -22,8 +25,25 @@ public extension ImagesUploadClient {
             return try await withThrowingTaskGroup(of: ImageUploadResponse.self, body: { group in
               for request in requests {
                 group.addTask {
-                  let response = try await apiClient.dispatch(request)
-                  return try JSONDecoder.noticeDecoder.decode(ImageUploadResponse.self, from: response)
+                  let response = try await wegliService.upload(request)
+                  
+                  // direct upload as PUT
+                  guard let directUploadURL = URL(string: response.directUpload.url) else {
+                    return response
+                  }
+                  let directUploadURLComponents = URLComponents(
+                    url: directUploadURL,
+                    resolvingAgainstBaseURL: false
+                  )
+                  
+                  try await googleUploadService.upload(
+                    directUploadURLComponents?.url,
+                    directUploadURLComponents?.queryItems,
+                    request.imageData,
+                    response.directUpload.headers
+                  )
+                  
+                  return response
                 }
               }
               var results: [ImageUploadResponse] = []
@@ -33,54 +53,21 @@ public extension ImagesUploadClient {
               return .success(results)
             })
           } catch {
-            debugPrint(error.localizedDescription)
-            return .failure(NSError(domain: "ImageUploader", code: -1))
+            debugPrint(error)
+            if let networkRequestError = error as? NetworkRequestError {
+              return .failure(
+                NSError(
+                  domain: networkRequestError.errorDescription ?? networkRequestError.localizedDescription,
+                  code: -1
+                )
+              )
+            } else {
+              return .failure(NSError(domain: "ImageUploader", code: -1))
+            }
           }
         }
       }
     )
-  }
-}
-
-public struct ImageUploadResponse: Codable, Equatable {
-  public let id: Int
-  public let key: String
-  public let filename: String
-  public let contentType: String
-  public let byteSize: Int64
-  public let checksum: String
-  public let createdAt: Date
-  public let signedId: String
-  public let directUpload: DirectUpload
-  
-  public init(
-    id: Int,
-    key: String,
-    filename: String,
-    contentType: String,
-    byteSize: Int64,
-    checksum: String,
-    createdAt: Date,
-    signedId: String,
-    directUpload: DirectUpload
-  ) {
-    self.id = id
-    self.key = key
-    self.filename = filename
-    self.contentType = contentType
-    self.byteSize = byteSize
-    self.checksum = checksum
-    self.createdAt = createdAt
-    self.signedId = signedId
-    self.directUpload = directUpload
-  }
-  
-  public struct DirectUpload: Codable, Equatable {
-    public init(url: String) {
-      self.url = url
-    }
-    
-    public let url: String
   }
 }
 
