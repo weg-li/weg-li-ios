@@ -1,4 +1,6 @@
+import Checksum
 import CryptoKit
+import CryptoSwift
 import Foundation
 import SharedModels
 import UIKit
@@ -32,12 +34,10 @@ public struct GetNoticesRequest: APIRequest {
   
   public init(
     endpoint: Endpoint = .notices,
-    httpMethod: HTTPMethod = .get,
-    body: Data? = nil
+    httpMethod: HTTPMethod = .get
   ) {
     self.endpoint = endpoint
     self.httpMethod = httpMethod
-    self.body = body
   }
 }
 
@@ -48,19 +48,20 @@ public struct UploadImageRequest: APIRequest {
   public var headers: HTTPHeaders? = .contentTypeApplicationJSON
   public let httpMethod: HTTPMethod
   public var body: Data?
+  public var imageData: Data?
   
-  var convert: (UIImage?, String) -> ImageUploadInput? = { image, filename in
+  var convertToImageUploadInput: (PickerImageResult) -> ImageUploadInput? = { pickerResult in
     guard
-      let image = image,
-      let jpegData = image.jpegData(compressionQuality: 95)
+      let fileURL = pickerResult.imageUrl,
+      let fileData = try? Data(contentsOf: fileURL)
     else {
       return nil
     }
-    let checksum = jpegData.base64EncodedString().MD5
+    
     return ImageUploadInput(
-      filename: filename.appending(".jpg"),
-      byteSize: UInt64(checksum.utf8.count),
-      checksum: checksum
+      filename: pickerResult.id,
+      byteSize: fileURL.fileSize,
+      checksum: fileData.md5DigestBase64()
     )
   }
   
@@ -71,15 +72,53 @@ public struct UploadImageRequest: APIRequest {
   ) {
     self.endpoint = endpoint
     self.httpMethod = httpMethod
-    let input = convert(pickerResult.asUIImage, pickerResult.id)
+    
+    self.imageData = pickerResult.imageUrl.flatMap { try? Data(contentsOf: $0) }
+    
+    let input = convertToImageUploadInput(pickerResult)
     let bodyData = try? JSONEncoder.noticeEncoder.encode(input)
     self.body = bodyData
   }
 }
 
-extension String {
-  var MD5: String {
-    let computed = Insecure.MD5.hash(data: self.data(using: .utf8)!)
-    return computed.map { String(format: "%02hhx", $0) }.joined()
+public struct DirectUploadRequest: APIRequest {
+  public var queryItems: [URLQueryItem] = []
+  public typealias ResponseDataType = [ImageUploadInput]
+  public let endpoint: Endpoint
+  public var headers: HTTPHeaders?
+  public let httpMethod: HTTPMethod = .put
+  public var body: Data?
+    
+  public init(
+    endpoint: Endpoint,
+    queryItems: [URLQueryItem],
+    body: Data?,
+    headers: HTTPHeaders
+  ) {
+    self.endpoint = endpoint
+    self.queryItems = queryItems
+    self.body = body
+    self.headers = headers
   }
+}
+
+
+extension Data {
+  func md5DigestBase64() -> String {
+    let digest = Insecure.MD5.hash(data: self)
+    return Data(digest).base64EncodedString()
+  }
+}
+
+extension URL {  
+  var attributes: [FileAttributeKey : Any]? {
+    do {
+      return try FileManager.default.attributesOfItem(atPath: path)
+    } catch let error as NSError {
+      print("FileAttribute error: \(error)")
+    }
+    return nil
+  }
+  
+  var fileSize: UInt64 { attributes?[.size] as? UInt64 ?? UInt64(0) }
 }
