@@ -36,7 +36,7 @@ public struct ReportState: Equatable {
   public var showEditDescription = false
   public var showEditContact = false
   
-  public var apiToken: String?
+  public var apiToken: String = ""
   
   public var uploadedImagesIds: [String] = []
   

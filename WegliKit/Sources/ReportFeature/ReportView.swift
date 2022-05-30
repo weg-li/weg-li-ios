@@ -81,9 +81,9 @@ public struct ReportView: View {
           isCompleted: viewStore.isContactValid
         ) { ContactWidget(store: store.scope(state: { $0 })) }
         
-        // Mail
+        // Send notice button
         VStack {
-          if viewStore.apiToken != nil {
+          if !viewStore.apiToken.isEmpty {
             Button(
               action: { viewStore.send(.uploadImages) },
               label: {
@@ -92,7 +92,7 @@ public struct ReportView: View {
                     ActivityIndicator(style: .medium, color: .white)
                       .foregroundColor(.white)
                   } else {
-                    Text("Anzeige senden")
+                    Text("Anzeige hinzufügen")
                   }
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -131,6 +131,7 @@ public struct ReportView: View {
           }
         }
       }
+      .disabled(viewStore.isUploadingNotice)
     }
     .onAppear { viewStore.send(.onAppear) }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
@@ -151,7 +152,6 @@ public struct ReportView: View {
       }
     )
     .accessibilityLabel(Text(L10n.Button.reset))
-    .accessibilityValue(viewStore.isResetButtonDisabled ? "deaktiviert" : "aktiviert")
     .contentShape(Rectangle())
     .disabled(viewStore.isResetButtonDisabled)
   }

@@ -46,7 +46,7 @@ public struct NoticeView: View {
                   Color.blue
                     .frame(width: 6)
                   Text(verbatim: registration)
-                    .font(.custom(FontName.nummernschild.rawValue, size: 23, relativeTo: .body))
+                    .font(.custom(FontName.nummernschild.rawValue, size: 23 , relativeTo: .body))
                     .foregroundColor(.black)
                     .textCase(.uppercase)
                     .padding(.trailing, 3)

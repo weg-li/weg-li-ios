@@ -41,8 +41,8 @@ struct ChargeView: View {
       if isSelected {
         Image(systemName: "checkmark")
           .resizable()
-          .frame(width: .grid(5), height: .grid(5))
-          .foregroundColor(.wegliBlue)
+          .frame(width: .grid(4), height: .grid(4))
+          .foregroundColor(.blue)
           .accessibilityValue(Text("ausgewählt"))
       }
     }

@@ -111,8 +111,7 @@ public struct AccountSettingsView: View {
   let description: AttributedString? = try? AttributedString(markdown: "Füge Deinen API-Token hinzu um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über [weg.li](https://www.weg.li) zu versenden. Du findest den API-Token in deinem Profil")
   
   public var body: some View {
-    UITextField.appearance().clearButtonMode = .whileEditing
-    return Form {
+    Form {
       Section(header: Label("API-Token", systemImage: "bolt.fill")) {
         VStack(alignment: .leading) {
           VStack(alignment: .leading, spacing: .grid(3)) {

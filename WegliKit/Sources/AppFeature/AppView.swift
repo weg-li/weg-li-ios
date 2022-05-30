@@ -167,20 +167,24 @@ public struct NoticesView: View {
         ActivityIndicator(style: .medium, color: .gray)
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       case let .results(notices):
-        ScrollView {
-          ForEach(notices, id: \.id) { notice in
-            NoticeView(notice: notice)
-          }
-          .padding()
+        List(notices) { notice in
+          NoticeView(notice: notice)
+            .listRowSeparator(.hidden)
+        }
+        .listStyle(.plain)
+        .refreshable {
+          await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
         }
       case .empty:
         emptyStateView
           .padding(.horizontal)
       case let .error(errorState):
         VStack(alignment: .center, spacing: .grid(2)) {
-          Image(systemName: "bolt.slash")
-            .font(.title)
-            .padding(.bottom, .grid(3))
+          if let systemImageName = errorState.systemImageName {
+            Image(systemName: systemImageName)
+              .font(.title)
+              .padding(.bottom, .grid(3))
+          }
           
           Text(errorState.title)
             .font(.title2.weight(.semibold))
@@ -191,13 +195,16 @@ public struct NoticesView: View {
               .font(.body)
               .multilineTextAlignment(.center)
           }
+          
+          if let errorMessage = errorState.error?.errorDump {
+            Text(errorMessage)
+              .font(.body.italic())
+              .multilineTextAlignment(.center)
+          }
         }
         .padding(.horizontal, .grid(3))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       }
-    }
-    .refreshable {
-      await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
     }
   }
   
