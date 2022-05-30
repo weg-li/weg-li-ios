@@ -163,7 +163,10 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       )
       
     case .onAppear:
+      guard !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty else {
         return .none
+      }
+      return Effect(value: .fetchNotices)
       
     case let .contactSettingsLoaded(result):
       let contact = (try? result.get()) ?? .init()
