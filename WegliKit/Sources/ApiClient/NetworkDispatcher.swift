@@ -19,11 +19,9 @@ public struct NetworkDispatcher {
            !(200...299).contains(response.statusCode) {
           throw httpError(response.statusCode)
         }
-        debugPrint("Response data: ", String(data: data, encoding: .utf8)!)
         return data
       })
       .mapError(handleError)
-      .print("API")
       .eraseToAnyPublisher()
   }
   
@@ -97,7 +95,12 @@ public struct ApiError: Codable, Error, Equatable, LocalizedError {
     if let networkRequestError = error as? NetworkRequestError {
       switch networkRequestError {
       case .unauthorized:
-        self.message = "Unauthorized\nEnter API Token in the account settings\nYou can still send a notices via email."
+        self.message = """
+        401 Unauthorized
+        Füge deinen API Token in den Accounteinstellungen hinzu
+        
+        Du kannst die App weiter nutzen und Anzeigen via Email versenden.
+        """
       default:
         // TODO: separate user facing from debug facing messages?
         self.message = networkRequestError.localizedDescription
