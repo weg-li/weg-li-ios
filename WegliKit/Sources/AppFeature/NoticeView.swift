@@ -23,6 +23,7 @@ public struct NoticeView: View {
             Image(systemName: "waveform.path.ecg")
               .font(.title2)
               .accessibility(hidden: true)
+              .unredacted()
             
             VStack(alignment: .leading, spacing: .grid(1)) {
               Text("Status: __\(notice.status)__")
@@ -37,13 +38,30 @@ public struct NoticeView: View {
             Image(systemName: "car")
               .font(.title2)
               .accessibility(hidden: true)
+              .unredacted()
             
             VStack(alignment: .leading, spacing: .grid(1)) {
               if let registration = notice.registration {
-                Text(verbatim: registration)
-                  .font(.custom(FontName.nummernschild.rawValue, size: 22, relativeTo: .body))
-                  .foregroundColor(Color(.label))
-                  .textCase(.uppercase)
+                HStack(alignment: .center, spacing: 3) {
+                  Color.blue
+                    .frame(width: 6)
+                  Text(verbatim: registration)
+                    .font(.custom(FontName.nummernschild.rawValue, size: 23, relativeTo: .body))
+                    .foregroundColor(.black)
+                    .textCase(.uppercase)
+                    .padding(.trailing, 3)
+                    .unredacted()
+                }
+                .background(.white)
+                .clipShape(
+                  RoundedRectangle(cornerRadius: 4, style: .circular)
+                )
+                .overlay(
+                  RoundedRectangle(cornerRadius: 4)
+                    .stroke(Color.black, lineWidth: 1)
+                )
+                .padding(.horizontal, 2)
+                .accessibility(value: Text(registration))
               }
               
               VStack(alignment: .leading) {
@@ -65,7 +83,8 @@ public struct NoticeView: View {
             Image(systemName: "exclamationmark.triangle")
               .font(.title2)
               .accessibility(hidden: true)
-          
+              .unredacted()
+            
             VStack(alignment: .leading, spacing: .grid(1)) {
               VStack(alignment: .leading) {
                 if let time = notice.time?.description {
@@ -99,6 +118,7 @@ public struct NoticeView: View {
             .offset(x: 70)
             .clipped()
             .blendMode(.overlay)
+            .unredacted()
         }
         Spacer()
       }

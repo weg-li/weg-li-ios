@@ -178,14 +178,21 @@ public struct NoticesView: View {
           .padding(.horizontal)
       case let .error(errorState):
         VStack(alignment: .center, spacing: .grid(2)) {
+          Image(systemName: "bolt.slash")
+            .font(.title)
+            .padding(.bottom, .grid(3))
+          
           Text(errorState.title)
             .font(.title2.weight(.semibold))
+            .padding(.bottom, .grid(2))
+          
           if let body = errorState.body {
             Text(body)
               .font(.body)
               .multilineTextAlignment(.center)
           }
         }
+        .padding(.horizontal, .grid(3))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       }
     }

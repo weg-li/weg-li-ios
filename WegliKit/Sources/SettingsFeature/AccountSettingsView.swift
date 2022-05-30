@@ -144,7 +144,7 @@ public struct AccountSettingsView: View {
             )
             .disableAutocorrection(true)
             .submitLabel(.done)
-            .padding(.bottom, .grid(5))
+            .padding(.vertical, .grid(4))
 
             Button(
               action: { viewStore.send(.fetchNotices) },

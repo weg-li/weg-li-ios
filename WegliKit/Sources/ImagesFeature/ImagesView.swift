@@ -103,18 +103,17 @@ public struct ImagesView: View {
         .padding(.trailing, .grid(1))
       }
     )
-      .font(.body)
-      .foregroundColor(Color(.label))
-      .background(.background)
-      .clipShape(
-        RoundedRectangle(cornerRadius: 8, style: .circular)
-      )
-      .overlay(
-        RoundedRectangle(cornerRadius: 8)
-          .stroke(Color(.label), lineWidth: 2)
-      )
-      .padding(.horizontal, 4)
-      .accessibility(value: Text(item.text))
+    .foregroundColor(Color(.label))
+    .background(.background)
+    .clipShape(
+      RoundedRectangle(cornerRadius: 8, style: .circular)
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 8)
+        .stroke(Color(.label), lineWidth: 2)
+    )
+    .padding(.horizontal, 4)
+    .accessibility(value: Text(item.text))
   }
   
   private var importButton: some View {
