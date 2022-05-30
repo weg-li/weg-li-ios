@@ -36,7 +36,7 @@ public struct AppState: Equatable {
   )
   
   var showReportWizard = false
-  public var isFetchingNotices = false
+  public var isFetchingNotices: Bool { notices == .loading }
   
   public init(
     settings: SettingsState = .init(
@@ -191,7 +191,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       let apiToken = (try? result.get()) ?? ""
       state.settings.accountSettingsState.accountSettings.apiToken = apiToken
       state.reportDraft.apiToken = apiToken
-      return Effect(value: .fetchNotices)
+      return .none
       
     case let .userSettingsLoaded(result):
       let userSettings = (try? result.get()) ?? UserSettings(showsAllTextRecognitionSettings: false)
@@ -252,8 +252,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         .map(AppAction.fetchNoticesResponse)
       
     case let .fetchNoticesResponse(.success(notices)):
-      state.isFetchingNotices = false
-            
       state.notices = notices.isEmpty
       ? .empty(.emptyNotices)
       : .results(notices)
@@ -264,7 +262,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         .fireAndForget()
       
     case let .fetchNoticesResponse(.failure(error)):
-      state.isFetchingNotices = false
       state.notices = .error(
         .init(
           systemImageName: "bolt.slash",

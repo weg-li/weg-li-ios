@@ -136,8 +136,6 @@ class AppStoreTests: XCTestCase {
       var report = $0.reportDraft
       report.images.storedPhotos.removeAll()
       report.mail.mailComposeResult = result
-      
-//      $0.reports = [report]
       $0.reportDraft = report
       $0.reportDraft.mail.mailComposeResult = result
     }
@@ -153,11 +151,11 @@ class AppStoreTests: XCTestCase {
   }
   
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
-    var AppState = AppState(reportDraft: report)
-    AppState.settings.contact = .preview
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
     
     let store = TestStore(
-      initialState: AppState,
+      initialState: state,
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
@@ -176,7 +174,7 @@ class AppStoreTests: XCTestCase {
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(
-          contact: AppState.settings.contact.contact,
+          contact: state.settings.contact.contact,
           alert: nil
         ),
         date: self.fixedDate
@@ -186,8 +184,8 @@ class AppStoreTests: XCTestCase {
   }
   
   func test_ActionStoredApiTokenLoaded() {
-    var AppState = AppState(reportDraft: report)
-    AppState.settings.contact = .preview
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
     
     let token = "API Token"
     var keychainClient = KeychainClient.noop
@@ -204,7 +202,7 @@ class AppStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: AppState,
+      initialState: state,
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: .immediate,
@@ -223,17 +221,11 @@ class AppStoreTests: XCTestCase {
       $0.reportDraft.apiToken = token
       $0.settings.accountSettingsState.accountSettings.apiToken = token
     }
-    store.receive(.fetchNotices) {
-      $0.notices = .loading
-    }
-    store.receive(.fetchNoticesResponse(.success([.mock]))) {
-      $0.notices = .results([.mock])
-    }
   }
   
   func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() {
-    var AppState = AppState(reportDraft: report)
-    AppState.settings.contact = .preview
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
     
     var didSaveNotices = false
     
@@ -244,7 +236,7 @@ class AppStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: AppState,
+      initialState: state,
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: .immediate,
@@ -259,18 +251,18 @@ class AppStoreTests: XCTestCase {
     )
     
     store.send(.fetchNoticesResponse(.success([]))) {
-      $0.isFetchingNotices = false
+      XCTAssertFalse($0.isFetchingNotices)
       $0.notices = .empty(.emptyNotices)
     }
     XCTAssertTrue(didSaveNotices)
   }
   
   func test_ActionOnAccountSettings_shouldPersistAccountsSettings() {
-    var AppState = AppState(reportDraft: report)
-    AppState.settings.contact = .preview
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
     
     let store = TestStore(
-      initialState: AppState,
+      initialState: state,
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: .immediate,
@@ -287,6 +279,69 @@ class AppStoreTests: XCTestCase {
     store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
       $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
       $0.reportDraft.apiToken = "TOKEN"
+    }
+  }
+  
+  func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() {
+    var state = AppState(reportDraft: report)
+    state.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
+    
+    var service = WegliAPIService.noop
+    service.getNotices = {
+      Just([.mock])
+        .setFailureType(to: ApiError.self)
+        .eraseToEffect()
+    }
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: service,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.onAppear)
+    store.receive(.fetchNotices) {
+      XCTAssertTrue($0.isFetchingNotices)
+    }
+    store.receive(.fetchNoticesResponse(.success([.mock]))) {
+      $0.notices = .results([.mock])
+      XCTAssertFalse($0.isFetchingNotices)
+    }
+  }
+  
+  func test_Action_onAppear_shouldPresentNoTokenErrorState() {
+    let store = TestStore(
+      initialState: AppState(reportDraft: report),
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.onAppear) {
+      $0.notices = .error(
+        .init(
+          systemImageName: "key",
+          title: "Kein API Token",
+          body: "Füge deinen API Token in den Account Einstellungen hinzu um die App mit deinem weg.li Account zu verbinden"
+        )
+      )
     }
   }
 }
