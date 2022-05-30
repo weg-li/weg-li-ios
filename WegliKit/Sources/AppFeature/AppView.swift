@@ -197,7 +197,7 @@ public struct NoticesView: View {
       }
     }
     .refreshable {
-      //      await viewStore.send(.fetchData, while: \.twitterFeedIsLoading)
+      await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
     }
   }
   
