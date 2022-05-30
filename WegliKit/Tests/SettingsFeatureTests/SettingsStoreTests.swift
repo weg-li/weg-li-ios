@@ -110,7 +110,7 @@ class SettingsStoreTests: XCTestCase {
     XCTAssertEqual(openedUrl, env.donateLink)
   }
   
-  func test_action_accountSettungs_setApiToken() {
+  func test_action_accountSettings_setApiToken_shouldPersistToken() {
     var env = defaultEnvironment
     
     var didWriteTokenToKeyChain = false
@@ -133,5 +133,28 @@ class SettingsStoreTests: XCTestCase {
       $0.accountSettingsState.accountSettings.apiToken = "TOKEN"
     }
     XCTAssertTrue(didWriteTokenToKeyChain)
+  }
+  
+  func test_action_openUserSettings_shouldCallURL() {
+    var openedUrl: URL!
+    
+    var env = defaultEnvironment
+    env.uiApplicationClient.open = { url, _ in
+      openedUrl = url
+      return .init(value: true)
+    }
+    
+    let store = TestStore(
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
+      reducer: settingsReducer,
+      environment: env
+    )
+    
+    store.send(.accountSettings(.openUserSettings))
+    XCTAssertEqual(openedUrl, URL(string: "https://www.weg.li/user")!)
   }
 }

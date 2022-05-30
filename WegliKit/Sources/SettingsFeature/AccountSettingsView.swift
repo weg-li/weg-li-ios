@@ -17,7 +17,6 @@ public struct AccountSettings: Equatable {
 
 // MARK: State
 public struct AccountSettingsState: Equatable {
-  public let userLink = URL(string: "https://www.weg.li/user")!
   public var accountSettings: AccountSettings
   
   public var isNetworkRequestInProgress = false
@@ -54,6 +53,8 @@ public struct AccountSettingsEnvironment {
   public let wegliService: WegliAPIService
   public let uiApplicationClient: UIApplicationClient
   public let mainQueue: AnySchedulerOf<DispatchQueue>
+  
+  public let userLink = URL(string: "https://www.weg.li/user")!
 }
 
 // MARK: Reducer
@@ -68,7 +69,7 @@ Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>
       
     case .openUserSettings:
       return environment.uiApplicationClient
-        .open(state.userLink, [:])
+        .open(environment.userLink, [:])
         .fireAndForget()
       
     case .fetchNotices:
