@@ -273,6 +273,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     }
   }
 )
+// store contact settings when changed in settings
 .onChange(of: \.reportDraft.contactState.contact) { contact, state, _, environment in
   struct SaveDebounceId: Hashable {}
   state.settings.contact.contact = contact
@@ -282,6 +283,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     .fireAndForget()
     .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
 }
+// store contact settings when changed in report
 .onChange(of: \.settings.contact) { contact, state, _, environment in
   struct SaveDebounceId: Hashable {}
   state.reportDraft.contactState = contact
@@ -291,6 +293,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     .fireAndForget()
     .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
 }
+// store usersettings when changed
 .onChange(of: \.settings.userSettings) { settings, state, _, environment in
   struct SaveDebounceId: Hashable {}
   state.reportDraft.images.showsAllTextRecognitionResults = settings.showsAllTextRecognitionSettings
