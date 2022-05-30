@@ -38,21 +38,39 @@ public struct DescriptionView: View {
     VStack(alignment: .leading) {
       VStack(alignment: .leading, spacing: 12) {
         row(title: L10n.Description.Row.licenseplateNumber, content: viewStore.description.licensePlateNumber)
+        
         row(title: L10n.Description.Row.carType, content: viewStore.brand)
+        
         row(title: L10n.Description.Row.carColor, content: viewStore.color)
+        
         row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)
+        
         row(title: L10n.Description.Row.length, content: viewStore.description.time)
-        if viewStore.description.blockedOthers {
-          HStack {
-            Text(L10n.Description.Row.didBlockOthers)
-              .foregroundColor(Color(.secondaryLabel))
-              .font(.callout)
-              .fontWeight(.bold)
-            Spacer()
-            Image(systemName: "checkmark.circle.fill")
-              .foregroundColor(.primary)
-          }
-        }
+        
+        toggleRow(
+          label: L10n.Description.Row.didBlockOthers,
+          value: viewStore.description.blockedOthers
+        )
+        
+        toggleRow(
+          label: "Das Fahrzeug war verlassen",
+          value: viewStore.description.verhicleEmpty
+        )
+        
+        toggleRow(
+          label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
+          value: viewStore.description.hazardLights
+        )
+        
+        toggleRow(
+          label: "Die TÜV-Plakette war abgelaufen",
+          value: viewStore.description.expiredTuv
+        )
+        
+        toggleRow(
+          label: "Die Umwelt-Plakette fehlte oder war ungültig",
+          value: viewStore.description.expiredEco
+        )
       }
       .accessibilitySortPriority(1)
       .accessibilityElement(children: .combine)
@@ -89,6 +107,18 @@ public struct DescriptionView: View {
         .accessibilityAddTraits([.isModal])
       }
     )
+  }
+  
+  @ViewBuilder func toggleRow(label: String, value: Bool) -> some View {
+    HStack {
+      Text(label)
+        .multilineTextAlignment(.leading)
+        .foregroundColor(Color(.secondaryLabel))
+        .font(.callout)
+      Spacer()
+      Image(systemName: value ? "checkmark.circle.fill" : "circle")
+        .foregroundColor(.primary)
+    }
   }
   
   private func row(title: String, content: String) -> some View {

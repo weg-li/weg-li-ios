@@ -38,6 +38,14 @@ public struct EditDescriptionView: View {
           chargeDurationView
 
           blockedOthersView
+          
+          verhicleEmtpyView
+          
+          hazardLightsView
+          
+          expiredTuvView
+          
+          expiredEcoView
         }
       }
       .onAppear { viewStore.send(.onAppear) }
@@ -188,24 +196,43 @@ public struct EditDescriptionView: View {
   }
   
   var blockedOthersView: some View {
-    Button(
-      action: {
-        viewStore.send(.toggleBlockedOthers)
-      },
-      label: {
-        HStack {
-          Text(L10n.Description.Row.didBlockOthers)
-            .foregroundColor(.secondary)
-          Spacer()
-          ToggleButton(
-            isOn: viewStore.binding(
-              get: \.blockedOthers,
-              send: DescriptionAction.toggleBlockedOthers
-            )
-          ).accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
-        }
-      }
+    ToggleButton(
+      label: L10n.Description.Row.didBlockOthers,
+      isOn: viewStore.binding(\.$blockedOthers)
     )
+    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
+  }
+  
+  var verhicleEmtpyView: some View {
+    ToggleButton(
+      label: "Das Fahrzeug war verlassen",
+      isOn: viewStore.binding(\.$verhicleEmpty)
+    )
+    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.verhicleEmpty)
+  }
+  
+  var hazardLightsView: some View {
+    ToggleButton(
+      label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
+      isOn: viewStore.binding(\.$hazardLights)
+    )
+    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.hazardLights)
+  }
+  
+  var expiredTuvView: some View {
+    ToggleButton(
+      label: "Die TÜV-Plakette war abgelaufen",
+      isOn: viewStore.binding(\.$expiredTuv)
+    )
+    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.expiredTuv)
+  }
+  
+  var expiredEcoView: some View {
+    ToggleButton(
+      label: "Die Umwelt-Plakette fehlte oder war ungültig",
+      isOn: viewStore.binding(\.$expiredEco)
+    )
+    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.expiredEco)
   }
   
   var closeButton: some View {

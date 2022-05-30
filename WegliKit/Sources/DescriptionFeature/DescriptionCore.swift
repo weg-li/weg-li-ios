@@ -14,7 +14,11 @@ public struct DescriptionState: Equatable {
     selectedBrand: CarBrand? = nil,
     selectedDuration: Int = 0,
     selectedCharge: Charge? = nil,
-    blockedOthers: Bool = false
+    blockedOthers: Bool = false,
+    verhicleEmpty: Bool = false,
+    hazardLights: Bool = false,
+    expiredTuv: Bool = false,
+    expiredEco: Bool = false
   ) {
     self.licensePlateNumber = licensePlateNumber
     self.selectedColor = selectedColor
@@ -22,6 +26,10 @@ public struct DescriptionState: Equatable {
     self.selectedDuration = selectedDuration
     self.selectedCharge = selectedCharge
     self.blockedOthers = blockedOthers
+    self.verhicleEmpty = verhicleEmpty
+    self.hazardLights = hazardLights
+    self.expiredTuv = expiredTuv
+    self.expiredEco = expiredEco
   }
   
   public var licensePlateNumber: String
@@ -29,7 +37,11 @@ public struct DescriptionState: Equatable {
   public var selectedBrand: CarBrand?
   public var selectedDuration: Int
   public var selectedCharge: Charge?
-  public var blockedOthers: Bool
+  @BindableState public var blockedOthers = false
+  @BindableState public var verhicleEmpty = false
+  @BindableState public var hazardLights = false
+  @BindableState public var expiredTuv = false
+  @BindableState public var expiredEco = false
   public var chargeTypeSearchText = ""
   public var carBrandSearchText = ""
   
@@ -55,12 +67,12 @@ public struct DescriptionState: Equatable {
   }  
 }
 
-public enum DescriptionAction: Equatable {
+public enum DescriptionAction: BindableAction, Equatable {
+  case binding(BindingAction<DescriptionState>)
   case onAppear
   case setLicensePlateNumber(String)
   case setBrand(CarBrand)
   case setColor(Int)
-  case toggleBlockedOthers
   case setCharge(Charge)
   case setDuraration(Int)
   case setChargeTypeSearchText(String)
@@ -91,6 +103,9 @@ public struct DescriptionEnvironment {
 /// Reducer handing actions from EditDescriptionView.
 public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, DescriptionEnvironment> { state, action, environment in
     switch action {
+    case .binding:
+      return .none
+      
     case .onAppear:
       return environment.fileClient.loadFavoriteCharges()
         .map(DescriptionAction.favoriteChargesLoaded)
@@ -106,10 +121,6 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       
     case let .setColor(value):
       state.selectedColor = value
-      return .none
-      
-    case .toggleBlockedOthers:
-      state.blockedOthers.toggle()
       return .none
       
     case let .setCharge(value):
@@ -179,6 +190,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       return .none
     }
 }
+.binding()
 
 extension DescriptionState: Codable {}
 

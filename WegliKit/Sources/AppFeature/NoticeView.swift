@@ -50,8 +50,8 @@ public struct NoticeView: View {
                     .foregroundColor(.black)
                     .textCase(.uppercase)
                     .padding(.trailing, 3)
-                    .unredacted()
                 }
+                .unredacted()
                 .background(.white)
                 .clipShape(
                   RoundedRectangle(cornerRadius: 4, style: .circular)
@@ -95,6 +95,7 @@ public struct NoticeView: View {
                 }
               }
               Text(notice.charge)
+                .multilineTextAlignment(.leading)
             }
             .font(.body)
           }

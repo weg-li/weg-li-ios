@@ -593,6 +593,10 @@ public extension SharedModels.NoticeInput {
       createdAt: .now,
       updatedAt: .now,
       sentAt: .now,
+      vehicleEmpty: reportState.description.verhicleEmpty,
+      hazardLights: reportState.description.hazardLights,
+      expiredTuv: reportState.description.expiredTuv,
+      expiredEco: reportState.description.expiredEco,
       photos: []
     )
   }
