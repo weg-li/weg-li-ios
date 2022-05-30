@@ -801,6 +801,13 @@ class ReportStoreTests: XCTestCase {
         .eraseToEffect()
     }
     
+    var didRemoveImageItems = false
+    var fileClient = FileClient.noop
+    fileClient.removeItem = { _ in
+      didRemoveImageItems = true
+      return .none
+    }
+    
     let store = TestStore(
       initialState: ReportState(
         uuid: fixedUUID,
@@ -808,8 +815,8 @@ class ReportStoreTests: XCTestCase {
           alert: nil,
           showImagePicker: false,
           storedPhotos: [
-            .init(uiImage: .add),
-            .init(uiImage: .actions)
+            .init(id: "1", uiImage: .add, imageUrl: .some(.init(string: "URL")!)),
+            .init(id: "2", uiImage: .actions, imageUrl: .some(.init(string: "URL")!))
           ],
           coordinateFromImagePicker: nil,
           dateFromImagePicker: nil
@@ -835,7 +842,7 @@ class ReportStoreTests: XCTestCase {
         locationManager: LocationManager.unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
-        fileClient: .noop,
+        fileClient: fileClient,
         wegliService: wegliService,
         date: Date.init,
         imagesUploadClient: imagesUploadClient
@@ -854,5 +861,6 @@ class ReportStoreTests: XCTestCase {
       $0.alert = .reportSent
       $0.uploadedImagesIds = []
     }
+    XCTAssertTrue(didRemoveImageItems)
   }
 }

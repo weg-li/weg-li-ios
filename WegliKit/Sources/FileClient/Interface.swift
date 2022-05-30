@@ -7,6 +7,7 @@ import SharedModels
 // MARK: Interface
 /// Client handling FileManager interactions
 public struct FileClient {
+  public var removeItem: (URL) -> Effect<Never, Error>
   public var delete: (String) -> Effect<Never, Error>
   public var load: (String) -> Effect<Data, Error>
   public var save: (String, Data) -> Effect<Never, Error>

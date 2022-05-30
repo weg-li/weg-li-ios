@@ -428,7 +428,16 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.isUploadingNotice = false
       state.alert = .reportSent
       state.uploadedImagesIds.removeAll()
-      return .none
+      
+      let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
+      return .fireAndForget {
+        imageURLs.forEach {
+          environment.fileClient.removeItem($0)
+            .ignoreFailure()
+            .eraseToEffect()
+        }
+      }
+      
     case let .composeNoticeResponse(.failure(error)):
       state.isUploadingNotice = false
       state.alert = .sendNoticeFailed(error: error)
