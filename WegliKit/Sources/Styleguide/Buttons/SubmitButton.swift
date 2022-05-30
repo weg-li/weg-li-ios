@@ -17,6 +17,7 @@ public struct SubmitButtonStyle: ViewModifier {
       .padding()
       .foregroundColor(.white)
       .frame(maxWidth: .infinity)
+      .disabled(disabled)
       .background(disabled ? Color(.systemGray2) : color)
       .clipShape(RoundedRectangle(cornerRadius: 10))
   }
