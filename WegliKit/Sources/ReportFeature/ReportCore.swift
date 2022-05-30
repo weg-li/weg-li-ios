@@ -251,14 +251,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         state.location.pinCoordinate = coordinate
         
         guard state.isInternetConnectionAvailable else {
-          state.alert = .init(
-            title: .init("Keine Internetverbindung"),
-            message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
-            buttons: [
-              .cancel(.init(L10n.cancel)),
-              .default(.init("Wiederholen"), action: .send(.location(.resolveLocation(state.location.pinCoordinate!))))
-            ]
-          )
+          state.alert = .noInternetConnection(coordinate: state.location.pinCoordinate!)
           return .none
         }
         
@@ -301,11 +294,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return Effect(value: ReportAction.mapAddressToDistrict(address))
         
       case let .resolveAddressFinished(.failure(error)):
-        debugPrint(error.localizedDescription)
-        state.alert = .init(
-          title: .init("Addresse konnte nicht ermittelt werden"),
-          message: .init(error.localizedDescription),
-          buttons: [.cancel(.init(L10n.cancel))])
+        state.alert = .addressResolveFailed(error: error)
         return .none
         
         // Handle manual address entering to trigger district mapping.
@@ -474,7 +463,7 @@ public extension ReportState {
       ),
       date: { Date(timeIntervalSince1970: 1580624207) },
       description: .init(
-        licensePlateNumber: "HH-ST-PAULI",
+        licensePlateNumber: "       ",
         selectedColor: 3,
         selectedBrand: .init("Opel"),
         selectedDuration: 5,
@@ -486,6 +475,25 @@ public extension ReportState {
 }
 
 public extension AlertState where Action == ReportAction {
+  static func noInternetConnection(coordinate: CLLocationCoordinate2D) -> Self {
+    Self(
+      title: .init("Keine Internetverbindung"),
+      message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
+      buttons: [
+        .cancel(.init(L10n.cancel)),
+        .default(.init("Wiederholen"), action: .send(.location(.resolveLocation(coordinate))))
+      ]
+    )
+  }
+  
+  static func addressResolveFailed(error: PlacesServiceError) -> Self {
+    Self(
+      title: .init("Addresse konnte nicht ermittelt werden"),
+      message: .init(error.message),
+      buttons: [.cancel(.init(L10n.cancel))]
+    )
+  }
+  
   static let resetReportAlert = Self(
     title: TextState(L10n.Report.Alert.title),
     primaryButton: .destructive(

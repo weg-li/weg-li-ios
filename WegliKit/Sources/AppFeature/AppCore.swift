@@ -245,7 +245,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.isFetchingNotices = false
             
       state.notices = notices.isEmpty
-      ? .empty(.init(text: "Keine Anzeigen", message: nil))
+      ? .empty(.emptyNotices)
       : .results(notices)
       
       return environment.fileClient
