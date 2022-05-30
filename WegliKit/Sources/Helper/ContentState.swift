@@ -36,13 +36,38 @@ public extension EmptyState {
 }
 
 public struct ErrorState: Equatable {
+  public var systemImageName: String?
   public let title: String
-  public let body: String?
-  public let error: NSError?
-  
-  public init(title: String, body: String?, error: NSError? = nil) {
+  public var body: String?
+  public var error: Error?
+
+  public init(
+    systemImageName: String? = nil,
+    title: String,
+    body: String? = nil,
+    error: Error? = nil
+  ) {
+    self.systemImageName = systemImageName
     self.title = title
     self.body = body
     self.error = error
+  }
+}
+
+public extension ErrorState {
+  struct Error: Equatable, LocalizedError {
+    public let errorDump: String
+    public let message: String
+    
+    public init(error: Swift.Error) {
+      var string = ""
+      dump(error, to: &string)
+      self.errorDump = string
+      self.message = error.localizedDescription
+    }
+    
+    public var errorDescription: String? {
+      self.message
+    }
   }
 }

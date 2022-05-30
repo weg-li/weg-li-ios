@@ -92,23 +92,8 @@ public struct ApiError: Codable, Error, Equatable, LocalizedError {
     self.errorDump = string
     self.file = String(describing: file)
     self.line = line
-    if let networkRequestError = error as? NetworkRequestError {
-      switch networkRequestError {
-      case .unauthorized:
-        self.message = """
-        401 Unauthorized
-        Füge deinen API Token in den Accounteinstellungen hinzu
-        
-        Du kannst die App weiter nutzen und Anzeigen via Email versenden.
-        """
-      default:
-        // TODO: separate user facing from debug facing messages?
-        self.message = networkRequestError.localizedDescription
-      }
-    } else {
-      // TODO: separate user facing from debug facing messages?
-      self.message = error.localizedDescription
-    }
+    // TODO: separate user facing from debug facing messages?
+    self.message = String(describing: error)
   }
 
   public var errorDescription: String? {
