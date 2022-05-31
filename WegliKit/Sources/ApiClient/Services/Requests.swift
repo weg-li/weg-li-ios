@@ -3,6 +3,7 @@ import Foundation
 import SharedModels
 import UIKit
 
+/// A ApiRequest to POST a new notice to `/api/notices`
 public struct SubmitNoticeRequest: APIRequest {
   public var queryItems: [URLQueryItem] = []
   public typealias ResponseDataType = Notice
@@ -22,6 +23,7 @@ public struct SubmitNoticeRequest: APIRequest {
   }
 }
 
+/// A ApiRequest to GET notices from `/api/notices`
 public struct GetNoticesRequest: APIRequest {
   public var queryItems: [URLQueryItem] = []
   public typealias ResponseDataType = [Notice]
@@ -39,6 +41,7 @@ public struct GetNoticesRequest: APIRequest {
   }
 }
 
+/// A APIRequest to upload images to the `/api/uploads` endpoint
 public struct UploadImageRequest: APIRequest {
   public var queryItems: [URLQueryItem] = []
   public typealias ResponseDataType = [ImageUploadInput]
