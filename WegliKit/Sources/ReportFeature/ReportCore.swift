@@ -39,6 +39,7 @@ public struct ReportState: Equatable {
   public var apiToken: String = ""
   
   public var uploadedImagesIds: [String] = []
+  public var uploadProgressState: String?
   
   public var isPhotosValid: Bool { !images.storedPhotos.isEmpty }
   public var isContactValid: Bool { contactState.isValid }
@@ -386,6 +387,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       }
       
       state.isUploadingNotice = true
+      state.uploadProgressState = "Uploading images ..."
       
       return environment.imagesUploadClient.uploadImages(imageUploadRequests)
         .subscribe(on: environment.backgroundQueue)
@@ -395,7 +397,6 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .uploadImagesResponse(.success(imageInputFromUpload)):
       state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
-      
       return Effect(value: .composeNoticeAndSend)
       
     case let .uploadImagesResponse(.failure(error)):
@@ -406,6 +407,8 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       notice.photos = state.uploadedImagesIds
       state.isUploadingNotice = true
       
+      state.uploadProgressState = "Sending notice ..."
+      
       return environment.wegliService.postNotice(notice)
         .receive(on: environment.mainQueue)
         .map(ReportAction.composeNoticeResponse)
@@ -415,6 +418,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.isUploadingNotice = false
       state.alert = .reportSent
       state.uploadedImagesIds.removeAll()
+      state.uploadProgressState = nil
       
       let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
       return .fireAndForget {
@@ -428,6 +432,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     case let .composeNoticeResponse(.failure(error)):
       state.isUploadingNotice = false
       state.alert = .sendNoticeFailed(error: error)
+      state.uploadProgressState = nil
       return .none
     }
   }

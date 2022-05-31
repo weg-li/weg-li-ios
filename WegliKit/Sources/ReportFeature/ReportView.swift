@@ -87,17 +87,26 @@ public struct ReportView: View {
             Button(
               action: { viewStore.send(.uploadImages) },
               label: {
-                HStack {
-                  if viewStore.isUploadingNotice {
-                    ActivityIndicator(style: .medium, color: .white)
-                      .foregroundColor(.white)
-                  } else {
-                    Text("Anzeige hinzufügen")
+                VStack(alignment: .center) {
+                  HStack {
+                    if viewStore.isUploadingNotice {
+                      ActivityIndicator(style: .medium, color: .white)
+                        .foregroundColor(.white)
+                    } else {
+                      Text("Anzeige hinzufügen")
+                    }
+                  }
+                  .frame(maxWidth: .infinity, alignment: .center)
+                  
+                  if let uploadProgressMessage = viewStore.uploadProgressState {
+                    Text(uploadProgressMessage)
+                      .font(.footnote)
+                      .foregroundColor(.secondary)
                   }
                 }
-                .frame(maxWidth: .infinity, alignment: .center)
               }
             )
+            .disabled(viewStore.isUploadingNotice)
             .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
             .padding()
           } else {

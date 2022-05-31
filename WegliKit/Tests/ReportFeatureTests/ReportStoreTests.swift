@@ -849,16 +849,20 @@ class ReportStoreTests: XCTestCase {
     )
     
     store.send(.uploadImages) {
+      $0.uploadProgressState = "Uploading images ..."
       $0.isUploadingNotice = true
     }
     store.receive(.uploadImagesResponse(.success(responses))) {
       $0.uploadedImagesIds = ["111", "222"]
     }
-    store.receive(.composeNoticeAndSend)
+    store.receive(.composeNoticeAndSend) {
+      $0.uploadProgressState = "Sending notice ..."
+    }
     store.receive(.composeNoticeResponse(.success(.mock))) {
       $0.isUploadingNotice = false
       $0.alert = .reportSent
       $0.uploadedImagesIds = []
+      $0.uploadProgressState = nil
     }
     XCTAssertTrue(didRemoveImageItems)
   }
