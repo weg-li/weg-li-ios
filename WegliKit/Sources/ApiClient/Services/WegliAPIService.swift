@@ -51,8 +51,8 @@ public extension WegliAPIService {
           .catchToEffect()
           .eraseToEffect()
       },
-      upload: {
-        let responseData = try await apiClient.dispatch($0)
+      upload: { imageUploadRequest in
+        let responseData = try await apiClient.dispatch(imageUploadRequest)
         return try JSONDecoder.noticeDecoder.decode(ImageUploadResponse.self, from: responseData)
       }
     )
