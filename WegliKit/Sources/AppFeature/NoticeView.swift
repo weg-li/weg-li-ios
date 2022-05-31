@@ -49,14 +49,12 @@ public struct NoticeView: View {
             VStack(alignment: .leading, spacing: .grid(1)) {
               if let registration = notice.registration {
                 HStack(alignment: .center, spacing: 3) {
-                  Color.blue
-                    .frame(width: 6)
                   Text(verbatim: registration)
                     .font(.custom(FontName.nummernschild.rawValue, size: 23 , relativeTo: .body))
                     .foregroundColor(.black)
                     .textCase(.uppercase)
-                    .padding(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 2))
+                    .overlay(Color.blue.frame(width: 6), alignment: .leading)
                 }
                 .unredacted()
                 .background(.white)
@@ -67,7 +65,6 @@ public struct NoticeView: View {
                   RoundedRectangle(cornerRadius: 4)
                     .stroke(Color.black, lineWidth: 1)
                 )
-                .padding(.horizontal, 2)
                 .accessibility(value: Text(registration))
               }
               
@@ -103,10 +100,10 @@ public struct NoticeView: View {
               }
               Text(notice.charge)
                 .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
             }
             .font(.body)
           }
-          .accessibility(label: Text("report info"))
           .accessibilityElement()
         }
         .padding()
