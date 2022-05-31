@@ -14,7 +14,7 @@ public extension DateFormatter {
   
   static let dateFormatterMediumStyle: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.timeStyle = .long
+    formatter.timeStyle = .short
     formatter.dateStyle = .medium
     formatter.locale = 🇩🇪
     formatter.timeZone = berlin
@@ -26,7 +26,7 @@ public extension DateIntervalFormatter {
   static let reportTimeFormatter: DateIntervalFormatter = {
     let formatter = DateIntervalFormatter()
     formatter.dateStyle = .none
-    formatter.timeStyle = .medium
+    formatter.timeStyle = .short
     formatter.locale = 🇩🇪
     formatter.timeZone = berlin
     return formatter

@@ -76,9 +76,9 @@ class ReportMailTests: XCTestCase {
     
     Verstoß: Parken verbotswidrig auf einem Gehweg
     
-    Tatzeit: 01.01.2001, 01:00:00 MEZ
+    Tatzeit: 01.01.2001, 01:00
     
-    Zeitraum: länger als 4 Minuten (01:00:00 – 01:04:00)
+    Zeitraum: 01:00–01:04 Uhr (länger als 4 Minuten)
     
     Das Fahrzeug war verlassen.
     
