@@ -238,12 +238,18 @@ public extension DescriptionState {
     return IdentifiedArray(uniqueElements: carBrands, id: \.id)
   }()
   
-  static let times = Times.allCases
+  var times: [Int] {
+    Array(
+      Times.times.sorted(by: { $0.0 < $1.0 })
+      .map(\.key)
+      .dropFirst()
+    )
+  }
   
-  var time: String { Times.allCases[selectedDuration].description }
+  var time: String { Times.times[selectedDuration] ?? "" }
   
   func timeInterval(from startDate: Date) -> String {
-    guard let interval = Times.allCases[selectedDuration].interval(from: startDate) else {
+    guard let interval = Times.interval(value: selectedDuration, from: startDate) else {
       return time
     }
     return "\(time) (\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!))"  

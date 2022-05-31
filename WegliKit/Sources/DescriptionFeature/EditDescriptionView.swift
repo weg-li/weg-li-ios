@@ -187,8 +187,8 @@ public struct EditDescriptionView: View {
         send: DescriptionAction.setDuraration
       )
     ) {
-      ForEach(1..<Times.allCases.count, id: \.self) {
-        Text(Times.allCases[$0].description)
+      ForEach(viewStore.times, id: \.self) { time in
+        Text(Times.times[time] ?? "")
           .contentShape(Rectangle())
           .foregroundColor(Color(.label))
       }

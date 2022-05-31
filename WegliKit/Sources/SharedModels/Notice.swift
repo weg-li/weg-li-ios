@@ -27,13 +27,12 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var expiredEco: Bool = false
   public var photos: [NoticePhoto]?
   
-  public var time: Times? { Times(rawValue: duration) }
+  public var time: String? { Times.times[Int(duration)] }
   
   public var interval: String? {
     guard
-      let time = self.time,
       let date = self.date,
-      let interval = time.interval(from: date)
+      let interval = Times.interval(value: Int(duration), from: date)
     else { return nil }
     return DateIntervalFormatter.reportTimeFormatter.string(from: interval)
   }
