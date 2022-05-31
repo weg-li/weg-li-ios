@@ -97,20 +97,21 @@ public struct ImagesView: View {
             .frame(width: 10)
           Text(item.text)
             .font(.custom(FontName.nummernschild.rawValue, size: 24, relativeTo: .headline))
-            .foregroundColor(Color(.label))
+            .foregroundColor(.black)
             .textCase(.uppercase)
+            .padding(.vertical, .grid(1))
         }
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.trailing, .grid(1))
       }
     )
-    .foregroundColor(Color(.label))
-    .background(.background)
+    .background(Color.white)
     .clipShape(
       RoundedRectangle(cornerRadius: 8, style: .circular)
     )
     .overlay(
       RoundedRectangle(cornerRadius: 8)
-        .stroke(Color(.label), lineWidth: 2)
+        .stroke(Color.black, lineWidth: 2)
     )
     .padding(.horizontal, 4)
     .accessibility(value: Text(item.text))

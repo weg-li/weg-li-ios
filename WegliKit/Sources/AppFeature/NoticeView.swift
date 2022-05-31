@@ -8,7 +8,13 @@ import Styleguide
 import SwiftUI
 
 public struct NoticeView: View {
- public let notice: Notice
+  public let notice: Notice
+  
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @Environment(\.horizontalSizeClass) var horizontalSizeClass
+  var useVStackOverall: Bool {
+    dynamicTypeSize > .accessibility2 && horizontalSizeClass == .compact
+  }
   
   public var body: some View {
     ZStack {
@@ -19,7 +25,7 @@ public struct NoticeView: View {
             .font(.title)
             .padding(.bottom, .grid(1))
           
-          HStack(spacing: .grid(3)) {
+          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
             Image(systemName: "waveform.path.ecg")
               .font(.title2)
               .accessibility(hidden: true)
@@ -34,7 +40,7 @@ public struct NoticeView: View {
           .accessibilityElement()
           .padding(.bottom, .grid(2))
           
-          HStack(spacing: .grid(3)) {
+          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
             Image(systemName: "car")
               .font(.title2)
               .accessibility(hidden: true)
@@ -49,7 +55,8 @@ public struct NoticeView: View {
                     .font(.custom(FontName.nummernschild.rawValue, size: 23 , relativeTo: .body))
                     .foregroundColor(.black)
                     .textCase(.uppercase)
-                    .padding(.trailing, 3)
+                    .padding(3)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
                 .unredacted()
                 .background(.white)
@@ -79,7 +86,7 @@ public struct NoticeView: View {
           .accessibilityElement()
           .padding(.bottom, .grid(2))
           
-          HStack(spacing: .grid(3)) {
+          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
             Image(systemName: "exclamationmark.triangle")
               .font(.title2)
               .accessibility(hidden: true)

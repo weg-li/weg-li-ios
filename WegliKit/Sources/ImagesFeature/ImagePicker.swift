@@ -154,7 +154,6 @@ extension FileManager {
     let dta = try Data(contentsOf: fileURL)
     createDirectory(withFolderName: "\(subDirectory)", toDirectory: .applicationSupportDirectory)
     try dta.write(to: fullDestPath, options: .atomic)
-    
     return fullDestPath
   }
   

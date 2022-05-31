@@ -200,7 +200,6 @@ public struct EditDescriptionView: View {
       label: L10n.Description.Row.didBlockOthers,
       isOn: viewStore.binding(\.$blockedOthers)
     )
-    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
   }
   
   var verhicleEmtpyView: some View {
@@ -208,7 +207,6 @@ public struct EditDescriptionView: View {
       label: "Das Fahrzeug war verlassen",
       isOn: viewStore.binding(\.$verhicleEmpty)
     )
-    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.verhicleEmpty)
   }
   
   var hazardLightsView: some View {
@@ -216,7 +214,6 @@ public struct EditDescriptionView: View {
       label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
       isOn: viewStore.binding(\.$hazardLights)
     )
-    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.hazardLights)
   }
   
   var expiredTuvView: some View {
@@ -224,7 +221,6 @@ public struct EditDescriptionView: View {
       label: "Die TÜV-Plakette war abgelaufen",
       isOn: viewStore.binding(\.$expiredTuv)
     )
-    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.expiredTuv)
   }
   
   var expiredEcoView: some View {
@@ -232,7 +228,6 @@ public struct EditDescriptionView: View {
       label: "Die Umwelt-Plakette fehlte oder war ungültig",
       isOn: viewStore.binding(\.$expiredEco)
     )
-    .accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.expiredEco)
   }
   
   var closeButton: some View {

@@ -74,6 +74,7 @@ public struct DescriptionView: View {
       }
       .accessibilitySortPriority(1)
       .accessibilityElement(children: .combine)
+      
       Button(
         action: { viewStore.send(.setShowEditDescription(true)) },
         label: {
@@ -109,7 +110,7 @@ public struct DescriptionView: View {
     )
   }
   
-  @ViewBuilder func toggleRow(label: String, value: Bool) -> some View {
+  func toggleRow(label: String, value: Bool) -> some View {
     HStack {
       Text(label)
         .multilineTextAlignment(.leading)
@@ -121,7 +122,7 @@ public struct DescriptionView: View {
     }
   }
   
-  private func row(title: String, content: String) -> some View {
+  func row(title: String, content: String) -> some View {
     VStack(alignment: .leading, spacing: .grid(1)) {
       Text(title)
         .foregroundColor(.secondary)
