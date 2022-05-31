@@ -204,7 +204,6 @@ class ReportStoreTests: XCTestCase {
     
     let storedImage = PickerImageResult(
       id: "1",
-      data: nil,
       imageUrl: nil,
       coordinate: .init(coordinate),
       creationDate: creationDate

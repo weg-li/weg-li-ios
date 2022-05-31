@@ -18,21 +18,18 @@ class ImagesStoreTests: XCTestCase {
     
     let pencilImage = PickerImageResult(
       id: "pencil",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate: coordinate,
       creationDate: creationDate
     )
     let trashImage = PickerImageResult(
       id: "trash",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate: coordinate,
       creationDate: creationDate
     )
     let heartImage = PickerImageResult(
       id: "heart",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate: coordinate,
       creationDate: creationDate
@@ -155,14 +152,12 @@ class ImagesStoreTests: XCTestCase {
 
     let pencilImage = PickerImageResult(
       id: "pencil",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate: coordinate,
       creationDate: creationDate
     )
     let trashImage = PickerImageResult(
       id: "trash",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate:.init(latitude: 36.32, longitude: 0.31),
       creationDate: creationDate
@@ -201,14 +196,12 @@ class ImagesStoreTests: XCTestCase {
     
     let pencilImage = PickerImageResult(
       id: "pencil",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate: coordinate,
       creationDate: creationDate
     )
     let trashImage = PickerImageResult(
       id: "trash",
-      data: "".data(using: .utf8)!,
       imageUrl: .init(string: ""),
       coordinate:.init(latitude: 36.32, longitude: 0.31),
       creationDate: creationDate
