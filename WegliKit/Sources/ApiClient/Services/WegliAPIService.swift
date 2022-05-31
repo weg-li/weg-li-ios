@@ -8,12 +8,12 @@ import SharedModels
 /// A Service to send a single notice and all persisted notices from the weg-li API
 public struct WegliAPIService {
   public var getNotices: () -> Effect<[Notice], ApiError>
-  public var postNotice: (Data?) -> Effect<Result<Notice, ApiError>, Never>
+  public var postNotice: (NoticeInput) -> Effect<Result<Notice, ApiError>, Never>
   public var upload: (UploadImageRequest) async throws -> ImageUploadResponse
 
   public init(
     getNotices: @escaping () -> Effect<[Notice], ApiError>,
-    postNotice: @escaping (Data?) -> Effect<Result<Notice, ApiError>, Never>,
+    postNotice: @escaping (NoticeInput) -> Effect<Result<Notice, ApiError>, Never>,
     upload: @escaping (UploadImageRequest) async throws -> ImageUploadResponse
   ) {
     self.getNotices = getNotices
@@ -36,8 +36,11 @@ public extension WegliAPIService {
           .mapError { ApiError(error: $0) }
           .eraseToEffect()
       },
-      postNotice: { data in
-        let request = SubmitNoticeRequest(body: data)
+      postNotice: { input in
+        let noticePutRequestBody = NoticePutRequestBody(notice: input)
+        let body = try? JSONEncoder.noticeEncoder.encode(noticePutRequestBody)
+        
+        let request = SubmitNoticeRequest(body: body)
         
         return apiClient.dispatch(request)
           .decode(

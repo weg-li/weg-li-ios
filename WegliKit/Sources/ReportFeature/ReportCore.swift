@@ -388,6 +388,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.isUploadingNotice = true
       
       return environment.imagesUploadClient.uploadImages(imageUploadRequests)
+        .subscribe(on: environment.backgroundQueue)
         .receive(on: environment.mainQueue)
         .map(ReportAction.uploadImagesResponse)
         .eraseToEffect()
@@ -403,12 +404,9 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     case .composeNoticeAndSend:
       var notice = NoticeInput(state)
       notice.photos = state.uploadedImagesIds
-      
-      let postBody = try? JSONEncoder.noticeEncoder.encode(notice)
-      
       state.isUploadingNotice = true
       
-      return environment.wegliService.postNotice(postBody)
+      return environment.wegliService.postNotice(notice)
         .receive(on: environment.mainQueue)
         .map(ReportAction.composeNoticeResponse)
         .eraseToEffect()
