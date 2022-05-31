@@ -163,14 +163,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       )
       
     case .onAppear:
-      guard !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty else {
-        state.notices = .error(
-          .init(
-            systemImageName: "key",
-            title: "Kein API Token",
-            body: "Füge deinen API Token in den Account Einstellungen hinzu um die App mit deinem weg.li Account zu verbinden"
-          )
-        )
+      let isTokenAvailable = !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty
+      guard isTokenAvailable else {
+        state.notices = .error(.tokenUnavailable)
         return .none
       }
       return Effect(value: .fetchNotices)
@@ -262,14 +257,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         .fireAndForget()
       
     case let .fetchNoticesResponse(.failure(error)):
-      state.notices = .error(
-        .init(
-          systemImageName: "bolt.slash",
-          title: "Fehler beim laden",
-          body: "Der hinzugefügte API Token ist ungültig",
-          error: .init(error: error)
-        )
-      )
+      state.notices = .error(.loadingError(error: .init(error: error)))
       return .none
       
     case .reportSaved:

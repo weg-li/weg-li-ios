@@ -48,6 +48,9 @@ public struct AppView: View {
           }
         }
       }
+      .refreshable {
+        await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
+      }
       .accessibilityAction(.magicTap) {
         viewStore.send(.showReportWizard(true))
       }
@@ -172,9 +175,6 @@ public struct NoticesView: View {
             .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
-        .refreshable {
-          await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
-        }
       case .empty:
         emptyStateView
           .padding(.horizontal)

@@ -70,4 +70,19 @@ public extension ErrorState {
       self.message
     }
   }
+  
+  static func loadingError(error: Error) -> Self {
+    Self(
+      systemImageName: "bolt.slash",
+      title: "Fehler beim laden",
+      body: "Der hinzugefügte API Token ist ungültig",
+      error: .init(error: error)
+    )
+  }
+  
+  static let tokenUnavailable = Self(
+    systemImageName: "key",
+    title: "Kein API Token",
+    body: "Füge deinen API Token in den Account Einstellungen hinzu um die App mit deinem weg.li Account zu verbinden"
+  )
 }
