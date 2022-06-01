@@ -64,6 +64,8 @@ class ReportMailTests: XCTestCase {
     
     hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
     
+    Falldaten:
+    
     Kennzeichen: B-HH-123
     
     Marke: Opel
@@ -74,7 +76,7 @@ class ReportMailTests: XCTestCase {
     Teststraße 23
     12345 Berlin
     
-    Verstoß: Parken verbotswidrig auf einem Gehweg
+    Verstoß: Parken verbotswidrig auf einem Gehweg, mit Behinderung (z.B. Anhalten, Ausweichen, Absteigen)
     
     Tatzeit: 01.01.2001, 01:00
     
@@ -85,11 +87,8 @@ class ReportMailTests: XCTestCase {
     
     Zeuge:
     
-    Name:
     Max Mustermann
     Telefonnummer: +491235346435
-    
-    Anschrift:
     Max-Brauer-Allee 23
     20095 Hamburg
     

@@ -11,6 +11,8 @@ public extension ReportState {
     
     hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:
     
+    Falldaten:
+    
     Kennzeichen: \(description.licensePlateNumber)
     
     Marke: \(description.selectedBrand?.title ?? "")
@@ -20,7 +22,7 @@ public extension ReportState {
     Adresse:
     \(location.resolvedAddress.humanReadableAddress())
     
-    Verstoß: \(description.selectedCharge?.text ?? "")
+    Verstoß: \(description.selectedCharge?.text ?? "")\(description.blockedOthers ? ", mit Behinderung (z.B. Anhalten, Ausweichen, Absteigen)" : "")
     
     Tatzeit: \(date.humandReadableTimeAndDate)
     
@@ -31,10 +33,7 @@ public extension ReportState {
     
     Zeuge:
     
-    Name:
     \(contactState.contact.humanReadableContact)
-    
-    Anschrift:
     \(contactState.contact.address.humanReadableAddress())
     
     Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
