@@ -84,7 +84,7 @@ public struct EditDescriptionView: View {
               if viewStore.state.selectedBrand == brand {
                 Image(systemName: "checkmark")
                   .resizable()
-                  .frame(width: .grid(5), height: .grid(5))
+                  .frame(width: .grid(4), height: .grid(4))
                   .foregroundColor(.wegliBlue)
               }
             }
@@ -162,6 +162,7 @@ public struct EditDescriptionView: View {
           ),
           placement: .navigationBarDrawer(displayMode: .always)
         )
+        .disableAutocorrection(true)
       },
       label: {
         HStack {
