@@ -112,7 +112,7 @@ public struct AccountSettingsView: View {
   
   public var body: some View {
     Form {
-      Section(header: Label("API-Token", systemImage: "bolt.fill")) {
+      Section(header: Label("API-Token", systemImage: "key.fill")) {
         VStack(alignment: .leading) {
           VStack(alignment: .leading, spacing: .grid(3)) {
             TextField(
@@ -152,26 +152,27 @@ public struct AccountSettingsView: View {
                   if viewStore.isNetworkRequestInProgress {
                     ActivityIndicator(style: .medium, color: .gray)
                   } else {
-                    Text("API-Token testen")
+                    HStack {
+                      Text("API-Token testen")
+                        
+                      if let result = viewStore.apiTestRequestResult {
+                        HStack {
+                          Image(systemName: result ? "checkmark.circle" : "x.circle")
+                            .font(.body)
+                            .foregroundColor(result ? .green : .red)
+                        }
+                      }
+                    }
                   }
                 }
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: 40)
               }
             )
             .disabled(viewStore.accountSettings.apiToken.isEmpty)
             .buttonStyle(.bordered)
             
             HStack(alignment: .center) {
-              Text("Ruft `weg.li\\api\\notices` vom Server ab")
-                .multilineTextAlignment(.leading)
-                .foregroundColor(Color(.secondaryLabel))
-                .font(.footnote)
               
-              if let result = viewStore.apiTestRequestResult {
-                Image(systemName: result ? "checkmark.circle" : "x.circle")
-                  .font(.body)
-                  .foregroundColor(result ? .green : .red)
-              }
             }
             .padding(.vertical, .grid(2))
             
@@ -186,11 +187,39 @@ public struct AccountSettingsView: View {
                 action: { viewStore.send(.openUserSettings) },
                 label: {
                   Label("Profil öffnen", systemImage: "arrow.up.right")
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .frame(maxWidth: .infinity, minHeight: 40)
                 }
               )
               .buttonStyle(.bordered)
               .accessibilityAddTraits([.isLink])
+              
+            
+              VStack(alignment: .center, spacing: .grid(2)) {
+                Text("Die App supported aktuell folgende Operationen")
+                  .multilineTextAlignment(.leading)
+                
+                VStack(alignment: .leading, spacing: .grid(1)) {
+                  HStack {
+                    Text("Meldungen abrufen")
+                    Image(systemName: "checkmark.circle")
+                  }
+                  HStack {
+                    Text("Meldungen hochladen/anlegen")
+                    Image(systemName: "checkmark.circle")
+                  }
+                  HStack {
+                    Text("Meldungen versenden")
+                    Image(systemName: "x.circle")
+                  }
+                }
+                
+                Text("Um deine Meldung zu versenden musst du aktuell noch die Webseite nutzen")
+                  .multilineTextAlignment(.leading)
+                  .fixedSize(horizontal: false, vertical: true)
+              }
+              .padding(.top, .grid(2))
+              .foregroundColor(Color(.secondaryLabel))
+              .font(.footnote)
               
             }
             .padding(.grid(2))
