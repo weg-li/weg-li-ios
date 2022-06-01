@@ -9,7 +9,11 @@ class SettingsStoreTests: XCTestCase {
     uiApplicationClient: .init(
       open: { _, _ in .none },
       openSettingsURLString: { "" }
-    )
+    ),
+    keychainClient: .noop,
+    apiClient: .noop,
+    wegliService: .noop,
+    mainQueue: .immediate
   )
   
   func test_setOpenLicensesRow_shouldCallURL() {
@@ -24,7 +28,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
@@ -43,7 +51,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
@@ -62,7 +74,11 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
@@ -81,12 +97,64 @@ class SettingsStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: SettingsState(contact: .preview, userSettings: .init(showsAllTextRecognitionSettings: false)),
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
       reducer: settingsReducer,
       environment: env
     )
     
     store.send(.donateTapped)
     XCTAssertEqual(openedUrl, env.donateLink)
+  }
+  
+  func test_action_accountSettings_setApiToken_shouldPersistToken() {
+    var env = defaultEnvironment
+    
+    var didWriteTokenToKeyChain = false
+    env.keychainClient.setString = { _, _, _ in
+        didWriteTokenToKeyChain = true
+      return .none
+    }
+    
+    let store = TestStore(
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
+      reducer: settingsReducer,
+      environment: env
+    )
+    
+    store.send(.accountSettings(.setApiToken("TOKEN"))) {
+      $0.accountSettingsState.accountSettings.apiToken = "TOKEN"
+    }
+    XCTAssertTrue(didWriteTokenToKeyChain)
+  }
+  
+  func test_action_openUserSettings_shouldCallURL() {
+    var openedUrl: URL!
+    
+    var env = defaultEnvironment
+    env.uiApplicationClient.open = { url, _ in
+      openedUrl = url
+      return .init(value: true)
+    }
+    
+    let store = TestStore(
+      initialState: SettingsState(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        contact: .preview,
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
+      reducer: settingsReducer,
+      environment: env
+    )
+    
+    store.send(.accountSettings(.openUserSettings))
+    XCTAssertEqual(openedUrl, URL(string: "https://www.weg.li/user")!)
   }
 }

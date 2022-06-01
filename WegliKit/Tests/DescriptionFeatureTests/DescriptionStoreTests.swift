@@ -84,25 +84,6 @@ class DescriptionStoreTests: XCTestCase {
     }
   }
   
-  func test_toggleBlockedOthers_shouldUpdateState() {
-    let store = TestStore(
-      initialState: DescriptionState(
-        licensePlateNumber: "",
-        selectedColor: 1,
-        selectedBrand: brand
-      ),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
-    )
-    
-    store.send(.toggleBlockedOthers) { state in
-      state.blockedOthers = true
-    }
-    store.send(.toggleBlockedOthers) { state in
-      state.blockedOthers = false
-    }
-  }
-  
   func test_setCarLicensePlate_shouldUpdateState_andSetItValid() {
     let store = TestStore(
       initialState: DescriptionState(

@@ -1,11 +1,14 @@
 // Created for weg-li in 2021.
 
 import AppFeature
+import ApiClient
 import ComposableArchitecture
 import ComposableCoreLocation
+import Combine
 import ContactFeature
 import FileClient
 import ImagesFeature
+import KeychainClient
 import MessageUI
 import ReportFeature
 import SharedModels
@@ -22,12 +25,12 @@ class AppStoreTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   var userDefaults: UserDefaults!
   
-  var report: Report!
+  var report: ReportState!
   
   override func setUp() {
     super.setUp()
     
-    report = Report(
+    report = ReportState(
       uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
@@ -53,6 +56,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
         fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -80,6 +86,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
         fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -114,6 +123,9 @@ class AppStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         fileClient: fileCient,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
@@ -124,13 +136,11 @@ class AppStoreTests: XCTestCase {
       var report = $0.reportDraft
       report.images.storedPhotos.removeAll()
       report.mail.mailComposeResult = result
-      
-      $0.reports = [report]
       $0.reportDraft = report
       $0.reportDraft.mail.mailComposeResult = result
     }
     store.receive(.reportSaved) {
-      $0.reportDraft = Report(
+      $0.reportDraft = ReportState(
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(contact: .empty, alert: nil),
@@ -141,27 +151,30 @@ class AppStoreTests: XCTestCase {
   }
   
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
-    var AppState = AppState(reportDraft: report)
-    AppState.settings.contact = .preview
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
     
     let store = TestStore(
-      initialState: AppState,
+      initialState: state,
       reducer: appReducer,
       environment: AppEnvironment(
         mainQueue: scheduler.eraseToAnyScheduler(),
         backgroundQueue: scheduler.eraseToAnyScheduler(),
         fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
         date: fixedDate,
         uuid: fixedUUID
       )
     )
     
     store.send(.report(.resetConfirmButtonTapped)) {
-      $0.reportDraft = Report(
+      $0.reportDraft = ReportState(
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(
-          contact: AppState.settings.contact.contact,
+          contact: state.settings.contact.contact,
           alert: nil
         ),
         date: self.fixedDate
@@ -169,10 +182,172 @@ class AppStoreTests: XCTestCase {
     }
     store.receive(.report(.dismissAlert))
   }
+  
+  func test_ActionStoredApiTokenLoaded() {
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
+    
+    let token = "API Token"
+    var keychainClient = KeychainClient.noop
+    keychainClient.getString = { _ in
+      return Just(token)
+        .eraseToEffect()
+    }
+    
+    var wegliService = WegliAPIService.noop
+    wegliService.getNotices = {
+      Just([.mock])
+        .setFailureType(to: ApiError.self)
+        .eraseToEffect()
+    }
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop,
+        keychainClient: keychainClient,
+        apiClient: .noop,
+        wegliService: wegliService,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.appDelegate(.didFinishLaunching))
+    store.receive(.storedApiTokenLoaded(.success(token))) {
+      $0.reportDraft.apiToken = token
+      $0.settings.accountSettingsState.accountSettings.apiToken = token
+    }
+  }
+  
+  func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() {
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
+    
+    var didSaveNotices = false
+    
+    var fileClient = FileClient.noop
+    fileClient.save = { _, _ in
+      didSaveNotices = true
+      return .none
+    }
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: fileClient,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.fetchNoticesResponse(.success([]))) {
+      $0.notices = .empty(.emptyNotices)
+      XCTAssertFalse($0.isFetchingNotices)
+    }
+    XCTAssertTrue(didSaveNotices)
+  }
+  
+  func test_ActionOnAccountSettings_shouldPersistAccountsSettings() {
+    var state = AppState(reportDraft: report)
+    state.settings.contact = .preview
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: scheduler.eraseToAnyScheduler(),
+        fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
+      $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
+      $0.reportDraft.apiToken = "TOKEN"
+    }
+  }
+  
+  func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() {
+    var state = AppState(reportDraft: report)
+    state.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
+    
+    var service = WegliAPIService.noop
+    service.getNotices = {
+      Just([.mock])
+        .setFailureType(to: ApiError.self)
+        .eraseToEffect()
+    }
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: service,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.onAppear)
+    store.receive(.fetchNotices) {
+      XCTAssertTrue($0.isFetchingNotices)
+    }
+    store.receive(.fetchNoticesResponse(.success([.mock]))) {
+      $0.notices = .results([.mock])
+      XCTAssertFalse($0.isFetchingNotices)
+    }
+  }
+  
+  func test_Action_onAppear_shouldPresentNoTokenErrorState() {
+    let store = TestStore(
+      initialState: AppState(reportDraft: report),
+      reducer: appReducer,
+      environment: AppEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        fileClient: .noop,
+        keychainClient: .noop,
+        apiClient: .noop,
+        wegliService: .noop,
+        date: fixedDate,
+        uuid: fixedUUID
+      )
+    )
+    
+    store.send(.onAppear) {
+      $0.notices = .error(
+        .init(
+          systemImageName: "key",
+          title: "Kein API Token",
+          body: "Füge deinen API Token in den Account Einstellungen hinzu um die App mit deinem weg.li Account zu verbinden"
+        )
+      )
+    }
+  }
 }
 
 extension AppState {
-  init(reportDraft: Report) {
+  init(reportDraft: ReportState) {
     self.init()
     self.reportDraft = reportDraft
   }

@@ -7,25 +7,30 @@ import SharedModels
 // MARK: Interface
 /// Client handling FileManager interactions
 public struct FileClient {
+  public var removeItem: (URL) -> Effect<Never, Error>
   public var delete: (String) -> Effect<Never, Error>
   public var load: (String) -> Effect<Data, Error>
   public var save: (String, Data) -> Effect<Never, Error>
   
   public func load<A: Decodable>(
-    _ type: A.Type, from fileName: String
+    _ type: A.Type,
+    from fileName: String,
+    with decoder: JSONDecoder = JSONDecoder()
   ) -> Effect<Result<A, NSError>, Never> {
     self.load(fileName)
-      .decode(type: A.self, decoder: JSONDecoder())
+      .decode(type: A.self, decoder: decoder)
       .mapError { $0 as NSError }
       .catchToEffect()
   }
   
   public func save<A: Encodable>(
-    _ data: A, to fileName: String, on queue: AnySchedulerOf<DispatchQueue>
+    _ data: A, to fileName: String,
+    on queue: AnySchedulerOf<DispatchQueue>,
+    with encoder: JSONEncoder = JSONEncoder()
   ) -> Effect<Never, Never> {
     Just(data)
       .subscribe(on: queue)
-      .encode(encoder: JSONEncoder())
+      .encode(encoder: encoder)
       .flatMap { data in self.save(fileName, data) }
       .ignoreFailure()
       .eraseToEffect()

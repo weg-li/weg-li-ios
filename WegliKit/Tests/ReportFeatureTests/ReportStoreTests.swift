@@ -1,5 +1,6 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -19,12 +20,12 @@ class ReportStoreTests: XCTestCase {
   
   let districs = DistrictFixtures.districts
   
-  var report: Report!
+  var report: ReportState!
   
   override func setUp() {
     super.setUp()
     
-    report = Report(
+    report = ReportState(
       uuid: fixedUUID,
       images: ImagesViewState(
         showImagePicker: false,
@@ -49,6 +50,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -81,6 +83,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -113,6 +116,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -139,6 +143,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -157,7 +162,6 @@ class ReportStoreTests: XCTestCase {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
   
-    let image = UIImage(systemName: "pencil")!
     let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
     let expectedAddress = Address(
       street: Contact.preview.address.street,
@@ -191,19 +195,25 @@ class ReportStoreTests: XCTestCase {
         ),
         regulatoryOfficeMapper: .live(),
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
     
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     
-    var storedImage = PickerImageResult(uiImage: image)
-    storedImage?.coordinate = .init(coordinate)
-    storedImage?.creationDate = creationDate
-    
+    let storedImage = PickerImageResult(
+      id: "1",
+      imageUrl: nil,
+      coordinate: .init(coordinate),
+      creationDate: creationDate
+    )
+
     store.send(.images(.setPhotos([storedImage]))) {
       $0.images.isRecognizingTexts = true
-      $0.images.storedPhotos = [storedImage!]
+      var images = self.report.images.storedPhotos
+      images.append(storedImage)
+      $0.images.storedPhotos = images
     }
     store.receive(.images(.setImageCoordinate(coordinate))) {
       $0.images.pickerResultCoordinate = coordinate
@@ -239,7 +249,7 @@ class ReportStoreTests: XCTestCase {
   func test_submitButtonTap_createsMail_andPresentsMailView() {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -255,9 +265,9 @@ class ReportStoreTests: XCTestCase {
           isMapExpanded: false,
           isResolvingAddress: false,
           resolvedAddress: .init(
-            street: Report.preview.contactState.contact.address.street,
-            postalCode: Report.preview.contactState.contact.address.postalCode,
-            city: Report.preview.contactState.contact.address.city
+            street: ReportState.preview.contactState.contact.address.street,
+            postalCode: ReportState.preview.contactState.contact.address.postalCode,
+            city: ReportState.preview.contactState.contact.address.city
           )
         )
       ),
@@ -269,6 +279,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -286,7 +297,7 @@ class ReportStoreTests: XCTestCase {
   func test_submitButtonTap_createsMail_butShowsError() {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -302,9 +313,9 @@ class ReportStoreTests: XCTestCase {
           isMapExpanded: false,
           isResolvingAddress: false,
           resolvedAddress: .init(
-            street: Report.preview.contactState.contact.address.street,
-            postalCode: Report.preview.contactState.contact.address.postalCode,
-            city: Report.preview.contactState.contact.address.city
+            street: ReportState.preview.contactState.contact.address.street,
+            postalCode: ReportState.preview.contactState.contact.address.postalCode,
+            city: ReportState.preview.contactState.contact.address.city
           )
         )
       ),
@@ -316,6 +327,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -338,6 +350,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -375,6 +388,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -414,6 +428,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -436,7 +451,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -466,6 +481,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -491,7 +507,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -521,6 +537,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -552,7 +569,7 @@ class ReportStoreTests: XCTestCase {
     let testDate = { Date(timeIntervalSinceReferenceDate: 0) }
     
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: ImagesViewState(
           showImagePicker: false,
@@ -582,6 +599,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
+        wegliService: .noop,
         date: testDate
       )
     )
@@ -596,7 +614,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_resetDataButtonTap_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -621,6 +639,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -633,7 +652,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_setShowContact_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -658,6 +677,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -670,7 +690,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_setShowDescription_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -695,6 +715,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -706,7 +727,7 @@ class ReportStoreTests: XCTestCase {
   
   func test_selectedLicensePlate_shouldSetDescriptionState() {
     let store = TestStore(
-      initialState: Report(
+      initialState: ReportState(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -731,6 +752,7 @@ class ReportStoreTests: XCTestCase {
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
+        wegliService: .noop,
         date: Date.init
       )
     )
@@ -739,5 +761,109 @@ class ReportStoreTests: XCTestCase {
     store.send(.images(.selectedTextItem(item))) {
       $0.description.licensePlateNumber = item.text
     }
+  }
+  
+  func test_action_uploadImages() {
+    
+    let responses: [ImageUploadResponse] = [
+      .init(
+        id: 1,
+        key: "key",
+        filename: "filename",
+        contentType: "type",
+        byteSize: 123,
+        checksum: "wer",
+        createdAt: Date(timeIntervalSince1970: 0),
+        signedId: "111",
+        directUpload: .init(url: "123", headers: [:])
+      ),
+      .init(
+        id: 2,
+        key: "key",
+        filename: "filename",
+        contentType: "type",
+        byteSize: 123,
+        checksum: "wer",
+        createdAt: Date(timeIntervalSince1970: 0),
+        signedId: "222",
+        directUpload: .init(url: "321", headers: [:])
+      )
+    ]
+    let imagesUploadClient = ImagesUploadClient(uploadImages: { requests in
+      Just(Result.success(responses))
+        .eraseToEffect()
+    })
+    
+    var wegliService = WegliAPIService.noop
+    wegliService.postNotice = { _ in
+      Just(Result.success(Notice.mock))
+        .eraseToEffect()
+    }
+    
+    var didRemoveImageItems = false
+    var fileClient = FileClient.noop
+    fileClient.removeItem = { _ in
+      didRemoveImageItems = true
+      return .none
+    }
+    
+    let store = TestStore(
+      initialState: ReportState(
+        uuid: fixedUUID,
+        images: .init(
+          alert: nil,
+          showImagePicker: false,
+          storedPhotos: [
+            .init(id: "1", uiImage: .add, imageUrl: .some(.init(string: "URL")!)),
+            .init(id: "2", uiImage: .actions, imageUrl: .some(.init(string: "URL")!))
+          ],
+          coordinateFromImagePicker: nil,
+          dateFromImagePicker: nil
+        ),
+        contactState: .empty,
+        district: nil,
+        date: fixedDate,
+        description: .init(),
+        location: .init(
+          locationOption: .fromPhotos,
+          isMapExpanded: false,
+          isResolvingAddress: false,
+          resolvedAddress: .init(
+            street: "TestStrasse 3",
+            postalCode: "1243", city: "Berlin"
+          )
+        )
+      ),
+      reducer: reportReducer,
+      environment: ReportEnvironment(
+        mainQueue: .immediate,
+        backgroundQueue: .immediate,
+        locationManager: LocationManager.unimplemented(),
+        placeService: .noop,
+        regulatoryOfficeMapper: .noop,
+        fileClient: fileClient,
+        wegliService: wegliService,
+        date: Date.init,
+        imagesUploadClient: imagesUploadClient
+      )
+    )
+    
+    store.send(.uploadImages) {
+      $0.uploadProgressState = "Uploading images ..."
+      $0.isUploadingNotice = true
+    }
+    store.receive(.uploadImagesResponse(.success(responses))) {
+      $0.uploadedImagesIds = ["111", "222"]
+    }
+    store.receive(.composeNoticeAndSend) {
+      $0.uploadProgressState = "Sending notice ..."
+    }
+    store.receive(.composeNoticeResponse(.success(.mock))) {
+      $0.isUploadingNotice = false
+      $0.alert = .reportSent
+      $0.uploadedImagesIds = []
+      $0.uploadProgressState = nil
+    }
+    XCTAssertTrue(didRemoveImageItems)
   }
 }

@@ -4,9 +4,7 @@ import CoreLocation
 import SharedModels
 
 public struct PlacesServiceClient {
-  public init(
-    placemarks: @escaping (CLLocation) -> Effect<[Address], PlacesServiceError>
-  ) {
+  public init(placemarks: @escaping (CLLocation) -> Effect<[Address], PlacesServiceError>) {
     self.placemarks = placemarks
   }
   

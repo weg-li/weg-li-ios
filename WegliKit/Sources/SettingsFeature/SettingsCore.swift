@@ -1,26 +1,32 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import ComposableArchitecture
 import ContactFeature
 import Foundation
+import KeychainClient
 import SharedModels
 import UIApplicationClient
 import UIKit
 
 public struct SettingsState: Equatable {
   public init(
+    accountSettingsState: AccountSettingsState,
     contact: ContactState,
     userSettings: UserSettings
   ) {
+    self.accountSettingsState = accountSettingsState
     self.contact = contact
     self.userSettings = userSettings
   }
   
+  public var accountSettingsState: AccountSettingsState
   public var contact: ContactState
   public var userSettings: UserSettings
 }
 
 public enum SettingsAction: Equatable {
+  case accountSettings(AccountSettingsAction)
   case contact(ContactStateAction)
   case userSettings(UserSettingsAction)
   case openLicensesRowTapped
@@ -30,8 +36,18 @@ public enum SettingsAction: Equatable {
 }
 
 public struct SettingsEnvironment {
-  public init(uiApplicationClient: UIApplicationClient) {
+  public init(
+    uiApplicationClient: UIApplicationClient,
+    keychainClient: KeychainClient,
+    apiClient: APIClient,
+    wegliService: WegliAPIService,
+    mainQueue: AnySchedulerOf<DispatchQueue>
+  ) {
     self.uiApplicationClient = uiApplicationClient
+    self.keychainClient = keychainClient
+    self.apiClient = apiClient
+    self.wegliService = wegliService
+    self.mainQueue = mainQueue
   }
   
   // swiftlint:disable force_unwrapping
@@ -40,10 +56,26 @@ public struct SettingsEnvironment {
   public let donateLink = URL(string: "https://www.weg.li/donate")!
   // swiftlint:enable force_unwrapping
   public var uiApplicationClient: UIApplicationClient
+  public var keychainClient: KeychainClient
+  public var apiClient: APIClient
+  public var wegliService: WegliAPIService
+  public var mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
 /// Reducer handling actions from the SettingsView and the descending EditDescriptionView.
 public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvironment>.combine(
+  accountSettingsReducer.pullback(
+    state: \.accountSettingsState,
+    action: /SettingsAction.accountSettings,
+    environment: { parent in
+      AccountSettingsEnvironment(
+        uiApplicationClient: parent.uiApplicationClient,
+        apiClient: parent.apiClient,
+        wegliService: parent.wegliService,
+        mainQueue: parent.mainQueue
+      )
+    }
+  ),
   contactViewReducer.pullback(
     state: \.contact,
     action: /SettingsAction.contact,
@@ -56,6 +88,9 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
   ),
   Reducer { _, action, env in
     switch action {
+    case .accountSettings:
+      return .none
+      
     case .openLicensesRowTapped:
       return URL(string: env.uiApplicationClient.openSettingsURLString())
         .map {
@@ -64,19 +99,30 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
         }
       ?? .none
     case .openImprintTapped:
-      return env.uiApplicationClient.open(env.imprintLink, [:])
+      return env.uiApplicationClient
+        .open(env.imprintLink, [:])
         .fireAndForget()
     case .openGitHubProjectTapped:
-      return env.uiApplicationClient.open(env.gitHubProjectLink, [:])
+      return env.uiApplicationClient
+        .open(env.gitHubProjectLink, [:])
         .fireAndForget()
     case .donateTapped:
-      return env.uiApplicationClient.open(env.donateLink, [:])
+      return env.uiApplicationClient
+        .open(env.donateLink, [:])
         .fireAndForget()
     case .contact, .userSettings:
       return .none
     }
   }
 )
+  .onChange(of: \.accountSettingsState.accountSettings.apiToken) { key, state, _, environment in
+    struct SaveDebounceId: Hashable {}
+    
+    return environment.keychainClient
+      .setApiToken(key)
+      .fireAndForget()
+      .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+  }
 
 
 public enum UserSettingsAction: Equatable {

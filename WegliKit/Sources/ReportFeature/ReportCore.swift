@@ -1,9 +1,11 @@
 // Created for weg-li in 2021.
 
+import ApiClient
 import ComposableArchitecture
 import ComposableCoreLocation
 import ContactFeature
 import DescriptionFeature
+import FileClient
 import Helper
 import L10n
 import LocationFeature
@@ -15,11 +17,10 @@ import PlacesServiceClient
 import RegulatoryOfficeMapper
 import SharedModels
 import SwiftUI
-import FileClient
 
 // MARK: - Report Core
 
-public struct Report: Codable, Equatable {
+public struct ReportState: Equatable {
   public var id: String
   public var images: ImagesViewState
   public var contactState: ContactState
@@ -35,6 +36,11 @@ public struct Report: Codable, Equatable {
   public var showEditDescription = false
   public var showEditContact = false
   
+  public var apiToken: String = ""
+  
+  public var uploadedImagesIds: [String] = []
+  public var uploadProgressState: String?
+  
   public var isPhotosValid: Bool { !images.storedPhotos.isEmpty }
   public var isContactValid: Bool { contactState.isValid }
   public var isDescriptionValid: Bool { description.isValid }
@@ -45,6 +51,7 @@ public struct Report: Codable, Equatable {
       && description == .init()
   }
   public var isInternetConnectionAvailable = true
+  public var isUploadingNotice = false
   
   public func isModified() -> Bool {
     district != nil
@@ -52,6 +59,13 @@ public struct Report: Codable, Equatable {
     || contactState.isValid
     || location != .init()
     || description != .init()
+  }
+  
+  public var isReportValid: Bool {
+    images.isValid
+    && contactState.isValid
+    && description.isValid
+    && location.resolvedAddress.isValid
   }
   
   public init(
@@ -73,10 +87,6 @@ public struct Report: Codable, Equatable {
     self.location = location
     self.mail = mail
   }
-  
-  private enum CodingKeys: String, CodingKey {
-    case id, images, contactState, district, date, description, location, mail
-  }
 }
 
 public enum ReportAction: Equatable {
@@ -96,6 +106,10 @@ public enum ReportAction: Equatable {
   case setDate(Date)
   case observeConnection
   case observeConnectionResponse(NetworkPath)
+  case uploadImages
+  case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
+  case composeNoticeAndSend
+  case composeNoticeResponse(Result<Notice, ApiError>)
 }
 
 public struct ReportEnvironment {
@@ -107,8 +121,10 @@ public struct ReportEnvironment {
     placeService: PlacesServiceClient,
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
     fileClient: FileClient,
+    wegliService: WegliAPIService,
     date: @escaping () -> Date,
-    pathMonitorClient: PathMonitorClient = .live(queue: .main)
+    pathMonitorClient: PathMonitorClient = .live(queue: .main),
+    imagesUploadClient: ImagesUploadClient = .live()
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
@@ -117,8 +133,11 @@ public struct ReportEnvironment {
     self.placeService = placeService
     self.regulatoryOfficeMapper = regulatoryOfficeMapper
     self.fileClient = fileClient
-    self.date = date
     self.pathMonitorClient = pathMonitorClient
+    self.imagesUploadClient = imagesUploadClient
+    self.wegliService = wegliService
+    
+    self.date = date
   }
   
   public var mainQueue: AnySchedulerOf<DispatchQueue>
@@ -129,6 +148,8 @@ public struct ReportEnvironment {
   public var regulatoryOfficeMapper: RegulatoryOfficeMapper
   public let fileClient: FileClient
   public let pathMonitorClient: PathMonitorClient
+  public let imagesUploadClient: ImagesUploadClient
+  public let wegliService: WegliAPIService
   public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
@@ -140,7 +161,7 @@ public struct ReportEnvironment {
 struct ObserveConnectionIdentifier: Hashable {}
 
 /// Combined reducer that is used in the ReportView and combing descending reducers.
-public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.combine(
+public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>.combine(
   imagesReducer.pullback(
     state: \.images,
     action: /ReportAction.images,
@@ -221,7 +242,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
       switch imageViewAction {
         // After the images coordinate was set trigger resolve location and map to district.
       case let .setImageCoordinate(coordinate):
-        guard let coordinate = coordinate else {
+        guard let coordinate = coordinate, !state.images.storedPhotos.isEmpty else {
           state.alert = .noPhotoCoordinate
           return .none
         }
@@ -231,14 +252,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         state.location.pinCoordinate = coordinate
         
         guard state.isInternetConnectionAvailable else {
-          state.alert = .init(
-            title: .init("Keine Internetverbindung"),
-            message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
-            buttons: [
-              .cancel(.init(L10n.cancel)),
-              .default(.init("Wiederholen"), action: .send(.location(.resolveLocation(state.location.pinCoordinate!))))
-            ]
-          )
+          state.alert = .noInternetConnection(coordinate: state.location.pinCoordinate!)
           return .none
         }
         
@@ -281,11 +295,7 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
         return Effect(value: ReportAction.mapAddressToDistrict(address))
         
       case let .resolveAddressFinished(.failure(error)):
-        debugPrint(error.localizedDescription)
-        state.alert = .init(
-          title: .init("Addresse konnte nicht ermittelt werden"),
-          message: .init(error.localizedDescription),
-          buttons: [.cancel(.init(L10n.cancel))])
+        state.alert = .addressResolveFailed(error: error)
         return .none
         
         // Handle manual address entering to trigger district mapping.
@@ -370,6 +380,60 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
     case let .observeConnectionResponse(networkPath):
       state.isInternetConnectionAvailable = networkPath.status == .satisfied
       return .none
+      
+    case .uploadImages:
+      let imageUploadRequests = state.images.imageStates.map {
+        UploadImageRequest(pickerResult: $0.image)
+      }
+      
+      state.isUploadingNotice = true
+      state.uploadProgressState = "Uploading images ..."
+      
+      return environment.imagesUploadClient.uploadImages(imageUploadRequests)
+        .subscribe(on: environment.backgroundQueue)
+        .receive(on: environment.mainQueue)
+        .map(ReportAction.uploadImagesResponse)
+        .eraseToEffect()
+      
+    case let .uploadImagesResponse(.success(imageInputFromUpload)):
+      state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
+      return Effect(value: .composeNoticeAndSend)
+      
+    case let .uploadImagesResponse(.failure(error)):
+      return Effect(value: .composeNoticeResponse(.failure(ApiError(error: error))))
+      
+    case .composeNoticeAndSend:
+      var notice = NoticeInput(state)
+      notice.photos = state.uploadedImagesIds
+      state.isUploadingNotice = true
+      
+      state.uploadProgressState = "Sending notice ..."
+      
+      return environment.wegliService.postNotice(notice)
+        .receive(on: environment.mainQueue)
+        .map(ReportAction.composeNoticeResponse)
+        .eraseToEffect()
+      
+    case let .composeNoticeResponse(.success(response)):
+      state.isUploadingNotice = false
+      state.alert = .reportSent
+      state.uploadedImagesIds.removeAll()
+      state.uploadProgressState = nil
+      
+      let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
+      return .fireAndForget {
+        imageURLs.forEach {
+          environment.fileClient.removeItem($0)
+            .ignoreFailure()
+            .eraseToEffect()
+        }
+      }
+      
+    case let .composeNoticeResponse(.failure(error)):
+      state.isUploadingNotice = false
+      state.alert = .sendNoticeFailed(error: error)
+      state.uploadProgressState = nil
+      return .none
     }
   }
 )
@@ -383,9 +447,9 @@ public let reportReducer = Reducer<Report, ReportAction, ReportEnvironment>.comb
 }
 
 // MARK: - Helper
-public extension Report {
-  static var preview: Report {
-    Report(
+public extension ReportState {
+  static var preview: ReportState {
+    ReportState(
       uuid: UUID.init,
       images: .init(
         showImagePicker: false,
@@ -402,7 +466,7 @@ public extension Report {
       ),
       date: { Date(timeIntervalSince1970: 1580624207) },
       description: .init(
-        licensePlateNumber: "HH-ST-PAULI",
+        licensePlateNumber: "       ",
         selectedColor: 3,
         selectedBrand: .init("Opel"),
         selectedDuration: 5,
@@ -414,6 +478,25 @@ public extension Report {
 }
 
 public extension AlertState where Action == ReportAction {
+  static func noInternetConnection(coordinate: CLLocationCoordinate2D) -> Self {
+    Self(
+      title: .init("Keine Internetverbindung"),
+      message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
+      buttons: [
+        .cancel(.init(L10n.cancel)),
+        .default(.init("Wiederholen"), action: .send(.location(.resolveLocation(coordinate))))
+      ]
+    )
+  }
+  
+  static func addressResolveFailed(error: PlacesServiceError) -> Self {
+    Self(
+      title: .init("Addresse konnte nicht ermittelt werden"),
+      message: .init(error.message),
+      buttons: [.cancel(.init(L10n.cancel))]
+    )
+  }
+  
   static let resetReportAlert = Self(
     title: TextState(L10n.Report.Alert.title),
     primaryButton: .destructive(
@@ -425,6 +508,22 @@ public extension AlertState where Action == ReportAction {
       action: .send(.dismissAlert)
     )
   )
+  
+  static let reportSent = Self(
+    title: .init("Anzeige gesendet"),
+    buttons: [.default(.init(verbatim: "Ok"))]
+  )
+  
+  static func sendNoticeFailed(error: ApiError) -> Self {
+    Self(
+      title: .init("Anzeige konnte nicht gesendet werden"),
+      message: .init("Fehler: \(error.message)"),
+      buttons: [
+        .default(.init(verbatim: "Erneut senden"), action: .send(.composeNoticeAndSend)),
+        .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
+      ]
+    )
+  }
   
   static let noMailAccount = Self(
     title: TextState("Fehler"),
@@ -458,15 +557,78 @@ public let mapperQueue = DispatchQueue(
 
 
 public extension FileClient {
-  func loadReports() -> Effect<Result<[Report], NSError>, Never> {
-    self.load([Report].self, from: reportsFileName)
+  func loadNotices(decoder: JSONDecoder = .noticeDecoder) -> Effect<Result<[Notice], NSError>, Never> {
+    self.load([Notice].self, from: noticesFileName, with: decoder)
   }
   
-  func saveReports(
-    _ reports: [Report], on queue: AnySchedulerOf<DispatchQueue>
+  func saveNotices(
+    _ notices: [Notice]?,
+    on queue: AnySchedulerOf<DispatchQueue>,
+    encoder: JSONEncoder = .noticeEncoder
   ) -> Effect<Never, Never> {
-    self.save(reports, to: reportsFileName, on: queue)
+    guard let notices = notices else {
+      return .none
+    }
+    return self.save(notices, to: noticesFileName, on: queue, with: encoder)
   }
 }
 
-let reportsFileName = "reports"
+let noticesFileName = "notices"
+
+public extension SharedModels.NoticeInput {
+  init(_ reportState: ReportState) {
+    self.init(
+      token: reportState.id,
+      status: "open",
+      street: reportState.location.resolvedAddress.street,
+      city: reportState.location.resolvedAddress.city,
+      zip: reportState.location.resolvedAddress.postalCode,
+      latitude: reportState.location.pinCoordinate?.latitude ?? 0,
+      longitude: reportState.location.pinCoordinate?.longitude ?? 0,
+      registration: reportState.description.licensePlateNumber,
+      brand: reportState.description.selectedBrand?.title ?? "",
+      color: DescriptionState.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.selectedCharge?.text ?? "",
+      date: reportState.date,
+      duration: Int64(reportState.description.selectedDuration),
+      severity: nil,
+      note: "",
+      createdAt: .now,
+      updatedAt: .now,
+      sentAt: .now,
+      vehicleEmpty: reportState.description.verhicleEmpty,
+      hazardLights: reportState.description.hazardLights,
+      expiredTuv: reportState.description.expiredTuv,
+      expiredEco: reportState.description.expiredEco,
+      photos: []
+    )
+  }
+}
+
+public extension SharedModels.Notice {
+  init(_ reportState: ReportState) {
+    self.init(
+      token: reportState.id,
+      status: "open",
+      street: reportState.location.resolvedAddress.street,
+      city: reportState.location.resolvedAddress.city,
+      zip: reportState.location.resolvedAddress.postalCode,
+      latitude: reportState.location.pinCoordinate?.latitude ?? 0,
+      longitude: reportState.location.pinCoordinate?.longitude ?? 0,
+      registration: reportState.description.licensePlateNumber,
+      brand: reportState.description.selectedBrand?.title ?? "",
+      color: DescriptionState.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.selectedCharge?.text ?? "",
+      date: reportState.date,
+      duration: Int64(reportState.description.selectedDuration),
+      severity: nil,
+      note: "",
+      createdAt: .now,
+      updatedAt: .now,
+      sentAt: .now,
+      photos: []
+    )
+  }
+  
+  static let placeholder = Self.init(.preview)
+}

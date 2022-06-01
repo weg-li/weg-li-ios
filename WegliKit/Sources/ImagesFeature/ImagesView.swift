@@ -35,7 +35,7 @@ public struct ImagesView: View {
             .foregroundColor(Color(.label))
             .padding(.bottom, .grid(1))
           if viewStore.isRecognizingTexts {
-            ActivityIndicator(style: .medium)
+            ActivityIndicator(style: .medium, color: .gray)
           }
         }
         if viewStore.state.licensePlates.isEmpty {
@@ -92,25 +92,29 @@ public struct ImagesView: View {
     Button(
       action: { viewStore.send(.selectedTextItem(item)) },
       label: {
-        Text(item.text)
-          .font(.custom(FontName.nummernschild.rawValue, size: 24, relativeTo: .headline))
-          .foregroundColor(Color(.label))
-          .textCase(.uppercase)
+        HStack {
+          Color.blue
+            .frame(width: 10)
+          Text(item.text)
+            .font(.custom(FontName.nummernschild.rawValue, size: 24, relativeTo: .headline))
+            .foregroundColor(.black)
+            .textCase(.uppercase)
+            .padding(.vertical, .grid(1))
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.trailing, .grid(1))
       }
     )
-      .font(.body)
-      .foregroundColor(Color(.label))
-      .padding(.grid(2))
-      .background(.background)
-      .clipShape(
-        RoundedRectangle(cornerRadius: 8, style: .circular)
-      )
-      .overlay(
-        RoundedRectangle(cornerRadius: 8)
-          .stroke(Color(.label), lineWidth: 2)
-      )
-      .padding(.horizontal, 2)
-      .accessibility(value: Text(item.text))
+    .background(Color.white)
+    .clipShape(
+      RoundedRectangle(cornerRadius: 8, style: .circular)
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 8)
+        .stroke(Color.black, lineWidth: 2)
+    )
+    .padding(.horizontal, 4)
+    .accessibility(value: Text(item.text))
   }
   
   private var importButton: some View {

@@ -37,15 +37,15 @@ public struct ImagePicker: UIViewControllerRepresentable {
             return
           }
           
-          let tempFileName = UUID().uuidString
-          
+          let tempFileName = !url.lastPathComponent.isEmpty ? url.lastPathComponent : UUID().uuidString
+                    
           do {
             let data = try Data(contentsOf: url)
             let tempFileUrl = FileManager.default.createDataTempFile(withData: data, withFileName: tempFileName)
             let destinationUrl = try FileManager.default.replaceExistingFile(
               withTempFile: tempFileUrl,
               existingFileName: tempFileName,
-              withSubDirectory: "wegli"
+              subDirectory: "wegli"
             )
             
             DispatchQueue.main.async {
@@ -59,7 +59,8 @@ public struct ImagePicker: UIViewControllerRepresentable {
                 creationDate = assetResults.firstObject?.creationDate
               }
               self?.parent.pickerResult.append(
-                .init(
+                PickerImageResult(
+                  id: tempFileName,
                   imageUrl: destinationUrl,
                   coordinate: assetCoordinate,
                   creationDate: creationDate
@@ -73,6 +74,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
       }
       DispatchQueue.main.async { [weak self] in
         self?.parent.isPresented = false
+        self?.parent.pickerResult.removeAll()
       }
     }
   }
@@ -141,18 +143,17 @@ extension FileManager {
   func replaceExistingFile(
     withTempFile fileURL: URL?,
     existingFileName: String,
-    withSubDirectory: String
+    subDirectory: String
   ) throws -> URL? {
     guard let fileURL = fileURL else { return nil }
     let fileManager = FileManager.default
     
     let destPath = try? fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-    guard let fullDestPath = destPath?.appendingPathComponent(withSubDirectory + "/" + existingFileName) else { return nil }
+    guard let fullDestPath = destPath?.appendingPathComponent(subDirectory + "/" + existingFileName) else { return nil }
     
     let dta = try Data(contentsOf: fileURL)
-    createDirectory(withFolderName: "\(withSubDirectory)", toDirectory: .applicationSupportDirectory)
+    createDirectory(withFolderName: "\(subDirectory)", toDirectory: .applicationSupportDirectory)
     try dta.write(to: fullDestPath, options: .atomic)
-    
     return fullDestPath
   }
   

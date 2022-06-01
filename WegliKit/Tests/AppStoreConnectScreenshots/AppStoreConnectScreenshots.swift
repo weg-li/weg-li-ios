@@ -57,7 +57,7 @@ class AppStoreConnectScreenshots: XCTestCase {
   func test_EditDescriptionViewScreenshot() {    
     let view = EditDescriptionView(
       store: .init(
-        initialState: Report.preview.description,
+        initialState: ReportState.preview.description,
         reducer: .empty,
         environment: ()
       )

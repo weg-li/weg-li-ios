@@ -3,43 +3,68 @@
 import Foundation
 import UIKit
 
-public struct PickerImageResult: Equatable, Identifiable, Codable {
+public struct PickerImageResult: Hashable, Identifiable, Codable {
   public let id: String
-  public let data: Data?
   public var imageUrl: URL?
   public var coordinate: CoordinateRegion.Coordinate?
   public var creationDate: Date?
   
-  public init(
-    id: String = UUID().uuidString,
-    data: Data? = nil,
+  public var jpegData: Data? {
+    guard
+      let imageUrl = imageUrl,
+      let image = UIImage(contentsOfFile: imageUrl.path)
+    else {
+      return nil
+    }
+    return image.jpegData(compressionQuality: 0.4)
+  }
+
+    public init(
+    id: String,
     imageUrl: URL? = nil,
     coordinate: CoordinateRegion.Coordinate? = nil,
     creationDate: Date? = nil
   ) {
     self.id = id
-    self.data = data
     self.imageUrl = imageUrl
     self.coordinate = coordinate
     self.creationDate = creationDate
   }
   
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+    hasher.combine(imageUrl)
+    hasher.combine(creationDate)
+  }
+  
   public var asUIImage: UIImage? {
-    guard let imageUrl = imageUrl else {
-      return nil
-    }
-    guard let data = try? Data(contentsOf: imageUrl) else { return nil }
+    guard let data = self.jpegData else { return nil }
     return UIImage(data: data)
   }
 }
 
 public extension PickerImageResult {
   init?(id: String = UUID().uuidString, uiImage: UIImage, imageUrl: URL? = nil) {
-    guard let data = uiImage.pngData() else {
-      return nil
-    }
-    self.data = data
     self.id = id
     self.imageUrl = imageUrl
+  }
+}
+
+private func resizedImage(at url: URL, for targetSize: CGSize = CGSize(width: 1000, height: 1000)) -> UIImage? {
+  guard let image = UIImage(contentsOfFile: url.path) else {
+    return nil
+  }
+  
+  let widthScaleRatio = targetSize.width / image.size.width
+  let heightScaleRatio = targetSize.height / image.size.height
+  let scaleFactor = min(widthScaleRatio, heightScaleRatio)
+  let scaledImageSize = CGSize(
+    width: image.size.width * scaleFactor,
+    height: image.size.height * scaleFactor
+  )
+  
+  let renderer = UIGraphicsImageRenderer(size: scaledImageSize)
+  return renderer.image { (context) in
+    image.draw(in: CGRect(origin: .zero, size: scaledImageSize))
   }
 }

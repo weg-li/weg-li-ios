@@ -35,9 +35,17 @@ public struct EditDescriptionView: View {
         Section(header: Text(L10n.Description.Section.Violation.copy)) {
           chargeTypeView
 
-          chargeLengthView
+          chargeDurationView
 
           blockedOthersView
+          
+          verhicleEmtpyView
+          
+          hazardLightsView
+          
+          expiredTuvView
+          
+          expiredEcoView
         }
       }
       .onAppear { viewStore.send(.onAppear) }
@@ -171,7 +179,7 @@ public struct EditDescriptionView: View {
     )
   }
   
-  var chargeLengthView: some View {
+  var chargeDurationView: some View {
     Picker(
       L10n.Description.Row.length,
       selection: viewStore.binding(
@@ -179,8 +187,8 @@ public struct EditDescriptionView: View {
         send: DescriptionAction.setDuraration
       )
     ) {
-      ForEach(1..<Times.allCases.count, id: \.self) {
-        Text(Times.allCases[$0].description)
+      ForEach(viewStore.times, id: \.self) { time in
+        Text(Times.times[time] ?? "")
           .contentShape(Rectangle())
           .foregroundColor(Color(.label))
       }
@@ -188,23 +196,37 @@ public struct EditDescriptionView: View {
   }
   
   var blockedOthersView: some View {
-    Button(
-      action: {
-        viewStore.send(.toggleBlockedOthers)
-      },
-      label: {
-        HStack {
-          Text(L10n.Description.Row.didBlockOthers)
-            .foregroundColor(.secondary)
-          Spacer()
-          ToggleButton(
-            isOn: viewStore.binding(
-              get: \.blockedOthers,
-              send: DescriptionAction.toggleBlockedOthers
-            )
-          ).accessibleAnimation(.easeIn(duration: 0.2), value: viewStore.blockedOthers)
-        }
-      }
+    ToggleButton(
+      label: L10n.Description.Row.didBlockOthers,
+      isOn: viewStore.binding(\.$blockedOthers)
+    )
+  }
+  
+  var verhicleEmtpyView: some View {
+    ToggleButton(
+      label: "Das Fahrzeug war verlassen",
+      isOn: viewStore.binding(\.$verhicleEmpty)
+    )
+  }
+  
+  var hazardLightsView: some View {
+    ToggleButton(
+      label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
+      isOn: viewStore.binding(\.$hazardLights)
+    )
+  }
+  
+  var expiredTuvView: some View {
+    ToggleButton(
+      label: "Die TÜV-Plakette war abgelaufen",
+      isOn: viewStore.binding(\.$expiredTuv)
+    )
+  }
+  
+  var expiredEcoView: some View {
+    ToggleButton(
+      label: "Die Umwelt-Plakette fehlte oder war ungültig",
+      isOn: viewStore.binding(\.$expiredEco)
     )
   }
   

@@ -11,10 +11,10 @@ import Styleguide
 import SwiftUI
 
 public struct ReportView: View {
-  private let store: Store<Report, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<Report, ReportAction>
+  private let store: Store<ReportState, ReportAction>
+  @ObservedObject private var viewStore: ViewStore<ReportState, ReportAction>
     
-  public init(store: Store<Report, ReportAction>) {
+  public init(store: Store<ReportState, ReportAction>) {
     self.store = store
     viewStore = ViewStore(store)
   }
@@ -81,10 +81,66 @@ public struct ReportView: View {
           isCompleted: viewStore.isContactValid
         ) { ContactWidget(store: store.scope(state: { $0 })) }
         
-        // Mail
-        MailContentView(store: store)
-          .padding()
+        // Send notice button
+        VStack {
+          if !viewStore.apiToken.isEmpty {
+            Button(
+              action: { viewStore.send(.uploadImages) },
+              label: {
+                VStack(alignment: .center) {
+                  HStack {
+                    if viewStore.isUploadingNotice {
+                      ActivityIndicator(style: .medium, color: .white)
+                        .foregroundColor(.white)
+                    } else {
+                      Text("Anzeige hinzufügen")
+                    }
+                  }
+                  .frame(maxWidth: .infinity, alignment: .center)
+                  
+                  if let uploadProgressMessage = viewStore.uploadProgressState {
+                    Text(uploadProgressMessage)
+                      .font(.footnote)
+                      .foregroundColor(.secondary)
+                  }
+                }
+              }
+            )
+            .disabled(viewStore.isUploadingNotice)
+            .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
+            .padding()
+          } else {
+            MailContentView(store: store)
+              .padding()
+          }
+          
+          if !viewStore.state.isReportValid {
+            VStack(spacing: .grid(2)) {
+              Text(L10n.Mail.readyToSubmitErrorCopy)
+                .fontWeight(.semibold)
+              VStack(spacing: .grid(1)) {
+                if !viewStore.state.images.isValid {
+                  Text(L10n.Report.Error.images.asBulletPoint)
+                }
+                if !viewStore.state.location.resolvedAddress.isValid {
+                  Text(L10n.Report.Error.location.asBulletPoint)
+                }
+                if !viewStore.state.description.isValid {
+                  Text(L10n.Report.Error.description.asBulletPoint)
+                }
+                if !viewStore.state.contactState.isValid {
+                  Text(L10n.Report.Error.contact.asBulletPoint)
+                }
+              }
+            }
+            .accessibilityElement(children: .combine)
+            .foregroundColor(.red)
+            .font(.callout)
+            .multilineTextAlignment(.center)
+          }
+        }
       }
+      .disabled(viewStore.isUploadingNotice)
     }
     .onAppear { viewStore.send(.onAppear) }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
@@ -105,7 +161,6 @@ public struct ReportView: View {
       }
     )
     .accessibilityLabel(Text(L10n.Button.reset))
-    .accessibilityValue(viewStore.isResetButtonDisabled ? "deaktiviert" : "aktiviert")
     .contentShape(Rectangle())
     .disabled(viewStore.isResetButtonDisabled)
   }
@@ -122,5 +177,11 @@ struct ReportForm_Previews: PreviewProvider {
         )
       )
     }
+  }
+}
+
+private extension String {
+  var asBulletPoint: Self {
+    "\u{2022} \(self)"
   }
 }

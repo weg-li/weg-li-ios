@@ -1,10 +1,12 @@
 // Created for weg-li in 2021.
 
 import ComposableArchitecture
+import DescriptionFeature
 import L10n
 import Helper
 import ReportFeature
 import SettingsFeature
+import SharedModels
 import Styleguide
 import SwiftUI
 
@@ -23,15 +25,17 @@ public struct AppView: View {
       Group {
         if horizontalSizeClass == .compact {
           ZStack(alignment: .bottomTrailing) {
-            reportsView()
+            NoticesView(store: viewStore.notices == .loading ? .placeholder : self.store)
+              .redacted(reason: viewStore.notices == .loading ? .placeholder : [])
             
             addReportButton
               .padding(.grid(6))
           }
         } else {
           HStack {
-            reportsView()
+            NoticesView(store: viewStore.notices == .loading ? .placeholder : self.store)
               .frame(width: 300)
+              .redacted(reason: viewStore.notices == .loading ? .placeholder : [])
             
             Divider()
             
@@ -44,6 +48,9 @@ public struct AppView: View {
           }
         }
       }
+      .refreshable {
+        await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
+      }
       .accessibilityAction(.magicTap) {
         viewStore.send(.showReportWizard(true))
       }
@@ -53,33 +60,6 @@ public struct AppView: View {
       .onAppear { viewStore.send(.onAppear) }
     }
     .navigationViewStyle(StackNavigationViewStyle())
-  }
-  
-  @ViewBuilder private func reportsView() -> some View {
-    if viewStore.reports.isEmpty {
-      emptyStateView
-        .padding(.horizontal)
-    } else {
-      ScrollView {
-        ForEach(viewStore.reports, id: \.id) { report in
-          ReportCellView(report: report)
-        }
-        .padding()
-      }
-    }
-  }
-  
-  private var emptyStateView: some View {
-    VStack(spacing: 12) {
-      Image(systemName: "doc.richtext")
-        .font(Font.system(.largeTitle))
-        .accessibility(hidden: true)
-      Text(L10n.Home.emptyStateCopy)
-        .font(.system(.title))
-        .multilineTextAlignment(.center)
-        .padding()
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
   
   private var addReportButton: some View {
@@ -106,8 +86,8 @@ public struct AppView: View {
         }
       )
       
-        .buttonStyle(AddReportButtonStyle())
-        .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
+      .buttonStyle(AddReportButtonStyle())
+      .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
     }
   }
   
@@ -125,18 +105,19 @@ public struct AppView: View {
           .contentShape(Rectangle())
       }
     )
-      .accessibility(label: Text(L10n.Settings.title))
+    .accessibility(label: Text(L10n.Settings.title))
   }
 }
 
 struct MainView_Previews: PreviewProvider {
   static var previews: some View {
-    Preview {
+    var appState = AppState()
+    appState.notices = .results(.placeholder)
+    
+    return Preview {
       AppView(
         store: .init(
-          initialState: AppState(
-            reports: [.preview, .preview, .preview, .preview]
-          ),
+          initialState: appState,
           reducer: .empty,
           environment: ()
         )
@@ -161,5 +142,82 @@ extension UIDevice {
   
   static var isIPhone: Bool {
     UIDevice.current.userInterfaceIdiom == .phone
+  }
+}
+
+extension Notice {
+  var displayColor: String? {
+    guard let safeColor = self.color else { return nil }
+    return DescriptionState.colors.first { color in
+      color.key.lowercased() == safeColor.lowercased()
+    }?.value
+  }
+}
+
+public struct NoticesView: View {
+  let store: Store<AppState, AppAction>
+  @ObservedObject var viewStore: ViewStore<AppState, AppAction>
+  
+  public init(store: Store<AppState, AppAction>) {
+    self.store = store
+    self.viewStore = ViewStore(store)
+  }
+  
+  public var body: some View {
+    Group {
+      switch viewStore.notices {
+      case .loading:
+        ActivityIndicator(style: .medium, color: .gray)
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      case let .results(notices):
+        List(notices) { notice in
+          NoticeView(notice: notice)
+            .listRowSeparator(.hidden)
+        }
+        .listStyle(.plain)
+      case .empty:
+        emptyStateView
+          .padding(.horizontal)
+      case let .error(errorState):
+        VStack(alignment: .center, spacing: .grid(2)) {
+          if let systemImageName = errorState.systemImageName {
+            Image(systemName: systemImageName)
+              .font(.title)
+              .padding(.bottom, .grid(3))
+          }
+          
+          Text(errorState.title)
+            .font(.title2.weight(.semibold))
+            .padding(.bottom, .grid(2))
+          
+          if let body = errorState.body {
+            Text(body)
+              .font(.body)
+              .multilineTextAlignment(.center)
+          }
+          
+          if let errorMessage = errorState.error?.errorDump {
+            Text(errorMessage)
+              .font(.body.italic())
+              .multilineTextAlignment(.center)
+          }
+        }
+        .padding(.horizontal, .grid(3))
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      }
+    }
+  }
+  
+  private var emptyStateView: some View {
+    VStack(alignment: .center, spacing: .grid(3)) {
+      Image(systemName: "doc.richtext")
+        .font(Font.system(.largeTitle))
+        .accessibility(hidden: true)
+      Text(L10n.Home.emptyStateCopy)
+        .font(.system(.title))
+        .multilineTextAlignment(.center)
+    }
+    .padding()
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 }

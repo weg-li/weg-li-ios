@@ -3,7 +3,7 @@ import Foundation
 import Helper
 import SharedModels
 
-public extension Report {
+public extension ReportState {
   // swiftlint:disable:next function_body_length
   func createMailBody() -> String {
     """

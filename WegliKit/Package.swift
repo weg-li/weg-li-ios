@@ -44,20 +44,32 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.28.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .exactItem("0.34.0")),
     .package(url: "https://github.com/pointfreeco/composable-core-location", .exact("0.1.0")),
     .package(
       name: "SnapshotTesting",
       url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
       .upToNextMajor(from: "1.8.2")
     ),
-    .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0"))
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
+    .package(name: "KeychainSwift", url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))
   ],
   targets: [
     .target(
+      name: "ApiClient",
+      dependencies:[
+        "Helper",
+        "KeychainClient",
+        "SharedModels",
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+      ]
+    ),
+    .target(
       name: "AppFeature",
       dependencies: [
+        "ApiClient",
         "FileClient",
+        "KeychainClient",
         "L10n",
         "ReportFeature",
         "SettingsFeature",
@@ -116,6 +128,13 @@ let package = Package(
         "SharedModels",
         "Styleguide",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+      ]
+    ),
+    .target(
+      name: "KeychainClient",
+      dependencies: [
+        .product(name: "KeychainSwift", package: "KeychainSwift"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -178,6 +197,7 @@ let package = Package(
     .target(
       name: "ReportFeature",
       dependencies: [
+        "ApiClient",
         "ContactFeature",
         "DescriptionFeature",
         "FileClient",
@@ -200,8 +220,10 @@ let package = Package(
     .target(
       name: "SettingsFeature",
       dependencies: [
+        "ApiClient",
         "ContactFeature",
         "Helper",
+        "KeychainClient",
         "L10n",
         "SharedModels",
         "Styleguide",

@@ -19,26 +19,22 @@ struct MailContentView: View {
     let isDescriptionValid: Bool
     let isContactValid: Bool
     
-    init(state: Report) {
+    init(state: ReportState) {
       districtName = state.district?.name
       isImagesValid = state.images.isValid
       isLocationValid = state.location.resolvedAddress.isValid
       isDescriptionValid = state.description.isValid
       isContactValid = state.contactState.isValid
       
-      let isValid = state.images.isValid
-      && state.contactState.isValid
-      && state.description.isValid
-      && state.location.resolvedAddress.isValid
-      isSubmitButtonDisabled = !isValid
+      isSubmitButtonDisabled = !state.isReportValid
       isMailComposerPresented = state.mail.isPresentingMailContent
     }
   }
   
   @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
-  let store: Store<Report, ReportAction>
+  let store: Store<ReportState, ReportAction>
   
-  init(store: Store<Report, ReportAction>) {
+  init(store: Store<ReportState, ReportAction>) {
     self.store = store
     viewStore = ViewStore(store.scope(state: ViewState.init))
   }
@@ -59,26 +55,6 @@ struct MailContentView: View {
         if !MFMailComposeViewController.canSendMail() {
           Text(L10n.Mail.deviceErrorCopy)
         }
-        if viewStore.isSubmitButtonDisabled {
-          VStack(spacing: .grid(2)) {
-            Text(L10n.Mail.readyToSubmitErrorCopy)
-              .fontWeight(.semibold)
-            VStack(spacing: .grid(1)) {
-              if !viewStore.isImagesValid {
-                Text(L10n.Report.Error.images.asBulletPoint)
-              }
-              if !viewStore.isLocationValid {
-                Text(L10n.Report.Error.location.asBulletPoint)
-              }
-              if !viewStore.isDescriptionValid {
-                Text(L10n.Report.Error.description.asBulletPoint)
-              }
-              if !viewStore.isContactValid {
-                Text(L10n.Report.Error.contact.asBulletPoint)
-              }
-            }
-          }
-        }
       }
       .accessibilityElement(children: .combine)
       .foregroundColor(.red)
@@ -96,12 +72,6 @@ struct MailContentView: View {
         )
       )
     }
-  }
-}
-
-private extension String {
-  var asBulletPoint: Self {
-    "\u{2022} \(self)"
   }
 }
 
@@ -124,6 +94,7 @@ struct MailContentView_Previews: PreviewProvider {
           placeService: .noop,
           regulatoryOfficeMapper: .live(),
           fileClient: .noop,
+          wegliService: .noop,
           date: Date.init
         )
       )

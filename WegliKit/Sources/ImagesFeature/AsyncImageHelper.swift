@@ -33,7 +33,7 @@ class AsyncImageStore: ObservableObject {
   init(
     url: URL,
     imageLoader: ImageLoader = ImageLoader(),
-    loadingImage: UIImage = UIImage(systemName: "questionmark.circle")!,
+    loadingImage: UIImage = UIImage(systemName: "rectangle.fill")!.withTintColor(.gray),
     errorImage: UIImage = UIImage(systemName: "xmark.circle")!
   ) {
     self.url = url

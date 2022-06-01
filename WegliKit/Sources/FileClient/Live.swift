@@ -8,6 +8,11 @@ extension FileClient {
       .first!
 
     return Self(
+      removeItem: { url in
+          .fireAndForget {
+            try? FileManager.default.removeItem(at: url)
+          }
+      },
       delete: { fileName in
         .fireAndForget {
           try? FileManager.default.removeItem(

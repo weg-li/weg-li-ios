@@ -6,7 +6,7 @@ class ReportMailTests: XCTestCase {
   func test_MailGeneration() {
     let date = Date(timeIntervalSinceReferenceDate: 0)
     
-    let report = Report(
+    let report = ReportState(
       uuid: { UUID(uuidString: "de71ce00-dead-beef-dead-beefdeadbeef")! },
       images: .init(
         alert: nil,
@@ -76,9 +76,9 @@ class ReportMailTests: XCTestCase {
     
     Verstoß: Parken verbotswidrig auf einem Gehweg
     
-    Tatzeit: 01.01.2001, 01:00:00 MEZ
+    Tatzeit: 01.01.2001, 01:00
     
-    Zeitraum: länger als 10 Minuten (01:00:00 – 01:10:00)
+    Zeitraum: 01:00–01:04 Uhr (länger als 4 Minuten)
     
     Das Fahrzeug war verlassen.
     
