@@ -19,7 +19,7 @@ public struct Widget<Content: View>: View {
   public let title: Text
   public var isCompleted: Bool
   public let content: () -> Content
-  @State private var showContent: Bool = true
+  @State private var showContent = true
   
   public var body: some View {
     VStack(alignment: .leading) {

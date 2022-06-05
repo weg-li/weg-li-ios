@@ -7,8 +7,8 @@ import ContactFeature
 import DescriptionFeature
 import FileClient
 import Helper
-import ImagesUploadClient
 import ImagesFeature
+import ImagesUploadClient
 import L10n
 import LocationFeature
 import MailFeature
@@ -37,7 +37,7 @@ public struct ReportState: Equatable {
   public var showEditDescription = false
   public var showEditContact = false
   
-  public var apiToken: String = ""
+  public var apiToken = ""
   
   public var uploadedImagesIds: [String] = []
   public var uploadProgressState: String?
