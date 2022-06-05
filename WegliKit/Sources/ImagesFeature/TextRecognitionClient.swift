@@ -5,7 +5,7 @@ import Vision
 
 public struct TextItem: Identifiable, Hashable {
   public var id: String = UUID().uuidString
-  public var text: String = ""
+  public var text = ""
   
   public init(id: String, text: String) {
     self.id = id

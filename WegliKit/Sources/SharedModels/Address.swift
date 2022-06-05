@@ -18,7 +18,7 @@ public struct Address: Equatable, Codable {
   @BindableState public var street: String
   @BindableState public var postalCode: String
   @BindableState public var city: String
-  @BindableState public var addition: String = ""
+  @BindableState public var addition = ""
 }
 
 public extension Address {

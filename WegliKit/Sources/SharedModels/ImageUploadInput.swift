@@ -8,7 +8,7 @@ public struct ImageUploadInput: Codable, Equatable {
   public let byteSize: UInt64
   /// MD5 base64digest of file
   public let checksum: String
-  var contentType: String = "image/jpeg"
+  var contentType = "image/jpeg"
   
   public init(
     filename: String,

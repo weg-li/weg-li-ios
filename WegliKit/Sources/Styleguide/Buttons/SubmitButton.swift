@@ -30,7 +30,7 @@ public struct ReadySubmitButton: View {
   }
   
   let district: String?
-  var disabled: Bool = false
+  var disabled = false
   
   public var body: some View {
     HStack(spacing: .grid(4)) {
@@ -87,7 +87,7 @@ public struct SubmitButton: View {
   }
   
   public let state: Status
-  public var disabled: Bool = false
+  public var disabled = false
   public let action: () -> Void
   
   public enum Status {

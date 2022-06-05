@@ -21,10 +21,10 @@ public struct Notice: Codable, Equatable, Identifiable {
   public let createdAt: Date
   public let updatedAt: Date
   public let sentAt: Date?
-  public var vehicleEmpty: Bool = false
-  public var hazardLights: Bool = false
-  public var expiredTuv: Bool = false
-  public var expiredEco: Bool = false
+  public var vehicleEmpty = false
+  public var hazardLights = false
+  public var expiredTuv = false
+  public var expiredEco = false
   public var photos: [NoticePhoto]?
   
   public var time: String? { Times.times[Int(duration)] }
@@ -117,10 +117,10 @@ public struct NoticeInput: Codable, Equatable, Identifiable {
   public let createdAt: Date
   public let updatedAt: Date
   public let sentAt: Date?
-  public var vehicleEmpty: Bool = false
-  public var hazardLights: Bool = false
-  public var expiredTuv: Bool = false
-  public var expiredEco: Bool = false
+  public var vehicleEmpty = false
+  public var hazardLights = false
+  public var expiredTuv = false
+  public var expiredEco = false
   public var photos: [String]
     
   public init(
