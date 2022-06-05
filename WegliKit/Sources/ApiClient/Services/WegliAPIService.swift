@@ -73,7 +73,7 @@ public extension WegliAPIService {
         .eraseToEffect()
     },
     upload: { _ in
-      return ImageUploadResponse(
+      ImageUploadResponse(
         id: 1,
         key: "",
         filename: "",

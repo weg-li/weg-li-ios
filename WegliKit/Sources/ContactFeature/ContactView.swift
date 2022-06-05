@@ -1,7 +1,7 @@
 // Created for weg-li in 2021.
 
-import ComposableArchitecture
 import Combine
+import ComposableArchitecture
 import L10n
 import SharedModels
 import Styleguide
@@ -15,7 +15,7 @@ public struct ContactDetailsView: View {
   
   public init(store: Store<Contact, ContactAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public var body: some View {
@@ -153,7 +153,7 @@ public struct ContactView: View {
   
   public init(store: Store<ContactState, ContactStateAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public var body: some View {

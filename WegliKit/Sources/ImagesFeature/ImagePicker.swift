@@ -101,6 +101,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
 }
 
 // MARK: Helper
+
 extension FileManager {
   func getDocumentsDirectory() -> URL {
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -121,11 +122,11 @@ extension FileManager {
     do {
       try itemReplacementDirectoryURL = fileManager.url(
         for: .itemReplacementDirectory,
-           in: .userDomainMask,
-           appropriateFor: destinationURL,
-           create: true
+        in: .userDomainMask,
+        appropriateFor: destinationURL,
+        create: true
       )
-    } catch let error {
+    } catch {
       debugPrint("error \(error)")
     }
     guard let destURL = itemReplacementDirectoryURL else { return nil }
@@ -134,7 +135,7 @@ extension FileManager {
     do {
       try data.write(to: tempFileURL, options: .atomic)
       return tempFileURL
-    } catch let error {
+    } catch {
       debugPrint("error \(error)")
       return nil
     }
@@ -158,17 +159,16 @@ extension FileManager {
   }
   
   func createDirectory(withFolderName dest: String, toDirectory directory: FileManager.SearchPathDirectory = .applicationSupportDirectory) {
-      let fileManager = FileManager.default
-      let urls = fileManager.urls(for: directory, in: .userDomainMask)
-      if let applicationSupportURL = urls.last {
-          do{
-              var newURL = applicationSupportURL
-              newURL = newURL.appendingPathComponent(dest, isDirectory: true)
-              try fileManager.createDirectory(at: newURL, withIntermediateDirectories: true, attributes: nil)
-          }
-          catch{
-              debugPrint("error \(error)")
-          }
+    let fileManager = FileManager.default
+    let urls = fileManager.urls(for: directory, in: .userDomainMask)
+    if let applicationSupportURL = urls.last {
+      do {
+        var newURL = applicationSupportURL
+        newURL = newURL.appendingPathComponent(dest, isDirectory: true)
+        try fileManager.createDirectory(at: newURL, withIntermediateDirectories: true, attributes: nil)
+      } catch {
+        debugPrint("error \(error)")
       }
+    }
   }
 }

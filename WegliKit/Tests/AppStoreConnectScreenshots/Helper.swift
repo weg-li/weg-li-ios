@@ -1,5 +1,5 @@
-import SwiftUI
 import SnapshotTesting
+import SwiftUI
 
 func assertAppStoreSnapshots<Description, SnapshotContent>(
   view: SnapshotContent,
@@ -12,7 +12,7 @@ func assertAppStoreSnapshots<Description, SnapshotContent>(
   line: UInt = #line,
   afterMilliSecondsDelay delay: Int = 0
 )
-where
+  where
   SnapshotContent: View,
   Description: View
 {
@@ -31,8 +31,8 @@ where
             .environment(\.colorScheme, colorScheme)
             .environment(\.deviceState, config.deviceState)
         }
-          .environment(\.colorScheme, colorScheme)
-          .environment(\.deviceState, config.deviceState),
+        .environment(\.colorScheme, colorScheme)
+        .environment(\.deviceState, config.deviceState),
         as: .image(precision: precision, layout: .device(config: config.viewImageConfig)),
         named: name,
         file: file,
@@ -43,8 +43,8 @@ where
   }
 }
 
-extension EnvironmentValues {
-  public var adaptiveSize: AdaptiveSize {
+public extension EnvironmentValues {
+  var adaptiveSize: AdaptiveSize {
     get { self[AdaptiveSizeKey.self] }
     set { self[AdaptiveSizeKey.self] = newValue }
   }
@@ -63,7 +63,6 @@ private struct AdaptiveSizeKey: EnvironmentKey {
   }
 }
 
-
 struct SnapshotConfig {
   let adaptiveSize: AdaptiveSize
   let deviceState: DeviceState
@@ -76,7 +75,7 @@ public enum AdaptiveSize {
   case large
 
   public func pad(_ other: CGFloat, by scale: CGFloat = 1) -> CGFloat {
-    self.padding * scale + other
+    padding * scale + other
   }
 
   public var padding: CGFloat {
@@ -103,34 +102,32 @@ public struct DeviceState {
   )
 
   public var isPad: Bool {
-    self.idiom == .pad
+    idiom == .pad
   }
 
   public var isPhone: Bool {
-    self.idiom == .phone
+    idiom == .phone
   }
 
   #if DEBUG
-    public static let phone = Self(
-      idiom: .phone,
-      orientation: .portrait,
-      previousOrientation: .portrait
-    )
+  public static let phone = Self(
+    idiom: .phone,
+    orientation: .portrait,
+    previousOrientation: .portrait
+  )
 
-    public static let pad = Self(
-      idiom: .pad,
-      orientation: .landscapeLeft,
-      previousOrientation: .landscapeLeft
-    )
+  public static let pad = Self(
+    idiom: .pad,
+    orientation: .landscapeLeft,
+    previousOrientation: .landscapeLeft
+  )
   #endif
 }
-
 
 public struct DeviceStateModifier: ViewModifier {
   @State var state: DeviceState = .default
 
-  public init() {
-  }
+  public init() {}
 
   public func body(content: Content) -> some View {
     content
@@ -141,12 +138,12 @@ public struct DeviceStateModifier: ViewModifier {
         self.state.previousOrientation = self.state.orientation
         self.state.orientation = UIDevice.current.orientation
       }
-      .environment(\.deviceState, self.state)
+      .environment(\.deviceState, state)
   }
 }
 
-extension EnvironmentValues {
-  public var deviceState: DeviceState {
+public extension EnvironmentValues {
+  var deviceState: DeviceState {
     get { self[DeviceStateKey.self] }
     set { self[DeviceStateKey.self] = newValue }
   }

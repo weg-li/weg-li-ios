@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import FileClient
 import Foundation
-import SharedModels
 import ReportFeature
+import SharedModels
 
 public struct AppDelegateState: Equatable {}
 
@@ -26,10 +26,9 @@ public struct AppDelegateEnvironment {
   }
 }
 
-
 let appDelegateReducer = Reducer<
   AppDelegateState, AppDelegateAction, AppDelegateEnvironment
-> { state, action, environment in
+> { _, action, _ in
   switch action {
   case .didFinishLaunching:
     return .none

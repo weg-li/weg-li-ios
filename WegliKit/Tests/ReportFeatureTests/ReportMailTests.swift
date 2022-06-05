@@ -51,7 +51,7 @@ class ReportMailTests: XCTestCase {
           address: "stapuli@hamburg.de",
           subject: "Anzeige mit der Bitte um Weiterverfolgung",
           body: "",
-          attachmentData: [UIImage(systemName: "heart")!.pngData()].compactMap({ $0 })
+          attachmentData: [UIImage(systemName: "heart")!.pngData()].compactMap { $0 }
         ),
         isPresentingMailContent: false
       )

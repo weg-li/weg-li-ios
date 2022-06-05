@@ -6,7 +6,7 @@ public enum AdaptiveSize {
   case large
 
   public func pad(_ other: CGFloat, by scale: CGFloat = 1) -> CGFloat {
-    self.padding * scale + other
+    padding * scale + other
   }
 
   public var padding: CGFloat {
@@ -21,8 +21,8 @@ public enum AdaptiveSize {
   }
 }
 
-extension EnvironmentValues {
-  public var adaptiveSize: AdaptiveSize {
+public extension EnvironmentValues {
+  var adaptiveSize: AdaptiveSize {
     get { self[AdaptiveSizeKey.self] }
     set { self[AdaptiveSizeKey.self] = newValue }
   }

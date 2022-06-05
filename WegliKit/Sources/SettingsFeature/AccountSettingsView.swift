@@ -16,6 +16,7 @@ public struct AccountSettings: Equatable {
 }
 
 // MARK: State
+
 public struct AccountSettingsState: Equatable {
   public var accountSettings: AccountSettings
   
@@ -28,6 +29,7 @@ public struct AccountSettingsState: Equatable {
 }
 
 // MARK: Actions
+
 public enum AccountSettingsAction: Equatable {
   case setApiToken(String)
   case openUserSettings
@@ -36,6 +38,7 @@ public enum AccountSettingsAction: Equatable {
 }
 
 // MARK: Environment
+
 public struct AccountSettingsEnvironment {
   public init(
     uiApplicationClient: UIApplicationClient,
@@ -58,47 +61,49 @@ public struct AccountSettingsEnvironment {
 }
 
 // MARK: Reducer
+
 public let accountSettingsReducer =
-Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
-  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
-    state, action, environment in
-    switch action {
-    case let .setApiToken(token):
-      state.accountSettings.apiToken = token
-      return .none
+  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
+    Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
+      state, action, environment in
+      switch action {
+      case let .setApiToken(token):
+        state.accountSettings.apiToken = token
+        return .none
       
-    case .openUserSettings:
-      return environment.uiApplicationClient
-        .open(environment.userLink, [:])
-        .fireAndForget()
+      case .openUserSettings:
+        return environment.uiApplicationClient
+          .open(environment.userLink, [:])
+          .fireAndForget()
       
-    case .fetchNotices:
-      state.isNetworkRequestInProgress = true
+      case .fetchNotices:
+        state.isNetworkRequestInProgress = true
       
-      return environment.wegliService.getNotices()
-        .receive(on: environment.mainQueue)
-        .catchToEffect()
-        .map(AccountSettingsAction.fetchNoticesResponse)
-        .eraseToEffect()
+        return environment.wegliService.getNotices()
+          .receive(on: environment.mainQueue)
+          .catchToEffect()
+          .map(AccountSettingsAction.fetchNoticesResponse)
+          .eraseToEffect()
       
-    case let .fetchNoticesResponse(.success(val)):
-      state.isNetworkRequestInProgress = false
-      state.apiTestRequestResult = true
-      return .none
+      case let .fetchNoticesResponse(.success(val)):
+        state.isNetworkRequestInProgress = false
+        state.apiTestRequestResult = true
+        return .none
       
-    case let .fetchNoticesResponse(.failure(error)):
-      print(error)
-      state.isNetworkRequestInProgress = false
-      state.apiTestRequestResult = false
-      return .none
+      case let .fetchNoticesResponse(.failure(error)):
+        print(error)
+        state.isNetworkRequestInProgress = false
+        state.apiTestRequestResult = false
+        return .none
+      }
     }
-  }
-)
+  )
 
-fileprivate typealias S = AccountSettingsState
-fileprivate typealias A = AccountSettingsAction
+private typealias S = AccountSettingsState
+private typealias A = AccountSettingsAction
 
-// MARK:- View
+// MARK: - View
+
 public struct AccountSettingsView: View {
   let store: Store<AccountSettingsState, AccountSettingsAction>
   @ObservedObject var viewStore: ViewStore<AccountSettingsState, AccountSettingsAction>
@@ -135,7 +140,8 @@ public struct AccountSettingsView: View {
             .background(Color.gitHubBannerBackground)
             .accentColor(Color.green)
             .clipShape(RoundedRectangle(
-              cornerRadius: .grid(2), style: .circular)
+              cornerRadius: .grid(2), style: .circular
+            )
             )
             .overlay(
               RoundedRectangle(cornerRadius: .grid(2))
@@ -171,10 +177,8 @@ public struct AccountSettingsView: View {
             .disabled(viewStore.accountSettings.apiToken.isEmpty)
             .buttonStyle(.bordered)
             
-            HStack(alignment: .center) {
-              
-            }
-            .padding(.vertical, .grid(2))
+            HStack(alignment: .center) {}
+              .padding(.vertical, .grid(2))
             
             VStack(alignment: .leading) {
               Text(description!)
@@ -193,7 +197,6 @@ public struct AccountSettingsView: View {
               .buttonStyle(.bordered)
               .accessibilityAddTraits([.isLink])
               
-            
               VStack(alignment: .center, spacing: .grid(2)) {
                 Text("Die App supported aktuell folgende Operationen")
                   .multilineTextAlignment(.leading)
@@ -220,7 +223,6 @@ public struct AccountSettingsView: View {
               .padding(.top, .grid(2))
               .foregroundColor(Color(.secondaryLabel))
               .font(.footnote)
-              
             }
             .padding(.grid(2))
             .overlay(
@@ -240,16 +242,17 @@ private extension View {
   func placeholder<Content: View>(
     when shouldShow: Bool,
     alignment: Alignment = .leading,
-    @ViewBuilder placeholder: () -> Content) -> some View {
-      
-      ZStack(alignment: alignment) {
-        placeholder().opacity(shouldShow ? 1 : 0)
-        self
-      }
+    @ViewBuilder placeholder: () -> Content
+  ) -> some View {
+    ZStack(alignment: alignment) {
+      placeholder().opacity(shouldShow ? 1 : 0)
+      self
     }
+  }
 }
 
 // MARK: Preview
+
 struct AccountSettingsView_Previews: PreviewProvider {
   static var previews: some View {
     AccountSettingsView(

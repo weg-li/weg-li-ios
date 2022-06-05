@@ -2,8 +2,8 @@
 
 import ComposableArchitecture
 import DescriptionFeature
-import L10n
 import Helper
+import L10n
 import ReportFeature
 import SettingsFeature
 import SharedModels
@@ -17,7 +17,7 @@ public struct AppView: View {
   
   public init(store: Store<AppState, AppAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public var body: some View {
@@ -147,7 +147,7 @@ extension UIDevice {
 
 extension Notice {
   var displayColor: String? {
-    guard let safeColor = self.color else { return nil }
+    guard let safeColor = color else { return nil }
     return DescriptionState.colors.first { color in
       color.key.lowercased() == safeColor.lowercased()
     }?.value

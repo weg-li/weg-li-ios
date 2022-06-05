@@ -5,7 +5,7 @@ public extension JSONDecoder.DateDecodingStrategy {
     let container = try decoder.singleValueContainer()
     let dateString = try container.decode(String.self)
     
-    guard let date = ISO8601DateFormatter.internetDateTimeWithFractionalSeconds.date(from: dateString)  else {
+    guard let date = ISO8601DateFormatter.internetDateTimeWithFractionalSeconds.date(from: dateString) else {
       throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date: \(dateString)")
     }
     return date

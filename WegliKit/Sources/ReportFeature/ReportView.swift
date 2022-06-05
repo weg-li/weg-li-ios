@@ -4,8 +4,8 @@ import ComposableArchitecture
 import ContactFeature
 import DescriptionFeature
 import Helper
-import L10n
 import ImagesFeature
+import L10n
 import LocationFeature
 import Styleguide
 import SwiftUI
@@ -16,7 +16,7 @@ public struct ReportView: View {
     
   public init(store: Store<ReportState, ReportAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public var body: some View {
@@ -37,7 +37,7 @@ public struct ReportView: View {
             .labelsHidden()
             .padding(.bottom)
             
-            Text("Beim auswählen eines Fotos wird das Datum aus den Metadaten ausgelesen")
+            Text("Beim auswählen eines Fotos wird das Datum aus den Metadaten des Fotos ausgelesen")
               .multilineTextAlignment(.leading)
               .foregroundColor(Color(.secondaryLabel))
               .font(.footnote)

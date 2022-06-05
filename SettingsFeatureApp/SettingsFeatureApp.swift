@@ -10,11 +10,11 @@ import SwiftUI
 
 @main
 struct SettingsFeatureApp: App {
-    var body: some Scene {
-        WindowGroup {
-          NavigationView {
-            ContentView()
-          }
-        }
+  var body: some Scene {
+    WindowGroup {
+      NavigationView {
+        ContentView()
+      }
     }
+  }
 }

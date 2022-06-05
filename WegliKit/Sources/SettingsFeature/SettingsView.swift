@@ -15,7 +15,7 @@ public struct SettingsView: View {
   
   public init(store: Store<SettingsState, SettingsAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public var body: some View {
@@ -157,8 +157,9 @@ public struct SettingsView: View {
     .padding([.top, .bottom], .grid(1))
     .background(
       LinearGradient(
-        gradient: Gradient(colors: [Color.gitHubBannerBackground, Color(.hex(0x2d1c3d))]), startPoint: .top, endPoint: .bottom)
-        .padding(-20)
+        gradient: Gradient(colors: [Color.gitHubBannerBackground, Color(.hex(0x2d1c3d))]), startPoint: .top, endPoint: .bottom
+      )
+      .padding(-20)
     )
   }
   

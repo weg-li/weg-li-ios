@@ -28,6 +28,6 @@ struct OnWidgetInteractionButtonStyle_Previews: PreviewProvider {
         Image(systemName: "trash")
       }
     )
-      .buttonStyle(OnWidgetInteractionButtonStyle())
+    .buttonStyle(OnWidgetInteractionButtonStyle())
   }
 }

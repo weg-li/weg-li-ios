@@ -4,8 +4,9 @@ import ApiClient
 import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
-import FileClient
 import DescriptionFeature
+import FileClient
+import ImagesUploadClient
 import ImagesFeature
 import LocationFeature
 import MapKit
@@ -68,7 +69,7 @@ class ReportStoreTests: XCTestCase {
     var didWriteContactToFile = false
     
     var fileClient = FileClient.noop
-    fileClient.save = { fileName, data in
+    fileClient.save = { fileName, _ in
       didWriteContactToFile = fileName == "contact-settings"
       return .none
     }
@@ -129,7 +130,6 @@ class ReportStoreTests: XCTestCase {
     store.send(.description(.setBrand(brand))) {
       $0.description.selectedBrand = brand
     }
-    
   }
   
   func test_updateCharge_shouldUpdateState() {
@@ -439,7 +439,6 @@ class ReportStoreTests: XCTestCase {
       city: "Hamburg"
     )
     
-    
     store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
@@ -647,7 +646,6 @@ class ReportStoreTests: XCTestCase {
     store.send(.resetButtonTapped) {
       $0.alert = .resetReportAlert
     }
-    
   }
   
   func test_setShowContact_shouldPresentAnAlert() {
@@ -685,7 +683,6 @@ class ReportStoreTests: XCTestCase {
     store.send(.setShowEditContact(true)) {
       $0.showEditContact = true
     }
-    
   }
   
   func test_setShowDescription_shouldPresentAnAlert() {
@@ -757,14 +754,13 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    let item = TextItem.init(id: "123", text: "B-MB 3000")
+    let item = TextItem(id: "123", text: "B-MB 3000")
     store.send(.images(.selectedTextItem(item))) {
       $0.description.licensePlateNumber = item.text
     }
   }
   
   func test_action_uploadImages() {
-    
     let responses: [ImageUploadResponse] = [
       .init(
         id: 1,
@@ -789,7 +785,7 @@ class ReportStoreTests: XCTestCase {
         directUpload: .init(url: "321", headers: [:])
       )
     ]
-    let imagesUploadClient = ImagesUploadClient(uploadImages: { requests in
+    let imagesUploadClient = ImagesUploadClient(uploadImages: { _ in
       Just(Result.success(responses))
         .eraseToEffect()
     })

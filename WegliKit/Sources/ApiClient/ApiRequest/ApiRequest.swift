@@ -33,7 +33,7 @@ public extension APIRequest {
     var request = URLRequest(url: url)
     request.httpMethod = httpMethod.rawValue
     request.addHeaders(headers)
-    if let body = self.body {
+    if let body = body {
       request.httpBody = body
     }
     return request

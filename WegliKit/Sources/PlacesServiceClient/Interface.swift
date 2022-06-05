@@ -16,9 +16,8 @@ public struct PlacesServiceError: Equatable, Error {
     self.message = message
   }
   
-    public var message = ""
+  public var message = ""
 }
-
 
 let transformPlacemarks: ([CLPlacemark]) -> [Address] = { placemarks in
   placemarks

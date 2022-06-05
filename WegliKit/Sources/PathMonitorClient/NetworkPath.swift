@@ -10,8 +10,8 @@ public struct NetworkPath: Equatable {
   }
 }
 
-extension NetworkPath {
-  public init(rawValue: NWPath) {
+public extension NetworkPath {
+  init(rawValue: NWPath) {
     self.status = rawValue.status
   }
 }

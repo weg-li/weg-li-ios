@@ -9,7 +9,7 @@ public struct MailView: UIViewControllerRepresentable {
   @ObservedObject private var viewStore: ViewStore<MailViewState, MailViewAction>
   
   public init(store: Store<MailViewState, MailViewAction>) {
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public class Coordinator: NSObject, MFMailComposeViewControllerDelegate {

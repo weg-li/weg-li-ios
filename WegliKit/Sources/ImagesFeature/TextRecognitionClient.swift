@@ -1,7 +1,7 @@
 import ComposableArchitecture
+import SharedModels
 import SwiftUI
 import Vision
-import SharedModels
 
 public struct TextItem: Identifiable, Hashable {
   public var id: String = UUID().uuidString
@@ -24,7 +24,7 @@ public struct TextRecognitionClient {
     in image: PickerImageResult,
     on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<[TextItem], VisionError> {
-    self.recognizeText(image)
+    recognizeText(image)
       .subscribe(on: queue)
       .eraseToEffect()
   }
@@ -33,43 +33,43 @@ public struct TextRecognitionClient {
 public extension TextRecognitionClient {
   static let live = Self(
     recognizeText: { image in
-        .future { callback in
-          guard let cgImage = image.asUIImage?.cgImage else {
-            callback(.failure(.missingCGImage))
+      .future { callback in
+        guard let cgImage = image.asUIImage?.cgImage else {
+          callback(.failure(.missingCGImage))
+          return
+        }
+          
+        // Create a new image-request handler.
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+          
+        // Create a new request to recognize text.
+        let request = VNRecognizeTextRequest { request, _ in
+          guard let observations = request.results as? [VNRecognizedTextObservation] else {
+            callback(.failure(.init(message: "Observations can not be casted to VNRecognizedTextObservation")))
             return
           }
-          
-          // Create a new image-request handler.
-          let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-          
-          // Create a new request to recognize text.
-          let request = VNRecognizeTextRequest { (request, error) in
-            guard let observations = request.results as? [VNRecognizedTextObservation] else {
-              callback(.failure(.init(message: "Observations can not be casted to VNRecognizedTextObservation")))
-              return
-            }
-            let textItems = observations
-              .compactMap { $0.topCandidates(1).first }
-              .map { TextItem(id: image.id, text: $0.string) }
-            callback(.success(textItems))
-          }
-          
-          request.recognitionLanguages = ["de", "en"]
-          request.recognitionLevel = .accurate
-          
-          do {
-            try requestHandler.perform([request])
-          } catch {
-            callback(.failure(.init(message: error.localizedDescription)))
-          }
+          let textItems = observations
+            .compactMap { $0.topCandidates(1).first }
+            .map { TextItem(id: image.id, text: $0.string) }
+          callback(.success(textItems))
         }
+          
+        request.recognitionLanguages = ["de", "en"]
+        request.recognitionLevel = .accurate
+          
+        do {
+          try requestHandler.perform([request])
+        } catch {
+          callback(.failure(.init(message: error.localizedDescription)))
+        }
+      }
     }
   )
 }
 
 public extension TextRecognitionClient {
   static let noop = Self(
-    recognizeText: { _ in return .none }
+    recognizeText: { _ in .none }
   )
 }
 

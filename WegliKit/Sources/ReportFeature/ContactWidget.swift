@@ -29,7 +29,7 @@ public struct ContactWidget: View {
   
   public init(store: Store<ReportState, ReportAction>) {
     self.store = store
-    viewStore = ViewStore(store.scope(state: ViewState.init))
+    self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
   
   public var body: some View {
@@ -57,9 +57,9 @@ public struct ContactWidget: View {
               .frame(maxWidth: .infinity)
           }
         )
-          .accessibilitySortPriority(3)
-          .buttonStyle(EditButtonStyle())
-          .padding(.top)
+        .accessibilitySortPriority(3)
+        .buttonStyle(EditButtonStyle())
+        .padding(.top)
       }
       .fixedSize(horizontal: false, vertical: true)
     }

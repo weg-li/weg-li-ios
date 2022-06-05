@@ -20,7 +20,7 @@ extension UIFont {
       print("Couldn't create font from data")
       return false
     }
-
+    
     var error: Unmanaged<CFError>?
     let success = CTFontManagerRegisterGraphicsFont(font, &error)
     guard success else {
@@ -32,7 +32,7 @@ extension UIFont {
       )
       return true
     }
-
+    
     return true
   }
 }

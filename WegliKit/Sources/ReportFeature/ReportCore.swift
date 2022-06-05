@@ -7,9 +7,10 @@ import ContactFeature
 import DescriptionFeature
 import FileClient
 import Helper
+import ImagesUploadClient
+import ImagesFeature
 import L10n
 import LocationFeature
-import ImagesFeature
 import MailFeature
 import MessageUI
 import PathMonitorClient
@@ -50,22 +51,23 @@ public struct ReportState: Equatable {
       && images.storedPhotos.isEmpty
       && description == .init()
   }
+
   public var isInternetConnectionAvailable = true
   public var isUploadingNotice = false
   
   public func isModified() -> Bool {
     district != nil
-    || isPhotosValid
-    || contactState.isValid
-    || location != .init()
-    || description != .init()
+      || isPhotosValid
+      || contactState.isValid
+      || location != .init()
+      || description != .init()
   }
   
   public var isReportValid: Bool {
     images.isValid
-    && contactState.isValid
-    && description.isValid
-    && location.resolvedAddress.isValid
+      && contactState.isValid
+      && description.isValid
+      && location.resolvedAddress.isValid
   }
   
   public init(
@@ -78,7 +80,7 @@ public struct ReportState: Equatable {
     location: LocationViewState = LocationViewState(),
     mail: MailViewState = MailViewState()
   ) {
-    id = uuid().uuidString
+    self.id = uuid().uuidString
     self.images = images
     self.contactState = contactState
     self.district = district
@@ -215,7 +217,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     case .onAppear:
       return Effect(value: .observeConnection)
   
-      // Triggers district mapping after geoAddress is stored.
+    // Triggers district mapping after geoAddress is stored.
     case let .mapAddressToDistrict(input):
       return environment.regulatoryOfficeMapper
         .mapAddress(address: input, on: environment.mapAddressQueue)
@@ -240,7 +242,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .images(imageViewAction):
       switch imageViewAction {
-        // After the images coordinate was set trigger resolve location and map to district.
+      // After the images coordinate was set trigger resolve location and map to district.
       case let .setImageCoordinate(coordinate):
         guard let coordinate = coordinate, !state.images.storedPhotos.isEmpty else {
           state.alert = .noPhotoCoordinate
@@ -266,8 +268,8 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         state.date = date ?? Date()
         return .none
       
-        // Handle single image remove action to reset map annotations and reset valid state.
-      case .image(_ , .removePhoto):
+      // Handle single image remove action to reset map annotations and reset valid state.
+      case .image(_, .removePhoto):
         if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
           state.images.pickerResultCoordinate = nil
           state.location.pinCoordinate = nil
@@ -286,8 +288,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .location(locationAction):
       switch locationAction {
-        
-        // Trigger district mapping after address is resolved.
+      // Trigger district mapping after address is resolved.
       case let .resolveAddressFinished(.success(resolvedAddresses)):
         guard let address = resolvedAddresses.first else {
           return .none
@@ -298,7 +299,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         state.alert = .addressResolveFailed(error: error)
         return .none
         
-        // Handle manual address entering to trigger district mapping.
+      // Handle manual address entering to trigger district mapping.
       case let .updateGeoAddressPostalCode(postalCode):
         guard postalCode.count == environment.postalCodeMinumimCharacters, postalCode.isNumeric else {
           return .none
@@ -323,7 +324,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return .none
       }
       
-      // Compose mail when send mail button was tapped.
+    // Compose mail when send mail button was tapped.
     case .mail(.submitButtonTapped):
       guard environment.canSendMail() else {
         state.alert = .noMailAccount
@@ -437,7 +438,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     }
   }
 )
-.onChange(of: \.contactState.contact) { contact, state, _, environment in
+.onChange(of: \.contactState.contact) { contact, _, _, environment in
   struct SaveDebounceId: Hashable {}
   
   return environment.fileClient
@@ -447,6 +448,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
 }
 
 // MARK: - Helper
+
 public extension ReportState {
   static var preview: ReportState {
     ReportState(
@@ -464,7 +466,7 @@ public extension ReportState {
         longitude: 13.13,
         personalEmail: true
       ),
-      date: { Date(timeIntervalSince1970: 1580624207) },
+      date: { Date(timeIntervalSince1970: 1_580_624_207) },
       description: .init(
         licensePlateNumber: "       ",
         selectedColor: 3,
@@ -555,10 +557,9 @@ public let mapperQueue = DispatchQueue(
   attributes: .concurrent
 )
 
-
 public extension FileClient {
   func loadNotices(decoder: JSONDecoder = .noticeDecoder) -> Effect<Result<[Notice], NSError>, Never> {
-    self.load([Notice].self, from: noticesFileName, with: decoder)
+    load([Notice].self, from: noticesFileName, with: decoder)
   }
   
   func saveNotices(
@@ -569,7 +570,7 @@ public extension FileClient {
     guard let notices = notices else {
       return .none
     }
-    return self.save(notices, to: noticesFileName, on: queue, with: encoder)
+    return save(notices, to: noticesFileName, on: queue, with: encoder)
   }
 }
 
@@ -630,5 +631,5 @@ public extension SharedModels.Notice {
     )
   }
   
-  static let placeholder = Self.init(.preview)
+  static let placeholder = Self(.preview)
 }

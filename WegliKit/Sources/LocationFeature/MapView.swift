@@ -1,8 +1,8 @@
 // Created for weg-li in 2021.
 
 import MapKit
-import SwiftUI
 import SharedModels
+import SwiftUI
 import UIKit
 
 struct MapView: UIViewRepresentable {
@@ -40,7 +40,7 @@ struct MapView: UIViewRepresentable {
   private func updateView(mapView: MKMapView, delegate: MKMapViewDelegate) {
     mapView.showsUserLocation = showsLocation
       
-    if let region = self.region {
+    if let region = region {
       mapView.setRegion(region.asMKCoordinateRegion, animated: true)
     }
     
@@ -65,7 +65,7 @@ struct MapView: UIViewRepresentable {
       self.parent = parent
     }
     
-    @objc func addPinBasedOnGesture(_ gestureRecognizer:UIGestureRecognizer) {
+    @objc func addPinBasedOnGesture(_ gestureRecognizer: UIGestureRecognizer) {
       let touchPoint = gestureRecognizer.location(in: gestureRecognizer.view)
       let newCoordinates = (gestureRecognizer.view as? MKMapView)?.convert(
         touchPoint, toCoordinateFrom: gestureRecognizer.view
@@ -75,7 +75,6 @@ struct MapView: UIViewRepresentable {
       annotation.coordinate = _newCoordinates
               
       parent.pinCoordinate = annotation.coordinate
-
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -137,7 +136,7 @@ struct MapView_Previews: PreviewProvider {
 }
 
 extension MKPointAnnotation {
-  static func <(lhs: MKPointAnnotation, rhs: MKPointAnnotation) -> Bool {
+  static func < (lhs: MKPointAnnotation, rhs: MKPointAnnotation) -> Bool {
     lhs.coordinate.latitude < rhs.coordinate.latitude
   }
 }

@@ -10,7 +10,7 @@ public struct ImageGrid: View {
   
   public init(store: Store<ImagesViewState, ImagesViewAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   let gridItemLayout = [

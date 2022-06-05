@@ -50,7 +50,7 @@ public struct NoticeView: View {
               if let registration = notice.registration {
                 HStack(alignment: .center, spacing: 3) {
                   Text(verbatim: registration)
-                    .font(.custom(FontName.nummernschild.rawValue, size: 23 , relativeTo: .body))
+                    .font(.custom(FontName.nummernschild.rawValue, size: 23, relativeTo: .body))
                     .foregroundColor(.black)
                     .textCase(.uppercase)
                     .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 2))

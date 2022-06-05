@@ -28,8 +28,8 @@ public struct ContactState: Equatable, Codable {
       contact.address.street,
       contact.address.city
     ].allSatisfy { !$0.isEmpty }
-    && contact.address.postalCode.isNumeric
-    && contact.address.postalCode.count == 5
+      && contact.address.postalCode.isNumeric
+      && contact.address.postalCode.count == 5
   }
   
   enum CodingKeys: String, CodingKey {
@@ -83,7 +83,7 @@ public enum ContactAction: BindableAction, Equatable {
   case binding(BindingAction<Contact>)
 }
 
-public let contactReducer = Reducer<Contact, ContactAction, ContactEnvironment> { state, action, _ in
+public let contactReducer = Reducer<Contact, ContactAction, ContactEnvironment> { _, action, _ in
   switch action {
   case .binding:
     return .none
@@ -91,8 +91,8 @@ public let contactReducer = Reducer<Contact, ContactAction, ContactEnvironment> 
 }
 .binding()
 
-
 // MARK: Helper
+
 public extension AlertState where Action == ContactStateAction {
   static let resetContactDataAlert = Self(
     title: TextState(L10n.Contact.Alert.title),

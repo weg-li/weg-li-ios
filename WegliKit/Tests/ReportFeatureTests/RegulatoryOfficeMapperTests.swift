@@ -21,7 +21,7 @@ class OfficeMapperTests: XCTestCase {
   
   func test_loadAllDistricts_performance() {
     measure {
-      let _ = [District].all
+      _ = [District].all
     }
   }
   
@@ -84,7 +84,7 @@ class OfficeMapperTests: XCTestCase {
             XCTAssertEqual(error, .unableToMatchRegularityOffice)
           }
         },
-        receiveValue: { value in
+        receiveValue: { _ in
           XCTFail()
         }
       )

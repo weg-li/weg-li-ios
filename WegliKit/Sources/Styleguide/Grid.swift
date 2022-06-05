@@ -1,5 +1,5 @@
 import CoreGraphics
 
-extension CGFloat {
-  public static func grid(_ n: Int) -> Self { Self(n) * 4 }
+public extension CGFloat {
+  static func grid(_ n: Int) -> Self { Self(n) * 4 }
 }

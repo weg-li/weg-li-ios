@@ -111,7 +111,6 @@ class ContactStoreTests: XCTestCase {
     store.send(.contact(.set(\.address.$addition, newValue))) {
       $0.contact.address.addition = newValue
     }
-
   }
 
   func test_setEmptyValues_shouldInvalidContact() {

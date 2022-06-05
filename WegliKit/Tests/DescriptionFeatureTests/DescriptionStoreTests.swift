@@ -64,7 +64,7 @@ class DescriptionStoreTests: XCTestCase {
     
     let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
     store.send(.setCharge(testCharge)) { state in
-      state.selectedCharge = testCharge      
+      state.selectedCharge = testCharge
     }
   }
   
@@ -130,9 +130,9 @@ class DescriptionStoreTests: XCTestCase {
   func test_onAppear_shouldUpdateCharges() {
     var fileClient = FileClient.noop
     fileClient.load = { _ in
-        .init(
-          value: try! JSONEncoder().encode(["0"])
-        )
+      .init(
+        value: try! JSONEncoder().encode(["0"])
+      )
     }
     
     let state = DescriptionState(

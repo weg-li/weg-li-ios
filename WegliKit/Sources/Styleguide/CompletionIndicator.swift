@@ -16,7 +16,6 @@ public struct CompletionIndicator: View {
         .foregroundColor(isValid ? .green : .orange)
         .rotationEffect(.degrees(isValid ? 4 : 0))
         .accessibleAnimation(.easeOut(duration: 0.2), value: isValid)
-        
     }
   }
 }

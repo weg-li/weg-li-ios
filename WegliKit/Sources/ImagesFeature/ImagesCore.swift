@@ -2,14 +2,13 @@
 
 import ComposableArchitecture
 import CoreLocation
-import OrderedCollections
 import Foundation
 import Helper
 import L10n
+import OrderedCollections
 import PhotoLibraryAccessClient
 import SharedModels
 import UIKit
-import OrderedCollections
 
 public struct ImagesViewState: Equatable, Codable {
   public init(
@@ -192,7 +191,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     debugPrint(licensePlate)
     return .none
     
-    // set photo coordinate from selected photos first element.
+  // set photo coordinate from selected photos first element.
   case let .setImageCoordinate(coordinate):
     guard let coordinate = coordinate, let resolvedCoordinate = state.pickerResultCoordinate else {
       return .none
@@ -219,21 +218,21 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     state.storedPhotos = photos
     
     let filterTextItems = state.recognizedTextItems
-      .compactMap{ $0 }
-      .filter({ $0.id != id })
+      .compactMap { $0 }
+      .filter { $0.id != id }
     state.recognizedTextItems = filterTextItems
 
     state.licensePlates.removeAll(where: { $0.id == id })
     
     var effects: [Effect<ImagesViewAction, Never>] = []
     
-    let imageCoordinates = state.storedPhotos.compactMap({ $0 }).imageCoordinates
+    let imageCoordinates = state.storedPhotos.compactMap { $0 }.imageCoordinates
     if !imageCoordinates.isEmpty, let firstCoordinate = imageCoordinates.first {
       effects.append(
         Effect(value: .setImageCoordinate(firstCoordinate))
       )
     }
-    let imageCreationDates = state.storedPhotos.compactMap({ $0 }).imageCreationDates
+    let imageCreationDates = state.storedPhotos.compactMap { $0 }.imageCreationDates
     if !imageCreationDates.isEmpty, let firstDate = imageCreationDates.first {
       effects.append(
         Effect(value: .setImageCreationDate(firstDate))
@@ -244,7 +243,8 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
   case let .image(id, .recognizeText):
     let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
     guard
-      let image = unwrappedPhotos.first(where: { $0.id == id }) else {
+      let image = unwrappedPhotos.first(where: { $0.id == id })
+    else {
       debugPrint("image can not be found")
       return .none
     }
@@ -294,10 +294,10 @@ extension String {
 
 extension Array where Element == PickerImageResult {
   var imageCoordinates: [CLLocationCoordinate2D] {
-    self.compactMap { $0.coordinate?.asCLLocationCoordinate2D }
+    compactMap { $0.coordinate?.asCLLocationCoordinate2D }
   }
   
   var imageCreationDates: [Date] {
-    self.compactMap { $0.creationDate }
+    compactMap(\.creationDate)
   }
 }

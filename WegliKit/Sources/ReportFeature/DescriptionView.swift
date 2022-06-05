@@ -3,9 +3,9 @@
 import ComposableArchitecture
 import DescriptionFeature
 import Helper
+import ImagesFeature
 import L10n
 import LocationFeature
-import ImagesFeature
 import Styleguide
 import SwiftUI
 
@@ -31,7 +31,7 @@ public struct DescriptionView: View {
   
   public init(store: Store<ReportState, ReportAction>) {
     self.store = store
-    viewStore = ViewStore(store.scope(state: ViewState.init))
+    self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
   
   public var body: some View {

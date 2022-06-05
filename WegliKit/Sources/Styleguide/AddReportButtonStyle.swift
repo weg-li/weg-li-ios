@@ -29,12 +29,10 @@ struct AddReportButtonStyle_Previews: PreviewProvider {
   static var previews: some View {
     Preview {
       Button(
-        action: {}/*@END_MENU_TOKEN@*/,
-        label: {
-          Text("+")
-        }
+        action: {},
+        label: { Text("+") }
       )
-        .buttonStyle(AddReportButtonStyle())
+      .buttonStyle(AddReportButtonStyle())
     }
   }
 }

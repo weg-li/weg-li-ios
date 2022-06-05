@@ -1,5 +1,5 @@
-import Contacts
 import ComposableArchitecture
+import Contacts
 import Foundation
 
 public struct Address: Equatable, Codable {
@@ -23,9 +23,9 @@ public struct Address: Equatable, Codable {
 
 public extension Address {
   init(address: CNPostalAddress) {
-    street = address.street
-    postalCode = address.postalCode
-    city = address.city
+    self.street = address.street
+    self.postalCode = address.postalCode
+    self.city = address.city
   }
   
   @StringBuilder func humanReadableAddress() -> String {
@@ -54,14 +54,13 @@ public extension Address {
 }
 
 @resultBuilder
-struct StringBuilder {
-  
+enum StringBuilder {
   static func buildBlock(_ components: String...) -> String {
     let filtered = components.filter { $0 != "" }
     return filtered.joined(separator: "\n")
   }
   
   static func buildOptional(_ component: String?) -> String {
-    return component ?? ""
+    component ?? ""
   }
 }

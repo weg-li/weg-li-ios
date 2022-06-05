@@ -21,8 +21,9 @@ public enum L10n {
     public enum Submit {
       /// Bezirk: %@
       public static func district(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "button.submit.district", String(describing: p1))
+        L10n.tr("Localizable", "button.submit.district", String(describing: p1))
       }
+
       /// Anzeige erstatten
       public static let title = L10n.tr("Localizable", "button.submit.title")
     }
@@ -45,6 +46,7 @@ public enum L10n {
       /// Daten zurücksetzen?
       public static let title = L10n.tr("Localizable", "contact.alert.title")
     }
+
     public enum Row {
       /// Addresszusatz
       public static let addressAddition = L10n.tr("Localizable", "contact.row.addressAddition")
@@ -59,6 +61,7 @@ public enum L10n {
       /// Strasse
       public static let streetCopy = L10n.tr("Localizable", "contact.row.streetCopy")
     }
+
     public enum RowType {
       /// Stadt
       public static let city = L10n.tr("Localizable", "contact.rowType.city")
@@ -73,11 +76,12 @@ public enum L10n {
       /// PLZ
       public static let zipCode = L10n.tr("Localizable", "contact.rowType.zipCode")
     }
+
     public enum Section {
       /// Optional
-      public static let `optional` = L10n.tr("Localizable", "contact.section.optional")
+      public static let optional = L10n.tr("Localizable", "contact.section.optional")
       /// Erforderlich
-      public static let `required` = L10n.tr("Localizable", "contact.section.required")
+      public static let required = L10n.tr("Localizable", "contact.section.required")
     }
   }
 
@@ -88,6 +92,7 @@ public enum L10n {
       /// Beschreibung bearbeiten
       public static let copy = L10n.tr("Localizable", "description.editButton.copy")
     }
+
     public enum Row {
       /// Farbe
       public static let carColor = L10n.tr("Localizable", "description.row.carColor")
@@ -102,11 +107,13 @@ public enum L10n {
       /// Kennzeichen
       public static let licenseplateNumber = L10n.tr("Localizable", "description.row.licenseplateNumber")
     }
+
     public enum Section {
       public enum Vehicle {
         /// Fahrzeug
         public static let copy = L10n.tr("Localizable", "description.section.vehicle.copy")
       }
+
       public enum Violation {
         /// Verstoß
         public static let copy = L10n.tr("Localizable", "description.section.violation.copy")
@@ -132,6 +139,7 @@ public enum L10n {
       /// Karteansicht erweitern
       public static let expandButtonLabel = L10n.tr("Localizable", "location.a11y.expandButtonLabel")
     }
+
     public enum Alert {
       /// Es konnte keine Koordinate aus dem Foto gelesen werden.
       public static let noCoordinate = L10n.tr("Localizable", "location.alert.noCoordinate")
@@ -142,6 +150,7 @@ public enum L10n {
       /// Ortungsdienste sind deaktiviert.
       public static let serviceIsOff = L10n.tr("Localizable", "location.alert.serviceIsOff")
     }
+
     public enum PickerCopy {
       /// Standort
       public static let currentLocation = L10n.tr("Localizable", "location.pickerCopy.currentLocation")
@@ -150,6 +159,7 @@ public enum L10n {
       /// Manuell
       public static let manual = L10n.tr("Localizable", "location.pickerCopy.manual")
     }
+
     public enum Placeholder {
       /// Stadt
       public static let city = L10n.tr("Localizable", "location.placeholder.city")
@@ -174,6 +184,7 @@ public enum L10n {
       /// Um Fotos hinzuzufügen braucht die App deine Zustimmung
       public static let accessDenied = L10n.tr("Localizable", "photos.alert.accessDenied")
     }
+
     public enum ImportButton {
       /// Fotos auswählen
       public static let copy = L10n.tr("Localizable", "photos.importButton.copy")
@@ -189,10 +200,12 @@ public enum L10n {
       /// Anzeige zurücksetzen?
       public static let title = L10n.tr("Localizable", "report.alert.title")
     }
+
     public enum Contact {
       /// Kontaktdaten
       public static let widgetTitle = L10n.tr("Localizable", "report.contact.widgetTitle")
     }
+
     public enum Error {
       /// Die Anzeige enthält keine Kontaktdaten
       public static let contact = L10n.tr("Localizable", "report.error.contact")
@@ -203,6 +216,7 @@ public enum L10n {
       /// Die Anzeige enthält keine Adresse der Tat
       public static let location = L10n.tr("Localizable", "report.error.location")
     }
+
     public enum Place {
       /// Ort
       public static let widgetTitle = L10n.tr("Localizable", "report.place.widgetTitle")
@@ -222,6 +236,7 @@ public enum L10n {
       /// Lizenzen
       public static let licenses = L10n.tr("Localizable", "settings.row.licenses")
     }
+
     public enum Section {
       /// Projekt
       public static let projectTitle = L10n.tr("Localizable", "settings.section.projectTitle")
@@ -232,16 +247,19 @@ public enum L10n {
     public enum Description {
       /// länger als %@ Minuten
       public static func longerThenNMinutes(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "times.description.longerThenNMinutes", String(describing: p1))
+        L10n.tr("Localizable", "times.description.longerThenNMinutes", String(describing: p1))
       }
+
       /// länger als %@ Stunde
       public static func longerThenNStunde(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "times.description.longerThenNStunde", String(describing: p1))
+        L10n.tr("Localizable", "times.description.longerThenNStunde", String(describing: p1))
       }
+
       /// länger als %@ Stunden
       public static func longerThenNStunden(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "times.description.longerThenNStunden", String(describing: p1))
+        L10n.tr("Localizable", "times.description.longerThenNStunden", String(describing: p1))
       }
+
       /// bis zu 3 Minuten
       public static let upTo3 = L10n.tr("Localizable", "times.description.upTo3")
     }
@@ -260,6 +278,7 @@ public enum L10n {
     }
   }
 }
+
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:enable nesting type_body_length type_name vertical_whitespace_opening_braces
 
@@ -282,4 +301,5 @@ private final class BundleToken {
     #endif
   }()
 }
+
 // swiftlint:enable convenience_type

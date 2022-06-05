@@ -57,11 +57,11 @@ let package = Package(
   targets: [
     .target(
       name: "ApiClient",
-      dependencies:[
+      dependencies: [
         "Helper",
         "KeychainClient",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -78,19 +78,19 @@ let package = Package(
         .product(
           name: "ComposableArchitecture",
           package: "swift-composable-architecture"
-        ),
+        )
       ]
     ),
     .target(
       name: "ContactFeature",
-      dependencies:[
+      dependencies: [
         "L10n",
         "SharedModels",
         "Styleguide",
         .product(
           name: "ComposableArchitecture",
           package: "swift-composable-architecture"
-        ),
+        )
       ]
     ),
     .target(
@@ -101,7 +101,7 @@ let package = Package(
         "L10n",
         "SharedModels",
         "Styleguide",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ],
       resources: [.process("Resources")]
     ),
@@ -127,7 +127,15 @@ let package = Package(
         "PhotoLibraryAccessClient",
         "SharedModels",
         "Styleguide",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+      ]
+    ),
+    .target(
+      name: "ImagesUploadClient",
+      dependencies: [
+        "ApiClient",
+        "SharedModels",
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -164,33 +172,33 @@ let package = Package(
       dependencies: [
         "L10n",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
       name: "PathMonitorClient",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
       name: "PhotoLibraryAccessClient",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
       name: "PlacesServiceClient",
       dependencies: [
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
       name: "RegulatoryOfficeMapper",
       dependencies: [
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ],
       resources: [.process("Resources")]
     ),
@@ -202,6 +210,7 @@ let package = Package(
         "DescriptionFeature",
         "FileClient",
         "Helper",
+        "ImagesUploadClient",
         "ImagesFeature",
         "L10n",
         "LocationFeature",
@@ -214,7 +223,7 @@ let package = Package(
           name: "ComposableCoreLocation",
           package: "composable-core-location"
         ),
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -228,7 +237,7 @@ let package = Package(
         "SharedModels",
         "Styleguide",
         "UIApplicationClient",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -249,13 +258,14 @@ let package = Package(
     .target(
       name: "UIApplicationClient",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     )
   ]
 )
 
 // MARK: - Test Targets
+
 package.targets.append(
   contentsOf: [
     .testTarget(
@@ -341,7 +351,7 @@ package.targets.append(
       dependencies: [
         "SharedModels",
         "SettingsFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .testTarget(

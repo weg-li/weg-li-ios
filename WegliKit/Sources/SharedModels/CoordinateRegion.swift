@@ -32,8 +32,8 @@ public extension CoordinateRegion {
   }
   
   init(coordinateRegion: MKCoordinateRegion) {
-    center = .init(coordinateRegion.center)
-    span = .init(coordinateRegion.span)
+    self.center = .init(coordinateRegion.center)
+    self.span = .init(coordinateRegion.span)
   }
 }
 

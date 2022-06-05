@@ -35,8 +35,8 @@ public extension ImageUploadInput {
   }
 }
 
-
 // MARK: Helper
+
 extension Data {
   func md5DigestBase64() -> String {
     let digest = Insecure.MD5.hash(data: self)

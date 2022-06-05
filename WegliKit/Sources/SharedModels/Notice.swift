@@ -31,7 +31,7 @@ public struct Notice: Codable, Equatable, Identifiable {
   
   public var interval: String? {
     guard
-      let date = self.date,
+      let date = date,
       let interval = Times.interval(value: Int(duration), from: date)
     else { return nil }
     return DateIntervalFormatter.reportTimeFormatter.string(from: interval)

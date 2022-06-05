@@ -40,7 +40,7 @@ class ImagesStoreTests: XCTestCase {
       TextItem(id: trashImage.id, text: "Trash"),
       TextItem(id: heartImage.id, text: "B-MB 1985"),
       TextItem(id: trashImage.id, text: "Trash"),
-      TextItem(id: heartImage.id, text: "B-MB 1985"),
+      TextItem(id: heartImage.id, text: "B-MB 1985")
     ]
     
     let store = TestStore(
@@ -61,7 +61,6 @@ class ImagesStoreTests: XCTestCase {
         })
       )
     )
-    
     
     store.send(.setPhotos([pencilImage, trashImage, heartImage])) {
       $0.storedPhotos = [
@@ -159,7 +158,7 @@ class ImagesStoreTests: XCTestCase {
     let trashImage = PickerImageResult(
       id: "trash",
       imageUrl: .init(string: ""),
-      coordinate:.init(latitude: 36.32, longitude: 0.31),
+      coordinate: .init(latitude: 36.32, longitude: 0.31),
       creationDate: creationDate
     )
     
@@ -203,7 +202,7 @@ class ImagesStoreTests: XCTestCase {
     let trashImage = PickerImageResult(
       id: "trash",
       imageUrl: .init(string: ""),
-      coordinate:.init(latitude: 36.32, longitude: 0.31),
+      coordinate: .init(latitude: 36.32, longitude: 0.31),
       creationDate: creationDate
     )
     

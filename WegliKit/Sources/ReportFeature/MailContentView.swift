@@ -20,14 +20,14 @@ struct MailContentView: View {
     let isContactValid: Bool
     
     init(state: ReportState) {
-      districtName = state.district?.name
-      isImagesValid = state.images.isValid
-      isLocationValid = state.location.resolvedAddress.isValid
-      isDescriptionValid = state.description.isValid
-      isContactValid = state.contactState.isValid
+      self.districtName = state.district?.name
+      self.isImagesValid = state.images.isValid
+      self.isLocationValid = state.location.resolvedAddress.isValid
+      self.isDescriptionValid = state.description.isValid
+      self.isContactValid = state.contactState.isValid
       
-      isSubmitButtonDisabled = !state.isReportValid
-      isMailComposerPresented = state.mail.isPresentingMailContent
+      self.isSubmitButtonDisabled = !state.isReportValid
+      self.isMailComposerPresented = state.mail.isPresentingMailContent
     }
   }
   
@@ -36,7 +36,7 @@ struct MailContentView: View {
   
   init(store: Store<ReportState, ReportAction>) {
     self.store = store
-    viewStore = ViewStore(store.scope(state: ViewState.init))
+    self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
   
   var body: some View {

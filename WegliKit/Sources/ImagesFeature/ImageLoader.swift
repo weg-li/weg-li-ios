@@ -28,9 +28,9 @@ actor ImageLoader {
   func loadImage(url: URL) async throws -> UIImage {
     if let status = images[url] {
       switch status {
-      case .fetched(let image):
+      case let .fetched(image):
         return image
-      case .inProgress(let task):
+      case let .inProgress(task):
         return try await task.value
       }
     }
@@ -48,7 +48,7 @@ actor ImageLoader {
       images[url] = .fetched(image)
       return image
       
-    } catch let (error) {
+    } catch {
       if let loaderError = error as? ImageLoaderError {
         debugPrint(loaderError.errorDescription ?? loaderError.localizedDescription)
         throw loaderError
@@ -62,9 +62,9 @@ actor ImageLoader {
   func loadThumbnail(url: URL) async throws -> UIImage {
     if let status = images[url] {
       switch status {
-      case .fetched(let image):
+      case let .fetched(image):
         return image
-      case .inProgress(let task):
+      case let .inProgress(task):
         return try await task.value
       }
     }
@@ -81,7 +81,7 @@ actor ImageLoader {
       let image = try await task.value
       images[url] = .fetched(image)
       return image
-    } catch let (error) {
+    } catch {
       if let loaderError = error as? ImageLoaderError {
         debugPrint(loaderError.errorDescription ?? loaderError.localizedDescription)
         throw loaderError
@@ -136,9 +136,7 @@ actor ImageLoader {
       continuation.resume(returning: image)
     }
   }
-  
 }
-
 
 struct ImageLoaderError: Swift.Error, LocalizedError {
   let errorDump: String
@@ -160,6 +158,6 @@ struct ImageLoaderError: Swift.Error, LocalizedError {
   }
   
   public var errorDescription: String? {
-    self.message
+    message
   }
 }

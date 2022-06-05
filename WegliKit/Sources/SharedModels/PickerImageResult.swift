@@ -19,7 +19,7 @@ public struct PickerImageResult: Hashable, Identifiable, Codable {
     return image.jpegData(compressionQuality: 0.4)
   }
 
-    public init(
+  public init(
     id: String,
     imageUrl: URL? = nil,
     coordinate: CoordinateRegion.Coordinate? = nil,
@@ -38,7 +38,7 @@ public struct PickerImageResult: Hashable, Identifiable, Codable {
   }
   
   public var asUIImage: UIImage? {
-    guard let data = self.jpegData else { return nil }
+    guard let data = jpegData else { return nil }
     return UIImage(data: data)
   }
 }
@@ -64,7 +64,7 @@ private func resizedImage(at url: URL, for targetSize: CGSize = CGSize(width: 10
   )
   
   let renderer = UIGraphicsImageRenderer(size: scaledImageSize)
-  return renderer.image { (context) in
+  return renderer.image { _ in
     image.draw(in: CGRect(origin: .zero, size: scaledImageSize))
   }
 }

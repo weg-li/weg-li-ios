@@ -97,7 +97,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
           env.uiApplicationClient.open($0, [:])
             .fireAndForget()
         }
-      ?? .none
+        ?? .none
     case .openImprintTapped:
       return env.uiApplicationClient
         .open(env.imprintLink, [:])
@@ -115,15 +115,14 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     }
   }
 )
-  .onChange(of: \.accountSettingsState.accountSettings.apiToken) { key, state, _, environment in
-    struct SaveDebounceId: Hashable {}
+.onChange(of: \.accountSettingsState.accountSettings.apiToken) { key, _, _, environment in
+  struct SaveDebounceId: Hashable {}
     
-    return environment.keychainClient
-      .setApiToken(key)
-      .fireAndForget()
-      .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
-  }
-
+  return environment.keychainClient
+    .setApiToken(key)
+    .fireAndForget()
+    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+}
 
 public enum UserSettingsAction: Equatable {
   case setShowsAllTextRecognitionResults(Bool)

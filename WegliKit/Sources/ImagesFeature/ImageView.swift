@@ -17,7 +17,7 @@ public struct ImageView: View {
   
   public init(store: Store<ImageState, ImageAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
 
   public var body: some View {

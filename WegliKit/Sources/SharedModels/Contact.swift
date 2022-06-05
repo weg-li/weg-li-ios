@@ -23,8 +23,8 @@ public struct Contact: Equatable, Codable {
   @BindableState public var dateOfBirth: String
 }
 
-
 // MARK: Helper
+
 public extension Contact {
   static let empty = Self(
     firstName: "",
@@ -57,14 +57,13 @@ public extension SharedModels.Contact {
     return formatter.string(from: components)
   }
   
-  var humanReadableContact: String {
-    var output = fullName
+  @StringBuilder var humanReadableContact: String {
+    fullName
     if !phone.isEmpty {
-      output.append("\nTelefonnummer: \(phone)")
+      "Telefonnummer: \(phone)"
     }
     if !dateOfBirth.isEmpty {
-      output.append("\nGeburtstag: \(dateOfBirth)")
+      "Geburtstag: \(dateOfBirth)"
     }
-    return output
   }
 }

@@ -30,8 +30,8 @@ public struct Widget<Content: View>: View {
           .accessibilitySortPriority(3)
           .accessibilityValue(
             isCompleted
-            ? L10n.Widget.A11y.CompletionIndicatorLabel.isValid
-            : L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid
+              ? L10n.Widget.A11y.CompletionIndicatorLabel.isValid
+              : L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid
           )
         Spacer()
         Button(action: {

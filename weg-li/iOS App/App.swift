@@ -25,6 +25,7 @@ struct WegliApp: App {
 }
 
 // MARK: AppDelegate
+
 final class AppDelegate: NSObject, UIApplicationDelegate {
   let store = Store(
     initialState: .init(),
@@ -41,7 +42,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     // swiftlint:disable:next discouraged_optional_collection
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    self.viewStore.send(.appDelegate(.didFinishLaunching))
+    viewStore.send(.appDelegate(.didFinishLaunching))
     return true
   }
 }

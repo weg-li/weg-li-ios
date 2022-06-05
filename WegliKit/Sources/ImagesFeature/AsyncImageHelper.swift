@@ -47,7 +47,7 @@ class AsyncImageStore: ObservableObject {
   /// image at the specified URL, it publishes an error image.
   func loadThumbnail() async {
     do {
-      self.thumbnailImage = try await imageLoader.loadThumbnail(url: url)
+      thumbnailImage = try await imageLoader.loadThumbnail(url: url)
     } catch {
       debugPrint(#function, "failed ❌")
     }
@@ -57,7 +57,7 @@ class AsyncImageStore: ObservableObject {
   /// specified URL, it publishes an error image.
   func loadImage() async {
     do {
-      self.image = try await imageLoader.loadImage(url: url)
+      image = try await imageLoader.loadImage(url: url)
     } catch {
       debugPrint(#function, "failed ❌")
     }
@@ -85,7 +85,7 @@ struct AsyncThumbnailView: View {
     Image(uiImage: imageStore.thumbnailImage)
       .resizable()
       .aspectRatio(contentMode: contentMode)
-      .task {                     
+      .task {
         await imageStore.loadThumbnail()
       }
   }

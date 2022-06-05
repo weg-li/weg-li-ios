@@ -25,7 +25,7 @@ public struct LocationView: View {
       self.isMapExpanded = state.isMapExpanded
       self.address = state.resolvedAddress
       self.showActivityIndicator = state.isRequestingCurrentLocation
-      || state.isResolvingAddress
+        || state.isResolvingAddress
       self.pinCoordinate = state.pinCoordinate
     }
   }
@@ -35,7 +35,7 @@ public struct LocationView: View {
   
   public init(store: Store<LocationViewState, LocationViewAction>) {
     self.store = store
-    viewStore = ViewStore(
+    self.viewStore = ViewStore(
       store.scope(
         state: ViewState.init,
         action: { $0 }
@@ -56,7 +56,7 @@ public struct LocationView: View {
           Text(selection.title).tag(selection)
         }
       }.pickerStyle(SegmentedPickerStyle())
-      .accessibilityHint("Setzt die Adresse an der Anzeige")
+        .accessibilityHint("Setzt die Adresse an der Anzeige")
       
       if LocationOption.manual == viewStore.locationOption {
         VStack(spacing: 8) {
@@ -67,8 +67,8 @@ public struct LocationView: View {
               send: LocationViewAction.updateGeoAddressStreet
             )
           )
-            .keyboardType(RowType.street.keyboardType)
-            .textContentType(RowType.street.textContentType)
+          .keyboardType(RowType.street.keyboardType)
+          .textContentType(RowType.street.textContentType)
           TextField(
             L10n.Location.Placeholder.postalCode,
             text: viewStore.binding(
@@ -76,8 +76,8 @@ public struct LocationView: View {
               send: LocationViewAction.updateGeoAddressPostalCode
             )
           )
-            .keyboardType(RowType.zipCode.keyboardType)
-            .textContentType(RowType.zipCode.textContentType)
+          .keyboardType(RowType.zipCode.keyboardType)
+          .textContentType(RowType.zipCode.textContentType)
           TextField(
             L10n.Location.Placeholder.city,
             text: viewStore.binding(
@@ -85,9 +85,9 @@ public struct LocationView: View {
               send: LocationViewAction.updateGeoAddressCity
             )
           )
-            .keyboardType(RowType.city.keyboardType)
-            .textContentType(RowType.city.textContentType)
-            .disableAutocorrection(true)
+          .keyboardType(RowType.city.keyboardType)
+          .textContentType(RowType.city.textContentType)
+          .disableAutocorrection(true)
         }
         .multilineTextAlignment(.leading)
         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -104,8 +104,8 @@ public struct LocationView: View {
               send: LocationViewAction.setPinCoordinate
             )
           )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .frame(height: viewStore.isMapExpanded ? 300 : 150)
+          .clipShape(RoundedRectangle(cornerRadius: 8))
+          .frame(height: viewStore.isMapExpanded ? 300 : 150)
           expandMapButton
             .padding(.grid(1))
             .accessibility(label: Text(L10n.Location.A11y.expandButtonLabel))
@@ -146,11 +146,11 @@ public struct LocationView: View {
       viewStore.send(.toggleMapExpanded)
     }, label: {
       Image(systemName: viewStore.isMapExpanded
-            ? "arrow.down.right.and.arrow.up.left"
-            : "arrow.up.left.and.arrow.down.right"
+        ? "arrow.down.right.and.arrow.up.left"
+        : "arrow.up.left.and.arrow.down.right"
       )
     })
-      .buttonStyle(OnWidgetInteractionButtonStyle())
+    .buttonStyle(OnWidgetInteractionButtonStyle())
   }
 }
 

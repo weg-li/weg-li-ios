@@ -3,7 +3,7 @@
 import Foundation
 import L10n
 
-public struct Times {
+public enum Times {
   public static let times: [Int: String] = [
     0: "",
     1: "bis zu 2 Minuten",
@@ -20,7 +20,7 @@ public struct Times {
     30: "länger als 30 Minuten",
     45: "länger als 45 Minuten",
     60: "länger als 1 Stunde",
-    180: "länger als 3 Stunden",
+    180: "länger als 3 Stunden"
   ]
   
   public static func interval(value: Int, from startDate: Date, calendar: Calendar = .current) -> DateInterval? {

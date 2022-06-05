@@ -1,11 +1,11 @@
 // Created for weg-li in 2021.
 
 import ComposableArchitecture
+import FileClient
 import Foundation
 import Helper
 import SharedModels
 import SwiftUI
-import FileClient
 
 public struct DescriptionState: Equatable {
   public init(
@@ -64,7 +64,7 @@ public struct DescriptionState: Equatable {
     } else {
       return charges.filter { $0.text.lowercased().contains(chargeTypeSearchText.lowercased()) }
     }
-  }  
+  }
 }
 
 public enum DescriptionAction: BindableAction, Equatable {
@@ -102,93 +102,93 @@ public struct DescriptionEnvironment {
 
 /// Reducer handing actions from EditDescriptionView.
 public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, DescriptionEnvironment> { state, action, environment in
-    switch action {
-    case .binding:
-      return .none
+  switch action {
+  case .binding:
+    return .none
       
-    case .onAppear:
-      return environment.fileClient.loadFavoriteCharges()
-        .map(DescriptionAction.favoriteChargesLoaded)
+  case .onAppear:
+    return environment.fileClient.loadFavoriteCharges()
+      .map(DescriptionAction.favoriteChargesLoaded)
     
-    case let .setLicensePlateNumber(value):
-      state.licensePlateNumber = value
-      return .none
+  case let .setLicensePlateNumber(value):
+    state.licensePlateNumber = value
+    return .none
       
-    case let .setBrand(value):
-      state.selectedBrand = value
-      state.presentCarBrandSelection = false
-      return .none
+  case let .setBrand(value):
+    state.selectedBrand = value
+    state.presentCarBrandSelection = false
+    return .none
       
-    case let .setColor(value):
-      state.selectedColor = value
-      return .none
+  case let .setColor(value):
+    state.selectedColor = value
+    return .none
       
-    case let .setCharge(value):
-      state.selectedCharge = value
-      state.presentChargeSelection = false
-      return .none
+  case let .setCharge(value):
+    state.selectedCharge = value
+    state.presentChargeSelection = false
+    return .none
       
-    case let .setDuraration(value):
-      state.selectedDuration = value
-      return .none
+  case let .setDuraration(value):
+    state.selectedDuration = value
+    return .none
       
-    case let .setChargeTypeSearchText(query):
-      state.chargeTypeSearchText = query
-      return .none
+  case let .setChargeTypeSearchText(query):
+    state.chargeTypeSearchText = query
+    return .none
       
-    case let .setCarBrandSearchText(query):
-      state.carBrandSearchText = query
-      return .none
+  case let .setCarBrandSearchText(query):
+    state.carBrandSearchText = query
+    return .none
       
-    case let .toggleChargeFavorite(charge):
-      var charge = charge
-      charge.isFavorite.toggle()
-      charge.isSelected = charge.id == state.selectedCharge?.id
-      guard let index = state.charges.firstIndex(where: { $0.id == charge.id }) else {
-        return .none
-      }
-      state.charges.update(charge, at: index)
-      
-      struct FavoritedId: Hashable {}
-      return .concatenate(
-        environment.fileClient.saveFavoriteCharges(
-          state.charges.filter(\.isFavorite).map(\.id),
-          on: environment.backgroundQueue
-        ).fireAndForget(),
-        Effect(value: .sortFavoritedCharges)
-          .delay(for: .seconds(0.7), scheduler: environment.mainQueue)
-          .eraseToEffect()
-      )
-      
-    case .sortFavoritedCharges:
-      state.charges.sort { $0.isFavorite && !$1.isFavorite }
-      return .none
-      
-    case let .favoriteChargesLoaded(result):
-      let chargeIds = (try? result.get()) ?? []
-      
-      let charges = DescriptionState.charges.map {
-        Charge(
-          id: $0.key,
-          text: $0.value,
-          isFavorite: chargeIds.contains($0.key),
-          isSelected: false
-        )
-      }
-      state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
-      
-      return Effect(value: .sortFavoritedCharges)
-      
-    case let .presentCargeSelectionView(value):
-      state.chargeTypeSearchText = ""
-      state.presentChargeSelection = value
-      return .none
-      
-    case let .presentBrandSelectionView(value):
-      state.carBrandSearchText = ""
-      state.presentCarBrandSelection = value
+  case let .toggleChargeFavorite(charge):
+    var charge = charge
+    charge.isFavorite.toggle()
+    charge.isSelected = charge.id == state.selectedCharge?.id
+    guard let index = state.charges.firstIndex(where: { $0.id == charge.id }) else {
       return .none
     }
+    state.charges.update(charge, at: index)
+      
+    struct FavoritedId: Hashable {}
+    return .concatenate(
+      environment.fileClient.saveFavoriteCharges(
+        state.charges.filter(\.isFavorite).map(\.id),
+        on: environment.backgroundQueue
+      ).fireAndForget(),
+      Effect(value: .sortFavoritedCharges)
+        .delay(for: .seconds(0.7), scheduler: environment.mainQueue)
+        .eraseToEffect()
+    )
+      
+  case .sortFavoritedCharges:
+    state.charges.sort { $0.isFavorite && !$1.isFavorite }
+    return .none
+      
+  case let .favoriteChargesLoaded(result):
+    let chargeIds = (try? result.get()) ?? []
+      
+    let charges = DescriptionState.charges.map {
+      Charge(
+        id: $0.key,
+        text: $0.value,
+        isFavorite: chargeIds.contains($0.key),
+        isSelected: false
+      )
+    }
+    state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
+      
+    return Effect(value: .sortFavoritedCharges)
+      
+  case let .presentCargeSelectionView(value):
+    state.chargeTypeSearchText = ""
+    state.presentChargeSelection = value
+    return .none
+      
+  case let .presentBrandSelectionView(value):
+    state.carBrandSearchText = ""
+    state.presentCarBrandSelection = value
+    return .none
+  }
 }
 .binding()
 
@@ -224,10 +224,10 @@ public extension DescriptionState {
       [String: String].self, from: "colors.json",
       keyDecodingStrategy: .convertFromSnakeCase
     )
-      .compactMap { $0 }
-      .sorted { a, b -> Bool in
-        a.value < b.value
-      }
+    .compactMap { $0 }
+    .sorted { a, b -> Bool in
+      a.value < b.value
+    }
     all.insert(("", ""), at: 0) // insert empty object for picker to start without initial selection
     return all
   }()
@@ -241,8 +241,8 @@ public extension DescriptionState {
   var times: [Int] {
     Array(
       Times.times.sorted(by: { $0.0 < $1.0 })
-      .map(\.key)
-      .dropFirst()
+        .map(\.key)
+        .dropFirst()
     )
   }
   
@@ -252,10 +252,9 @@ public extension DescriptionState {
     guard let interval = Times.interval(value: selectedDuration, from: startDate) else {
       return time
     }
-    return "\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!) (\(time))"  
+    return "\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!) (\(time))"
   }
 }
-
 
 public struct CarBrand: Identifiable, Equatable, Codable {
   public var id: String = UUID().uuidString

@@ -115,7 +115,7 @@ class SettingsStoreTests: XCTestCase {
     
     var didWriteTokenToKeyChain = false
     env.keychainClient.setString = { _, _, _ in
-        didWriteTokenToKeyChain = true
+      didWriteTokenToKeyChain = true
       return .none
     }
     

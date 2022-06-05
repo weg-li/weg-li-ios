@@ -1,6 +1,6 @@
 import Foundation
-import XCTest
 import SharedModels
+import XCTest
 
 final class NoticeCodingTests: XCTestCase {
   func test_noticeDecoding() throws {
@@ -32,7 +32,7 @@ final class NoticeCodingTests: XCTestCase {
     """.data(using: .utf8)!
     
     do {
-      let _ = try JSONDecoder.noticeDecoder.decode(Notice.self, from: rawValue)
+      _ = try JSONDecoder.noticeDecoder.decode(Notice.self, from: rawValue)
     } catch {
       print(error)
       XCTFail(error.localizedDescription)

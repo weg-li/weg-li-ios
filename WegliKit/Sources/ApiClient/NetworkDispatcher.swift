@@ -8,19 +8,21 @@ public struct NetworkDispatcher {
   public init(urlSession: @escaping () -> URLSession) {
     self.urlSession = urlSession
   }
+
   /// Dispatches an URLRequest and returns a publisher
   /// - Parameter request: URLRequest
   /// - Returns: A publisher with the provided decoded data or an error
   public func dispatch(request: URLRequest) -> AnyPublisher<Data, NetworkRequestError> {
-    return urlSession().dataTaskPublisher(for: request)
-      .tryMap({ data, response in
+    urlSession().dataTaskPublisher(for: request)
+      .tryMap { data, response in
         // If the response is invalid, throw an error
         if let response = response as? HTTPURLResponse,
-           !(200...299).contains(response.statusCode) {
+           !response.isSuccessful
+        {
           throw httpError(response.statusCode)
         }
         return data
-      })
+      }
       .mapError(handleError)
       .eraseToAnyPublisher()
   }
@@ -31,7 +33,8 @@ public struct NetworkDispatcher {
   public func dispatch(request: URLRequest) async throws -> Data {
     let (data, response) = try await urlSession().data(for: request)
     if let response = response as? HTTPURLResponse,
-       !(200...299).contains(response.statusCode) {
+       !response.isSuccessful
+    {
       throw httpError(response.statusCode)
     }
     return data
@@ -54,6 +57,7 @@ extension NetworkDispatcher {
     default: return .unknownError
     }
   }
+
   /// Parses URLSession Publisher errors and return proper ones
   /// - Parameter error: URLSession publisher error
   /// - Returns: Readable NetworkRequestError
@@ -97,7 +101,12 @@ public struct ApiError: Codable, Error, Equatable, LocalizedError {
   }
 
   public var errorDescription: String? {
-    self.message
+    message
   }
 }
 
+extension HTTPURLResponse {
+  var isSuccessful: Bool {
+    (200...299).contains(statusCode)
+  }
+}

@@ -5,6 +5,7 @@ import Helper
 import SharedModels
 
 // MARK: Interface
+
 /// Client handling FileManager interactions
 public struct FileClient {
   public var removeItem: (URL) -> Effect<Never, Error>
@@ -17,7 +18,7 @@ public struct FileClient {
     from fileName: String,
     with decoder: JSONDecoder = JSONDecoder()
   ) -> Effect<Result<A, NSError>, Never> {
-    self.load(fileName)
+    load(fileName)
       .decode(type: A.self, decoder: decoder)
       .mapError { $0 as NSError }
       .catchToEffect()
@@ -40,33 +41,33 @@ public struct FileClient {
 // Convenience methods for UserSettings handling
 public extension FileClient {
   func loadContactSettings() -> Effect<Result<Contact, NSError>, Never> {
-    self.load(Contact.self, from: contactSettingsFileName)
+    load(Contact.self, from: contactSettingsFileName)
   }
 
   func saveContactSettings(
     _ contact: Contact, on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<Never, Never> {
-    self.save(contact, to: contactSettingsFileName, on: queue)
+    save(contact, to: contactSettingsFileName, on: queue)
   }
   
   func loadFavoriteCharges() -> Effect<Result<[String], NSError>, Never> {
-    self.load([String].self, from: favoriteChargesIdsFileName)
+    load([String].self, from: favoriteChargesIdsFileName)
   }
   
   func saveFavoriteCharges(
     _ favorites: [String], on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<Never, Never> {
-    self.save(favorites, to: favoriteChargesIdsFileName, on: queue)
+    save(favorites, to: favoriteChargesIdsFileName, on: queue)
   }
   
   func loadUserSettings() -> Effect<Result<UserSettings, NSError>, Never> {
-    self.load(UserSettings.self, from: userSettingsFilenName)
+    load(UserSettings.self, from: userSettingsFilenName)
   }
   
   func saveUserSettings(
     _ settings: UserSettings, on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<Never, Never> {
-    self.save(settings, to: userSettingsFilenName, on: queue)
+    save(settings, to: userSettingsFilenName, on: queue)
   }
 }
 

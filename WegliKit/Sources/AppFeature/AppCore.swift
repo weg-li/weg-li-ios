@@ -6,18 +6,18 @@ import ComposableArchitecture
 import ComposableCoreLocation
 import Contacts
 import FileClient
-import Helper
 import Foundation
+import Helper
 import ImagesFeature
 import KeychainClient
 import MapKit
+import Network
 import OrderedCollections
 import PlacesServiceClient
 import ReportFeature
 import SettingsFeature
 import SharedModels
 import UIKit
-import Network
 
 // MARK: - AppState
 
@@ -51,7 +51,6 @@ public struct AppState: Equatable {
     self.notices = notices
     self.showReportWizard = showReportWizard
   }
-  
 }
 
 // MARK: - AppAction
@@ -178,8 +177,8 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .storedNoticesLoaded(result):
       let notices = (try? result.get()) ?? []
       state.notices = notices.isEmpty
-      ? .empty(.emptyNotices)
-      : .results(notices)
+        ? .empty(.emptyNotices)
+        : .results(notices)
       return .none
       
     case let .storedApiTokenLoaded(result):
@@ -197,7 +196,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case .settings:
       return .none
       
-      // After the emailResult reports the mail has been sent the report will be stored.
+    // After the emailResult reports the mail has been sent the report will be stored.
     case .report(.mail(.setMailResult(.sent))):
       state.reportDraft.images.storedPhotos.forEach { image in
         _ = try? image?.imageUrl.flatMap { safeUrl in
@@ -214,7 +213,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         uuid: environment.uuid,
         images: .init(),
         contactState: state.settings.contact,
-        date: environment.date, 
+        date: environment.date,
         location: .init()
       )
       return .none
@@ -248,8 +247,8 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.success(notices)):
       state.notices = notices.isEmpty
-      ? .empty(.emptyNotices)
-      : .results(notices)
+        ? .empty(.emptyNotices)
+        : .results(notices)
       
       return environment.fileClient
         .saveNotices(notices, on: environment.backgroundQueue)
@@ -302,13 +301,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     .fireAndForget()
     .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
 }
-.onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, environment in
+.onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, _ in
   state.reportDraft.apiToken = accountSettings.apiToken
   return .none
 }
 
-
 // MARK: Helper
+
 extension AppState {
   static let preview = AppState()
 }
@@ -323,7 +322,8 @@ extension Store where State == AppState, Action == AppAction {
       settings: .init(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         contact: .preview,
-        userSettings: .init()),
+        userSettings: .init()
+      ),
       notices: .results(.placeholder),
       showReportWizard: false
     ),

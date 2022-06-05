@@ -9,6 +9,7 @@ public struct ImageState: Hashable, Identifiable {
     self.id = id
     self.image = image
   }
+
   public let id: String
   public let image: PickerImageResult
   

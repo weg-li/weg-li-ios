@@ -13,7 +13,7 @@ public struct ImagesView: View {
   
   public init(store: Store<ImagesViewState, ImagesViewAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   let rows = [GridItem(.flexible(minimum: 30, maximum: 60))]

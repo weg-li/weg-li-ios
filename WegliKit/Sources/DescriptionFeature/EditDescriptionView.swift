@@ -16,7 +16,7 @@ public struct EditDescriptionView: View {
   
   public init(store: Store<DescriptionState, DescriptionAction>) {
     self.store = store
-    viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store)
   }
   
   public var body: some View {
@@ -127,7 +127,7 @@ public struct EditDescriptionView: View {
         send: DescriptionAction.setColor
       )
     ) {
-      ForEach(1..<DescriptionState.colors.count, id: \.self) {
+      ForEach(1 ..< DescriptionState.colors.count, id: \.self) {
         Text(DescriptionState.colors[$0].value)
           .contentShape(Rectangle())
           .tag($0)

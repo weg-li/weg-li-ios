@@ -15,7 +15,7 @@ public struct GoogleUploadService {
 public extension GoogleUploadService {
   static func live(networkDispatcher: NetworkDispatcher = .live) -> Self {
     Self(
-      upload: { url, queryItems, body, headers in
+      upload: { url, _, body, headers in
         guard let url = url else {
           throw NetworkRequestError.invalidRequest
         }
@@ -28,9 +28,8 @@ public extension GoogleUploadService {
         directUploadURLRequest.httpMethod = HTTPMethod.put.rawValue
         for (key, value) in headers {
           directUploadURLRequest.addValue(value, forHTTPHeaderField: key)
-        }        
-        let _ = try await networkDispatcher.dispatch(request: directUploadURLRequest)
-        return
+        }
+        _ = try await networkDispatcher.dispatch(request: directUploadURLRequest)
       }
     )
   }
@@ -38,6 +37,6 @@ public extension GoogleUploadService {
 
 public extension GoogleUploadService {
   static let noop = Self(
-    upload: { _, _, _, _ in return }
+    upload: { _, _, _, _ in }
   )
 }

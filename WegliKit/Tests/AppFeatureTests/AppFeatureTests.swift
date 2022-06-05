@@ -1,10 +1,10 @@
 // Created for weg-li in 2021.
 
-import AppFeature
 import ApiClient
+import AppFeature
+import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
-import Combine
 import ContactFeature
 import FileClient
 import ImagesFeature
@@ -14,10 +14,9 @@ import ReportFeature
 import SharedModels
 import XCTest
 
-extension UUID {
-  public static let ReportId = Self(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!
+public extension UUID {
+  static let ReportId = Self(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!
 }
-
 
 class AppStoreTests: XCTestCase {
   let fixedUUID = { UUID.ReportId }
@@ -111,7 +110,7 @@ class AppStoreTests: XCTestCase {
   func test_sentMailResult_shouldAppendDraftReportToReports() {
     var didWriteReports = false
     var fileCient = FileClient.noop
-    fileCient.save = { key, _ in
+    fileCient.save = { _, _ in
       didWriteReports = true
       return .none
     }
@@ -190,7 +189,7 @@ class AppStoreTests: XCTestCase {
     let token = "API Token"
     var keychainClient = KeychainClient.noop
     keychainClient.getString = { _ in
-      return Just(token)
+      Just(token)
         .eraseToEffect()
     }
     

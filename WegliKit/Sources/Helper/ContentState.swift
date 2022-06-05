@@ -67,7 +67,7 @@ public extension ErrorState {
     }
     
     public var errorDescription: String? {
-      self.message
+      message
     }
   }
   

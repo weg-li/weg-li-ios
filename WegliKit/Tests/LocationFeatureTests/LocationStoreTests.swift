@@ -4,8 +4,8 @@ import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
 import CoreLocation
-import MapKit
 import LocationFeature
+import MapKit
 import PlacesServiceClient
 import SharedModels
 import UIApplicationClient
@@ -32,7 +32,7 @@ class LocationStoreTests: XCTestCase {
         locationServicesEnabled: { true },
         requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
         requestWhenInUseAuthorization: { _ in
-            .fireAndForget { didRequestInUseAuthorization = true }
+          .fireAndForget { didRequestInUseAuthorization = true }
         },
         set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
       ),
@@ -103,11 +103,8 @@ class LocationStoreTests: XCTestCase {
       $0.isRequestingCurrentLocation = false
     }
     
-    
     setSubject.send(completion: .finished)
     locationManagerSubject.send(completion: .finished)
-    
-    
   }
   
   /// if location service enabled, test that locationOption selection triggers location request and address resolve
@@ -130,7 +127,7 @@ class LocationStoreTests: XCTestCase {
         locationServicesEnabled: { true },
         requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
         requestWhenInUseAuthorization: { _ in
-            .fireAndForget { didRequestInUseAuthorization = true }
+          .fireAndForget { didRequestInUseAuthorization = true }
         },
         set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
       ),
@@ -209,11 +206,8 @@ class LocationStoreTests: XCTestCase {
       $0.resolvedAddress = expectedAddress
     }
     
-    
     setSubject.send(completion: .finished)
     locationManagerSubject.send(completion: .finished)
-    
-    
   }
   
   /// if locationServices disabled, test that alert state is set
@@ -236,7 +230,6 @@ class LocationStoreTests: XCTestCase {
       reducer: locationReducer,
       environment: env
     )
-    
     
     store.send(.onAppear)
     // simulate user decision of segmented control
@@ -264,7 +257,7 @@ class LocationStoreTests: XCTestCase {
         create: { _ in locationManagerSubject.eraseToEffect() },
         locationServicesEnabled: { true },
         requestWhenInUseAuthorization: { _ in
-            .fireAndForget { didRequestInUseAuthorization = true }
+          .fireAndForget { didRequestInUseAuthorization = true }
         },
         set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
       ),
@@ -296,7 +289,6 @@ class LocationStoreTests: XCTestCase {
     
     setSubject.send(completion: .finished)
     locationManagerSubject.send(completion: .finished)
-    
   }
   
   func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() {

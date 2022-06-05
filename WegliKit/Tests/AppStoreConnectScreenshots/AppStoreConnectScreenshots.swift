@@ -10,11 +10,12 @@ let appStoreViewConfigs: [String: SnapshotConfig] = [
   "iPhone_5_5": .init(adaptiveSize: .medium, deviceState: .phone, viewImageConfig: .iPhone8Plus),
   "iPhone_6_5": .init(adaptiveSize: .large, deviceState: .phone, viewImageConfig: .iPhoneXsMax),
   "iPad_12_9": .init(
-    adaptiveSize: .large, deviceState: .pad, viewImageConfig: .iPadPro12_9(.landscape)),
+    adaptiveSize: .large, deviceState: .pad, viewImageConfig: .iPadPro12_9(.landscape)
+  )
 ]
 
 class AppStoreConnectScreenshots: XCTestCase {
-  static override func setUp() {
+  override static func setUp() {
     super.setUp()
     SnapshotTesting.diffTool = "ksdiff"
   }
@@ -28,7 +29,6 @@ class AppStoreConnectScreenshots: XCTestCase {
     isRecording = false
     super.tearDown()
   }
-  
   
   func test_AppViewScreenShot() {
     let appState = AppState(
@@ -54,7 +54,7 @@ class AppStoreConnectScreenshots: XCTestCase {
     )
   }
   
-  func test_EditDescriptionViewScreenshot() {    
+  func test_EditDescriptionViewScreenshot() {
     let view = EditDescriptionView(
       store: .init(
         initialState: ReportState.preview.description,

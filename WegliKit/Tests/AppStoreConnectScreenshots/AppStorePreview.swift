@@ -2,7 +2,7 @@ import SnapshotTesting
 import SwiftUI
 
 struct AppStorePreview<SnapshotContent, Description>: View
-where
+  where
   Description: View,
   SnapshotContent: View
 {
@@ -118,16 +118,18 @@ where
     .background(self.backgroundColor.ignoresSafeArea())
   }
 }
+
 extension View {
   @ViewBuilder
   func foreground<V: View>(_ view: V?) -> some View {
     if let view = view {
-      self.overlay(view).mask(self)
+      overlay(view).mask(self)
     } else {
       self
     }
   }
 }
+
 struct Notch: Shape {
   func path(in rect: CGRect) -> Path {
     Path {
@@ -173,6 +175,7 @@ struct Notch: Shape {
     }
   }
 }
+
 struct CellularBars: View {
   let barsCount = 4
   let minimumHeightRatio = CGFloat(0.5)
@@ -180,7 +183,7 @@ struct CellularBars: View {
   var body: some View {
     GeometryReader { proxy in
       HStack(alignment: .bottom, spacing: 1) {
-        ForEach(0...barsCount-1, id: \.self) { index in
+        ForEach(0...barsCount - 1, id: \.self) { index in
           RoundedRectangle(cornerRadius: 1, style: .continuous)
             .frame(height: proxy.size.height * heightRatio(at: index))
         }

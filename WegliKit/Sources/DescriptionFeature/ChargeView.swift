@@ -16,7 +16,6 @@ public struct Charge: Hashable, Codable, Identifiable {
   }
 }
 
-
 struct ChargeView: View {
   let text: String
   let isSelected: Bool

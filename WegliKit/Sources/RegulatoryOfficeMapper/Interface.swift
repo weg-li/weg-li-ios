@@ -21,7 +21,7 @@ public struct RegulatoryOfficeMapper {
     address: Address,
     on queue: AnySchedulerOf<DispatchQueue>
   ) -> Effect<District, RegularityOfficeMapError> {
-    self.mapAddressToDistrict(address)
+    mapAddressToDistrict(address)
       .subscribe(on: queue)
       .eraseToEffect()
   }
@@ -40,7 +40,6 @@ public struct RegularityOfficeMapError: Error, Equatable {
 public extension RegularityOfficeMapError {
   static let unableToMatchRegularityOffice = RegularityOfficeMapError(message: "Unable to match address")
 }
-
 
 // MARK: All districts from JSON
 
