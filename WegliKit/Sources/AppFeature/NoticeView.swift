@@ -20,10 +20,12 @@ public struct NoticeView: View {
     ZStack {
       HStack {
         VStack(alignment: .leading) {
-          Text(notice.createdAt.humandReadableDate)
-            .fontWeight(.bold)
-            .font(.title)
-            .padding(.bottom, .grid(1))
+          if let creationDate = notice.createdAt {
+            Text(creationDate.humandReadableDate)
+              .fontWeight(.bold)
+              .font(.title)
+              .padding(.bottom, .grid(1))
+          }
           
           HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
             Image(systemName: "waveform.path.ecg")
@@ -32,7 +34,9 @@ public struct NoticeView: View {
               .unredacted()
             
             VStack(alignment: .leading, spacing: .grid(1)) {
-              Text("Status: __\(notice.status)__")
+              if let status = notice.status {
+                Text("Status: __\(status)__")
+              }
             }
             .font(.body)
           }
@@ -98,9 +102,11 @@ public struct NoticeView: View {
                   Text(interval)
                 }
               }
-              Text(notice.charge)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
+              if let charge = notice.charge {
+                Text(charge)
+                  .multilineTextAlignment(.leading)
+                  .fixedSize(horizontal: false, vertical: true)
+              }
             }
             .font(.body)
           }

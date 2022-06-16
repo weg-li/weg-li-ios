@@ -4,7 +4,7 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var id: String { token }
   
   public let token: String
-  public let status: String
+  public let status: String?
   public let street: String?
   public let city: String?
   public let zip: String?
@@ -13,13 +13,13 @@ public struct Notice: Codable, Equatable, Identifiable {
   public let registration: String?
   public let brand: String?
   public let color: String?
-  public let charge: String
+  public let charge: String?
   public let date: Date?
-  public let duration: Int64
+  public let duration: Int64?
   public let severity: String?
   public var note: String?
-  public let createdAt: Date
-  public let updatedAt: Date
+  public let createdAt: Date?
+  public let updatedAt: Date?
   public let sentAt: Date?
   public var vehicleEmpty = false
   public var hazardLights = false
@@ -27,11 +27,17 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var expiredEco = false
   public var photos: [NoticePhoto]?
   
-  public var time: String? { Times.times[Int(duration)] }
+  public var time: String? {
+    guard let duration = duration else {
+      return nil
+    }
+    return Times.times[Int(duration)]
+  }
   
   public var interval: String? {
     guard
       let date = date,
+      let duration = duration,
       let interval = Times.interval(value: Int(duration), from: date)
     else { return nil }
     return DateIntervalFormatter.reportTimeFormatter.string(from: interval)
