@@ -50,7 +50,6 @@ public struct AppState: Equatable {
     }
   }
   
-  var showReportWizard = false
   public var isFetchingNotices: Bool { notices == .loading }
   
   @BindableState
@@ -64,12 +63,10 @@ public struct AppState: Equatable {
       contact: .empty,
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    notices: ContentState<[Notice], AppAction> = .loading,
-    showReportWizard: Bool = false
+    notices: ContentState<[Notice], AppAction> = .loading
   ) {
     self.settings = settings
     self.notices = notices
-    self.showReportWizard = showReportWizard
   }
 }
 
@@ -83,7 +80,6 @@ public enum AppAction: Equatable, BindableAction {
   case storedApiTokenLoaded(Result<String?, NSError>)
   case settings(SettingsAction)
   case report(ReportAction)
-  case showReportWizard(Bool)
   case fetchNotices(forceReload: Bool)
   case fetchNoticesResponse(Result<[Notice], ApiError>)
   case reportSaved
@@ -227,7 +223,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         }
       }
       state.reportDraft.images.storedPhotos.removeAll()
-      state.showReportWizard = false
       
       return Effect(value: AppAction.reportSaved)
       
@@ -243,21 +238,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     
     case .report:
       return .none
-  
-    case let .showReportWizard(value):
-      if !state.reportDraft.isModified() {
-        var imagesState: ImagesViewState = .init()
-        imagesState.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
-        state.reportDraft = .init(
-          uuid: environment.uuid,
-          images: imagesState,
-          contactState: state.settings.contact,
-          date: environment.date
-        )
-      }
-      state.showReportWizard = value
-      return .none
-      
+        
     case let .fetchNotices(forceReload):
       guard state.isNetworkAvailable else {
         state.alert = .noInternetConnection
@@ -374,8 +355,7 @@ extension Store where State == AppState, Action == AppAction {
         contact: .preview,
         userSettings: .init()
       ),
-      notices: .results(.placeholder),
-      showReportWizard: false
+      notices: .results(.placeholder)
     ),
     reducer: .empty,
     environment: ()
