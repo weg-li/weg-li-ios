@@ -85,7 +85,7 @@ public struct EditDescriptionView: View {
                 Image(systemName: "checkmark")
                   .resizable()
                   .frame(width: .grid(4), height: .grid(4))
-                  .foregroundColor(.wegliBlue)
+                  .foregroundColor(.blue)
               }
             }
             .accessibilityValue(Text(viewStore.state.selectedBrand == brand ? "ausgewählt" : ""))

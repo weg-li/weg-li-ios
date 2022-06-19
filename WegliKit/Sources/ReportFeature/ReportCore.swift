@@ -18,6 +18,7 @@ import PlacesServiceClient
 import RegulatoryOfficeMapper
 import SharedModels
 import SwiftUI
+import UIApplicationClient
 
 // MARK: - Report Core
 
@@ -54,6 +55,8 @@ public struct ReportState: Equatable {
 
   public var isNetworkAvailable = true
   public var isUploadingNotice = false
+  
+  var uploadedNoticeID: String?
   
   public func isModified() -> Bool {
     district != nil
@@ -148,6 +151,7 @@ public enum ReportAction: Equatable {
   case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
   case composeNoticeAndSend
   case composeNoticeResponse(Result<Notice, ApiError>)
+  case editNoticeInBrowser
 }
 
 public struct ReportEnvironment {
@@ -160,6 +164,7 @@ public struct ReportEnvironment {
     regulatoryOfficeMapper: RegulatoryOfficeMapper,
     fileClient: FileClient,
     wegliService: WegliAPIService,
+    uiApplicationClient: UIApplicationClient = .live,
     date: @escaping () -> Date,
     pathMonitorClient: PathMonitorClient = .live(queue: .main),
     imagesUploadClient: ImagesUploadClient = .live()
@@ -174,6 +179,7 @@ public struct ReportEnvironment {
     self.pathMonitorClient = pathMonitorClient
     self.imagesUploadClient = imagesUploadClient
     self.wegliService = wegliService
+    self.uiApplicationClient = uiApplicationClient
     
     self.date = date
   }
@@ -188,6 +194,7 @@ public struct ReportEnvironment {
   public let pathMonitorClient: PathMonitorClient
   public let imagesUploadClient: ImagesUploadClient
   public let wegliService: WegliAPIService
+  public let uiApplicationClient: UIApplicationClient
   public var date: () -> Date
   
   public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
@@ -446,6 +453,8 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.uploadedImagesIds.removeAll()
       state.uploadProgressState = nil
       
+      state.uploadedNoticeID = response.token
+      
       let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
       return .fireAndForget {
         imageURLs.forEach {
@@ -460,6 +469,15 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.alert = .sendNoticeFailed(error: error)
       state.uploadProgressState = nil
       return .none
+      
+    case .editNoticeInBrowser:
+      guard let id = state.uploadedNoticeID else {
+        return .none
+      }
+      let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
+      return environment.uiApplicationClient
+        .open(editURL, [:])
+        .fireAndForget()
     }
   }
 )
@@ -537,13 +555,17 @@ public extension AlertState where Action == ReportAction {
   )
   
   static let reportSent = Self(
-    title: .init("Anzeige gesendet"),
-    buttons: [.default(.init(verbatim: "Ok"))]
+    title: .init("Meldung hinzugefügt"),
+    message: .init("Meldung wurde deinem Account hinzugefügt. Gehe zu `weg.li` um die Anzeige abzusenden (z.Z. noch nicht über die App möglich)"),
+    buttons: [
+      .default(.init("Ok"), action: .send(.resetConfirmButtonTapped)),
+      .default(.init("Gehe zu `weg.li`"), action: .send(.editNoticeInBrowser))
+    ]
   )
   
   static func sendNoticeFailed(error: ApiError) -> Self {
     Self(
-      title: .init("Anzeige konnte nicht gesendet werden"),
+      title: .init("Meldung konnte nicht gesendet werden"),
       message: .init("Fehler: \(error.message)"),
       buttons: [
         .default(.init(verbatim: "Erneut senden"), action: .send(.composeNoticeAndSend)),
@@ -557,7 +579,7 @@ public extension AlertState where Action == ReportAction {
     message: TextState("Mail kann nicht gesendet werden, da kein Account gefunden werden konnte"),
     buttons: [
       .default(
-        .init("Anzeige kopieren"),
+        .init("Meldung kopieren"),
         action: .send(.mail(.copyMailBody))
       ),
       .default(

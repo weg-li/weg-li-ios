@@ -84,31 +84,33 @@ public struct ReportView: View {
         // Send notice button
         VStack {
           if !viewStore.apiToken.isEmpty {
-            Button(
-              action: { viewStore.send(.uploadImages) },
-              label: {
-                VStack(alignment: .center) {
-                  HStack {
-                    if viewStore.isUploadingNotice {
-                      ActivityIndicator(style: .medium, color: .white)
-                        .foregroundColor(.white)
-                    } else {
-                      Text(L10n.Notice.add)
+            VStack {
+              Button(
+                action: { viewStore.send(.uploadImages) },
+                label: {
+                  VStack(alignment: .center) {
+                    HStack {
+                      if viewStore.isUploadingNotice {
+                        ActivityIndicator(style: .medium, color: .white)
+                          .foregroundColor(.white)
+                      } else {
+                        Text("Meldung hochladen")
+                      }
                     }
-                  }
-                  .frame(maxWidth: .infinity, alignment: .center)
-                  
-                  if let uploadProgressMessage = viewStore.uploadProgressState {
-                    Text(uploadProgressMessage)
-                      .font(.footnote)
-                      .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
                   }
                 }
+              )
+              .disabled(viewStore.isUploadingNotice)
+              .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
+              .padding()
+
+              if let uploadProgressMessage = viewStore.uploadProgressState {
+                Text(uploadProgressMessage)
+                  .font(.footnote)
+                  .foregroundColor(Color(.secondaryLabel))
               }
-            )
-            .disabled(viewStore.isUploadingNotice)
-            .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
-            .padding()
+            }
           } else {
             MailContentView(store: store)
               .padding()
