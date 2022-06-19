@@ -419,6 +419,18 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       return .none
       
     case .uploadImages:
+      guard state.isNetworkAvailable else {
+        state.alert = .init(
+          title: .init("Keine Internetverbindung"),
+          message: .init("Verbinde dich mit dem Internet um die Meldung hochzuladen"),
+          buttons: [
+            .cancel(.init(L10n.cancel)),
+            .default(.init("Wiederholen"), action: .send(.uploadImages))
+          ]
+        )
+        return .none
+      }
+      
       let imageUploadRequests = state.images.imageStates.map {
         UploadImageRequest(pickerResult: $0.image)
       }
@@ -498,33 +510,31 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
 // MARK: - Helper
 
 public extension ReportState {
-  static var preview: ReportState {
-    ReportState(
-      uuid: UUID.init,
-      images: .init(
-        showImagePicker: false,
-        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
-      ),
-      contactState: .preview,
-      district: District(
-        name: "Hamburg St. Pauli",
-        zip: "20099",
-        email: "mail@stpauli.de",
-        latitude: 53.53,
-        longitude: 13.13,
-        personalEmail: true
-      ),
-      date: { Date(timeIntervalSince1970: 1_580_624_207) },
-      description: .init(
-        licensePlateNumber: "       ",
-        selectedColor: 3,
-        selectedBrand: .init("Opel"),
-        selectedDuration: 5,
-        selectedCharge: .init(id: "1", text: "Parken auf dem Radweg", isFavorite: true, isSelected: false),
-        blockedOthers: true
-      )
+  static let preview = ReportState(
+    uuid: UUID.init,
+    images: .init(
+      showImagePicker: false,
+      storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
+    ),
+    contactState: .preview,
+    district: District(
+      name: "Hamburg St. Pauli",
+      zip: "20099",
+      email: "mail@stpauli.de",
+      latitude: 53.53,
+      longitude: 13.13,
+      personalEmail: true
+    ),
+    date: { Date(timeIntervalSince1970: 1_580_624_207) },
+    description: .init(
+      licensePlateNumber: "       ",
+      selectedColor: 3,
+      selectedBrand: .init("Opel"),
+      selectedDuration: 5,
+      selectedCharge: .init(id: "1", text: "Parken auf dem Radweg", isFavorite: true, isSelected: false),
+      blockedOthers: true
     )
-  }
+  )
 }
 
 public extension AlertState where Action == ReportAction {
