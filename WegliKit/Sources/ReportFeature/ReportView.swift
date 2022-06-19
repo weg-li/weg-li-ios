@@ -23,12 +23,12 @@ public struct ReportView: View {
     ScrollView {
       VStack {
         Widget(
-          title: Text("Datum"),
+          title: Text(L10n.date),
           isCompleted: true
         ) {
           VStack(alignment: .leading) {
             DatePicker(
-              "Datum",
+              L10n.date,
               selection: viewStore.binding(
                 get: \.date,
                 send: ReportAction.setDate
@@ -37,7 +37,7 @@ public struct ReportView: View {
             .labelsHidden()
             .padding(.bottom)
             
-            Text("Beim auswählen eines Fotos wird das Datum aus den Metadaten des Fotos ausgelesen")
+            Text(L10n.Report.Notice.Photos.dateHint)
               .multilineTextAlignment(.leading)
               .foregroundColor(Color(.secondaryLabel))
               .font(.footnote)
@@ -93,7 +93,7 @@ public struct ReportView: View {
                       ActivityIndicator(style: .medium, color: .white)
                         .foregroundColor(.white)
                     } else {
-                      Text("Anzeige hinzufügen")
+                      Text(L10n.Notice.add)
                     }
                   }
                   .frame(maxWidth: .infinity, alignment: .center)

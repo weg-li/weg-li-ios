@@ -52,7 +52,7 @@ public struct ReportState: Equatable {
       && description == .init()
   }
 
-  public var isInternetConnectionAvailable = true
+  public var isNetworkAvailable = true
   public var isUploadingNotice = false
   
   public func isModified() -> Bool {
@@ -70,6 +70,44 @@ public struct ReportState: Equatable {
       && location.resolvedAddress.isValid
   }
   
+  internal init(
+    id: String,
+    images: ImagesViewState,
+    contactState: ContactState,
+    district: District? = nil,
+    date: Date,
+    description: DescriptionState,
+    location: LocationViewState,
+    mail: MailViewState,
+    alert: AlertState<ReportAction>? = nil,
+    showEditDescription: Bool = false,
+    showEditContact: Bool = false,
+    apiToken: String = "",
+    uploadedImagesIds: [String] = [],
+    uploadProgressState: String? = nil,
+    isNetworkAvailable: Bool = true,
+    isUploadingNotice: Bool = false
+  ) {
+    self.id = id
+    self.images = images
+    self.contactState = contactState
+    self.district = district
+    self.date = date
+    self.description = description
+    self.location = location
+    self.mail = mail
+    self.alert = alert
+    self.showEditDescription = showEditDescription
+    self.showEditContact = showEditContact
+    self.apiToken = apiToken
+    self.uploadedImagesIds = uploadedImagesIds
+    self.uploadProgressState = uploadProgressState
+    self.isNetworkAvailable = isNetworkAvailable
+    self.isUploadingNotice = isUploadingNotice
+  }
+}
+
+extension ReportState {
   public init(
     uuid: @escaping () -> UUID,
     images: ImagesViewState,
@@ -106,8 +144,6 @@ public enum ReportAction: Equatable {
   case setShowEditContact(Bool)
   case dismissAlert
   case setDate(Date)
-  case observeConnection
-  case observeConnectionResponse(NetworkPath)
   case uploadImages
   case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
   case composeNoticeAndSend
@@ -215,7 +251,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     
     switch action {
     case .onAppear:
-      return Effect(value: .observeConnection)
+      return .none
   
     // Triggers district mapping after geoAddress is stored.
     case let .mapAddressToDistrict(input):
@@ -253,7 +289,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         state.images.pickerResultCoordinate = coordinate
         state.location.pinCoordinate = coordinate
         
-        guard state.isInternetConnectionAvailable else {
+        guard state.isNetworkAvailable else {
           state.alert = .noInternetConnection(coordinate: state.location.pinCoordinate!)
           return .none
         }
@@ -369,17 +405,6 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .setDate(date):
       state.date = date
-      return .none
-      
-    case .observeConnection:
-      return Effect(environment.pathMonitorClient.networkPathPublisher)
-        .receive(on: environment.mainQueue)
-        .eraseToEffect()
-        .map(ReportAction.observeConnectionResponse)
-        .cancellable(id: ObserveConnectionIdentifier())
-      
-    case let .observeConnectionResponse(networkPath):
-      state.isInternetConnectionAvailable = networkPath.status == .satisfied
       return .none
       
     case .uploadImages:

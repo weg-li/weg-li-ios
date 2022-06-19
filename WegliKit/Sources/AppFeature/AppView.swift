@@ -21,91 +21,46 @@ public struct AppView: View {
   }
   
   public var body: some View {
-    NavigationView {
-      Group {
-        if horizontalSizeClass == .compact {
-          ZStack(alignment: .bottomTrailing) {
-            NoticesView(store: viewStore.notices == .loading ? .placeholder : self.store)
-              .redacted(reason: viewStore.notices == .loading ? .placeholder : [])
-            
-            addReportButton
-              .padding(.grid(6))
+    TabView(selection: viewStore.binding(\.$selectedTab)) {
+      // Notices
+      NavigationView {
+        NoticesView(store: viewStore.notices == .loading ? .placeholder : self.store)
+          .redacted(reason: viewStore.notices == .loading ? .placeholder : [])
+          .refreshable {
+            await viewStore.send(.fetchNotices(forceReload: true), while: \.isFetchingNotices)
           }
-        } else {
-          HStack {
-            NoticesView(store: viewStore.notices == .loading ? .placeholder : self.store)
-              .frame(width: 300)
-              .redacted(reason: viewStore.notices == .loading ? .placeholder : [])
-            
-            Divider()
-            
-            ReportView(
-              store: store.scope(
-                state: \.reportDraft,
-                action: AppAction.report
-              )
-            )
-          }
-        }
+          .navigationBarTitle(L10n.Home.navigationBarTitle)
+          .onAppear { viewStore.send(.onAppear) }
       }
-      .refreshable {
-        await viewStore.send(.fetchNotices, while: \.isFetchingNotices)
-      }
-      .accessibilityAction(.magicTap) {
-        viewStore.send(.showReportWizard(true))
-      }
-      .navigationViewStyle(StackNavigationViewStyle())
-      .navigationBarTitle(L10n.Home.navigationBarTitle)
-      .navigationBarItems(trailing: settings)
-      .onAppear { viewStore.send(.onAppear) }
-    }
-    .navigationViewStyle(StackNavigationViewStyle())
-  }
-  
-  private var addReportButton: some View {
-    VStack {
-      NavigationLink(
-        destination: ReportView(
+      .tabItem { Label(L10n.notices, systemImage: "list.dash") }
+      .tag(Tabs.notices)
+      
+      // New Notice
+      NavigationView {
+        ReportView(
           store: store.scope(
             state: \.reportDraft,
             action: AppAction.report
           )
-        ),
-        isActive: viewStore.binding(
-          get: \.showReportWizard,
-          send: AppAction.showReportWizard
-        ),
-        label: {
-          EmptyView()
-        }
-      )
-      Button(
-        action: { viewStore.send(.showReportWizard(true)) },
-        label: {
-          Image(systemName: "plus").font(.title)
-        }
-      )
-      
-      .buttonStyle(AddReportButtonStyle())
-      .accessibility(label: Text(L10n.Home.A11y.addReportButtonLabel))
-    }
-  }
-  
-  var settings: some View {
-    NavigationLink(
-      destination: SettingsView(
-        store: store.scope(
-          state: \.settings,
-          action: AppAction.settings
         )
-      ),
-      label: {
-        Image(systemName: "gearshape")
-          .font(Font.system(.body).bold())
-          .contentShape(Rectangle())
       }
-    )
-    .accessibility(label: Text(L10n.Settings.title))
+      .badge(viewStore.reportDraft.isModified() ? "!" : nil)
+      .tabItem { Label(L10n.Notice.add, systemImage: "plus.circle") }
+      .tag(Tabs.notice)
+      
+      // Settings
+      NavigationView {
+        SettingsView(
+          store: store.scope(
+            state: \.settings,
+            action: AppAction.settings
+          )
+        )
+      }
+      .tabItem { Label(L10n.Settings.title, systemImage: "gearshape") }
+      .tag(Tabs.settings)
+    }
+    .navigationViewStyle(StackNavigationViewStyle())
   }
 }
 

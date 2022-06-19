@@ -1,37 +1,33 @@
-/*
-  Localizable.strings
-  weg-li
-
-  Created by Malte on 03.04.21.
-  Copyright © 2021 Martin Wilhelmi. All rights reserved.
-*/
-
 // HOME
-"home.navigationBarTitle" = "Anzeigen";
+"home.navigationBarTitle" = "Meldungen";
 
-"home.emptyStateCopy" = "Keine gespeicherten Anzeigen";
+"home.emptyStateCopy" = "Keine gespeicherten Meldungen";
 
-"home.a11y.addReportButtonLabel" = "Anzeige erstellen";
+"home.a11y.addReportButtonLabel" = "Meldung erstellen";
 
 
 // Report
-"report.navigationBarTitle" = "Anzeige";
+"report.navigationBarTitle" = "Neue Meldung";
 
 "report.contact.widgetTitle" = "Kontaktdaten";
 
 "report.place.widgetTitle" = "Ort";
 
-"report.alert.title" = "Anzeige zurücksetzen?";
+"report.alert.title" = "Meldung zurücksetzen?";
 
 "report.alert.reset" = "Zurücksetzen";
 
-"report.error.images" = "Die Anzeige enthält keine Bilder";
+"report.error.images" = "Die Meldung enthält keine Bilder";
 
-"report.error.location" = "Die Anzeige enthält keine Adresse der Tat";
+"report.error.location" = "Die Meldung enthält keine Adresse der Tat";
 
-"report.error.description" = "Die Anzeige enthält keine Beschreibung";
+"report.error.description" = "Die Meldung enthält keine Beschreibung";
 
-"report.error.contact" = "Die Anzeige enthält keine Kontaktdaten";
+"report.error.contact" = "Die Meldung enthält keine Kontaktdaten";
+
+"report.notice.add" = "Meldung hinzufügen";
+
+"report.notice.photos.dateHint" = "Beim auswählen eines Fotos wird das Datum aus den Metadaten des Fotos ausgelesen";
 
 
 // Photos
@@ -111,7 +107,7 @@
 
 "contact.editButtonCopy" =  "Kontaktdaten bearbeiten";
 
-"contact.reportHintCopy" = "Die Anzeige kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
+"contact.reportHintCopy" = "Die Meldung kann nur bearbeitet werden, wenn du richtige Angaben zu deiner Person machst.";
 
 "contact.mailInfo" = "Ihre Emailadresse wird über die Mail App konfiguriert.";
 
@@ -137,7 +133,7 @@
 // Mail
 "mail.deviceErrorCopy" = "Auf diesem Gerät können leider keine E-Mails versendet werden!";
 
-"mail.readyToSubmitErrorCopy" = "Gib alle nötigen Daten an um die Anzeige zu versenden";
+"mail.readyToSubmitErrorCopy" = "Gib alle nötigen Daten an um die Meldung zu versenden";
 
 
 // Widget
@@ -173,7 +169,7 @@
 
 
 // SubmitButton
-"button.submit.title" = "Anzeige erstatten";
+"button.submit.title" = "Meldung erstatten";
 
 "button.submit.district" = "Bezirk: %@";
 
@@ -183,3 +179,9 @@
 
 // General
 "cancel" = "Abbrechen";
+
+"date" = "Datum";
+
+"notices" = "Meldungen";
+
+"notice.add" = "Neue Meldung";

@@ -374,7 +374,7 @@ class ReportStoreTests: XCTestCase {
     let coordinate = CLLocationCoordinate2D(latitude: 31.31, longitude: 12.12)
     
     var state = report
-    state?.isInternetConnectionAvailable = false
+    state?.isNetworkAvailable = false
     state?.location.pinCoordinate = coordinate
     
     let store = TestStore(

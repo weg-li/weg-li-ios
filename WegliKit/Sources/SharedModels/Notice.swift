@@ -1,9 +1,9 @@
 import Foundation
 
 public struct Notice: Codable, Equatable, Identifiable {
-  public var id: String { token }
+  public var id: String { token ?? UUID().uuidString }
   
-  public let token: String
+  public let token: String?
   public let status: String?
   public let street: String?
   public let city: String?

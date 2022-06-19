@@ -10,14 +10,23 @@ import Foundation
 import Helper
 import ImagesFeature
 import KeychainClient
+import L10n
 import MapKit
 import Network
 import OrderedCollections
+import PathMonitorClient
 import PlacesServiceClient
 import ReportFeature
 import SettingsFeature
 import SharedModels
 import UIKit
+
+public enum Tabs: Hashable {
+  case notices
+  case notice
+  case settings
+}
+
 
 // MARK: - AppState
 
@@ -35,8 +44,19 @@ public struct AppState: Equatable {
     date: Date.init
   )
   
+  public var isNetworkAvailable = true {
+    didSet {
+      reportDraft.isNetworkAvailable = isNetworkAvailable
+    }
+  }
+  
   var showReportWizard = false
   public var isFetchingNotices: Bool { notices == .loading }
+  
+  @BindableState
+  public var selectedTab: Tabs = .notice
+  
+  public var alert: AlertState<AppAction>?
   
   public init(
     settings: SettingsState = .init(
@@ -55,7 +75,8 @@ public struct AppState: Equatable {
 
 // MARK: - AppAction
 
-public enum AppAction: Equatable {
+public enum AppAction: Equatable, BindableAction {
+  case binding(BindingAction<AppState>)
   case appDelegate(AppDelegateAction)
   case contactSettingsLoaded(Result<Contact, NSError>)
   case storedNoticesLoaded(Result<[Notice], NSError>)
@@ -68,6 +89,9 @@ public enum AppAction: Equatable {
   case fetchNoticesResponse(Result<[Notice], ApiError>)
   case reportSaved
   case onAppear
+  case observeConnection
+  case observeConnectionResponse(NetworkPath)
+  case dismissAlert
 }
 
 // MARK: - Environment
@@ -80,6 +104,7 @@ public struct AppEnvironment {
     keychainClient: KeychainClient,
     apiClient: APIClient,
     wegliService: WegliAPIService,
+    pathMonitorClient: PathMonitorClient,
     date: @escaping () -> Date = Date.init,
     uuid: @escaping () -> UUID = UUID.init
   ) {
@@ -89,6 +114,7 @@ public struct AppEnvironment {
     self.keychainClient = keychainClient
     self.apiClient = apiClient
     self.wegliService = wegliService
+    self.pathMonitorClient = pathMonitorClient
     self.date = date
     self.uuid = uuid
   }
@@ -99,6 +125,7 @@ public struct AppEnvironment {
   public let keychainClient: KeychainClient
   public var apiClient: APIClient
   public let wegliService: WegliAPIService
+  public let pathMonitorClient: PathMonitorClient
   
   public var date: () -> Date
   public var uuid: () -> UUID
@@ -111,7 +138,8 @@ public extension AppEnvironment {
     fileClient: .live,
     keychainClient: .live(),
     apiClient: .live,
-    wegliService: .live()
+    wegliService: .live(),
+    pathMonitorClient: .live(queue: .main)
   )
 }
 
@@ -149,6 +177,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
   ),
   Reducer { state, action, environment in
     switch action {
+    case .binding:
+      return .none
+      
     case .appDelegate:
       return .merge(
         .concatenate(
@@ -235,8 +266,16 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.showReportWizard = value
       return .none
       
-    case .fetchNotices:
-      let apiToken = state.settings.accountSettingsState.accountSettings.apiToken
+    case let .fetchNotices(forceReload):
+      guard state.isNetworkAvailable else {
+        state.alert = .noInternetConnection
+        return .none
+      }
+      
+      // dont reload every time
+      if let elements = state.notices.elements, !elements.isEmpty, !forceReload {
+        return .none
+      }
       
       state.notices = .loading
       
@@ -268,9 +307,26 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         date: environment.date
       )
       return .none
+      
+    case .observeConnection:
+      return Effect(environment.pathMonitorClient.networkPathPublisher)
+        .receive(on: environment.mainQueue)
+        .eraseToEffect()
+        .map(AppAction.observeConnectionResponse)
+        .cancellable(id: ObserveConnectionIdentifier())
+      
+    case let .observeConnectionResponse(networkPath):
+      state.isNetworkAvailable = networkPath.status == .satisfied
+      return .none
+
+    case .dismissAlert:
+      state.alert = nil
+      return .none
+      
     }
   }
 )
+.binding()
 // store contact settings when changed in settings
 .onChange(of: \.reportDraft.contactState.contact) { contact, state, _, environment in
   struct SaveDebounceId: Hashable {}
@@ -307,6 +363,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 }
 
 // MARK: Helper
+struct ObserveConnectionIdentifier: Hashable {}
 
 extension AppState {
   static let preview = AppState()
@@ -329,5 +386,16 @@ extension Store where State == AppState, Action == AppAction {
     ),
     reducer: .empty,
     environment: ()
+  )
+}
+
+public extension AlertState where Action == AppAction {
+  static let noInternetConnection = Self(
+    title: .init("Keine Internetverbindung"),
+    message: .init("Verbinde dich mit dem Internet um deine Meldungen zu laden"),
+    buttons: [
+      .cancel(.init(L10n.cancel)),
+      .default(.init("Wiederholen"), action: .send(.fetchNotices(forceReload: true)))
+    ]
   )
 }
