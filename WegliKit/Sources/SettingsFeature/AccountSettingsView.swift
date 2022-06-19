@@ -79,7 +79,7 @@ public let accountSettingsReducer =
       case .fetchNotices:
         state.isNetworkRequestInProgress = true
       
-        return environment.wegliService.getNotices()
+        return environment.wegliService.getNotices(false)
           .receive(on: environment.mainQueue)
           .catchToEffect()
           .map(AccountSettingsAction.fetchNoticesResponse)

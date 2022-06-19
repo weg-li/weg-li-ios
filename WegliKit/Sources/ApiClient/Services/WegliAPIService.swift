@@ -7,12 +7,12 @@ import SharedModels
 // Interface
 /// A Service to send a single notice and all persisted notices from the weg-li API
 public struct WegliAPIService {
-  public var getNotices: () -> Effect<[Notice], ApiError>
+  public var getNotices: (Bool) -> Effect<[Notice], ApiError>
   public var postNotice: (NoticeInput) -> Effect<Result<Notice, ApiError>, Never>
   public var upload: (UploadImageRequest) async throws -> ImageUploadResponse
 
   public init(
-    getNotices: @escaping () -> Effect<[Notice], ApiError>,
+    getNotices: @escaping (Bool) -> Effect<[Notice], ApiError>,
     postNotice: @escaping (NoticeInput) -> Effect<Result<Notice, ApiError>, Never>,
     upload: @escaping (UploadImageRequest) async throws -> ImageUploadResponse
   ) {
@@ -25,8 +25,8 @@ public struct WegliAPIService {
 public extension WegliAPIService {
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
-      getNotices: {
-        let request = GetNoticesRequest()
+      getNotices: { forceReload in
+        let request = GetNoticesRequest(forceReload: forceReload)
         
         return apiClient.dispatch(request)
           .decode(
@@ -61,7 +61,7 @@ public extension WegliAPIService {
 
 public extension WegliAPIService {
   static let noop = Self(
-    getNotices: {
+    getNotices: { _ in
       Just([Notice.mock])
         .setFailureType(to: ApiError.self)
         .eraseToEffect()
@@ -91,7 +91,7 @@ public extension WegliAPIService {
   )
   
   static let failing = Self(
-    getNotices: {
+    getNotices: { _ in
       Fail(error: ApiError(error: NetworkRequestError.invalidRequest))
         .eraseToEffect()
     },

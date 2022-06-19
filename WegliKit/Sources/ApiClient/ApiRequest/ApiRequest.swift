@@ -11,11 +11,13 @@ public protocol APIRequest {
   var headers: HTTPHeaders? { get }
   var queryItems: [URLQueryItem] { get set }
   var body: Data? { get }
+  var cachePolicy: URLRequest.CachePolicy { get set }
   func makeRequest() throws -> URLRequest
 }
 
 public extension APIRequest {
   var queryItems: [String: String] { [:] }
+  var cachePolicy: URLRequest.CachePolicy { .useProtocolCachePolicy }
   
   func makeRequest() throws -> URLRequest {
     var components = URLComponents()
@@ -36,6 +38,7 @@ public extension APIRequest {
     if let body = body {
       request.httpBody = body
     }
+    request.cachePolicy = cachePolicy
     return request
   }
 }

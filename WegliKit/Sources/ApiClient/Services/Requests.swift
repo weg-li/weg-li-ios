@@ -10,6 +10,7 @@ public struct SubmitNoticeRequest: APIRequest {
   public var headers: HTTPHeaders? = .contentTypeApplicationJSON
   public let httpMethod: HTTPMethod
   public var body: Data?
+  public var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
   
   public init(
     endpoint: Endpoint = .notices,
@@ -30,13 +31,16 @@ public struct GetNoticesRequest: APIRequest {
   public var headers: HTTPHeaders? = .contentTypeApplicationJSON
   public let httpMethod: HTTPMethod
   public var body: Data?
+  public var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
   
   public init(
     endpoint: Endpoint = .notices,
-    httpMethod: HTTPMethod = .get
+    httpMethod: HTTPMethod = .get,
+    forceReload: Bool = false
   ) {
     self.endpoint = endpoint
     self.httpMethod = httpMethod
+    self.cachePolicy = forceReload ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy
   }
 }
 
@@ -49,6 +53,7 @@ public struct UploadImageRequest: APIRequest {
   public let httpMethod: HTTPMethod
   public var body: Data?
   public var imageData: Data?
+  public var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
     
   public init(
     endpoint: Endpoint = .uploads,

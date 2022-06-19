@@ -194,7 +194,7 @@ class AppStoreTests: XCTestCase {
     }
     
     var wegliService = WegliAPIService.noop
-    wegliService.getNotices = {
+    wegliService.getNotices = { _ in
       Just([.mock])
         .setFailureType(to: ApiError.self)
         .eraseToEffect()
@@ -286,7 +286,7 @@ class AppStoreTests: XCTestCase {
     state.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
     
     var service = WegliAPIService.noop
-    service.getNotices = {
+    service.getNotices = { _ in
       Just([.mock])
         .setFailureType(to: ApiError.self)
         .eraseToEffect()

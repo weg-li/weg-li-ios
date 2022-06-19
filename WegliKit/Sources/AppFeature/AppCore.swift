@@ -64,7 +64,7 @@ public enum AppAction: Equatable {
   case settings(SettingsAction)
   case report(ReportAction)
   case showReportWizard(Bool)
-  case fetchNotices
+  case fetchNotices(forceReload: Bool)
   case fetchNoticesResponse(Result<[Notice], ApiError>)
   case reportSaved
   case onAppear
@@ -167,7 +167,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         state.notices = .error(.tokenUnavailable)
         return .none
       }
-      return Effect(value: .fetchNotices)
+      return Effect(value: .fetchNotices(forceReload: false))
       
     case let .contactSettingsLoaded(result):
       let contact = (try? result.get()) ?? .init()
@@ -240,7 +240,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
       state.notices = .loading
       
-      return environment.wegliService.getNotices()
+      return environment.wegliService.getNotices(forceReload)
         .receive(on: environment.mainQueue)
         .catchToEffect()
         .map(AppAction.fetchNoticesResponse)
