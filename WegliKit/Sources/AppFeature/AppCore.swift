@@ -56,8 +56,10 @@ public struct AppState: Equatable {
   public var selectedTab: Tabs = .notice
   
   public var alert: AlertState<AppAction>?
-  
-  public init(
+}
+
+public extension AppState {
+  init(
     settings: SettingsState = .init(
       accountSettingsState: .init(accountSettings: .init(apiToken: "")),
       contact: .empty,
