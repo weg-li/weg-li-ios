@@ -31,6 +31,8 @@ public struct ReportState: Equatable {
   public var date: Date
   public var description: DescriptionState
   public var location: LocationViewState
+  @BindableState
+  public var note: String = ""
   public var mail: MailViewState
   
   public var alert: AlertState<ReportAction>?
@@ -132,7 +134,8 @@ extension ReportState {
   }
 }
 
-public enum ReportAction: Equatable {
+public enum ReportAction: BindableAction, Equatable {
+  case binding(BindingAction<ReportState>)
   case onAppear
   case images(ImagesViewAction)
   case contact(ContactStateAction)
@@ -257,6 +260,9 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     struct DebounceID: Hashable {}
     
     switch action {
+    case .binding:
+      return .none
+      
     case .onAppear:
       return .none
   
@@ -481,6 +487,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     }
   }
 )
+.binding()
 .onChange(of: \.contactState.contact) { contact, _, _, environment in
   struct SaveDebounceId: Hashable {}
   
@@ -670,7 +677,7 @@ public extension SharedModels.Notice {
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
-      note: "",
+      note: reportState.note,
       createdAt: .now,
       updatedAt: .now,
       sentAt: .now,

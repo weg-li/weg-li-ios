@@ -81,6 +81,19 @@ public struct ReportView: View {
           isCompleted: viewStore.isContactValid
         ) { ContactWidget(store: store.scope(state: { $0 })) }
         
+        VStack(alignment: .leading) {
+          Text("Notizen")
+            .fontWeight(.bold)
+            .accessibilitySortPriority(3)
+          TextEditor(text: viewStore.binding(\.$note))
+            .font(.body)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .padding()
+        .background(Color(.secondarySystemFill))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding()
+        
         // Send notice button
         VStack {
           if !viewStore.apiToken.isEmpty {
