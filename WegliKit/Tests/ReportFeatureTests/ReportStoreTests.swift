@@ -859,6 +859,7 @@ class ReportStoreTests: XCTestCase {
       $0.alert = .reportSent
       $0.uploadedImagesIds = []
       $0.uploadProgressState = nil
+      $0.uploadedNoticeID = Notice.mock.id
     }
     XCTAssertTrue(didRemoveImageItems)
   }

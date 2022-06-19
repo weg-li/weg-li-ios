@@ -47,6 +47,12 @@ public struct EditDescriptionView: View {
           
           expiredEcoView
         }
+        
+        Section(header: Text("Hinweise")) {
+          TextEditor(text: viewStore.binding(\.$note))
+            .font(.body)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
       }
       .onAppear { viewStore.send(.onAppear) }
       .navigationTitle(Text(L10n.Description.widgetTitle))

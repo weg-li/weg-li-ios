@@ -42,6 +42,8 @@ public struct DescriptionState: Equatable {
   @BindableState public var hazardLights = false
   @BindableState public var expiredTuv = false
   @BindableState public var expiredEco = false
+  @BindableState public var note = ""
+  
   public var chargeTypeSearchText = ""
   public var carBrandSearchText = ""
   

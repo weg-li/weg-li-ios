@@ -96,7 +96,7 @@ public struct Notice: Codable, Equatable, Identifiable {
 
 public extension Notice {
   static let mock = Self(
-    token: "",
+    token: "123",
     status: "",
     street: "",
     city: "",

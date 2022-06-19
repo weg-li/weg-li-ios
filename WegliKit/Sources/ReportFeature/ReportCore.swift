@@ -31,8 +31,6 @@ public struct ReportState: Equatable {
   public var date: Date
   public var description: DescriptionState
   public var location: LocationViewState
-  @BindableState
-  public var note: String = ""
   public var mail: MailViewState
   
   public var alert: AlertState<ReportAction>?
@@ -58,7 +56,7 @@ public struct ReportState: Equatable {
   public var isNetworkAvailable = true
   public var isUploadingNotice = false
   
-  var uploadedNoticeID: String?
+  public var uploadedNoticeID: String?
   
   public func isModified() -> Bool {
     district != nil
@@ -647,7 +645,7 @@ public extension SharedModels.NoticeInput {
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
-      note: "",
+      note: reportState.description.note,
       createdAt: .now,
       updatedAt: .now,
       sentAt: .now,
@@ -677,7 +675,7 @@ public extension SharedModels.Notice {
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
-      note: reportState.note,
+      note: reportState.description.note,
       createdAt: .now,
       updatedAt: .now,
       sentAt: .now,
