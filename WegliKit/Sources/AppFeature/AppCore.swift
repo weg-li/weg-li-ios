@@ -34,7 +34,7 @@ public struct AppState: Equatable {
   /// Settings
   public var settings: SettingsState
   
-  public var notices: ContentState<[Notice]>
+  public var notices: ContentState<[Notice], AppAction>
   
   /// Holds a report that has not been stored or sent via mail
   public var reportDraft: ReportState = .init(
@@ -64,7 +64,7 @@ public struct AppState: Equatable {
       contact: .empty,
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    notices: ContentState<[Notice]> = .loading,
+    notices: ContentState<[Notice], AppAction> = .loading,
     showReportWizard: Bool = false
   ) {
     self.settings = settings
@@ -79,7 +79,6 @@ public enum AppAction: Equatable, BindableAction {
   case binding(BindingAction<AppState>)
   case appDelegate(AppDelegateAction)
   case contactSettingsLoaded(Result<Contact, NSError>)
-  case storedNoticesLoaded(Result<[Notice], NSError>)
   case userSettingsLoaded(Result<UserSettings, NSError>)
   case storedApiTokenLoaded(Result<String?, NSError>)
   case settings(SettingsAction)
@@ -205,13 +204,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.settings.contact = .init(contact: contact, alert: nil)
       return .none
       
-    case let .storedNoticesLoaded(result):
-      let notices = (try? result.get()) ?? []
-      state.notices = notices.isEmpty
-        ? .empty(.emptyNotices)
-        : .results(notices)
-      return .none
-      
     case let .storedApiTokenLoaded(result):
       let apiToken = (try? result.get()) ?? ""
       state.settings.accountSettingsState.accountSettings.apiToken = apiToken
@@ -269,6 +261,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case let .fetchNotices(forceReload):
       guard state.isNetworkAvailable else {
         state.alert = .noInternetConnection
+        state.notices = .empty(.emptyNotices())
         return .none
       }
       
@@ -286,8 +279,8 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.success(notices)):
       state.notices = notices.isEmpty
-        ? .empty(.emptyNotices)
-        : .results(notices)
+      ? .empty(.emptyNotices())
+      : .results(notices)
       
       return environment.fileClient
         .saveNotices(notices, on: environment.backgroundQueue)
@@ -398,4 +391,14 @@ public extension AlertState where Action == AppAction {
       .default(.init("Wiederholen"), action: .send(.fetchNotices(forceReload: true)))
     ]
   )
+}
+
+public extension EmptyState {
+  static func emptyNotices() -> EmptyState<AppAction> {
+    .init(
+      text: "Keine Meldungen",
+      message: .init(string: "Meldungen konnten nicht geladen werden"),
+      action: .init(label: "Erneut laden", action: .fetchNotices(forceReload: false))
+    )
+  }
 }

@@ -224,7 +224,7 @@ class AppStoreTests: XCTestCase {
     )
     
     store.send(.fetchNoticesResponse(.success([]))) {
-      $0.notices = .empty(.emptyNotices)
+      $0.notices = .empty(.emptyNotices())
       XCTAssertFalse($0.isFetchingNotices)
     }
     XCTAssertTrue(didSaveNotices)

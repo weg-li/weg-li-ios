@@ -2,10 +2,10 @@ import Foundation
 import UIKit
 
 /// Wrapper type to represent the state of a loadable object. Typically from a network request
-public enum ContentState<T: Equatable>: Equatable {
+public enum ContentState<T: Equatable, Action>: Equatable {
   case loading
   case results(T)
-  case empty(EmptyState)
+  case empty(EmptyState<Action>)
   case error(ErrorState)
   
   public var elements: T? {
@@ -18,21 +18,34 @@ public enum ContentState<T: Equatable>: Equatable {
   }
 }
 
-public struct EmptyState: Equatable {
+public struct EmptyState<A>: Equatable {
   public let text: String
   public var message: NSAttributedString?
+  public var action: Action?
 
   public init(
     text: String,
-    message: NSAttributedString? = nil
+    message: NSAttributedString? = nil,
+    action: Action? = nil
   ) {
     self.text = text
     self.message = message
+    self.action = action
   }
-}
-
-public extension EmptyState {
-  static let emptyNotices = Self(text: "Keine Anzeigen", message: nil)
+  
+  public struct Action: Equatable {
+    public let label: String
+    public var action: A
+    
+    public init(label: String, action: A) {
+      self.label = label
+      self.action = action
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+      lhs.label == rhs.label
+    }
+  }
 }
 
 public struct ErrorState: Equatable {
