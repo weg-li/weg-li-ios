@@ -44,7 +44,6 @@ public struct AppView: View {
           )
         )
       }
-      .badge(viewStore.reportDraft.isModified() ? "!" : nil)
       .tabItem { Label(L10n.Notice.add, systemImage: "plus.circle") }
       .tag(Tabs.notice)
       
