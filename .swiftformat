@@ -64,3 +64,5 @@
 --wrapreturntype preserve
 --xcodeindentation disabled
 --yodaswap always
+
+--exclude **/*.generated.swift
