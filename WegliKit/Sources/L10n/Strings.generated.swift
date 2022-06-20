@@ -172,7 +172,7 @@ public enum L10n {
   }
 
   public enum Notice {
-    /// Meldung hinzufügen
+    /// Neue Meldung
     public static let add = L10n.tr("Localizable", "notice.add")
   }
 

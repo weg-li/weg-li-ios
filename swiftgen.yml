@@ -3,6 +3,6 @@ strings:
   - WegliKit/Sources/L10n/Resources/de.lproj/Localizable.strings
  outputs:
    - templateName: structured-swift4
-     output: WegliKit/Sources/L10n/Strings.swift
+     output: WegliKit/Sources/L10n/Strings.generated.swift
      params:
         publicAccess: true
