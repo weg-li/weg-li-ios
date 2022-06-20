@@ -139,6 +139,7 @@ public struct ReportView: View {
             .foregroundColor(.red)
             .font(.callout)
             .multilineTextAlignment(.center)
+            .padding(.bottom)
           }
         }
       }
