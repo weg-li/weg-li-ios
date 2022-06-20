@@ -33,71 +33,37 @@ public struct AccountSettingsState: Equatable {
 public enum AccountSettingsAction: Equatable {
   case setApiToken(String)
   case openUserSettings
-  case fetchNotices
-  case fetchNoticesResponse(Result<[Notice], ApiError>)
 }
 
 // MARK: Environment
 
 public struct AccountSettingsEnvironment {
-  public init(
-    uiApplicationClient: UIApplicationClient,
-    apiClient: APIClient = .live,
-    wegliService: WegliAPIService,
-    mainQueue: AnySchedulerOf<DispatchQueue>
-  ) {
+  public init(uiApplicationClient: UIApplicationClient) {
     self.uiApplicationClient = uiApplicationClient
-    self.apiClient = apiClient
-    self.wegliService = wegliService
-    self.mainQueue = mainQueue
   }
 
-  public let apiClient: APIClient
-  public let wegliService: WegliAPIService
   public let uiApplicationClient: UIApplicationClient
-  public let mainQueue: AnySchedulerOf<DispatchQueue>
-  
   public let userLink = URL(string: "https://www.weg.li/user")!
 }
 
 // MARK: Reducer
 
 public let accountSettingsReducer =
-  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
-    Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
-      state, action, environment in
-      switch action {
-      case let .setApiToken(token):
-        state.accountSettings.apiToken = token
-        return .none
+Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
+  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
+    state, action, environment in
+    switch action {
+    case let .setApiToken(token):
+      state.accountSettings.apiToken = token
+      return .none
       
-      case .openUserSettings:
-        return environment.uiApplicationClient
-          .open(environment.userLink, [:])
-          .fireAndForget()
-      
-      case .fetchNotices:
-        state.isNetworkRequestInProgress = true
-      
-        return environment.wegliService.getNotices(false)
-          .receive(on: environment.mainQueue)
-          .catchToEffect()
-          .map(AccountSettingsAction.fetchNoticesResponse)
-          .eraseToEffect()
-      
-      case let .fetchNoticesResponse(.success(val)):
-        state.isNetworkRequestInProgress = false
-        state.apiTestRequestResult = true
-        return .none
-      
-      case let .fetchNoticesResponse(.failure(error)):
-        print(error)
-        state.isNetworkRequestInProgress = false
-        state.apiTestRequestResult = false
-        return .none
-      }
+    case .openUserSettings:
+      return environment.uiApplicationClient
+        .open(environment.userLink, [:])
+        .fireAndForget()
     }
-  )
+  }
+)
 
 private typealias S = AccountSettingsState
 private typealias A = AccountSettingsAction
@@ -150,32 +116,6 @@ public struct AccountSettingsView: View {
             .disableAutocorrection(true)
             .submitLabel(.done)
             .padding(.vertical, .grid(4))
-
-            Button(
-              action: { viewStore.send(.fetchNotices) },
-              label: {
-                HStack {
-                  if viewStore.isNetworkRequestInProgress {
-                    ActivityIndicator(style: .medium, color: .gray)
-                  } else {
-                    HStack {
-                      Text("API-Token testen")
-                        
-                      if let result = viewStore.apiTestRequestResult {
-                        HStack {
-                          Image(systemName: result ? "checkmark.circle" : "x.circle")
-                            .font(.body)
-                            .foregroundColor(result ? .green : .red)
-                        }
-                      }
-                    }
-                  }
-                }
-                .frame(maxWidth: .infinity, minHeight: 40)
-              }
-            )
-            .disabled(viewStore.accountSettings.apiToken.isEmpty)
-            .buttonStyle(.bordered)
             
             HStack(alignment: .center) {}
               .padding(.vertical, .grid(2))
@@ -260,9 +200,7 @@ struct AccountSettingsView_Previews: PreviewProvider {
         initialState: .init(accountSettings: .init(apiToken: "")),
         reducer: accountSettingsReducer,
         environment: .init(
-          uiApplicationClient: .noop,
-          wegliService: .noop,
-          mainQueue: .failing
+          uiApplicationClient: .noop
         )
       )
     )

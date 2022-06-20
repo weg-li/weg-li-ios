@@ -166,8 +166,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       SettingsEnvironment(
         uiApplicationClient: .live,
         keychainClient: parent.keychainClient,
-        apiClient: parent.apiClient,
-        wegliService: parent.wegliService,
         mainQueue: parent.mainQueue
       )
     }

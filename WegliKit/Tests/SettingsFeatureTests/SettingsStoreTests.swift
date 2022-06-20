@@ -11,8 +11,6 @@ class SettingsStoreTests: XCTestCase {
       openSettingsURLString: { "" }
     ),
     keychainClient: .noop,
-    apiClient: .noop,
-    wegliService: .noop,
     mainQueue: .immediate
   )
   

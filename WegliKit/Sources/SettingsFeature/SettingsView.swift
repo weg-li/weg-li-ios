@@ -190,8 +190,6 @@ struct SettingsView_Previews: PreviewProvider {
             environment: SettingsEnvironment(
               uiApplicationClient: .live,
               keychainClient: .noop,
-              apiClient: .noop,
-              wegliService: .noop,
               mainQueue: .failing
             )
           )

@@ -39,14 +39,10 @@ public struct SettingsEnvironment {
   public init(
     uiApplicationClient: UIApplicationClient,
     keychainClient: KeychainClient,
-    apiClient: APIClient,
-    wegliService: WegliAPIService,
     mainQueue: AnySchedulerOf<DispatchQueue>
   ) {
     self.uiApplicationClient = uiApplicationClient
     self.keychainClient = keychainClient
-    self.apiClient = apiClient
-    self.wegliService = wegliService
     self.mainQueue = mainQueue
   }
   
@@ -57,8 +53,6 @@ public struct SettingsEnvironment {
   // swiftlint:enable force_unwrapping
   public var uiApplicationClient: UIApplicationClient
   public var keychainClient: KeychainClient
-  public var apiClient: APIClient
-  public var wegliService: WegliAPIService
   public var mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
@@ -68,12 +62,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
     state: \.accountSettingsState,
     action: /SettingsAction.accountSettings,
     environment: { parent in
-      AccountSettingsEnvironment(
-        uiApplicationClient: parent.uiApplicationClient,
-        apiClient: parent.apiClient,
-        wegliService: parent.wegliService,
-        mainQueue: parent.mainQueue
-      )
+      AccountSettingsEnvironment(uiApplicationClient: parent.uiApplicationClient)
     }
   ),
   contactViewReducer.pullback(
