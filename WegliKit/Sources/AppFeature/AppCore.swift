@@ -27,7 +27,6 @@ public enum Tabs: Hashable {
   case settings
 }
 
-
 // MARK: - AppState
 
 public struct AppState: Equatable {
@@ -260,8 +259,8 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.success(notices)):
       state.notices = notices.isEmpty
-      ? .empty(.emptyNotices())
-      : .results(notices)
+        ? .empty(.emptyNotices())
+        : .results(notices)
       
       return environment.fileClient
         .saveNotices(notices, on: environment.backgroundQueue)
@@ -296,7 +295,6 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case .dismissAlert:
       state.alert = nil
       return .none
-      
     }
   }
 )
@@ -337,6 +335,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 }
 
 // MARK: Helper
+
 struct ObserveConnectionIdentifier: Hashable {}
 
 extension AppState {

@@ -110,8 +110,8 @@ public struct ReportState: Equatable {
   }
 }
 
-extension ReportState {
-  public init(
+public extension ReportState {
+  init(
     uuid: @escaping () -> UUID,
     images: ImagesViewState,
     contactState: ContactState,

@@ -109,7 +109,6 @@ class AppStoreConnectScreenshots: XCTestCase {
   }
 }
 
-
 extension Notice {
   static var report2: Notice {
     let report = ReportState(

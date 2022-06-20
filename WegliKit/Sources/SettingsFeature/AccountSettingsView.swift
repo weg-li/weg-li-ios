@@ -49,21 +49,21 @@ public struct AccountSettingsEnvironment {
 // MARK: Reducer
 
 public let accountSettingsReducer =
-Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
-  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
-    state, action, environment in
-    switch action {
-    case let .setApiToken(token):
-      state.accountSettings.apiToken = token
-      return .none
+  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
+    Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
+      state, action, environment in
+      switch action {
+      case let .setApiToken(token):
+        state.accountSettings.apiToken = token
+        return .none
       
-    case .openUserSettings:
-      return environment.uiApplicationClient
-        .open(environment.userLink, [:])
-        .fireAndForget()
+      case .openUserSettings:
+        return environment.uiApplicationClient
+          .open(environment.userLink, [:])
+          .fireAndForget()
+      }
     }
-  }
-)
+  )
 
 private typealias S = AccountSettingsState
 private typealias A = AccountSettingsAction
