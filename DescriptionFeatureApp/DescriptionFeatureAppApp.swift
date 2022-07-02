@@ -9,7 +9,7 @@ struct DescriptionFeatureAppApp: App {
         store: .init(
           initialState: .init(),
           reducer: descriptionReducer,
-          environment: DescriptionEnvironment()
+          environment: DescriptionEnvironment(backgroundQueue: .main)
         )
       )
     }
