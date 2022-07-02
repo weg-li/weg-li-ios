@@ -39,7 +39,7 @@ public struct EditDescriptionView: View {
 
           blockedOthersView
           
-          verhicleEmtpyView
+          vehicleEmptyView
           
           hazardLightsView
           
@@ -209,10 +209,10 @@ public struct EditDescriptionView: View {
     )
   }
   
-  var verhicleEmtpyView: some View {
+  var vehicleEmptyView: some View {
     ToggleButton(
       label: "Das Fahrzeug war verlassen",
-      isOn: viewStore.binding(\.$verhicleEmpty)
+      isOn: viewStore.binding(\.$vehicleEmpty)
     )
   }
   

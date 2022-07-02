@@ -54,7 +54,7 @@ public struct DescriptionView: View {
         
         toggleRow(
           label: "Das Fahrzeug war verlassen",
-          value: viewStore.description.verhicleEmpty
+          value: viewStore.description.vehicleEmpty
         )
         
         toggleRow(

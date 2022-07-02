@@ -15,7 +15,7 @@ public struct DescriptionState: Equatable {
     selectedDuration: Int = 0,
     selectedCharge: Charge? = nil,
     blockedOthers: Bool = false,
-    verhicleEmpty: Bool = false,
+    vehicleEmpty: Bool = false,
     hazardLights: Bool = false,
     expiredTuv: Bool = false,
     expiredEco: Bool = false
@@ -26,7 +26,7 @@ public struct DescriptionState: Equatable {
     self.selectedDuration = selectedDuration
     self.selectedCharge = selectedCharge
     self.blockedOthers = blockedOthers
-    self.verhicleEmpty = verhicleEmpty
+    self.vehicleEmpty = vehicleEmpty
     self.hazardLights = hazardLights
     self.expiredTuv = expiredTuv
     self.expiredEco = expiredEco
@@ -38,7 +38,7 @@ public struct DescriptionState: Equatable {
   public var selectedDuration: Int
   public var selectedCharge: Charge?
   @BindableState public var blockedOthers = false
-  @BindableState public var verhicleEmpty = false
+  @BindableState public var vehicleEmpty = false
   @BindableState public var hazardLights = false
   @BindableState public var expiredTuv = false
   @BindableState public var expiredEco = false
