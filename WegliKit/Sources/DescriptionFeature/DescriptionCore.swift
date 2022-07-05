@@ -76,13 +76,13 @@ public enum DescriptionAction: BindableAction, Equatable {
   case setBrand(CarBrand)
   case setColor(Int)
   case setCharge(Charge)
-  case setDuraration(Int)
+  case setDuration(Int)
   case setChargeTypeSearchText(String)
   case setCarBrandSearchText(String)
   case toggleChargeFavorite(Charge)
   case sortFavoritedCharges
   case favoriteChargesLoaded(Result<[String], NSError>)
-  case presentCargeSelectionView(Bool)
+  case presentChargeSelectionView(Bool)
   case presentBrandSelectionView(Bool)
 }
 
@@ -130,7 +130,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     state.presentChargeSelection = false
     return .none
       
-  case let .setDuraration(value):
+  case let .setDuration(value):
     state.selectedDuration = value
     return .none
       
@@ -181,7 +181,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       
     return Effect(value: .sortFavoritedCharges)
       
-  case let .presentCargeSelectionView(value):
+  case let .presentChargeSelectionView(value):
     state.chargeTypeSearchText = ""
     state.presentChargeSelection = value
     return .none

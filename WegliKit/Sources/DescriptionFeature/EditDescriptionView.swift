@@ -146,7 +146,7 @@ public struct EditDescriptionView: View {
     NavigationLink(
       isActive: viewStore.binding(
         get: \.presentChargeSelection,
-        send: DescriptionAction.presentCargeSelectionView
+        send: DescriptionAction.presentChargeSelectionView
       ),
       destination: {
         List {
@@ -180,7 +180,7 @@ public struct EditDescriptionView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-          viewStore.send(.presentCargeSelectionView(true))
+          viewStore.send(.presentChargeSelectionView(true))
         }
       }
     )
@@ -191,7 +191,7 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.length,
       selection: viewStore.binding(
         get: \.selectedDuration,
-        send: DescriptionAction.setDuraration
+        send: DescriptionAction.setDuration
       )
     ) {
       ForEach(viewStore.times, id: \.self) { time in
