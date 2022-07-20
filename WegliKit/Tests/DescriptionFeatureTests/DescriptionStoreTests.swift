@@ -79,7 +79,7 @@ class DescriptionStoreTests: XCTestCase {
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setDuraration(1)) { state in
+    store.send(.setDuration(1)) { state in
       state.selectedDuration = 1
     }
   }

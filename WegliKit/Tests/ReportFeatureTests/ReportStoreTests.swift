@@ -153,7 +153,7 @@ class ReportStoreTests: XCTestCase {
     store.send(.description(.setCharge(testCharge))) {
       $0.description.selectedCharge = testCharge
     }
-    store.send(.description(.setDuraration(duration))) {
+    store.send(.description(.setDuration(duration))) {
       $0.description.selectedDuration = duration
     }
   }
