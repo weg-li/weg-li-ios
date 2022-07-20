@@ -151,7 +151,6 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     }
     state.charges.update(charge, at: index)
       
-    struct FavoritedId: Hashable {}
     return .concatenate(
       environment.fileClient.saveFavoriteCharges(
         state.charges.filter(\.isFavorite).map(\.id),

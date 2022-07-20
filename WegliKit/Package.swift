@@ -82,6 +82,12 @@ let package = Package(
       ]
     ),
     .target(
+      name: "CameraAccessClient",
+      dependencies: [
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+      ]
+    ),
+    .target(
       name: "ContactFeature",
       dependencies: [
         "L10n",
@@ -122,6 +128,7 @@ let package = Package(
     .target(
       name: "ImagesFeature",
       dependencies: [
+        "CameraAccessClient",
         "Helper",
         "L10n",
         "PhotoLibraryAccessClient",
@@ -300,6 +307,7 @@ package.targets.append(
     .testTarget(
       name: "ImagesFeatureTests",
       dependencies: [
+        "CameraAccessClient",
         "ImagesFeature",
         "L10n",
         "PhotoLibraryAccessClient",

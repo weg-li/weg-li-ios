@@ -215,6 +215,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       ImagesViewEnvironment(
         mainQueue: $0.mainQueue,
         backgroundQueue: $0.backgroundQueue,
+        cameraAccessClient: .live(),
         photoLibraryAccessClient: .live(),
         textRecognitionClient: .live
       )
