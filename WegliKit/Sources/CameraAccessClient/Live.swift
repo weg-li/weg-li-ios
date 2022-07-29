@@ -5,10 +5,8 @@ public extension CameraAccessClient {
   static func live() -> Self {
     Self(
       requestAuthorization: {
-        .future { promise in
-          AVCaptureDevice.requestAccess(for: .video) { status in
-            promise(.success(status))
-          }
+        .task {
+          await AVCaptureDevice.requestAccess(for: .video)
         }
       },
       authorizationStatus: {
