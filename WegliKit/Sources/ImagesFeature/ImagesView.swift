@@ -22,15 +22,15 @@ public struct ImagesView: View {
     VStack(alignment: .center, spacing: 20.0) {
       ImageGrid(store: store)
       
-      importButton
-        .buttonStyle(EditButtonStyle())
-
       takePhotoButton
         .buttonStyle(EditButtonStyle())
+
+      importButton
+        .buttonStyle(EditButtonStyle())
         .padding(.bottom, .grid(1))
-      
+
       Divider()
-      
+
       VStack(alignment: .center) {
         HStack {
           Label("Erkannte Nummernschilder", systemImage: "text.magnifyingglass")
