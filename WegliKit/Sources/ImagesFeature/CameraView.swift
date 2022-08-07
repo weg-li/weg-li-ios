@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 import SharedModels
 
@@ -35,16 +36,23 @@ public struct CameraView: UIViewControllerRepresentable {
       }
       guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage,
       let imageData = image.jpegData(compressionQuality: 1) else {
+        debugPrint("originalImage info from ImagePickerController could not be casted to UIImage")
         return
       }
 
       let filename = "camera\(Date().description)"
       let url = FileManager.default.createDataTempFile(withData: imageData, withFileName: filename)
 
+      var coordinate: CoordinateRegion.Coordinate?
+      if let asset: PHAsset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset,
+         let imageCoordinate = asset.location?.coordinate {
+        coordinate = .init(imageCoordinate)
+      }
+
       parent.pickerResult = [PickerImageResult(
         id: filename,
         imageUrl: url,
-        coordinate: nil,
+        coordinate: coordinate,
         creationDate: Date()
       )]
     }
