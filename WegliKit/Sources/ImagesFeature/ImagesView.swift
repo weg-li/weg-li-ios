@@ -98,7 +98,8 @@ public struct ImagesView: View {
         CameraView(
           isPresented: viewStore.binding(
             get: \.showCamera,
-            send: ImagesViewAction.setShowCamera),
+            send: ImagesViewAction.setShowCamera
+          ),
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
             send: ImagesViewAction.setPhotos
