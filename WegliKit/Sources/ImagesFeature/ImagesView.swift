@@ -22,12 +22,15 @@ public struct ImagesView: View {
     VStack(alignment: .center, spacing: 20.0) {
       ImageGrid(store: store)
       
+      takePhotoButton
+        .buttonStyle(EditButtonStyle())
+
       importButton
         .buttonStyle(EditButtonStyle())
         .padding(.bottom, .grid(1))
-      
+
       Divider()
-      
+
       VStack(alignment: .center) {
         HStack {
           Label("Erkannte Nummernschilder", systemImage: "text.magnifyingglass")
@@ -86,6 +89,23 @@ public struct ImagesView: View {
         )
       }
     )
+    .fullScreenCover(
+      isPresented: viewStore.binding(
+        get: \.showCamera,
+        send: ImagesViewAction.setShowCamera
+      ),
+      content: {
+        CameraView(
+          isPresented: viewStore.binding(
+            get: \.showCamera,
+            send: ImagesViewAction.setShowCamera),
+          pickerResult: viewStore.binding(
+            get: \.storedPhotos,
+            send: ImagesViewAction.setPhotos
+          )
+        )
+      }
+    )
   }
   
   @ViewBuilder private func licensePlateView(item: TextItem) -> some View {
@@ -122,6 +142,16 @@ public struct ImagesView: View {
       action: { viewStore.send(.addPhotosButtonTapped) },
       label: {
         Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
+          .frame(maxWidth: .infinity)
+      }
+    )
+  }
+
+  private var takePhotoButton: some View {
+    Button(
+      action: { viewStore.send(.takePhotosButtonTapped) },
+      label: {
+        Label(L10n.Camera.TakePhotoButton.copy, systemImage: "camera")
           .frame(maxWidth: .infinity)
       }
     )

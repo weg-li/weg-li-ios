@@ -53,6 +53,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
         textRecognitionClient: .init(recognizeText: { _ in
           Just([textItems.removeFirst()])
@@ -120,6 +121,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
         textRecognitionClient: .noop
       )
@@ -141,6 +143,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
         textRecognitionClient: .noop
       )
@@ -185,6 +188,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
         textRecognitionClient: .noop
       )
@@ -237,6 +241,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: accessClient,
         textRecognitionClient: .noop
       )
@@ -270,6 +275,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: accessClient,
         textRecognitionClient: .noop
       )
@@ -303,6 +309,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: accessClient,
         textRecognitionClient: .noop
       )
@@ -328,6 +335,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
         textRecognitionClient: .noop
       )
@@ -357,6 +365,7 @@ class ImagesStoreTests: XCTestCase {
       environment: ImagesViewEnvironment(
         mainQueue: scheduler,
         backgroundQueue: .immediate,
+        cameraAccessClient: .mock,
         photoLibraryAccessClient: accessClient,
         textRecognitionClient: .noop
       )

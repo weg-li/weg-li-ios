@@ -37,6 +37,10 @@
 
 "photos.alert.accessDenied" = "Um Fotos hinzuzufügen braucht die App deine Zustimmung";
 
+// Camera
+"camera.takePhotoButton.copy" = "Neues Foto aufnehmen";
+
+"camera.alert.accessDenied" = "Damit die App auf deine Kamera zugreifen kann benötigt sie deine Zustimmung.";
 
 // Description
 "description.widgetTitle" = "Beschreibung";

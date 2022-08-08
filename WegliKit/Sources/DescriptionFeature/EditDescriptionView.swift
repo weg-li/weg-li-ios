@@ -39,7 +39,7 @@ public struct EditDescriptionView: View {
 
           blockedOthersView
           
-          verhicleEmtpyView
+          vehicleEmptyView
           
           hazardLightsView
           
@@ -146,7 +146,7 @@ public struct EditDescriptionView: View {
     NavigationLink(
       isActive: viewStore.binding(
         get: \.presentChargeSelection,
-        send: DescriptionAction.presentCargeSelectionView
+        send: DescriptionAction.presentChargeSelectionView
       ),
       destination: {
         List {
@@ -180,7 +180,7 @@ public struct EditDescriptionView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-          viewStore.send(.presentCargeSelectionView(true))
+          viewStore.send(.presentChargeSelectionView(true))
         }
       }
     )
@@ -191,7 +191,7 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.length,
       selection: viewStore.binding(
         get: \.selectedDuration,
-        send: DescriptionAction.setDuraration
+        send: DescriptionAction.setDuration
       )
     ) {
       ForEach(viewStore.times, id: \.self) { time in
@@ -209,10 +209,10 @@ public struct EditDescriptionView: View {
     )
   }
   
-  var verhicleEmtpyView: some View {
+  var vehicleEmptyView: some View {
     ToggleButton(
       label: "Das Fahrzeug war verlassen",
-      isOn: viewStore.binding(\.$verhicleEmpty)
+      isOn: viewStore.binding(\.$vehicleEmpty)
     )
   }
   

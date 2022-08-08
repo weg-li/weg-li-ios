@@ -22,6 +22,20 @@ public struct ReportView: View {
   public var body: some View {
     ScrollView {
       VStack {
+        // Photos
+        Widget(
+          title: Text(L10n.Photos.widgetTitle),
+          isCompleted: viewStore.isPhotosValid
+        ) {
+          ImagesView(
+            store: store.scope(
+              state: \.images,
+              action: ReportAction.images
+            )
+          )
+        }
+
+        // Date
         Widget(
           title: Text(L10n.date),
           isCompleted: true
@@ -36,26 +50,14 @@ public struct ReportView: View {
             )
             .labelsHidden()
             .padding(.bottom)
-            
+
             Text(L10n.Report.Notice.Photos.dateHint)
               .multilineTextAlignment(.leading)
               .foregroundColor(Color(.secondaryLabel))
               .font(.footnote)
           }
         }
-        // Photos
-        Widget(
-          title: Text(L10n.Photos.widgetTitle),
-          isCompleted: viewStore.isPhotosValid
-        ) {
-          ImagesView(
-            store: store.scope(
-              state: \.images,
-              action: ReportAction.images
-            )
-          )
-        }
-        
+
         // Location
         Widget(
           title: Text(L10n.Location.widgetTitle),

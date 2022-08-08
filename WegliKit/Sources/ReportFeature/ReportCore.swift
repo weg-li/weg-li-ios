@@ -215,6 +215,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       ImagesViewEnvironment(
         mainQueue: $0.mainQueue,
         backgroundQueue: $0.backgroundQueue,
+        cameraAccessClient: .live(),
         photoLibraryAccessClient: .live(),
         textRecognitionClient: .live
       )
@@ -659,7 +660,7 @@ public extension SharedModels.NoticeInput {
       createdAt: .now,
       updatedAt: .now,
       sentAt: .now,
-      vehicleEmpty: reportState.description.verhicleEmpty,
+      vehicleEmpty: reportState.description.vehicleEmpty,
       hazardLights: reportState.description.hazardLights,
       expiredTuv: reportState.description.expiredTuv,
       expiredEco: reportState.description.expiredEco,

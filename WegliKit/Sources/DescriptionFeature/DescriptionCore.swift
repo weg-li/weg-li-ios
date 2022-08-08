@@ -15,7 +15,7 @@ public struct DescriptionState: Equatable {
     selectedDuration: Int = 0,
     selectedCharge: Charge? = nil,
     blockedOthers: Bool = false,
-    verhicleEmpty: Bool = false,
+    vehicleEmpty: Bool = false,
     hazardLights: Bool = false,
     expiredTuv: Bool = false,
     expiredEco: Bool = false
@@ -26,7 +26,7 @@ public struct DescriptionState: Equatable {
     self.selectedDuration = selectedDuration
     self.selectedCharge = selectedCharge
     self.blockedOthers = blockedOthers
-    self.verhicleEmpty = verhicleEmpty
+    self.vehicleEmpty = vehicleEmpty
     self.hazardLights = hazardLights
     self.expiredTuv = expiredTuv
     self.expiredEco = expiredEco
@@ -38,7 +38,7 @@ public struct DescriptionState: Equatable {
   public var selectedDuration: Int
   public var selectedCharge: Charge?
   @BindableState public var blockedOthers = false
-  @BindableState public var verhicleEmpty = false
+  @BindableState public var vehicleEmpty = false
   @BindableState public var hazardLights = false
   @BindableState public var expiredTuv = false
   @BindableState public var expiredEco = false
@@ -76,13 +76,13 @@ public enum DescriptionAction: BindableAction, Equatable {
   case setBrand(CarBrand)
   case setColor(Int)
   case setCharge(Charge)
-  case setDuraration(Int)
+  case setDuration(Int)
   case setChargeTypeSearchText(String)
   case setCarBrandSearchText(String)
   case toggleChargeFavorite(Charge)
   case sortFavoritedCharges
   case favoriteChargesLoaded(Result<[String], NSError>)
-  case presentCargeSelectionView(Bool)
+  case presentChargeSelectionView(Bool)
   case presentBrandSelectionView(Bool)
 }
 
@@ -130,7 +130,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     state.presentChargeSelection = false
     return .none
       
-  case let .setDuraration(value):
+  case let .setDuration(value):
     state.selectedDuration = value
     return .none
       
@@ -151,7 +151,6 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     }
     state.charges.update(charge, at: index)
       
-    struct FavoritedId: Hashable {}
     return .concatenate(
       environment.fileClient.saveFavoriteCharges(
         state.charges.filter(\.isFavorite).map(\.id),
@@ -181,7 +180,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
       
     return Effect(value: .sortFavoritedCharges)
       
-  case let .presentCargeSelectionView(value):
+  case let .presentChargeSelectionView(value):
     state.chargeTypeSearchText = ""
     state.presentChargeSelection = value
     return .none

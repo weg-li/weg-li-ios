@@ -6,7 +6,7 @@ struct ContentView: View {
     SettingsView(
       store: .init(
         initialState: .init(
-          accountSettingsState: .init(accountSettings: .init(apiKey: "")),
+            accountSettingsState: .init(accountSettings: .init(apiToken: "")),
           contact: .empty,
           userSettings: .init()
         ),

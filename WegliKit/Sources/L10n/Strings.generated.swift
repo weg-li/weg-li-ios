@@ -32,6 +32,17 @@ public enum L10n {
     }
   }
 
+  public enum Camera {
+    public enum Alert {
+      /// Damit die App auf deine Kamera zugreifen kann benötigt sie deine Zustimmung.
+      public static let accessDenied = L10n.tr("Localizable", "camera.alert.accessDenied")
+    }
+    public enum TakePhotoButton {
+      /// Neues Foto aufnehmen
+      public static let copy = L10n.tr("Localizable", "camera.takePhotoButton.copy")
+    }
+  }
+
   public enum Contact {
     /// Kontaktdaten bearbeiten
     public static let editButtonCopy = L10n.tr("Localizable", "contact.editButtonCopy")

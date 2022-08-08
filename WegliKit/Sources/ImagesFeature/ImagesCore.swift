@@ -1,5 +1,6 @@
 // Created for weg-li in 2021.
 
+import CameraAccessClient
 import ComposableArchitecture
 import CoreLocation
 import Foundation
@@ -13,6 +14,7 @@ import UIKit
 public struct ImagesViewState: Equatable, Codable {
   public init(
     alert: AlertState<ImagesViewAction>? = nil,
+    showCamera: Bool = false,
     showImagePicker: Bool = false,
     storedPhotos: [PickerImageResult?] = [],
     coordinateFromImagePicker: CLLocationCoordinate2D? = nil,
@@ -20,6 +22,7 @@ public struct ImagesViewState: Equatable, Codable {
   ) {
     self.alert = alert
     self.showImagePicker = showImagePicker
+    self.showCamera = showCamera
     self.storedPhotos = storedPhotos
     self.pickerResultCoordinate = coordinateFromImagePicker
     self.pickerResultDate = dateFromImagePicker
@@ -27,6 +30,7 @@ public struct ImagesViewState: Equatable, Codable {
   
   public var alert: AlertState<ImagesViewAction>?
   public var showImagePicker: Bool
+  public var showCamera: Bool
   public var storedPhotos: [PickerImageResult?]
   public var pickerResultCoordinate: CLLocationCoordinate2D?
   public var pickerResultDate: Date?
@@ -38,6 +42,7 @@ public struct ImagesViewState: Equatable, Codable {
   
   enum CodingKeys: String, CodingKey {
     case showImagePicker
+    case showCamera
     case storedPhotos
     case pickerResultCoordinate
     case pickerResultDate
@@ -63,6 +68,10 @@ public enum ImagesViewAction: Equatable {
   case setShowImagePicker(Bool)
   case requestPhotoLibraryAccess
   case requestPhotoLibraryAccessResult(PhotoLibraryAuthorizationStatus)
+  case takePhotosButtonTapped
+  case setShowCamera(Bool)
+  case requestCameraAccess
+  case requestCameraAccessResult(Bool)
   case setImageCoordinate(CLLocationCoordinate2D?)
   case setImageCreationDate(Date?)
   case dismissAlert
@@ -74,6 +83,7 @@ public enum ImagesViewAction: Equatable {
 public struct ImagesViewEnvironment {
   public var mainQueue: AnySchedulerOf<DispatchQueue>
   public var backgroundQueue: AnySchedulerOf<DispatchQueue>
+  public var cameraAccessClient: CameraAccessClient
   public let photoLibraryAccessClient: PhotoLibraryAccessClient
   public let textRecognitionClient: TextRecognitionClient
   public let distanceFilter: Double = 50
@@ -81,11 +91,13 @@ public struct ImagesViewEnvironment {
   public init(
     mainQueue: AnySchedulerOf<DispatchQueue>,
     backgroundQueue: AnySchedulerOf<DispatchQueue>,
+    cameraAccessClient: CameraAccessClient,
     photoLibraryAccessClient: PhotoLibraryAccessClient,
     textRecognitionClient: TextRecognitionClient
   ) {
     self.mainQueue = mainQueue
     self.backgroundQueue = backgroundQueue
+    self.cameraAccessClient = cameraAccessClient
     self.photoLibraryAccessClient = photoLibraryAccessClient
     self.textRecognitionClient = textRecognitionClient
   }
@@ -131,7 +143,40 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     default:
       return .none
     }
-    
+
+  case .takePhotosButtonTapped:
+    switch env.cameraAccessClient.authorizationStatus() {
+    case .authorized:
+      return Effect(value: .setShowCamera(true))
+    case .denied:
+      state.alert = .init(title: TextState(L10n.Camera.Alert.accessDenied))
+      return .none
+    case .notDetermined:
+      return Effect(value: .requestCameraAccess)
+    case .restricted:
+      // TODO: How to handle this?
+      return .none
+    @unknown default:
+      return .none
+    }
+
+  case let .setShowCamera(value):
+    state.showCamera = value
+    return .none
+
+  case .requestCameraAccess:
+    return env.cameraAccessClient
+      .requestAuthorization()
+      .receive(on: env.mainQueue)
+      .map(ImagesViewAction.requestCameraAccessResult)
+      .eraseToEffect()
+
+  case let .requestCameraAccessResult(success):
+    if success {
+      return Effect(value: .setShowCamera(true))
+    }
+    return .none
+
   case let .setPhotos(photos):
     state.storedPhotos.append(contentsOf: photos)
   
