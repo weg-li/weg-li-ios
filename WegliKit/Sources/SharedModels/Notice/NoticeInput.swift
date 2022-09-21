@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NoticeInput: Codable, Equatable, Identifiable {
+public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
   public var id: String { token }
   
   public let token: String

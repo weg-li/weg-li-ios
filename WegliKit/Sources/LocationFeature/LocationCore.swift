@@ -69,7 +69,7 @@ public enum LocationViewAction: Equatable {
   case updateRegion(CoordinateRegion?)
   case locationManager(LocationManager.Action)
   case resolveLocation(CLLocationCoordinate2D)
-  case resolveAddressFinished(Result<[Address], PlacesServiceError>)
+  case resolveAddressFinished(TaskResult<[Address]>)
   case updateGeoAddressStreet(String)
   case updateGeoAddressCity(String)
   case updateGeoAddressPostalCode(String)
@@ -212,12 +212,16 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       latitude: coordinate.latitude,
       longitude: coordinate.longitude
     )
-    return environment.placeService
-      .placemarks(clLocation)
-      .receive(on: environment.mainRunLoop)
-      .catchToEffect(LocationViewAction.resolveAddressFinished)
-      .cancellable(id: CancelSearchId(), cancelInFlight: true)
     
+    return .task {
+      await .resolveAddressFinished(
+        TaskResult {
+          await environment.placeService.placemarks(clLocation)
+        }
+      )
+    }
+    .cancellable(id: CancelSearchId(), cancelInFlight: true)
+        
   case let .resolveAddressFinished(.success(address)):
     state.isResolvingAddress = false
     state.resolvedAddress = address.first ?? .init()

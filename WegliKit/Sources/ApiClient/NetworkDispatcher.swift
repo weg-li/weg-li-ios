@@ -4,37 +4,14 @@ import Foundation
 /// A client to dispatch network request to URLSession
 public struct NetworkDispatcher {
   var urlSession: () -> URLSession
-  
+
   public init(urlSession: @escaping () -> URLSession) {
     self.urlSession = urlSession
   }
 
-  /// Dispatches an URLRequest and returns a publisher
-  /// - Parameter request: URLRequest
-  /// - Returns: A publisher with the provided decoded data or an error
-  public func dispatch(request: URLRequest) -> AnyPublisher<Data, NetworkRequestError> {
-    urlSession().dataTaskPublisher(for: request)
-      .tryMap { data, response in
-        // If the response is invalid, throw an error
-        if let response = response as? HTTPURLResponse,
-           !response.isSuccessful
-        {
-          throw httpError(response.statusCode)
-        }
-        return data
-      }
-      .mapError(handleError)
-      .eraseToAnyPublisher()
-  }
-  
-  /// Dispatches an URLRequest and returns a publisher
-  /// - Parameter request: URLRequest
-  /// - Returns: A publisher with the provided decoded data or an error
-  public func dispatch(request: URLRequest) async throws -> Data {
+  func dispatch(request: URLRequest) async throws -> Data {
     let (data, response) = try await urlSession().data(for: request)
-    if let response = response as? HTTPURLResponse,
-       !response.isSuccessful
-    {
+    if let response = response as? HTTPURLResponse, !response.isSuccessful {
       throw httpError(response.statusCode)
     }
     return data

@@ -44,7 +44,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .exactItem("0.34.0")),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .upToNextMajor(from: "0.34.0")),
     .package(url: "https://github.com/pointfreeco/composable-core-location", .exact("0.1.0")),
     .package(
       name: "SnapshotTesting",

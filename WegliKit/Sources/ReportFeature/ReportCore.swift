@@ -141,7 +141,7 @@ public enum ReportAction: BindableAction, Equatable {
   case location(LocationViewAction)
   case mail(MailViewAction)
   case mapAddressToDistrict(Address)
-  case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
+  case mapDistrictFinished(TaskResult<District>)
   case resetButtonTapped
   case resetConfirmButtonTapped
   case setShowEditDescription(Bool)
@@ -149,9 +149,9 @@ public enum ReportAction: BindableAction, Equatable {
   case dismissAlert
   case setDate(Date)
   case uploadImages
-  case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
+  case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
   case composeNoticeAndSend
-  case composeNoticeResponse(Result<Notice, ApiError>)
+  case composeNoticeResponse(TaskResult<Notice>)
   case editNoticeInBrowser
 }
 
@@ -267,17 +267,13 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
   
     // Triggers district mapping after geoAddress is stored.
     case let .mapAddressToDistrict(input):
-      return environment.regulatoryOfficeMapper
-        .mapAddress(address: input, on: environment.mapAddressQueue)
-        .receive(on: environment.mainQueue)
-        .catchToEffect()
-        .map(ReportAction.mapDistrictFinished)
-        .eraseToEffect()
-        .debounce(
-          id: DebounceID(),
-          for: .seconds(environment.debounce),
-          scheduler: environment.mainQueue
+      return .task {
+        await .mapDistrictFinished(
+          TaskResult {
+            try await environment.regulatoryOfficeMapper.mapAddressToDistrict(input)
+          }
         )
+      }
       
     case let .mapDistrictFinished(.success(district)):
       state.district = district
@@ -285,7 +281,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .mapDistrictFinished(.failure(error)):
       // present alert maybe?
-      debugPrint(error.message)
+//      debugPrint(error.message)
       return .none
       
     case let .images(imageViewAction):
@@ -344,7 +340,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return Effect(value: ReportAction.mapAddressToDistrict(address))
         
       case let .resolveAddressFinished(.failure(error)):
-        state.alert = .addressResolveFailed(error: error)
+        state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
         return .none
         
       // Handle manual address entering to trigger district mapping.
@@ -439,11 +435,18 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.isUploadingNotice = true
       state.uploadProgressState = "Uploading images ..."
       
-      return environment.imagesUploadClient.uploadImages(imageUploadRequests)
-        .subscribe(on: environment.backgroundQueue)
-        .receive(on: environment.mainQueue)
-        .map(ReportAction.uploadImagesResponse)
-        .eraseToEffect()
+      return .task {
+        await .uploadImagesResponse(
+          TaskResult {
+            try await environment.imagesUploadClient.uploadImages(imageUploadRequests)
+          }
+        )
+      }
+//      return environment.imagesUploadClient.uploadImages(imageUploadRequests)
+//        .subscribe(on: environment.backgroundQueue)
+//        .receive(on: environment.mainQueue)
+//        .map(ReportAction.uploadImagesResponse)
+//        .eraseToEffect()
       
     case let .uploadImagesResponse(.success(imageInputFromUpload)):
       state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
@@ -459,10 +462,13 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
       state.uploadProgressState = "Sending notice ..."
       
-      return environment.wegliService.postNotice(notice)
-        .receive(on: environment.mainQueue)
-        .map(ReportAction.composeNoticeResponse)
-        .eraseToEffect()
+      return .task { [notice] in
+        await .composeNoticeResponse(
+          TaskResult {
+            try await environment.wegliService.postNotice(notice)
+          }
+        )
+      }
       
     case let .composeNoticeResponse(.success(response)):
       state.isUploadingNotice = false
@@ -483,7 +489,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .composeNoticeResponse(.failure(error)):
       state.isUploadingNotice = false
-      state.alert = .sendNoticeFailed(error: error)
+      state.alert = .sendNoticeFailed(error: error as! ApiError)
       state.uploadProgressState = nil
       return .none
       

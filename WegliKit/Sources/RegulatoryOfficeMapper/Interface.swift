@@ -4,27 +4,13 @@ import Foundation
 import SharedModels
 
 public struct RegulatoryOfficeMapper {
-  internal init(
-    mapAddressToDistrict: @escaping (Address) -> Effect<District, RegularityOfficeMapError>
+  init(
+    mapAddressToDistrict: @escaping (Address) async throws -> District
   ) {
     self.mapAddressToDistrict = mapAddressToDistrict
   }
   
-  public var mapAddressToDistrict: (Address) -> Effect<District, RegularityOfficeMapError>
-  
-  /// Map an Address to a District
-  /// - Parameters:
-  ///   - address: A valid address
-  ///   - queue: a queue to perform the mapping task on
-  /// - Returns: Effect which has a mapped district or an `unableToMatchRegularityOffice` error
-  public func mapAddress(
-    address: Address,
-    on queue: AnySchedulerOf<DispatchQueue>
-  ) -> Effect<District, RegularityOfficeMapError> {
-    mapAddressToDistrict(address)
-      .subscribe(on: queue)
-      .eraseToEffect()
-  }
+  public var mapAddressToDistrict: (Address) async throws -> District
 }
 
 // MARK: RegularityOfficeMapError

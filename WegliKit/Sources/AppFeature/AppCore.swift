@@ -82,7 +82,7 @@ public enum AppAction: Equatable, BindableAction {
   case settings(SettingsAction)
   case report(ReportAction)
   case fetchNotices(forceReload: Bool)
-  case fetchNoticesResponse(Result<[Notice], ApiError>)
+  case fetchNoticesResponse(TaskResult<[Notice]>)
   case reportSaved
   case onAppear
   case observeConnection
@@ -252,10 +252,13 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
       state.notices = .loading
       
-      return environment.wegliService.getNotices(forceReload)
-        .receive(on: environment.mainQueue)
-        .catchToEffect()
-        .map(AppAction.fetchNoticesResponse)
+      return .task {
+        await .fetchNoticesResponse(
+          TaskResult {
+            try await environment.wegliService.getNotices(forceReload)
+          }
+        )
+      }
       
     case let .fetchNoticesResponse(.success(notices)):
       state.notices = notices.isEmpty

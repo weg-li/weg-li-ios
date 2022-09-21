@@ -1,17 +1,16 @@
-import ComposableArchitecture
 import Photos
 
 public typealias PhotoLibraryAuthorizationStatus = PHAuthorizationStatus
 
 public struct PhotoLibraryAccessClient {
   public init(
-    requestAuthorization: @escaping () -> Effect<PhotoLibraryAuthorizationStatus, Never>,
+    requestAuthorization: @escaping () async -> PhotoLibraryAuthorizationStatus,
     authorizationStatus: @escaping () -> PhotoLibraryAuthorizationStatus
   ) {
     self.requestAuthorization = requestAuthorization
     self.authorizationStatus = authorizationStatus
   }
   
-  public var requestAuthorization: () -> Effect<PhotoLibraryAuthorizationStatus, Never>
+  public var requestAuthorization: () async -> PhotoLibraryAuthorizationStatus
   public var authorizationStatus: () -> PhotoLibraryAuthorizationStatus
 }

@@ -75,7 +75,7 @@ public enum ImagesViewAction: Equatable {
   case setImageCoordinate(CLLocationCoordinate2D?)
   case setImageCreationDate(Date?)
   case dismissAlert
-  case textRecognitionCompleted(Result<[TextItem], VisionError>)
+  case textRecognitionCompleted(TaskResult<[TextItem]>)
   case selectedTextItem(TextItem)
   case image(id: String, action: ImageAction)
 }
@@ -124,12 +124,12 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .none
     
   case .requestPhotoLibraryAccess:
-    return env.photoLibraryAccessClient
-      .requestAuthorization()
-      .receive(on: env.mainQueue)
-      .map(ImagesViewAction.requestPhotoLibraryAccessResult)
-      .eraseToEffect()
-    
+    return .task {
+      .requestPhotoLibraryAccessResult(
+        await env.photoLibraryAccessClient.requestAuthorization()
+      )
+    }
+        
   case let .requestPhotoLibraryAccessResult(status):
     switch status {
     case .authorized, .limited:
@@ -194,12 +194,14 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       Effect(value: .setImageCreationDate(images.imageCreationDates.first)),
       .merge(
         images.map { image in
-          env.textRecognitionClient.recognizeText(in: image, on: env.backgroundQueue)
-            .receive(on: env.mainQueue)
-            .catchToEffect()
-            .delay(for: 0.2, scheduler: env.mainQueue)
-            .map(ImagesViewAction.textRecognitionCompleted)
-            .eraseToEffect()
+          Effect.task {
+            await ImagesViewAction.textRecognitionCompleted(
+              TaskResult {
+                try await Task.sleep(nanoseconds: NSEC_PER_SEC / 5)
+                return try await env.textRecognitionClient.recognizeText(image)
+              }
+            )
+          }
         }
       )
     )
@@ -296,13 +298,14 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     
     state.isRecognizingTexts = true
     
-    return env.textRecognitionClient
-      .recognizeText(in: image, on: env.backgroundQueue)
-      .receive(on: env.mainQueue)
-      .catchToEffect()
-      .delay(for: 0.2, scheduler: env.mainQueue)
-      .map(ImagesViewAction.textRecognitionCompleted)
-      .eraseToEffect()
+    return Effect.task {
+      await ImagesViewAction.textRecognitionCompleted(
+        TaskResult {
+          try await Task.sleep(nanoseconds: NSEC_PER_SEC / 5)
+          return try await env.textRecognitionClient.recognizeText(image)
+        }
+      )
+    }
     
   case .image:
     return .none
