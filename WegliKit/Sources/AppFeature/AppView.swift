@@ -24,8 +24,8 @@ public struct AppView: View {
     TabView(selection: viewStore.binding(\.$selectedTab)) {
       // Notices
       NavigationView {
-        NoticesView(store: viewStore.notices == .loading ? .placeholder : self.store)
-          .redacted(reason: viewStore.notices == .loading ? .placeholder : [])
+        NoticesView(store: viewStore.isFetchingNotices ? .placeholder : self.store)
+          .redacted(reason: viewStore.isFetchingNotices ? .placeholder : [])
           .refreshable {
             await viewStore.send(.fetchNotices(forceReload: true), while: \.isFetchingNotices)
           }
