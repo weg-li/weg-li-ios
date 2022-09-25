@@ -5,7 +5,8 @@ import Foundation
 import ImagesFeature
 import XCTest
 
-class CameraAccessTests: XCTestCase {
+@MainActor
+final class CameraAccessTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
 
   func test_cameraButtonTapped_shouldRequestAccess_andPresentCamera_whenAuthorised() {

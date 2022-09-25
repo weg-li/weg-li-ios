@@ -11,17 +11,21 @@ import ImagesUploadClient
 import LocationFeature
 import MapKit
 import PlacesServiceClient
+import RegulatoryOfficeMapper
 import ReportFeature
 import SharedModels
 import XCTest
 
-class ReportStoreTests: XCTestCase {
+@MainActor
+final class ReportStoreTests: XCTestCase {
   let fixedUUID = { UUID(uuidString: "de71ce00-dead-beef-dead-beefdeadbeef")! }
   let fixedDate = { Date() }
   
   let districs = DistrictFixtures.districts
   
   var report: ReportState!
+  
+  let mainQueue = DispatchQueue.test
   
   override func setUp() {
     super.setUp()
@@ -158,7 +162,7 @@ class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_updateImages_shouldTriggerAddressResolve() {
+  func test_updateImages_shouldTriggerAddressResolve() async {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
   
@@ -181,7 +185,7 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: .immediate,
+        mainQueue: mainQueue.eraseToAnyScheduler(),
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
         locationManager: LocationManager.unimplemented(
@@ -191,7 +195,7 @@ class ReportStoreTests: XCTestCase {
           set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
         ),
         placeService: PlacesServiceClient(
-          placemarks: { _ in Effect(value: [expectedAddress]) }
+          placemarks: { _ in [expectedAddress] }
         ),
         regulatoryOfficeMapper: .live(),
         fileClient: .noop,
@@ -209,36 +213,40 @@ class ReportStoreTests: XCTestCase {
       creationDate: creationDate
     )
 
-    store.send(.images(.setPhotos([storedImage]))) {
+    await store.send(.images(.setPhotos([storedImage]))) {
       $0.images.isRecognizingTexts = true
       var images = self.report.images.storedPhotos
       images.append(storedImage)
       $0.images.storedPhotos = images
     }
-    store.receive(.images(.setImageCoordinate(coordinate))) {
+    await store.receive(.images(.setImageCoordinate(coordinate))) {
       $0.images.pickerResultCoordinate = coordinate
       
       $0.location.region = CoordinateRegion(center: coordinate)
       $0.location.pinCoordinate = coordinate
       $0.images.pickerResultCoordinate = coordinate
     }
-    store.receive(.images(.setImageCreationDate(creationDate))) {
+    await store.receive(.images(.setImageCreationDate(creationDate))) {
       $0.images.pickerResultDate = creationDate
       $0.date = creationDate
     }
-    store.receive(.images(.textRecognitionCompleted(.failure(.missingCGImage)))) {
-      $0.images.isRecognizingTexts = false
-    }
-    store.receive(.location(.resolveLocation(coordinate))) {
+    
+    await store.receive(.location(.resolveLocation(coordinate))) {
       $0.location.isResolvingAddress = true
     }
-    store.receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+    await mainQueue.advance(by: 1)
+    
+    await store.receive(.images(.textRecognitionCompleted(.failure(VisionError.missingCGImage)))) {
+      $0.images.isRecognizingTexts = false
+    }
+    
+    await store.receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.isResolvingAddress = false
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
     
-    store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
       $0.district = expectedDistrict
     }
     
@@ -338,7 +346,7 @@ class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() {
+  func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() async {
     let store = TestStore(
       initialState: report,
       reducer: reportReducer,
@@ -361,11 +369,11 @@ class ReportStoreTests: XCTestCase {
       city: "Berlin"
     )
     
-    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+    await store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.success(districs[0]))) {
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }
   }
@@ -407,16 +415,9 @@ class ReportStoreTests: XCTestCase {
         ]
       )
     }
-//    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
-//      $0.location.resolvedAddress = expectedAddress
-//    }
-//    store.receive(.mapAddressToDistrict(expectedAddress))
-//    store.receive(.mapDistrictFinished(.success(districs[0]))) {
-//      $0.district = self.districs[0]
-//    }
   }
   
-  func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() {
+  func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() async {
     let store = TestStore(
       initialState: report,
       reducer: reportReducer,
@@ -439,16 +440,14 @@ class ReportStoreTests: XCTestCase {
       city: "Hamburg"
     )
     
-    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+    await store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.failure(.unableToMatchRegularityOffice))) {
-      $0.district = nil
-    }
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(TaskResult.failure(RegularityOfficeMapError.unableToMatchRegularityOffice)))
   }
   
-  func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() {
+  func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() async {
     let store = TestStore(
       initialState: ReportState(
         uuid: fixedUUID,
@@ -492,19 +491,17 @@ class ReportStoreTests: XCTestCase {
     
     let newPostalCode = "12437"
     
-    store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
+    await store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
       $0.location.resolvedAddress = Address(
         street: "",
         postalCode: newPostalCode, city: ""
       )
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.failure(.unableToMatchRegularityOffice))) {
-      $0.district = nil
-    }
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(TaskResult.failure(RegularityOfficeMapError.unableToMatchRegularityOffice)))
   }
   
-  func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() {
+  func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() async {
     let store = TestStore(
       initialState: ReportState(
         uuid: fixedUUID,
@@ -548,11 +545,11 @@ class ReportStoreTests: XCTestCase {
     )
     
     let newPostalCode = "12437"
-    store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
+    await store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.success(districs[0]))) {
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }
   }
@@ -760,7 +757,7 @@ class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_action_uploadImages() {
+  func test_action_uploadImages() async {
     let responses: [ImageUploadResponse] = [
       .init(
         id: 1,
@@ -785,16 +782,10 @@ class ReportStoreTests: XCTestCase {
         directUpload: .init(url: "321", headers: [:])
       )
     ]
-    let imagesUploadClient = ImagesUploadClient(uploadImages: { _ in
-      Just(Result.success(responses))
-        .eraseToEffect()
-    })
+    let imagesUploadClient = ImagesUploadClient(uploadImages: { _ in responses })
     
     var wegliService = WegliAPIService.noop
-    wegliService.postNotice = { _ in
-      Just(Result.success(Notice.mock))
-        .eraseToEffect()
-    }
+    wegliService.postNotice = { _ in .mock }
     
     var didRemoveImageItems = false
     var fileClient = FileClient.noop
@@ -844,17 +835,17 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.uploadImages) {
+    await store.send(.uploadImages) {
       $0.uploadProgressState = "Uploading images ..."
       $0.isUploadingNotice = true
     }
-    store.receive(.uploadImagesResponse(.success(responses))) {
+    await store.receive(.uploadImagesResponse(.success(responses))) {
       $0.uploadedImagesIds = ["111", "222"]
     }
-    store.receive(.composeNoticeAndSend) {
+    await store.receive(.composeNoticeAndSend) {
       $0.uploadProgressState = "Sending notice ..."
     }
-    store.receive(.composeNoticeResponse(.success(.mock))) {
+    await store.receive(.composeNoticeResponse(.success(.mock))) {
       $0.isUploadingNotice = false
       $0.alert = .reportSent
       $0.uploadedImagesIds = []

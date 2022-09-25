@@ -4,7 +4,8 @@ import ComposableArchitecture
 import ContactFeature
 import XCTest
 
-class ContactStoreTests: XCTestCase {
+@MainActor
+final class ContactStoreTests: XCTestCase {
   func test_changeFirstName_shouldUpdateState() {
     let store = TestStore(
       initialState: ContactState.preview,

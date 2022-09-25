@@ -4,7 +4,8 @@ import ComposableArchitecture
 import SettingsFeature
 import XCTest
 
-class SettingsStoreTests: XCTestCase {
+@MainActor
+final class SettingsStoreTests: XCTestCase {
   var defaultEnvironment = SettingsEnvironment(
     uiApplicationClient: .init(
       open: { _, _ in .none },

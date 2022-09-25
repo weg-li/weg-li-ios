@@ -8,7 +8,7 @@ import RegulatoryOfficeMapper
 import SharedModels
 import XCTest
 
-class OfficeMapperTests: XCTestCase {
+final class OfficeMapperTests: XCTestCase {
   var sut: RegulatoryOfficeMapper!
   
   private var bag = Set<AnyCancellable>()
@@ -25,69 +25,42 @@ class OfficeMapperTests: XCTestCase {
     }
   }
   
-  func test_officeMappingByPostalCode() {
+  func test_officeMappingByPostalCode() async throws {
     let address = Address(
       street: "TestStrasse 3",
       postalCode: "10629",
       city: "Berlin"
     )
     
-    Effect(sut.mapAddressToDistrict(address))
-      .upstream
-      .sink(
-        receiveCompletion: { completion in
-          if case .failure = completion {
-            XCTFail()
-          }
-        },
-        receiveValue: { value in
-          XCTAssertEqual(value, self.districts[0])
-        }
-      )
-      .store(in: &bag)
+    let district = try await sut.mapAddressToDistrict(address)
+    
+    XCTAssertEqual(district, self.districts[0])
   }
   
-  func test_officeMappingByCityName() {
+  func test_officeMappingByCityName() async throws {
     let address = Address(
       street: "TestStrasse 3",
       postalCode: "12345",
       city: "Berlin"
     )
     
-    Effect(sut.mapAddressToDistrict(address))
-      .upstream
-      .sink(
-        receiveCompletion: { completion in
-          if case .failure = completion {
-            XCTFail()
-          }
-        },
-        receiveValue: { value in
-          XCTAssertEqual(value, self.districts[0])
-        }
-      )
-      .store(in: &bag)
+    let district = try await sut.mapAddressToDistrict(address)
+    
+    XCTAssertEqual(district, self.districts[0])
   }
   
-  func test_officeMappingByCityName_shouldFail_whenPostalCodeAndCityName() {
+  func test_officeMappingByCityName_shouldFail_whenPostalCodeAndCityName() async throws {
     let address = Address(
       street: "TestStrasse 3",
       postalCode: "00001",
       city: "Rendsburg"
     )
     
-    Effect(sut.mapAddressToDistrict(address))
-      .upstream
-      .sink(
-        receiveCompletion: { completion in
-          if case let .failure(error) = completion {
-            XCTAssertEqual(error, .unableToMatchRegularityOffice)
-          }
-        },
-        receiveValue: { _ in
-          XCTFail()
-        }
-      )
-      .store(in: &bag)
+    do {
+      let _ = try await sut.mapAddressToDistrict(address)
+      XCTFail()
+    } catch {
+      print("Test succeded")
+    }
   }
 }

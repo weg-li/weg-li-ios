@@ -19,7 +19,9 @@ public extension UUID {
   static let reportId = Self(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!
 }
 
-class AppStoreTests: XCTestCase {
+
+@MainActor
+final class AppStoreTests: XCTestCase {
   let fixedUUID = { UUID.reportId }
   let fixedDate = { Date(timeIntervalSinceReferenceDate: 0) }
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
@@ -183,11 +185,7 @@ class AppStoreTests: XCTestCase {
     }
     
     var wegliService = WegliAPIService.noop
-    wegliService.getNotices = { _ in
-      Just([.mock])
-        .setFailureType(to: ApiError.self)
-        .eraseToEffect()
-    }
+    wegliService.getNotices = { _ in [.mock]}
     
     let store = TestStore(
       initialState: state,
@@ -246,16 +244,12 @@ class AppStoreTests: XCTestCase {
     }
   }
   
-  func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() {
+  func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() async {
     var state = AppState(reportDraft: report)
     state.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
     
     var service = WegliAPIService.noop
-    service.getNotices = { _ in
-      Just([.mock])
-        .setFailureType(to: ApiError.self)
-        .eraseToEffect()
-    }
+    service.getNotices = { _ in [.mock] }
     
     let store = TestStore(
       initialState: state,
@@ -263,13 +257,11 @@ class AppStoreTests: XCTestCase {
       environment: defaultAppEnvironment(wegliService: service)
     )
     
-    store.send(.onAppear)
-    store.receive(.fetchNotices(forceReload: false)) {
-      XCTAssertTrue($0.isFetchingNotices)
-    }
-    store.receive(.fetchNoticesResponse(.success([.mock]))) {
+    await store.send(.onAppear)
+    try? await store.environment.mainQueue.sleep(for: .milliseconds(100))
+    await store.receive(.fetchNotices(forceReload: false))
+    await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.notices = .results([.mock])
-      XCTAssertFalse($0.isFetchingNotices)
     }
   }
   
@@ -305,16 +297,12 @@ class AppStoreTests: XCTestCase {
     // does not fetch notices again
   }
   
-  func test_Action_fetchNotices_shouldReload_whenElementsHaveBeenLoaded_andForceReload() {
+  func test_Action_fetchNotices_shouldReload_whenElementsHaveBeenLoaded_andForceReload() async {
     var state = AppState(reportDraft: report)
     state.notices = .results([.placeholder])
     
     var service = WegliAPIService.noop
-    service.getNotices = { _ in
-      Just([.mock])
-        .setFailureType(to: ApiError.self)
-        .eraseToEffect()
-    }
+    service.getNotices = { _ in [.mock] }
     
     let store = TestStore(
       initialState: state,
@@ -322,10 +310,10 @@ class AppStoreTests: XCTestCase {
       environment: defaultAppEnvironment(wegliService: service)
     )
     
-    store.send(.fetchNotices(forceReload: true)) {
+    await store.send(.fetchNotices(forceReload: true)) {
       $0.notices = .loading
     }
-    store.receive(.fetchNoticesResponse(.success([.mock]))) {
+    await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.notices = .results([.mock])
     }
   }

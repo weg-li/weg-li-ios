@@ -11,9 +11,10 @@ import SharedModels
 import UIApplicationClient
 import XCTest
 
-class LocationStoreTests: XCTestCase {
+@MainActor
+final class LocationStoreTests: XCTestCase {
   /// if location service enabled, test that locationOption selection triggers location request and address resolve
-  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve() {
+  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve() async {
     var didRequestInUseAuthorization = false
     var didRequestLocation = false
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
@@ -36,7 +37,7 @@ class LocationStoreTests: XCTestCase {
         },
         set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
       ),
-      placeService: PlacesServiceClient(placemarks: { _ in Effect(value: [expectedAddress]) }),
+      placeService: PlacesServiceClient(placemarks: { _ in [expectedAddress] }),
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
     
@@ -56,34 +57,31 @@ class LocationStoreTests: XCTestCase {
       verticalAccuracy: 0
     )
     
-    store.send(.onAppear)
-    // simulate user decision of segmented control
-    store.send(.setLocationOption(.currentLocation)) {
+    await store.send(.onAppear)
+    await store.send(.setLocationOption(.currentLocation)) {
       $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
-    store.receive(.locationRequested) {
+    await store.receive(.locationRequested) {
       $0.isRequestingCurrentLocation = true
     }
     XCTAssertTrue(didRequestInUseAuthorization)
     // Simulate being given authorized to access location
     locationManagerSubject.send(.didChangeAuthorization(.authorizedAlways))
     
-    store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
+    await store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
     XCTAssertTrue(didRequestLocation)
     // Simulate finding the user's current location
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
-    store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
+    await store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
       $0.isRequestingCurrentLocation = false
       $0.region = CoordinateRegion(
         center: currentLocation.coordinate
       )
     }
-    store.receive(.resolveLocation(currentLocation.coordinate)) {
-      $0.isResolvingAddress = true
-    }
-    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+    await store.receive(.resolveLocation(currentLocation.coordinate))
+    await store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }
@@ -99,16 +97,14 @@ class LocationStoreTests: XCTestCase {
     )
     locationManagerSubject.send(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst]))
     
-    store.receive(.locationManager(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst]))) {
-      $0.isRequestingCurrentLocation = false
-    }
+    await store.receive(.locationManager(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst])))
     
     setSubject.send(completion: .finished)
     locationManagerSubject.send(completion: .finished)
   }
   
   /// if location service enabled, test that locationOption selection triggers location request and address resolve
-  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve_whenANewLocationIsFurtherAway() {
+  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve_whenANewLocationIsFurtherAway() async {
     var didRequestInUseAuthorization = false
     var didRequestLocation = false
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
@@ -131,7 +127,7 @@ class LocationStoreTests: XCTestCase {
         },
         set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
       ),
-      placeService: PlacesServiceClient(placemarks: { _ in Effect(value: [expectedAddress]) }),
+      placeService: PlacesServiceClient(placemarks: { _ in [expectedAddress] }),
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
     
@@ -151,34 +147,32 @@ class LocationStoreTests: XCTestCase {
       verticalAccuracy: 0
     )
     
-    store.send(.onAppear)
+    await store.send(.onAppear)
     // simulate user decision of segmented control
-    store.send(.setLocationOption(.currentLocation)) {
+    await store.send(.setLocationOption(.currentLocation)) {
       $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
-    store.receive(.locationRequested) {
+    await store.receive(.locationRequested) {
       $0.isRequestingCurrentLocation = true
     }
     XCTAssertTrue(didRequestInUseAuthorization)
     // Simulate being given authorized to access location
     locationManagerSubject.send(.didChangeAuthorization(.authorizedAlways))
     
-    store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
+    await store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
     XCTAssertTrue(didRequestLocation)
     // Simulate finding the user's current location
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
-    store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
+    await store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
       $0.isRequestingCurrentLocation = false
       $0.region = CoordinateRegion(
         center: currentLocation.coordinate
       )
     }
-    store.receive(.resolveLocation(currentLocation.coordinate)) {
-      $0.isResolvingAddress = true
-    }
-    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+    await store.receive(.resolveLocation(currentLocation.coordinate))
+    await store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }
@@ -194,14 +188,14 @@ class LocationStoreTests: XCTestCase {
     )
     locationManagerSubject.send(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))
     
-    store.receive(.locationManager(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))) {
+    await store.receive(.locationManager(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))) {
       $0.isRequestingCurrentLocation = false
       $0.region = .init(center: locationWithBiggerDistanceChangeFromFirst.coordinate)
     }
-    store.receive(.resolveLocation(locationWithBiggerDistanceChangeFromFirst.coordinate)) {
+    await store.receive(.resolveLocation(locationWithBiggerDistanceChangeFromFirst.coordinate)) {
       $0.isResolvingAddress = true
     }
-    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+    await store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }

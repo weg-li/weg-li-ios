@@ -9,10 +9,11 @@ import PhotoLibraryAccessClient
 import SharedModels
 import XCTest
 
-class ImagesStoreTests: XCTestCase {
+@MainActor
+final class ImagesStoreTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   
-  func test_addPhoto_shouldUpdateState() {
+  func test_addPhoto_shouldUpdateState() async {
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     let coordinate: CoordinateRegion.Coordinate = .init(latitude: 23.32, longitude: 13.31)
     
@@ -55,15 +56,11 @@ class ImagesStoreTests: XCTestCase {
         backgroundQueue: .immediate,
         cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
-        textRecognitionClient: .init(recognizeText: { _ in
-          Just([textItems.removeFirst()])
-            .ignoreFailure(setFailureType: VisionError.self)
-            .eraseToEffect()
-        })
+        textRecognitionClient: .init(recognizeText: { _ in [textItems.removeFirst()] })
       )
     )
     
-    store.send(.setPhotos([pencilImage, trashImage, heartImage])) {
+    await store.send(.setPhotos([pencilImage, trashImage, heartImage])) {
       $0.storedPhotos = [
         pencilImage,
         trashImage,
@@ -71,25 +68,25 @@ class ImagesStoreTests: XCTestCase {
       ]
       $0.isRecognizingTexts = true
     }
-    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
+    await store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
       $0.pickerResultCoordinate = coordinate.asCLLocationCoordinate2D
     }
-    store.receive(.setImageCreationDate(creationDate)) {
+    await store.receive(.setImageCreationDate(creationDate)) {
       $0.pickerResultDate = creationDate
     }
-    store.receive(.textRecognitionCompleted(.success([TextItem(id: pencilImage.id, text: "HH.TV 3000")]))) {
+    await store.receive(.textRecognitionCompleted(.success([
+      TextItem(id: pencilImage.id, text: "HH.TV 3000"),
+      TextItem(id: trashImage.id, text: "Trash"),
+      TextItem(id: heartImage.id, text: "B-MB 1985")
+    ]))) {
       $0.isRecognizingTexts = false
-      $0.licensePlates = [TextItem(id: pencilImage.id, text: "HH TV 3000")]
-    }
-    store.receive(.textRecognitionCompleted(.success([TextItem(id: trashImage.id, text: "Trash")])))
-    store.receive(.textRecognitionCompleted(.success([TextItem(id: heartImage.id, text: "B-MB 1985")]))) {
       $0.licensePlates = [
         TextItem(id: pencilImage.id, text: "HH TV 3000"),
         TextItem(id: heartImage.id, text: "B MB 1985")
       ]
     }
     
-    store.send(.image(id: pencilImage.id, action: .removePhoto)) {
+    await store.send(.image(id: pencilImage.id, action: .removePhoto)) {
       $0.licensePlates = [
         TextItem(id: heartImage.id, text: "B MB 1985")
       ]
@@ -98,8 +95,8 @@ class ImagesStoreTests: XCTestCase {
         heartImage
       ]
     }
-    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D))
-    store.receive(.setImageCreationDate(creationDate))
+    await store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D))
+    await store.receive(.setImageCreationDate(creationDate))
   }
   
   func test_removePhoto_shouldUpdateState() {
@@ -132,7 +129,7 @@ class ImagesStoreTests: XCTestCase {
     }
   }
   
-  func test_selectMultiplePhotos_shouldAddPhotosAndSetCoordinate() {
+  func test_selectMultiplePhotos_shouldAddPhotosAndSetCoordinate() async throws {
     let store = TestStore(
       initialState: ImagesViewState(
         showImagePicker: false,
@@ -141,13 +138,14 @@ class ImagesStoreTests: XCTestCase {
       ),
       reducer: imagesReducer,
       environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
+        mainQueue: .immediate,
         backgroundQueue: .immediate,
         cameraAccessClient: .mock,
         photoLibraryAccessClient: .noop,
         textRecognitionClient: .noop
       )
     )
+    store.environment.textRecognitionClient.recognizeText = { _ in [] }
       
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     let coordinate: CoordinateRegion.Coordinate = .init(latitude: 23.32, longitude: 13.31)
@@ -165,19 +163,22 @@ class ImagesStoreTests: XCTestCase {
       creationDate: creationDate
     )
     
-    store.send(.setPhotos([pencilImage, trashImage])) {
+    await store.send(.setPhotos([pencilImage, trashImage])) {
       $0.isRecognizingTexts = true
       $0.storedPhotos = [pencilImage, trashImage]
     }
-    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
+    await store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
       $0.pickerResultCoordinate = coordinate.asCLLocationCoordinate2D
     }
-    store.receive(.setImageCreationDate(creationDate)) {
+    await store.receive(.setImageCreationDate(creationDate)) {
       $0.pickerResultDate = creationDate
+    }
+    await store.receive(.textRecognitionCompleted(.success([]))) {
+      $0.isRecognizingTexts = false
     }
   }
   
-  func test_selectMultiplePhotos_withSmallCoordinateUpdateShouldOnlySetCoordinateOnce() {
+  func test_selectMultiplePhotos_withSmallCoordinateUpdateShouldOnlySetCoordinateOnce() async {
     let store = TestStore(
       initialState: ImagesViewState(
         showImagePicker: false,
@@ -210,24 +211,24 @@ class ImagesStoreTests: XCTestCase {
       creationDate: creationDate
     )
     
-    store.send(.setPhotos([pencilImage, trashImage])) {
+    await store.send(.setPhotos([pencilImage, trashImage])) {
       $0.isRecognizingTexts = true
       $0.storedPhotos = [pencilImage, trashImage]
     }
-    store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
+    await store.receive(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)) {
       $0.pickerResultCoordinate = coordinate.asCLLocationCoordinate2D
     }
-    store.receive(.setImageCreationDate(creationDate)) {
+    await store.receive(.setImageCreationDate(creationDate)) {
       $0.pickerResultDate = creationDate
     }
+    await store.receive(.textRecognitionCompleted(.success([]))) {
+      $0.isRecognizingTexts = false
+    }
   }
   
-  func test_addPhotosButtonTapped_shouldRequestAccess_andPresentPicker_whenAuthorised() {
-    let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.authorized)
+  func test_addPhotosButtonTapped_shouldRequestAccess_andPresentPicker_whenAuthorised() async {
     let accessClient = PhotoLibraryAccessClient(
-      requestAuthorization: {
-        Effect(subject)
-      },
+      requestAuthorization: { .authorized },
       authorizationStatus: { .notDetermined }
     )
     
@@ -247,21 +248,17 @@ class ImagesStoreTests: XCTestCase {
       )
     )
     
-    store.send(.addPhotosButtonTapped)
-    store.receive(.requestPhotoLibraryAccess)
-    store.receive(.requestPhotoLibraryAccessResult(.authorized))
-    store.receive(.setShowImagePicker(true)) {
+    await store.send(.addPhotosButtonTapped)
+    await store.receive(.requestPhotoLibraryAccess)
+    await store.receive(.requestPhotoLibraryAccessResult(.authorized))
+    await store.receive(.setShowImagePicker(true)) {
       $0.showImagePicker = true
     }
-    subject.send(completion: .finished)
   }
   
-  func test_addPhotosButtonTapped_shouldRequestAccess_andPresentPicker_whenLimited() {
-    let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.limited)
+  func test_addPhotosButtonTapped_shouldRequestAccess_andPresentPicker_whenLimited() async {
     let accessClient = PhotoLibraryAccessClient(
-      requestAuthorization: {
-        Effect(subject)
-      },
+      requestAuthorization: { .limited },
       authorizationStatus: { .notDetermined }
     )
     
@@ -281,21 +278,18 @@ class ImagesStoreTests: XCTestCase {
       )
     )
     
-    store.send(.addPhotosButtonTapped)
-    store.receive(.requestPhotoLibraryAccess)
-    store.receive(.requestPhotoLibraryAccessResult(.limited))
-    store.receive(.setShowImagePicker(true)) {
+    await store.send(.addPhotosButtonTapped)
+    await store.receive(.requestPhotoLibraryAccess)
+    await store.receive(.requestPhotoLibraryAccessResult(.limited))
+    await store.receive(.setShowImagePicker(true)) {
       $0.showImagePicker = true
     }
-    subject.send(completion: .finished)
   }
   
-  func test_addPhotosButtonTapped_shouldRequestAccess_andPresentAlert_whenAccessIsDenied() {
+  func test_addPhotosButtonTapped_shouldRequestAccess_andPresentAlert_whenAccessIsDenied() async {
     let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.denied)
     let accessClient = PhotoLibraryAccessClient(
-      requestAuthorization: {
-        Effect(subject)
-      },
+      requestAuthorization: { .denied },
       authorizationStatus: { .notDetermined }
     )
     
@@ -315,12 +309,11 @@ class ImagesStoreTests: XCTestCase {
       )
     )
     
-    store.send(.addPhotosButtonTapped)
-    store.receive(.requestPhotoLibraryAccess)
-    store.receive(.requestPhotoLibraryAccessResult(.denied)) {
+    await store.send(.addPhotosButtonTapped)
+    await store.receive(.requestPhotoLibraryAccess)
+    await store.receive(.requestPhotoLibraryAccessResult(.denied)) {
       $0.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
     }
-    subject.send(completion: .finished)
   }
   
   func test_dismissAlert_shouldUpdateState() {
@@ -346,12 +339,10 @@ class ImagesStoreTests: XCTestCase {
     }
   }
   
-  func test_addPhotosButtonTapped_() {
+  func test_addPhotosButtonTapped_() async {
     let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.denied)
     let accessClient = PhotoLibraryAccessClient(
-      requestAuthorization: {
-        Effect(subject)
-      },
+      requestAuthorization: { .denied },
       authorizationStatus: { .notDetermined }
     )
     
@@ -371,11 +362,10 @@ class ImagesStoreTests: XCTestCase {
       )
     )
     
-    store.send(.addPhotosButtonTapped)
-    store.receive(.requestPhotoLibraryAccess)
-    store.receive(.requestPhotoLibraryAccessResult(.denied)) {
+    await store.send(.addPhotosButtonTapped)
+    await store.receive(.requestPhotoLibraryAccess)
+    await store.receive(.requestPhotoLibraryAccessResult(.denied)) {
       $0.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
     }
-    subject.send(completion: .finished)
   }
 }

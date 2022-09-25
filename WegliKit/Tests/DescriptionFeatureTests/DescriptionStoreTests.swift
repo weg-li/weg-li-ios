@@ -6,7 +6,8 @@ import DescriptionFeature
 import FileClient
 import XCTest
 
-class DescriptionStoreTests: XCTestCase {
+@MainActor
+final class DescriptionStoreTests: XCTestCase {
   let brand: CarBrand = .init("Opel")
   
   func test_setCarColor_shouldUpdateState() {
