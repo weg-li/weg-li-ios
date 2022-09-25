@@ -281,7 +281,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .mapDistrictFinished(.failure(error)):
       // present alert maybe?
-//      debugPrint(error.message)
+      debugPrint(error)
       return .none
       
     case let .images(imageViewAction):
@@ -442,11 +442,6 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
           }
         )
       }
-//      return environment.imagesUploadClient.uploadImages(imageUploadRequests)
-//        .subscribe(on: environment.backgroundQueue)
-//        .receive(on: environment.mainQueue)
-//        .map(ReportAction.uploadImagesResponse)
-//        .eraseToEffect()
       
     case let .uploadImagesResponse(.success(imageInputFromUpload)):
       state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
