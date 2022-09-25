@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -45,10 +45,10 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .upToNextMajor(from: "0.34.0")),
-    .package(url: "https://github.com/pointfreeco/composable-core-location", .exact("0.1.0")),
+    .package(url: "https://github.com/pointfreeco/composable-core-location", exact: .init(0, 1, 0)),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
-    .package(name: "KeychainSwift", url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))
+    .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))
   ],
   targets: [
     .target(
@@ -56,8 +56,7 @@ let package = Package(
       dependencies: [
         "Helper",
         "KeychainClient",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        "SharedModels"
       ]
     ),
     .target(
@@ -79,9 +78,7 @@ let package = Package(
     ),
     .target(
       name: "CameraAccessClient",
-      dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-      ]
+      dependencies: []
     ),
     .target(
       name: "ContactFeature",
@@ -111,8 +108,7 @@ let package = Package(
       name: "FileClient",
       dependencies: [
         "Helper",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        "SharedModels"
       ]
     ),
     .target(
@@ -137,15 +133,13 @@ let package = Package(
       name: "ImagesUploadClient",
       dependencies: [
         "ApiClient",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        "SharedModels"
       ]
     ),
     .target(
       name: "KeychainClient",
       dependencies: [
-        .product(name: "KeychainSwift", package: "KeychainSwift"),
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .product(name: "KeychainSwift", package: "keychain-swift")
       ]
     ),
     .target(
@@ -180,28 +174,22 @@ let package = Package(
     ),
     .target(
       name: "PathMonitorClient",
-      dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-      ]
+      dependencies: []
     ),
     .target(
       name: "PhotoLibraryAccessClient",
-      dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-      ]
+      dependencies: []
     ),
     .target(
       name: "PlacesServiceClient",
       dependencies: [
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        "SharedModels"
       ]
     ),
     .target(
       name: "RegulatoryOfficeMapper",
       dependencies: [
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        "SharedModels"
       ],
       resources: [.process("Resources")]
     ),
@@ -260,9 +248,7 @@ let package = Package(
     ),
     .target(
       name: "UIApplicationClient",
-      dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-      ]
+      dependencies: []
     )
   ]
 )

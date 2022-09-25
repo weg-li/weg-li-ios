@@ -58,9 +58,9 @@ public let accountSettingsReducer =
         return .none
       
       case .openUserSettings:
-        return environment.uiApplicationClient
-          .open(environment.userLink, [:])
-          .fireAndForget()
+        return .fireAndForget(priority: .userInitiated) {
+          _ = await environment.uiApplicationClient.open(environment.userLink, [:])
+        }
       }
     }
   )

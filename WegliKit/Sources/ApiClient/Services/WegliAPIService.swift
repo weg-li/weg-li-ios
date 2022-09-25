@@ -1,5 +1,4 @@
 import Combine
-import ComposableArchitecture
 import Foundation
 import Helper
 import SharedModels
@@ -7,14 +6,14 @@ import SharedModels
 // Interface
 /// A Service to send a single notice and all persisted notices from the weg-li API
 public struct WegliAPIService {
-  public var getNotices: (Bool) async throws -> [Notice]
+  public var getNotices: @Sendable (Bool) async throws -> [Notice]
   public var postNotice: @Sendable (NoticeInput) async throws -> Notice
-  public var upload: (UploadImageRequest) async throws -> ImageUploadResponse
+  public var upload: @Sendable (UploadImageRequest) async throws -> ImageUploadResponse
 
   public init(
-    getNotices: @escaping (Bool) async throws -> [Notice],
+    getNotices: @Sendable @escaping (Bool) async throws -> [Notice],
     postNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
-    upload: @escaping (UploadImageRequest) async throws -> ImageUploadResponse
+    upload: @Sendable @escaping (UploadImageRequest) async throws -> ImageUploadResponse
   ) {
     self.getNotices = getNotices
     self.postNotice = postNotice

@@ -81,36 +81,39 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
       return .none
       
     case .openLicensesRowTapped:
-      return URL(string: env.uiApplicationClient.openSettingsURLString())
-        .map {
-          env.uiApplicationClient.open($0, [:])
-            .fireAndForget()
-        }
-        ?? .none
+      return .fireAndForget {
+        guard
+          let url = await URL(string: env.uiApplicationClient.openSettingsURLString())
+        else { return }
+        _ = await env.uiApplicationClient.open(url, [:])
+      }
+      
     case .openImprintTapped:
-      return env.uiApplicationClient
-        .open(env.imprintLink, [:])
-        .fireAndForget()
+      return .fireAndForget {
+        _ = await env.uiApplicationClient.open(env.imprintLink, [:])
+      }
     case .openGitHubProjectTapped:
-      return env.uiApplicationClient
-        .open(env.gitHubProjectLink, [:])
-        .fireAndForget()
+      return .fireAndForget {
+        _ = await env.uiApplicationClient.open(env.gitHubProjectLink, [:])
+      }
     case .donateTapped:
-      return env.uiApplicationClient
-        .open(env.donateLink, [:])
-        .fireAndForget()
+      return .fireAndForget {
+        _ = await env.uiApplicationClient.open(env.donateLink, [:])
+      }
     case .contact, .userSettings:
       return .none
     }
   }
 )
 .onChange(of: \.accountSettingsState.accountSettings.apiToken) { key, _, _, environment in
-  struct SaveDebounceId: Hashable {}
-    
-  return environment.keychainClient
-    .setApiToken(key)
-    .fireAndForget()
-    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+  enum CancelID {}
+  
+  return .fireAndForget {
+    await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try? await environment.mainQueue.sleep(for: .seconds(0.3))
+      _ = await environment.keychainClient.setApiToken(key)
+    }
+  }
 }
 
 public enum UserSettingsAction: Equatable {

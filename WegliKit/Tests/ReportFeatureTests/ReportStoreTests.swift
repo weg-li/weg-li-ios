@@ -69,13 +69,13 @@ final class ReportStoreTests: XCTestCase {
   
   // MARK: - Reducer integration tests
   
-  func test_updateContact_shouldUpdateState_andWriteContactToFile() {
-    var didWriteContactToFile = false
+  func test_updateContact_shouldUpdateState_andWriteContactToFile() async {
+    let didWriteContactToFile = ActorIsolated(false)
     
     var fileClient = FileClient.noop
-    fileClient.save = { fileName, _ in
-      didWriteContactToFile = fileName == "contact-settings"
-      return .none
+    fileClient.save = { @Sendable fileName, _ in
+      await didWriteContactToFile.setValue(fileName == "contact-settings")
+      return ()
     }
     
     let store = TestStore(
@@ -97,17 +97,20 @@ final class ReportStoreTests: XCTestCase {
     let lastName = "ROSS"
     let city = "Rosstown"
     
-    store.send(.contact(.contact(.set(\.$firstName, firstName)))) {
+    await store.send(.contact(.contact(.set(\.$firstName, firstName)))) {
       $0.contactState.contact.firstName = firstName
     }
-    store.send(.contact(.contact(.set(\.$name, lastName)))) {
+    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+    await store.send(.contact(.contact(.set(\.$name, lastName)))) {
       $0.contactState.contact.name = lastName
     }
-    store.send(.contact(.contact(.set(\.address.$city, city)))) {
+    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+    await store.send(.contact(.contact(.set(\.address.$city, city)))) {
       $0.contactState.contact.address.city = city
     }
-    
-    XCTAssertTrue(didWriteContactToFile)
+    await didWriteContactToFile.withValue({ value in
+      XCTAssertTrue(value)
+    })
   }
   
   func test_updateCar_shouldUpdateState() {
@@ -787,11 +790,11 @@ final class ReportStoreTests: XCTestCase {
     var wegliService = WegliAPIService.noop
     wegliService.postNotice = { _ in .mock }
     
-    var didRemoveImageItems = false
+    let didRemoveImageItems = ActorIsolated(false)
     var fileClient = FileClient.noop
-    fileClient.removeItem = { _ in
-      didRemoveImageItems = true
-      return .none
+    fileClient.removeItem = { @Sendable _ in
+      await didRemoveImageItems.setValue(true)
+      return ()
     }
     
     let store = TestStore(
@@ -852,6 +855,9 @@ final class ReportStoreTests: XCTestCase {
       $0.uploadProgressState = nil
       $0.uploadedNoticeID = Notice.mock.id
     }
-    XCTAssertTrue(didRemoveImageItems)
+    await didRemoveImageItems.withValue({ value in
+      XCTAssertTrue(value)
+    })
+    
   }
 }

@@ -285,7 +285,7 @@ final class LocationStoreTests: XCTestCase {
     locationManagerSubject.send(completion: .finished)
   }
   
-  func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() {
+  func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() async {
     let store = TestStore(
       initialState: LocationViewState(
         locationOption: .manual,
@@ -305,27 +305,27 @@ final class LocationStoreTests: XCTestCase {
     let newPostalCode = Contact.preview.address.postalCode
     let newCity = Contact.preview.address.city
     
-    store.send(.updateGeoAddressStreet(newStreet)) {
+    await store.send(.updateGeoAddressStreet(newStreet)) {
       $0.resolvedAddress.street = newStreet
       XCTAssertFalse($0.resolvedAddress.isValid)
     }
-    store.send(.updateGeoAddressPostalCode(newPostalCode)) {
+    await store.send(.updateGeoAddressPostalCode(newPostalCode)) {
       $0.resolvedAddress.postalCode = newPostalCode
       XCTAssertFalse($0.resolvedAddress.isValid)
     }
-    store.send(.updateGeoAddressCity(newCity)) {
+    await store.send(.updateGeoAddressCity(newCity)) {
       $0.resolvedAddress.city = newCity
       XCTAssertTrue($0.resolvedAddress.isValid)
     }
   }
   
-  func test_goToSettingsAction_shouldOpenSettingsURL() {
-    var openedUrl: URL!
+  func test_goToSettingsAction_shouldOpenSettingsURL() async {
+    let openedUrl: ActorIsolated<URL?> = .init(nil)
     let settingsURL = "settings:weg-li//weg-li/settings"
     let uiApplicationClient: UIApplicationClient = .init(
-      open: { url, _ in
-        openedUrl = url
-        return .init(value: true)
+      open: { @Sendable url, _ in
+        await openedUrl.setValue(url)
+        return true
       },
       openSettingsURLString: { settingsURL }
     )
@@ -345,7 +345,10 @@ final class LocationStoreTests: XCTestCase {
       )
     )
     
-    store.send(.goToSettingsButtonTapped)
-    XCTAssertEqual(openedUrl, URL(string: settingsURL))
+    await store.send(.onGoToSettingsButtonTapped)
+    await openedUrl.withValue({ url in
+      XCTAssertEqual(url, URL(string: settingsURL))
+    })
+    
   }
 }

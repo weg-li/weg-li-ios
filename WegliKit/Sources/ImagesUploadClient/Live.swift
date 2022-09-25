@@ -9,47 +9,36 @@ public extension ImagesUploadClient {
   ) -> Self {
     Self(
       uploadImages: { requests in
-        do {
-          return try await withThrowingTaskGroup(of: ImageUploadResponse.self, body: { group in
-            for request in requests {
-              group.addTask {
-                let response = try await wegliService.upload(request)
-                
-                guard let directUploadURL = URL(string: response.directUpload.url) else {
-                  return response
-                }
-                let directUploadURLComponents = URLComponents(
-                  url: directUploadURL,
-                  resolvingAgainstBaseURL: false
-                )
-                
-                // wait until direct upload to gcloud is finished
-                try await googleUploadService.upload(
-                  directUploadURLComponents?.url,
-                  directUploadURLComponents?.queryItems,
-                  request.imageData,
-                  response.directUpload.headers
-                )
-                
-                return response
+        try await withThrowingTaskGroup(of: ImageUploadResponse.self) { group in
+          for request in requests {
+            group.addTask {
+              let gcloudUploadResponse = try await wegliService.upload(request)
+              
+              guard let directUploadURL = URL(string: gcloudUploadResponse.directUpload.url) else {
+                return gcloudUploadResponse
               }
+              let directUploadURLComponents = URLComponents(
+                url: directUploadURL,
+                resolvingAgainstBaseURL: false
+              )
+              
+              // wait until direct upload to gcloud is finished
+              try await googleUploadService.upload(
+                directUploadURLComponents?.url,
+                directUploadURLComponents?.queryItems,
+                request.imageData,
+                gcloudUploadResponse.directUpload.headers
+              )
+              
+              return gcloudUploadResponse
             }
-            var results: [ImageUploadResponse] = []
-            for try await result in group {
-              results.append(result)
-            }
-            return results
-          })
-        } catch {
-          debugPrint(error)
-          if let networkRequestError = error as? NetworkRequestError {
-            throw NSError(
-              domain: networkRequestError.errorDescription ?? networkRequestError.localizedDescription,
-              code: -1
-            )
-          } else {
-            throw NSError(domain: "ImageUploader", code: -1)
           }
+          
+          var results: [ImageUploadResponse] = []
+          for try await result in group {
+            results.append(result)
+          }
+          return results
         }
       }
     )

@@ -4,9 +4,9 @@ import Foundation
 
 public extension FileClient {
   static let noop = Self(
-    removeItem: { _ in .none },
-    delete: { _ in .none },
-    load: { _ in .none },
-    save: { _, _ in .none }
+    removeItem: { _ in () },
+    delete: { _ in () },
+    load: { _ in throw CancellationError() },
+    save: { _, _ in () }
   )
 }

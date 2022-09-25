@@ -74,7 +74,7 @@ final class AppStoreTests: XCTestCase {
     userDefaults.removePersistentDomain(forName: #file)
   }
   
-  func test_updateContact_ShouldUpdateState() {
+  func test_updateContact_ShouldUpdateState() async {
     let store = TestStore(
       initialState: AppState(),
       reducer: appReducer,
@@ -83,7 +83,7 @@ final class AppStoreTests: XCTestCase {
     
     let newContact: ContactState = .preview
     
-    store.send(
+    await store.send(
       .settings(
         .contact(
           .contact(.set(\.$firstName, newContact.contact.firstName))
@@ -95,7 +95,7 @@ final class AppStoreTests: XCTestCase {
     }
   }
   
-  func test_updateReport_ShouldUpdateState() {
+  func test_updateReport_ShouldUpdateState() async {
     let store = TestStore(
       initialState: AppState(),
       reducer: appReducer,
@@ -104,7 +104,7 @@ final class AppStoreTests: XCTestCase {
     
     let newContact: ContactState = .preview
     
-    store.send(
+    await store.send(
       .report(
         .contact(
           .contact(.set(\.$firstName, newContact.contact.firstName))
@@ -115,40 +115,7 @@ final class AppStoreTests: XCTestCase {
       $0.reportDraft.contactState.contact.firstName = newContact.contact.firstName
     }
   }
-  
-  func test_sentMailResult_shouldAppendDraftReportToReports() {
-    var didWriteReports = false
-    var fileCient = FileClient.noop
-    fileCient.save = { _, _ in
-      didWriteReports = true
-      return .none
-    }
     
-    let store = TestStore(
-      initialState: AppState(reportDraft: report),
-      reducer: appReducer,
-      environment: defaultAppEnvironment(fileClient: fileCient)
-    )
-        
-    let result = MFMailComposeResult.sent
-    store.send(.report(.mail(.setMailResult(result)))) {
-      var report = $0.reportDraft
-      report.images.storedPhotos.removeAll()
-      report.mail.mailComposeResult = result
-      $0.reportDraft = report
-      $0.reportDraft.mail.mailComposeResult = result
-    }
-    store.receive(.reportSaved) {
-      $0.reportDraft = ReportState(
-        uuid: self.fixedUUID,
-        images: .init(),
-        contactState: .init(contact: .empty, alert: nil),
-        date: self.fixedDate
-      )
-    }
-    XCTAssertTrue(didWriteReports)
-  }
-  
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
     var state = AppState(reportDraft: report)
     state.settings.contact = .preview
@@ -173,16 +140,15 @@ final class AppStoreTests: XCTestCase {
     store.receive(.report(.dismissAlert))
   }
   
-  func test_ActionStoredApiTokenLoaded() {
+  func test_ActionStoredApiTokenLoaded() async {
+    let mainQueue = DispatchQueue.test
+    
     var state = AppState(reportDraft: report)
     state.settings.contact = .preview
     
     let token = "API Token"
     var keychainClient = KeychainClient.noop
-    keychainClient.getString = { _ in
-      Just(token)
-        .eraseToEffect()
-    }
+    keychainClient.getString = { _ in token }
     
     var wegliService = WegliAPIService.noop
     wegliService.getNotices = { _ in [.mock]}
@@ -191,28 +157,40 @@ final class AppStoreTests: XCTestCase {
       initialState: state,
       reducer: appReducer,
       environment: defaultAppEnvironment(
+        mainQueue: mainQueue.eraseToAnyScheduler(),
         keychainClient: keychainClient,
         wegliService: wegliService
       )
     )
+    store.environment.fileClient.load = { @Sendable [contact = state.settings.contact.contact, user = state.settings.userSettings] key in
+      if key == "contact-settings" {
+        return try! contact.encoded()
+      }
+      if key == "user-settings" {
+        return try! user.encoded()
+      }
+      fatalError()
+    }
     
-    store.send(.appDelegate(.didFinishLaunching))
-    store.receive(.storedApiTokenLoaded(.success(token))) {
+    await store.send(.appDelegate(.didFinishLaunching))
+    await store.receive(.contactSettingsLoaded(.success(report.contactState.contact)))
+    await store.receive(.userSettingsLoaded(.success(state.settings.userSettings)))
+    await store.receive(.storedApiTokenLoaded(.success(token)), timeout: 200) {
       $0.reportDraft.apiToken = token
       $0.settings.accountSettingsState.accountSettings.apiToken = token
     }
   }
   
-  func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() {
+  func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() async {
     var state = AppState(reportDraft: report)
     state.settings.contact = .preview
     
-    var didSaveNotices = false
+    let didSaveNotices = ActorIsolated(false)
     
     var fileClient = FileClient.noop
-    fileClient.save = { _, _ in
-      didSaveNotices = true
-      return .none
+    fileClient.save = { @Sendable _, _ in
+      await didSaveNotices.setValue(true)
+      return ()
     }
     
     let store = TestStore(
@@ -221,14 +199,17 @@ final class AppStoreTests: XCTestCase {
       environment: defaultAppEnvironment(fileClient: fileClient)
     )
     
-    store.send(.fetchNoticesResponse(.success([]))) {
+    await store.send(.fetchNoticesResponse(.success([]))) {
       $0.notices = .empty(.emptyNotices())
       XCTAssertFalse($0.isFetchingNotices)
     }
-    XCTAssertTrue(didSaveNotices)
+    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+    await didSaveNotices.withValue({ value in
+      XCTAssertTrue(value)
+    })
   }
   
-  func test_ActionOnAccountSettings_shouldPersistAccountsSettings() {
+  func test_ActionOnAccountSettings_shouldPersistAccountsSettings() async {
     var state = AppState(reportDraft: report)
     state.settings.contact = .preview
     
@@ -238,7 +219,7 @@ final class AppStoreTests: XCTestCase {
       environment: defaultAppEnvironment()
     )
     
-    store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
+    await store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
       $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
       $0.reportDraft.apiToken = "TOKEN"
     }
@@ -256,9 +237,14 @@ final class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: defaultAppEnvironment(wegliService: service)
     )
+    store.environment.fileClient.load = { @Sendable [contact = state.settings.contact.contact] key in
+      if key == "contact-settings" {
+        return try! contact.encoded()
+      }
+      fatalError()
+    }
     
     await store.send(.onAppear)
-    try? await store.environment.mainQueue.sleep(for: .milliseconds(100))
     await store.receive(.fetchNotices(forceReload: false))
     await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.notices = .results([.mock])

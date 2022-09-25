@@ -305,6 +305,12 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
         
       case .setPhotos:
+        if state.images.pickerResultCoordinate == nil {
+          if let coordinate = state.location.region?.center {
+            return Effect(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
+          }
+        }
+        
         return .none
         
       case let .setImageCreationDate(date):
@@ -475,11 +481,14 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
       let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
       return .fireAndForget {
-        imageURLs.forEach {
-          environment.fileClient.removeItem($0)
-            .ignoreFailure()
-            .eraseToEffect()
-        }
+        await withTaskGroup(of: Void.self, body: { group in
+          imageURLs.forEach { url in
+            group.addTask(priority: .background) {
+              try? await environment.fileClient.removeItem(url)
+            }
+          }
+          debugPrint("removed items")
+        })
       }
       
     case let .composeNoticeResponse(.failure(error)):
@@ -493,20 +502,22 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return .none
       }
       let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
-      return environment.uiApplicationClient
-        .open(editURL, [:])
-        .fireAndForget()
+      return .fireAndForget {
+        _ = await environment.uiApplicationClient.open(editURL, [:])
+      }
+      
     }
   }
 )
 .binding()
 .onChange(of: \.contactState.contact) { contact, _, _, environment in
-  struct SaveDebounceId: Hashable {}
-  
-  return environment.fileClient
-    .saveContactSettings(contact, on: environment.backgroundQueue)
-    .fireAndForget()
-    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+  enum CancelID {}
+  return .fireAndForget {
+    try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try await environment.mainQueue.sleep(for: .seconds(0.3))
+      await environment.fileClient.saveContactSettings(contact)
+    }
+  }
 }
 
 // MARK: - Helper
@@ -620,25 +631,6 @@ public let mapperQueue = DispatchQueue(
   qos: .userInitiated,
   attributes: .concurrent
 )
-
-public extension FileClient {
-  func loadNotices(decoder: JSONDecoder = .noticeDecoder) -> Effect<Result<[Notice], NSError>, Never> {
-    load([Notice].self, from: noticesFileName, with: decoder)
-  }
-  
-  func saveNotices(
-    _ notices: [Notice]?,
-    on queue: AnySchedulerOf<DispatchQueue>,
-    encoder: JSONEncoder = .noticeEncoder
-  ) -> Effect<Never, Never> {
-    guard let notices = notices else {
-      return .none
-    }
-    return save(notices, to: noticesFileName, on: queue, with: encoder)
-  }
-}
-
-let noticesFileName = "notices"
 
 public extension SharedModels.NoticeInput {
   init(_ reportState: ReportState) {

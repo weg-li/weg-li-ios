@@ -8,22 +8,22 @@ import XCTest
 final class SettingsStoreTests: XCTestCase {
   var defaultEnvironment = SettingsEnvironment(
     uiApplicationClient: .init(
-      open: { _, _ in .none },
+      open: { _, _ in false },
       openSettingsURLString: { "" }
     ),
     keychainClient: .noop,
     mainQueue: .immediate
   )
   
-  func test_setOpenLicensesRow_shouldCallURL() {
-    var openedUrl: URL!
+  func test_setOpenLicensesRow_shouldCallURL() async {
+    let openedUrl = ActorIsolated<URL?>(nil)
     let settingsURL = "settings:weg-li//weg-li/settings"
     
     var env = defaultEnvironment
     env.uiApplicationClient.openSettingsURLString = { settingsURL }
-    env.uiApplicationClient.open = { url, _ in
-      openedUrl = url
-      return .init(value: true)
+    env.uiApplicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return true
     }
     
     let store = TestStore(
@@ -36,17 +36,19 @@ final class SettingsStoreTests: XCTestCase {
       environment: env
     )
     
-    store.send(.openLicensesRowTapped)
-    XCTAssertEqual(openedUrl, URL(string: settingsURL))
+    await store.send(.openLicensesRowTapped)
+    await openedUrl.withValue({ url in
+      XCTAssertEqual(url, URL(string: settingsURL))
+    })
   }
   
-  func test_setOpenImprintRow_shouldCallURL() {
-    var openedUrl: URL!
+  func test_setOpenImprintRow_shouldCallURL() async {
+    let openedUrl = ActorIsolated<URL?>(nil)
     
     var env = defaultEnvironment
-    env.uiApplicationClient.open = { url, _ in
-      openedUrl = url
-      return .init(value: true)
+    env.uiApplicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
     }
     
     let store = TestStore(
@@ -59,17 +61,19 @@ final class SettingsStoreTests: XCTestCase {
       environment: env
     )
     
-    store.send(.openImprintTapped)
-    XCTAssertEqual(openedUrl, env.imprintLink)
+    await store.send(.openImprintTapped)
+    await openedUrl.withValue({ [link = env.imprintLink] url in
+      XCTAssertEqual(url, link)
+    })
   }
   
-  func test_setOpenGitHubRow_shouldCallURL() {
-    var openedUrl: URL!
+  func test_setOpenGitHubRow_shouldCallURL() async {
+    let openedUrl = ActorIsolated<URL?>(nil)
     
     var env = defaultEnvironment
-    env.uiApplicationClient.open = { url, _ in
-      openedUrl = url
-      return .init(value: true)
+    env.uiApplicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
     }
     
     let store = TestStore(
@@ -82,17 +86,19 @@ final class SettingsStoreTests: XCTestCase {
       environment: env
     )
     
-    store.send(.openGitHubProjectTapped)
-    XCTAssertEqual(openedUrl, env.gitHubProjectLink)
+    await store.send(.openGitHubProjectTapped)
+    await openedUrl.withValue({ [link = env.gitHubProjectLink] url in
+      XCTAssertEqual(url, link)
+    })
   }
   
-  func test_donateTapped_shouldCallURL() {
-    var openedUrl: URL!
+  func test_donateTapped_shouldCallURL() async {
+    let openedUrl = ActorIsolated<URL?>(nil)
     
     var env = defaultEnvironment
-    env.uiApplicationClient.open = { url, _ in
-      openedUrl = url
-      return .init(value: true)
+    env.uiApplicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
     }
     
     let store = TestStore(
@@ -105,17 +111,19 @@ final class SettingsStoreTests: XCTestCase {
       environment: env
     )
     
-    store.send(.donateTapped)
-    XCTAssertEqual(openedUrl, env.donateLink)
+    await store.send(.donateTapped)
+    await openedUrl.withValue({ [link = env.donateLink] url in
+      XCTAssertEqual(url, link)
+    })
   }
   
-  func test_action_accountSettings_setApiToken_shouldPersistToken() {
+  func test_action_accountSettings_setApiToken_shouldPersistToken() async {
     var env = defaultEnvironment
     
-    var didWriteTokenToKeyChain = false
-    env.keychainClient.setString = { _, _, _ in
-      didWriteTokenToKeyChain = true
-      return .none
+    let didWriteTokenToKeyChain = ActorIsolated<Bool>(false)
+    env.keychainClient.setString = { @Sendable [self] _, _, _ in
+      await didWriteTokenToKeyChain.setValue(true)
+      return true
     }
     
     let store = TestStore(
@@ -128,19 +136,21 @@ final class SettingsStoreTests: XCTestCase {
       environment: env
     )
     
-    store.send(.accountSettings(.setApiToken("TOKEN"))) {
+    await store.send(.accountSettings(.setApiToken("TOKEN"))) {
       $0.accountSettingsState.accountSettings.apiToken = "TOKEN"
     }
-    XCTAssertTrue(didWriteTokenToKeyChain)
+    await didWriteTokenToKeyChain.withValue({ didWriteToKeychain in
+      XCTAssertTrue(didWriteToKeychain)
+    })
   }
   
-  func test_action_openUserSettings_shouldCallURL() {
-    var openedUrl: URL!
+  func test_action_openUserSettings_shouldCallURL() async {
+    let openedUrl = ActorIsolated<URL?>(nil)
     
     var env = defaultEnvironment
-    env.uiApplicationClient.open = { url, _ in
-      openedUrl = url
-      return .init(value: true)
+    env.uiApplicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
     }
     
     let store = TestStore(
@@ -153,7 +163,9 @@ final class SettingsStoreTests: XCTestCase {
       environment: env
     )
     
-    store.send(.accountSettings(.openUserSettings))
-    XCTAssertEqual(openedUrl, URL(string: "https://www.weg.li/user")!)
+    await store.send(.accountSettings(.openUserSettings))
+    await openedUrl.withValue({ url in
+      XCTAssertEqual(url, URL(string: "https://www.weg.li/user")!)
+    })
   }
 }

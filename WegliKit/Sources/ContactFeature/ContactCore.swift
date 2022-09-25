@@ -16,10 +16,8 @@ public struct ContactState: Equatable, Codable {
     self.alert = alert
   }
   
-  @BindableState
-  public var contact: Contact
-  @BindableState
-  public var alert: AlertState<ContactStateAction>?
+  @BindableState public var contact: Contact
+  @BindableState public var alert: AlertState<ContactStateAction>?
   
   public var isValid: Bool {
     [

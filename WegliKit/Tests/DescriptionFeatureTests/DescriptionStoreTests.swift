@@ -10,33 +10,33 @@ import XCTest
 final class DescriptionStoreTests: XCTestCase {
   let brand: CarBrand = .init("Opel")
   
-  func test_setCarColor_shouldUpdateState() {
+  func test_setCarColor_shouldUpdateState() async {
     let store = TestStore(
       initialState: DescriptionState(),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setColor(1)) { state in
+    await store.send(.setColor(1)) { state in
       state.selectedColor = 1
       
       XCTAssertEqual(DescriptionState.colors[1].value, "Beige")
     }
   }
   
-  func test_setCarType_shouldUpdateState() {
+  func test_setCarType_shouldUpdateState() async {
     let store = TestStore(
       initialState: DescriptionState(selectedColor: 1),
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setBrand(brand)) { state in
+    await store.send(.setBrand(brand)) { state in
       state.selectedBrand = self.brand
     }
   }
   
-  func test_setCarLicensePlate_shouldUpdateState() {
+  func test_setCarLicensePlate_shouldUpdateState() async {
     let store = TestStore(
       initialState: DescriptionState(
         licensePlateNumber: "",
@@ -47,12 +47,12 @@ final class DescriptionStoreTests: XCTestCase {
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
+    await store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
       state.licensePlateNumber = "WEG-LI-101"
     }
   }
   
-  func test_selectCharge_shouldUpdateState() {
+  func test_selectCharge_shouldUpdateState() async {
     let store = TestStore(
       initialState: DescriptionState(
         licensePlateNumber: "",
@@ -64,12 +64,12 @@ final class DescriptionStoreTests: XCTestCase {
     )
     
     let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
-    store.send(.setCharge(testCharge)) { state in
+    await store.send(.setCharge(testCharge)) { state in
       state.selectedCharge = testCharge
     }
   }
   
-  func test_selectDuration_shouldUpdateState() {
+  func test_selectDuration_shouldUpdateState() async {
     let store = TestStore(
       initialState: DescriptionState(
         licensePlateNumber: "",
@@ -80,12 +80,12 @@ final class DescriptionStoreTests: XCTestCase {
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setDuration(1)) { state in
+    await store.send(.setDuration(1)) { state in
       state.selectedDuration = 1
     }
   }
   
-  func test_setCarLicensePlate_shouldUpdateState_andSetItValid() {
+  func test_setCarLicensePlate_shouldUpdateState_andSetItValid() async {
     let store = TestStore(
       initialState: DescriptionState(
         licensePlateNumber: "",
@@ -99,14 +99,14 @@ final class DescriptionStoreTests: XCTestCase {
       environment: DescriptionEnvironment(backgroundQueue: .failing)
     )
     
-    store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
+    await store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
       state.licensePlateNumber = "WEG-LI-101"
       
       XCTAssertTrue(state.isValid)
     }
   }
   
-  func test_actionSetChargeTypeSearchText_shouldUpdateCharges() {
+  func test_actionSetChargeTypeSearchText_shouldUpdateCharges() async {
     let state = DescriptionState(
       licensePlateNumber: "",
       selectedColor: 1,
@@ -123,16 +123,16 @@ final class DescriptionStoreTests: XCTestCase {
       )
     )
     
-    store.send(.setChargeTypeSearchText("query")) {
+    await store.send(.setChargeTypeSearchText("query")) {
       $0.chargeTypeSearchText = "query"
     }
   }
   
-  func test_onAppear_shouldUpdateCharges() {
+  func test_onAppear_shouldUpdateCharges() async {
     var fileClient = FileClient.noop
     fileClient.load = { _ in
       .init(
-        value: try! JSONEncoder().encode(["0"])
+        try! JSONEncoder().encode(["0"])
       )
     }
     
@@ -160,22 +160,24 @@ final class DescriptionStoreTests: XCTestCase {
         isSelected: false
       )
     }
-    store.send(.onAppear)
-    store.receive(.favoriteChargesLoaded(.success(["0"]))) {
+    await store.send(.onAppear)
+    await store.receive(.favoriteChargesLoaded(.success(["0"]))) {
       $0.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
     }
-    store.receive(.sortFavoritedCharges) {
+    await store.receive(.sortFavoritedCharges) {
       let sortedCharges = charges.sorted(by: { $0.isFavorite && !$1.isFavorite })
       $0.charges = IdentifiedArrayOf(uniqueElements: sortedCharges, id: \.id)
     }
   }
   
-  func test_actionToggleChargeFavorite() {
-    var didWriteFiles = false
+  func test_actionToggleChargeFavorite() async {
+    let testQueue = DispatchQueue.test
+    
+    let didWriteFiles = ActorIsolated(false)
     var fileClient = FileClient.noop
-    fileClient.save = { fileName, _ in
-      didWriteFiles = fileName == "favorite-charge-Ids"
-      return .none
+    fileClient.save = { @Sendable fileName, _ in
+      await didWriteFiles.setValue(true)
+      return ()
     }
     
     var state = DescriptionState(
@@ -192,24 +194,27 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: descriptionReducer,
       environment: DescriptionEnvironment(
-        mainQueue: .immediate,
+        mainQueue: testQueue.eraseToAnyScheduler(),
         backgroundQueue: .immediate,
         fileClient: fileClient
       )
     )
     
-    store.send(.toggleChargeFavorite(charge2)) {
+    await store.send(.toggleChargeFavorite(charge2)) {
       $0.charges = [
         charge1,
         Charge(id: "2", text: "Text", isFavorite: true, isSelected: false)
       ]
     }
-    store.receive(.sortFavoritedCharges) {
+    
+    
+    
+    await testQueue.advance(by: .milliseconds(1001))
+    await store.receive(.sortFavoritedCharges) {
       $0.charges = [
         Charge(id: "2", text: "Text", isFavorite: true, isSelected: false),
         charge1
       ]
     }
-    XCTAssertTrue(didWriteFiles)
   }
 }

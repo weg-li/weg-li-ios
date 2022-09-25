@@ -117,9 +117,9 @@ public struct LocationView: View {
     .alert(
       store.scope(
         state: { $0.alert },
-        action: { _ in LocationViewAction.dismissAlertButtonTapped }
+        action: { _ in LocationViewAction.onDismissAlertButtonTapped }
       ),
-      dismiss: LocationViewAction.dismissAlertButtonTapped
+      dismiss: LocationViewAction.onDismissAlertButtonTapped
     )
     .onAppear { viewStore.send(.onAppear) }
   }
@@ -127,7 +127,9 @@ public struct LocationView: View {
   @ViewBuilder var addressView: some View {
     HStack(spacing: .grid(2)) {
       if viewStore.showActivityIndicator {
-        ActivityIndicator(style: .medium, color: .gray)
+        ProgressView {
+          Text("Suche Adresse ...")
+        }
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
         EmptyView()
       } else {
@@ -143,7 +145,7 @@ public struct LocationView: View {
   
   var expandMapButton: some View {
     Button(action: {
-      viewStore.send(.toggleMapExpanded)
+      viewStore.send(.onToggleMapExpandedTapped)
     }, label: {
       Image(systemName: viewStore.isMapExpanded
         ? "arrow.down.right.and.arrow.up.left"

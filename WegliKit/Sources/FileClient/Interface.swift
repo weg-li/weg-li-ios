@@ -1,5 +1,3 @@
-import Combine
-import ComposableArchitecture
 import Foundation
 import Helper
 import SharedModels
@@ -8,69 +6,71 @@ import SharedModels
 
 /// Client handling FileManager interactions
 public struct FileClient {
-  public var removeItem: (URL) -> Effect<Never, Error>
-  public var delete: (String) -> Effect<Never, Error>
-  public var load: (String) -> Effect<Data, Error>
-  public var save: (String, Data) -> Effect<Never, Error>
+  public var removeItem: @Sendable (URL) async throws -> Void
+  public var delete: @Sendable (String) async throws -> Void
+  public var load: @Sendable (String) async throws -> Data
+  public var save: @Sendable (String, Data) async throws -> Void
   
   public func load<A: Decodable>(
     _ type: A.Type,
     from fileName: String,
     with decoder: JSONDecoder = JSONDecoder()
-  ) -> Effect<Result<A, NSError>, Never> {
-    load(fileName)
-      .decode(type: A.self, decoder: decoder)
-      .mapError { $0 as NSError }
-      .catchToEffect()
+  ) async throws -> A {
+    let data = try await load(fileName)
+    return try data.decoded(decoder: decoder)
   }
   
   public func save<A: Encodable>(
-    _ data: A, to fileName: String,
-    on queue: AnySchedulerOf<DispatchQueue>,
+    _ data: A,
+    to fileName: String,
     with encoder: JSONEncoder = JSONEncoder()
-  ) -> Effect<Never, Never> {
-    Just(data)
-      .subscribe(on: queue)
-      .encode(encoder: encoder)
-      .flatMap { data in self.save(fileName, data) }
-      .ignoreFailure()
-      .eraseToEffect()
+  ) async -> Swift.Void {
+    Task(priority: .background) {
+      let data = try data.encoded(encoder: encoder)
+      try await self.save(fileName, data)
+    }
   }
 }
 
 // Convenience methods for UserSettings handling
 public extension FileClient {
-  func loadContactSettings() -> Effect<Result<Contact, NSError>, Never> {
-    load(Contact.self, from: contactSettingsFileName)
+  func loadContactSettings() async throws -> Contact {
+    try await load(Contact.self, from: contactSettingsFileName)
   }
 
-  func saveContactSettings(
-    _ contact: Contact, on queue: AnySchedulerOf<DispatchQueue>
-  ) -> Effect<Never, Never> {
-    save(contact, to: contactSettingsFileName, on: queue)
+  func saveContactSettings(_ contact: Contact) async -> Void {
+    await save(contact, to: contactSettingsFileName)
   }
   
-  func loadFavoriteCharges() -> Effect<Result<[String], NSError>, Never> {
-    load([String].self, from: favoriteChargesIdsFileName)
+  func loadFavoriteCharges() async throws -> [String] {
+    try await load([String].self, from: favoriteChargesIdsFileName)
   }
   
-  func saveFavoriteCharges(
-    _ favorites: [String], on queue: AnySchedulerOf<DispatchQueue>
-  ) -> Effect<Never, Never> {
-    save(favorites, to: favoriteChargesIdsFileName, on: queue)
+  func saveFavoriteCharges(_ favorites: [String]) async throws -> Void {
+    await save(favorites, to: favoriteChargesIdsFileName)
   }
   
-  func loadUserSettings() -> Effect<Result<UserSettings, NSError>, Never> {
-    load(UserSettings.self, from: userSettingsFilenName)
+  func loadUserSettings() async throws -> UserSettings {
+    try await load(UserSettings.self, from: userSettingsFilenName)
   }
   
-  func saveUserSettings(
-    _ settings: UserSettings, on queue: AnySchedulerOf<DispatchQueue>
-  ) -> Effect<Never, Never> {
-    save(settings, to: userSettingsFilenName, on: queue)
+  func saveUserSettings(_ settings: UserSettings) async -> Void {
+    await save(settings, to: userSettingsFilenName)
+  }
+  
+  func loadNotices(decoder: JSONDecoder = .noticeDecoder) async throws -> [Notice] {
+    try await load([Notice].self, from: noticesFileName, with: decoder)
+  }
+  
+  func saveNotices(_ notices: [Notice]?, encoder: JSONEncoder = .noticeEncoder) async throws -> Void {
+    guard let notices = notices else {
+      throw CancellationError()
+    }
+    return await save(notices, to: noticesFileName, with: encoder)
   }
 }
 
 let contactSettingsFileName = "contact-settings"
 let favoriteChargesIdsFileName = "favorite-charge-Ids"
 let userSettingsFilenName = "user-settings"
+let noticesFileName = "notices"

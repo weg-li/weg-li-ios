@@ -1,20 +1,19 @@
-import ComposableArchitecture
 import Foundation
 import KeychainSwift
 
 public struct KeychainClient {
-  public var getString: (String) -> Effect<String?, Never>
-  public var setString: (String, String, KeychainSwiftAccessOptions?) -> Effect<Bool, Never>
-  public var delete: (String) -> Effect<Bool, Never>
-  public var clear: () -> Effect<Bool, Never>
+  public var getString: @Sendable (String) async -> String?
+  public var setString: @Sendable (String, String, KeychainSwiftAccessOptions?) async -> Bool
+  public var delete: @Sendable (String) async -> Bool
+  public var clear: @Sendable () async -> Bool
   public var getToken: () -> String?
 
   public init(
-    getString: @escaping (String) -> Effect<String?, Never>,
-    setString: @escaping (String, String, KeychainSwiftAccessOptions?) -> Effect<Bool, Never>,
-    delete: @escaping (String) -> Effect<Bool, Never>,
-    clear: @escaping () -> Effect<Bool, Never>,
-    getToken: @escaping () -> String?
+    getString: @Sendable @escaping (String) async -> String?,
+    setString: @Sendable @escaping (String, String, KeychainSwiftAccessOptions?) async -> Bool,
+    delete: @Sendable @escaping (String) async -> Bool,
+    clear: @Sendable @escaping () async -> Bool,
+    getToken: @Sendable @escaping () -> String?
   ) {
     self.getString = getString
     self.setString = setString
@@ -23,14 +22,12 @@ public struct KeychainClient {
     self.getToken = getToken
   }
   
-  public func setApiToken(_ token: String) -> Effect<Bool, Never> {
-    setString(token, tokenKey, nil)
+  public func setApiToken(_ token: String) async -> Bool {
+    await setString(token, tokenKey, nil)
   }
   
-  public func getApiToken() -> Effect<Result<String?, NSError>, Never> {
-    getString(tokenKey)
-      .setFailureType(to: NSError.self)
-      .catchToEffect()
+  public func getApiToken() async -> String? {
+    await getString(tokenKey)
   }
 }
 

@@ -81,7 +81,7 @@ public enum DescriptionAction: BindableAction, Equatable {
   case setCarBrandSearchText(String)
   case toggleChargeFavorite(Charge)
   case sortFavoritedCharges
-  case favoriteChargesLoaded(Result<[String], NSError>)
+  case favoriteChargesLoaded(TaskResult<[String]>)
   case presentChargeSelectionView(Bool)
   case presentBrandSelectionView(Bool)
 }
@@ -109,8 +109,9 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     return .none
       
   case .onAppear:
-    return environment.fileClient.loadFavoriteCharges()
-      .map(DescriptionAction.favoriteChargesLoaded)
+    return .task {
+      await .favoriteChargesLoaded(TaskResult { try await environment.fileClient.loadFavoriteCharges() })
+    }
     
   case let .setLicensePlateNumber(value):
     state.licensePlateNumber = value
@@ -151,14 +152,16 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     }
     state.charges.update(charge, at: index)
       
+    let ids = state.charges.filter(\.isFavorite).map(\.id)
+    
     return .concatenate(
-      environment.fileClient.saveFavoriteCharges(
-        state.charges.filter(\.isFavorite).map(\.id),
-        on: environment.backgroundQueue
-      ).fireAndForget(),
-      Effect(value: .sortFavoritedCharges)
-        .delay(for: .seconds(0.7), scheduler: environment.mainQueue)
-        .eraseToEffect()
+      .task {
+        try await environment.mainQueue.sleep(for: .milliseconds(500))
+        return .sortFavoritedCharges
+      },
+      .fireAndForget(priority: .userInitiated) {
+        try await environment.fileClient.saveFavoriteCharges(ids)
+      }
     )
       
   case .sortFavoritedCharges:
@@ -166,7 +169,7 @@ public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, Des
     return .none
       
   case let .favoriteChargesLoaded(result):
-    let chargeIds = (try? result.get()) ?? []
+    let chargeIds = (try? result.value) ?? []
       
     let charges = DescriptionState.charges.map {
       Charge(

@@ -17,7 +17,7 @@ public enum UserLocationError: Error {
 
 // TCA uses Hashable structs for identifying effects
 struct LocationManagerId: Hashable {}
-struct CancelSearchId: Hashable {}
+enum CancelSearchId {}
 
 // MARK: - Location Core
 
@@ -62,9 +62,9 @@ public struct LocationViewState: Equatable, Codable {
 public enum LocationViewAction: Equatable {
   case onAppear
   case locationRequested
-  case toggleMapExpanded
-  case goToSettingsButtonTapped
-  case dismissAlertButtonTapped
+  case onToggleMapExpandedTapped
+  case onGoToSettingsButtonTapped
+  case onDismissAlertButtonTapped
   case setLocationOption(LocationOption)
   case updateRegion(CoordinateRegion?)
   case locationManager(LocationManager.Action)
@@ -138,11 +138,11 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       return .none
     }
     
-  case .dismissAlertButtonTapped:
+  case .onDismissAlertButtonTapped:
     state.alert = nil
     return .none
     
-  case .toggleMapExpanded:
+  case .onToggleMapExpandedTapped:
     state.isMapExpanded.toggle()
     return .none
     
@@ -214,13 +214,14 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     )
     
     return .task {
-      await .resolveAddressFinished(
-        TaskResult {
-          await environment.placeService.placemarks(clLocation)
-        }
-      )
+      await withTaskCancellation(id: CancelSearchId.self, cancelInFlight: true) {
+        await .resolveAddressFinished(
+          TaskResult {
+            await environment.placeService.placemarks(clLocation)
+          }
+        )
+      }
     }
-    .cancellable(id: CancelSearchId(), cancelInFlight: true)
         
   case let .resolveAddressFinished(.success(address)):
     state.isResolvingAddress = false
@@ -255,13 +256,11 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     }
     return .none
     
-  case .goToSettingsButtonTapped:
-    return URL(string: environment.uiApplicationClient.openSettingsURLString())
-      .map {
-        environment.uiApplicationClient.open($0, [:])
-          .fireAndForget()
-      }
-      ?? .none
+  case .onGoToSettingsButtonTapped:
+    return .fireAndForget {
+      guard let url = await URL(string: environment.uiApplicationClient.openSettingsURLString()) else { return }
+      _ = await environment.uiApplicationClient.open(url, [:])
+    }
   }
 }
 
@@ -284,7 +283,7 @@ public extension AlertState where Action == LocationViewAction {
     title: TextState(L10n.Location.Alert.provideAccessToLocationService),
     primaryButton: .default(
       TextState(L10n.Settings.title),
-      action: .send(.goToSettingsButtonTapped)
+      action: .send(.onGoToSettingsButtonTapped)
     ),
     secondaryButton: .default(TextState("OK"))
   )

@@ -73,7 +73,6 @@ public struct ApiError: Codable, Error, Equatable, LocalizedError {
     self.errorDump = string
     self.file = String(describing: file)
     self.line = line
-    // TODO: separate user facing from debug facing messages?
     self.message = String(describing: error)
   }
 

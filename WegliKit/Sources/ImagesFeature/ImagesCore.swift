@@ -71,7 +71,7 @@ public enum ImagesViewAction: Equatable {
   case requestPhotoLibraryAccess
   case requestPhotoLibraryAccessResult(PhotoLibraryAuthorizationStatus)
   case requestCameraAccess
-  case requestCameraAccessResult(Bool)
+  case requestCameraAccessResult(TaskResult<Bool>)
   case setImageCoordinate(CLLocationCoordinate2D?)
   case setImageCreationDate(Date?)
   case dismissAlert
@@ -164,14 +164,17 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .none
 
   case .requestCameraAccess:
-    return env.cameraAccessClient
-      .requestAuthorization()
-      .receive(on: env.mainQueue)
-      .map(ImagesViewAction.requestCameraAccessResult)
-      .eraseToEffect()
+    return .task {
+      await .requestCameraAccessResult(
+        TaskResult {
+          await env.cameraAccessClient.requestAuthorization()
+        }
+      )
+    }
 
-  case let .requestCameraAccessResult(success):
-    if success {
+  case let .requestCameraAccessResult(result):
+    let userDidGrantAccess = (try? result.value) ?? false
+    if userDidGrantAccess {
       return Effect(value: .setShowCamera(true))
     }
     return .none

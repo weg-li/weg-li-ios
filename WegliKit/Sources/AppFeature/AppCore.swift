@@ -76,9 +76,9 @@ public extension AppState {
 public enum AppAction: Equatable, BindableAction {
   case binding(BindingAction<AppState>)
   case appDelegate(AppDelegateAction)
-  case contactSettingsLoaded(Result<Contact, NSError>)
-  case userSettingsLoaded(Result<UserSettings, NSError>)
-  case storedApiTokenLoaded(Result<String?, NSError>)
+  case contactSettingsLoaded(TaskResult<Contact>)
+  case userSettingsLoaded(TaskResult<UserSettings>)
+  case storedApiTokenLoaded(TaskResult<String?>)
   case settings(SettingsAction)
   case report(ReportAction)
   case fetchNotices(forceReload: Bool)
@@ -117,7 +117,7 @@ public struct AppEnvironment {
   
   public let mainQueue: AnySchedulerOf<DispatchQueue>
   public let backgroundQueue: AnySchedulerOf<DispatchQueue>
-  public let fileClient: FileClient
+  public var fileClient: FileClient
   public let keychainClient: KeychainClient
   public var apiClient: APIClient
   public let wegliService: WegliAPIService
@@ -175,16 +175,33 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       return .none
       
     case .appDelegate:
-      return .merge(
-        .concatenate(
-          environment.fileClient.loadContactSettings()
-            .map(AppAction.contactSettingsLoaded),
-          environment.fileClient.loadUserSettings()
-            .map(AppAction.userSettingsLoaded),
-          environment.keychainClient.getApiToken()
-            .map(AppAction.storedApiTokenLoaded)
-        )
-      )
+      return .run { send in
+        await withThrowingTaskGroup(of: Void.self) { group in
+          group.addTask {
+            await send(
+              .contactSettingsLoaded(
+                TaskResult { try await environment.fileClient.loadContactSettings() }
+              )
+            )
+          }
+          
+          group.addTask {
+            await send(
+              .userSettingsLoaded(
+                TaskResult { try await environment.fileClient.loadUserSettings() }
+              )
+            )
+          }
+          
+          group.addTask {
+            await send(
+              .storedApiTokenLoaded(
+                TaskResult { await environment.keychainClient.getApiToken() }
+              )
+            )
+          }
+        }
+      }
       
     case .onAppear:
       let isTokenAvailable = !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty
@@ -195,18 +212,18 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       return Effect(value: .fetchNotices(forceReload: false))
       
     case let .contactSettingsLoaded(result):
-      let contact = (try? result.get()) ?? .init()
+      let contact = (try? result.value) ?? .init()
       state.settings.contact = .init(contact: contact, alert: nil)
       return .none
       
     case let .storedApiTokenLoaded(result):
-      let apiToken = (try? result.get()) ?? ""
+      let apiToken = (try? result.value) ?? ""
       state.settings.accountSettingsState.accountSettings.apiToken = apiToken
       state.reportDraft.apiToken = apiToken
       return .none
       
     case let .userSettingsLoaded(result):
-      let userSettings = (try? result.get()) ?? UserSettings(showsAllTextRecognitionSettings: false)
+      let userSettings = (try? result.value) ?? UserSettings(showsAllTextRecognitionSettings: false)
       state.settings.userSettings = userSettings
       state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
       return .none
@@ -214,7 +231,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     case .settings:
       return .none
       
-    // After the emailResult reports the mail has been sent the report will be stored.
+      // After the emailResult reports the mail has been sent the report will be stored.
     case .report(.mail(.setMailResult(.sent))):
       state.reportDraft.images.storedPhotos.forEach { image in
         _ = try? image?.imageUrl.flatMap { safeUrl in
@@ -234,10 +251,10 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
         location: .init()
       )
       return .none
-    
+      
     case .report:
       return .none
-        
+      
     case let .fetchNotices(forceReload):
       guard state.isNetworkAvailable else {
         state.alert = .noInternetConnection
@@ -262,13 +279,12 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .fetchNoticesResponse(.success(notices)):
       state.notices = notices.isEmpty
-        ? .empty(.emptyNotices())
-        : .results(notices)
+      ? .empty(.emptyNotices())
+      : .results(notices)
       
-      return environment.fileClient
-        .saveNotices(notices, on: environment.backgroundQueue)
-        .receive(on: environment.mainQueue)
-        .fireAndForget()
+      return .fireAndForget {
+        try await environment.fileClient.saveNotices(notices)
+      }
       
     case let .fetchNoticesResponse(.failure(error)):
       state.notices = .error(.loadingError(error: .init(error: error)))
@@ -285,61 +301,68 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       return .none
       
     case .observeConnection:
-      return Effect(environment.pathMonitorClient.networkPathPublisher)
-        .receive(on: environment.mainQueue)
-        .eraseToEffect()
-        .map(AppAction.observeConnectionResponse)
-        .cancellable(id: ObserveConnectionIdentifier())
+      return .run { send in
+        for await path in await environment.pathMonitorClient.networkPathPublisher() {
+          await send(.observeConnectionResponse(path))
+        }
+      }
+      .cancellable(id: ObserveConnectionIdentifier.self)
       
     case let .observeConnectionResponse(networkPath):
       state.isNetworkAvailable = networkPath.status == .satisfied
       return .none
-
+      
     case .dismissAlert:
       state.alert = nil
       return .none
     }
   }
 )
-.binding()
+  .binding()
 // store contact settings when changed in settings
-.onChange(of: \.reportDraft.contactState.contact) { contact, state, _, environment in
-  struct SaveDebounceId: Hashable {}
-  state.settings.contact.contact = contact
-
-  return environment.fileClient
-    .saveContactSettings(contact, on: environment.backgroundQueue)
-    .fireAndForget()
-    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
-}
+  .onChange(of: \.reportDraft.contactState.contact) { contact, state, _, environment in
+    enum CancelID {}
+    state.settings.contact.contact = contact
+    
+    return .fireAndForget {
+      await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+        try? await environment.mainQueue.sleep(for: .seconds(0.5))
+        await environment.fileClient.saveContactSettings(contact)
+      }
+    }
+  }
 // store contact settings when changed in report
-.onChange(of: \.settings.contact) { contact, state, _, environment in
-  struct SaveDebounceId: Hashable {}
-  state.reportDraft.contactState = contact
-
-  return environment.fileClient
-    .saveContactSettings(contact.contact, on: environment.backgroundQueue)
-    .fireAndForget()
-    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
-}
+  .onChange(of: \.settings.contact) { contact, state, _, environment in
+    enum CancelID {}
+    state.reportDraft.contactState = contact
+    
+    return .fireAndForget {
+      await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+        try? await environment.mainQueue.sleep(for: .seconds(0.5))
+        await environment.fileClient.saveContactSettings(contact.contact)
+      }
+    }
+  }
 // store usersettings when changed
-.onChange(of: \.settings.userSettings) { settings, state, _, environment in
-  struct SaveDebounceId: Hashable {}
-  state.reportDraft.images.showsAllTextRecognitionResults = settings.showsAllTextRecognitionSettings
-  
-  return environment.fileClient
-    .saveUserSettings(settings, on: environment.backgroundQueue)
-    .fireAndForget()
-    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
-}
-.onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, _ in
-  state.reportDraft.apiToken = accountSettings.apiToken
-  return .none
-}
+  .onChange(of: \.settings.userSettings) { settings, state, _, environment in
+    enum CancelID {}
+    state.reportDraft.images.showsAllTextRecognitionResults = settings.showsAllTextRecognitionSettings
+    
+    return .fireAndForget {
+      await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+        try? await environment.mainQueue.sleep(for: .seconds(0.5))
+        await environment.fileClient.saveUserSettings(settings)
+      }
+    }
+  }
+  .onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, _ in
+    state.reportDraft.apiToken = accountSettings.apiToken
+    return .none
+  }
 
 // MARK: Helper
 
-struct ObserveConnectionIdentifier: Hashable {}
+enum ObserveConnectionIdentifier {}
 
 extension AppState {
   static let preview = AppState()
