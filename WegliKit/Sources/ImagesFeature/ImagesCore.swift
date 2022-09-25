@@ -63,13 +63,13 @@ public struct ImagesViewState: Equatable, Codable {
 }
 
 public enum ImagesViewAction: Equatable {
+  case onAddPhotosButtonTapped
+  case onTakePhotosButtonTapped
   case setPhotos([PickerImageResult?])
-  case addPhotosButtonTapped
   case setShowImagePicker(Bool)
+  case setShowCamera(Bool)
   case requestPhotoLibraryAccess
   case requestPhotoLibraryAccessResult(PhotoLibraryAuthorizationStatus)
-  case takePhotosButtonTapped
-  case setShowCamera(Bool)
   case requestCameraAccess
   case requestCameraAccessResult(Bool)
   case setImageCoordinate(CLLocationCoordinate2D?)
@@ -85,7 +85,7 @@ public struct ImagesViewEnvironment {
   public var backgroundQueue: AnySchedulerOf<DispatchQueue>
   public var cameraAccessClient: CameraAccessClient
   public let photoLibraryAccessClient: PhotoLibraryAccessClient
-  public let textRecognitionClient: TextRecognitionClient
+  public var textRecognitionClient: TextRecognitionClient
   public let distanceFilter: Double = 50
   
   public init(
@@ -106,7 +106,7 @@ public struct ImagesViewEnvironment {
 /// Reducer handling actions from ImagesView combined with the single Image reducer.
 public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnvironment> { state, action, env in
   switch action {
-  case .addPhotosButtonTapped:
+  case .onAddPhotosButtonTapped:
     switch env.photoLibraryAccessClient.authorizationStatus() {
     case .notDetermined:
       return Effect(value: .requestPhotoLibraryAccess)
@@ -144,7 +144,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       return .none
     }
 
-  case .takePhotosButtonTapped:
+  case .onTakePhotosButtonTapped:
     switch env.cameraAccessClient.authorizationStatus() {
     case .authorized:
       return Effect(value: .setShowCamera(true))
@@ -154,7 +154,6 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     case .notDetermined:
       return Effect(value: .requestCameraAccess)
     case .restricted:
-      // TODO: How to handle this?
       return .none
     @unknown default:
       return .none
@@ -192,18 +191,28 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .merge(
       Effect(value: .setImageCoordinate(images.imageCoordinates.first)),
       Effect(value: .setImageCreationDate(images.imageCreationDates.first)),
-      .merge(
-        images.map { image in
-          Effect.task {
-            await ImagesViewAction.textRecognitionCompleted(
-              TaskResult {
-                try await Task.sleep(nanoseconds: NSEC_PER_SEC / 5)
-                return try await env.textRecognitionClient.recognizeText(image)
-              }
-            )
+      .task {
+        await withThrowingTaskGroup(of: [TextItem].self) { group in
+          for image in images {
+            group.addTask {
+              try await env.textRecognitionClient.recognizeText(image)
+            }
+          }
+          
+          do {
+            var results: [[TextItem]] = []
+            
+            for try await result in group {
+              results.append(result)
+            }
+            
+            let flattenedResults = results.flatMap { $0 }
+            return ImagesViewAction.textRecognitionCompleted(.success(flattenedResults))
+          } catch {
+            return ImagesViewAction.textRecognitionCompleted(.failure(error))
           }
         }
-      )
+      }
     )
     
   case let .textRecognitionCompleted(.success(items)):
@@ -301,7 +310,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return Effect.task {
       await ImagesViewAction.textRecognitionCompleted(
         TaskResult {
-          try await Task.sleep(nanoseconds: NSEC_PER_SEC / 5)
+          try await env.mainQueue.sleep(for: .milliseconds(200))
           return try await env.textRecognitionClient.recognizeText(image)
         }
       )
@@ -329,7 +338,7 @@ private func isMatches(_ regex: String, _ string: String) -> Bool {
   return false
 }
 
-private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$"
+private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$" // TODO: Do swift regex
 
 extension String {
   func withReplacedCharacters(_ characters: String, by separator: String) -> String {

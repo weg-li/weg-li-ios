@@ -248,7 +248,7 @@ final class ImagesStoreTests: XCTestCase {
       )
     )
     
-    await store.send(.addPhotosButtonTapped)
+    await store.send(.onAddPhotosButtonTapped)
     await store.receive(.requestPhotoLibraryAccess)
     await store.receive(.requestPhotoLibraryAccessResult(.authorized))
     await store.receive(.setShowImagePicker(true)) {
@@ -278,7 +278,7 @@ final class ImagesStoreTests: XCTestCase {
       )
     )
     
-    await store.send(.addPhotosButtonTapped)
+    await store.send(.onAddPhotosButtonTapped)
     await store.receive(.requestPhotoLibraryAccess)
     await store.receive(.requestPhotoLibraryAccessResult(.limited))
     await store.receive(.setShowImagePicker(true)) {
@@ -309,7 +309,7 @@ final class ImagesStoreTests: XCTestCase {
       )
     )
     
-    await store.send(.addPhotosButtonTapped)
+    await store.send(.onAddPhotosButtonTapped)
     await store.receive(.requestPhotoLibraryAccess)
     await store.receive(.requestPhotoLibraryAccessResult(.denied)) {
       $0.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
@@ -362,7 +362,7 @@ final class ImagesStoreTests: XCTestCase {
       )
     )
     
-    await store.send(.addPhotosButtonTapped)
+    await store.send(.onAddPhotosButtonTapped)
     await store.receive(.requestPhotoLibraryAccess)
     await store.receive(.requestPhotoLibraryAccessResult(.denied)) {
       $0.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))

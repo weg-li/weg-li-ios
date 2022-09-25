@@ -66,12 +66,16 @@ public struct ImageView: View {
               .padding()
             }
           } else {
-            ActivityIndicator(style: .medium, color: .gray)
+            ProgressView {
+              Text("Loading ...")
+            }
           }
         }
       
     } else {
-      ActivityIndicator(style: .medium, color: .gray)
+      ProgressView {
+        Text("Loading ...")
+      }
     }
   }
 }

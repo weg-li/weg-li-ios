@@ -33,7 +33,7 @@ final class CameraAccessTests: XCTestCase {
       )
     )
 
-    store.send(.takePhotosButtonTapped)
+    store.send(.onTakePhotosButtonTapped)
     store.receive(.requestCameraAccess)
     store.receive(.requestCameraAccessResult(true))
     store.receive(.setShowCamera(true)) {
