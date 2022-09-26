@@ -90,9 +90,9 @@ public struct LocationViewEnvironment {
     self.mainRunLoop = mainRunLoop
   }
   
-  public let locationManager: ComposableCoreLocation.LocationManager
-  public let placeService: PlacesServiceClient
-  public let uiApplicationClient: UIApplicationClient
+  public var locationManager: ComposableCoreLocation.LocationManager
+  public var placeService: PlacesServiceClient
+  public var uiApplicationClient: UIApplicationClient
   public var mainRunLoop: AnySchedulerOf<DispatchQueue>
 }
 
@@ -105,7 +105,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
         .create(id: LocationManagerId())
         .map(LocationViewAction.locationManager),
       environment.locationManager
-        .setup(id: LocationManagerId())
+        .setup()
         .fireAndForget()
     )
     
@@ -118,7 +118,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     case .notDetermined:
       state.isRequestingCurrentLocation = true
       return environment.locationManager
-        .requestWhenInUseAuthorization(id: LocationManagerId())
+        .requestWhenInUseAuthorization()
         .fireAndForget()
       
     case .restricted:
@@ -131,7 +131,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       
     case .authorizedAlways, .authorizedWhenInUse:
       return environment.locationManager
-        .startUpdatingLocation(id: LocationManagerId())
+        .startUpdatingLocation()
         .fireAndForget()
       
     @unknown default:
@@ -166,7 +166,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
          .didChangeAuthorization(.authorizedWhenInUse):
       if state.isRequestingCurrentLocation {
         return environment.locationManager
-          .requestLocation(id: LocationManagerId())
+          .requestLocation()
           .fireAndForget()
       }
       return .none
@@ -267,13 +267,17 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
 // MARK: - Utils
 
 extension LocationManager {
-  func setup(id: AnyHashable) -> Effect<Never, Never> {
+  /// Configures the LocationManager
+  func setup() -> Effect<Never, Never> {
     set(
-      id: id,
-      activityType: .other,
-      desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
-      distanceFilter: 100.0,
-      showsBackgroundLocationIndicator: true
+      .init(
+        activityType: .otherNavigation,
+        allowsBackgroundLocationUpdates: false,
+        desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
+        distanceFilter: 100,
+        pausesLocationUpdatesAutomatically: true,
+        showsBackgroundLocationIndicator: true
+      )
     )
   }
 }

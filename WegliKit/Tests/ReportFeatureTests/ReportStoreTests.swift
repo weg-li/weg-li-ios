@@ -51,7 +51,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -84,7 +84,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
@@ -120,7 +120,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -146,7 +146,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -191,12 +191,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: mainQueue.eraseToAnyScheduler(),
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(
-          authorizationStatus: { .authorizedAlways },
-          create: { _ in locationManagerSubject.eraseToEffect() },
-          locationServicesEnabled: { true },
-          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-        ),
+        locationManager: .failing,
         placeService: PlacesServiceClient(
           placemarks: { _ in [expectedAddress] }
         ),
@@ -206,6 +201,10 @@ final class ReportStoreTests: XCTestCase {
         date: Date.init
       )
     )
+    store.environment.locationManager.authorizationStatus = { .authorizedAlways }
+    store.environment.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+    store.environment.locationManager.locationServicesEnabled = { true }
+    store.environment.locationManager.set =  { _ in setSubject.eraseToEffect() }
     
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     
@@ -286,7 +285,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -334,7 +333,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -357,7 +356,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -395,7 +394,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -428,7 +427,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -478,7 +477,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -532,7 +531,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -594,7 +593,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -603,7 +602,7 @@ final class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.images(.image(id: "123", action: .removePhoto))) {
+    store.send(.images(.image(id: "123", action: .onRemovePhotoButtonTapped))) {
       $0.date = testDate()
       $0.images.storedPhotos = []
       $0.location.resolvedAddress = .init()
@@ -634,7 +633,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -643,7 +642,7 @@ final class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.resetButtonTapped) {
+    store.send(.onResetButtonTapped) {
       $0.alert = .resetReportAlert
     }
   }
@@ -671,7 +670,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -708,7 +707,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -745,7 +744,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -828,7 +827,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
@@ -838,7 +837,7 @@ final class ReportStoreTests: XCTestCase {
       )
     )
     
-    await store.send(.uploadImages) {
+    await store.send(.onUploadImagesButtonTapped) {
       $0.uploadProgressState = "Uploading images ..."
       $0.isUploadingNotice = true
     }

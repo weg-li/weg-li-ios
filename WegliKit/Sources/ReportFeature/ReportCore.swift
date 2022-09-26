@@ -142,13 +142,13 @@ public enum ReportAction: BindableAction, Equatable {
   case mail(MailViewAction)
   case mapAddressToDistrict(Address)
   case mapDistrictFinished(TaskResult<District>)
-  case resetButtonTapped
-  case resetConfirmButtonTapped
+  case onResetButtonTapped
+  case onUploadImagesButtonTapped
+  case onResetConfirmButtonTapped
   case setShowEditDescription(Bool)
   case setShowEditContact(Bool)
   case dismissAlert
   case setDate(Date)
-  case uploadImages
   case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
   case composeNoticeAndSend
   case composeNoticeResponse(TaskResult<Notice>)
@@ -319,7 +319,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return .none
       
       // Handle single image remove action to reset map annotations and reset valid state.
-      case .image(_, .removePhoto):
+      case .image(_, .onRemovePhotoButtonTapped):
         if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
           state.images.pickerResultCoordinate = nil
           state.location.pinCoordinate = nil
@@ -397,11 +397,11 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     case .contact, .description:
       return .none
       
-    case .resetButtonTapped:
+    case .onResetButtonTapped:
       state.alert = .resetReportAlert
       return .none
       
-    case .resetConfirmButtonTapped:
+    case .onResetConfirmButtonTapped:
       // Reset report will be handled in the homeReducer
       return Effect(value: .dismissAlert)
       
@@ -421,14 +421,14 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.date = date
       return .none
       
-    case .uploadImages:
+    case .onUploadImagesButtonTapped:
       guard state.isNetworkAvailable else {
         state.alert = .init(
           title: .init("Keine Internetverbindung"),
           message: .init("Verbinde dich mit dem Internet um die Meldung hochzuladen"),
           buttons: [
             .cancel(.init(L10n.cancel)),
-            .default(.init("Wiederholen"), action: .send(.uploadImages))
+            .default(.init("Wiederholen"), action: .send(.onUploadImagesButtonTapped))
           ]
         )
         return .none
@@ -574,7 +574,7 @@ public extension AlertState where Action == ReportAction {
     title: TextState(L10n.Report.Alert.title),
     primaryButton: .destructive(
       TextState(L10n.Report.Alert.reset),
-      action: .send(.resetConfirmButtonTapped)
+      action: .send(.onResetConfirmButtonTapped)
     ),
     secondaryButton: .cancel(
       .init(L10n.cancel),
@@ -586,7 +586,7 @@ public extension AlertState where Action == ReportAction {
     title: .init("Meldung hinzugefügt"),
     message: .init("Meldung wurde deinem Account hinzugefügt. Gehe zu `weg.li` um die Anzeige abzusenden (z.Z. noch nicht über die App möglich)"),
     buttons: [
-      .default(.init("Ok"), action: .send(.resetConfirmButtonTapped)),
+      .default(.init("Ok"), action: .send(.onResetConfirmButtonTapped)),
       .default(.init("Gehe zu `weg.li`"), action: .send(.editNoticeInBrowser))
     ]
   )

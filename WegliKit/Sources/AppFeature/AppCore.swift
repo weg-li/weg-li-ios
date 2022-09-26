@@ -242,7 +242,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
       return Effect(value: AppAction.reportSaved)
       
-    case .report(.resetConfirmButtonTapped):
+    case .report(.onResetConfirmButtonTapped):
       state.reportDraft = ReportState(
         uuid: environment.uuid,
         images: .init(),

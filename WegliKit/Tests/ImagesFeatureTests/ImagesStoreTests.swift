@@ -86,7 +86,7 @@ final class ImagesStoreTests: XCTestCase {
       ]
     }
     
-    await store.send(.image(id: pencilImage.id, action: .removePhoto)) {
+    await store.send(.image(id: pencilImage.id, action: .onRemovePhotoButtonTapped)) {
       $0.licensePlates = [
         TextItem(id: heartImage.id, text: "B MB 1985")
       ]
@@ -124,7 +124,7 @@ final class ImagesStoreTests: XCTestCase {
       )
     )
     
-    store.send(.image(id: id1, action: .removePhoto)) {
+    store.send(.image(id: id1, action: .onRemovePhotoButtonTapped)) {
       $0.storedPhotos = [storableImage2]
     }
   }

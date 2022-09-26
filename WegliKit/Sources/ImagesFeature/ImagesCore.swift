@@ -194,28 +194,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .merge(
       Effect(value: .setImageCoordinate(images.imageCoordinates.first)),
       Effect(value: .setImageCreationDate(images.imageCreationDates.first)),
-      .task {
-        await withThrowingTaskGroup(of: [TextItem].self) { group in
-          for image in images {
-            group.addTask {
-              try await env.textRecognitionClient.recognizeText(image)
-            }
-          }
-          
-          do {
-            var results: [[TextItem]] = []
-            
-            for try await result in group {
-              results.append(result)
-            }
-            
-            let flattenedResults = results.flatMap { $0 }
-            return ImagesViewAction.textRecognitionCompleted(.success(flattenedResults))
-          } catch {
-            return ImagesViewAction.textRecognitionCompleted(.failure(error))
-          }
-        }
-      }
+      .textRecognition(in: images, client: env.textRecognitionClient)
     )
     
   case let .textRecognitionCompleted(.success(items)):
@@ -269,7 +248,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     state.pickerResultDate = date
     return .none
     
-  case let .image(id, .removePhoto):
+  case let .image(id, .onRemovePhotoButtonTapped):
     // filter storedPhotos by image ID which removes the selected one.
     let photos = state.storedPhotos
       .compactMap { $0 }
@@ -299,7 +278,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     }
     return .merge(effects)
     
-  case let .image(id, .recognizeText):
+  case let .image(id, .onRecognizeTextButtonTapped):
     let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
     guard
       let image = unwrappedPhotos.first(where: { $0.id == id })
@@ -325,6 +304,39 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
   case .dismissAlert:
     state.alert = nil
     return .none
+  }
+}
+
+// MARK: Helper
+
+
+private extension Effect {
+  static func textRecognition(
+    in images: [PickerImageResult],
+    client: TextRecognitionClient
+  ) -> Effect<ImagesViewAction, Never> {
+    .task {
+      await withThrowingTaskGroup(of: [TextItem].self) { group in
+        for image in images {
+          group.addTask {
+            try await client.recognizeText(image)
+          }
+        }
+        
+        do {
+          var results: [[TextItem]] = []
+          
+          for try await result in group {
+            results.append(result)
+          }
+          
+          let flattenedResults = results.flatMap { $0 }
+          return ImagesViewAction.textRecognitionCompleted(.success(flattenedResults))
+        } catch {
+          return ImagesViewAction.textRecognitionCompleted(.failure(error))
+        }
+      }
+    }
   }
 }
 

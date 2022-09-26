@@ -126,7 +126,7 @@ final class AppStoreTests: XCTestCase {
       environment: defaultAppEnvironment()
     )
     
-    store.send(.report(.resetConfirmButtonTapped)) {
+    store.send(.report(.onResetConfirmButtonTapped)) {
       $0.reportDraft = ReportState(
         uuid: self.fixedUUID,
         images: .init(),
@@ -203,7 +203,7 @@ final class AppStoreTests: XCTestCase {
       $0.notices = .empty(.emptyNotices())
       XCTAssertFalse($0.isFetchingNotices)
     }
-    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 2)
     await didSaveNotices.withValue({ value in
       XCTAssertTrue(value)
     })

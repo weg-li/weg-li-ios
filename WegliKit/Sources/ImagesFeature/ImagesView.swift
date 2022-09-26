@@ -37,15 +37,14 @@ public struct ImagesView: View {
             .font(.subheadline)
             .foregroundColor(Color(.label))
             .padding(.bottom, .grid(1))
-          if viewStore.isRecognizingTexts {
-            ActivityIndicator(style: .medium, color: .gray)
-          }
         }
         if viewStore.state.licensePlates.isEmpty {
           Text("Keine")
             .italic()
             .font(.callout)
             .foregroundColor(Color(.secondaryLabel))
+        } else if viewStore.isRecognizingTexts {
+          ActivityIndicator(style: .medium, color: .gray)
         } else {
           VStack {
             ScrollView(.horizontal) {

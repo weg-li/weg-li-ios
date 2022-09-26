@@ -127,7 +127,8 @@ public struct LocationView: View {
   @ViewBuilder var addressView: some View {
     HStack(spacing: .grid(2)) {
       if viewStore.showActivityIndicator {
-        ProgressView {
+        HStack {
+          ProgressView()
           Text("Suche Adresse ...")
         }
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {

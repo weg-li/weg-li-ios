@@ -38,7 +38,7 @@ public extension FileClient {
     try await load(Contact.self, from: contactSettingsFileName)
   }
 
-  func saveContactSettings(_ contact: Contact) async -> Void {
+  func saveContactSettings(_ contact: Contact) async {
     await save(contact, to: contactSettingsFileName)
   }
   
@@ -46,7 +46,7 @@ public extension FileClient {
     try await load([String].self, from: favoriteChargesIdsFileName)
   }
   
-  func saveFavoriteCharges(_ favorites: [String]) async throws -> Void {
+  func saveFavoriteCharges(_ favorites: [String]) async throws {
     await save(favorites, to: favoriteChargesIdsFileName)
   }
   
@@ -54,7 +54,7 @@ public extension FileClient {
     try await load(UserSettings.self, from: userSettingsFilenName)
   }
   
-  func saveUserSettings(_ settings: UserSettings) async -> Void {
+  func saveUserSettings(_ settings: UserSettings) async {
     await save(settings, to: userSettingsFilenName)
   }
   
@@ -62,7 +62,7 @@ public extension FileClient {
     try await load([Notice].self, from: noticesFileName, with: decoder)
   }
   
-  func saveNotices(_ notices: [Notice]?, encoder: JSONEncoder = .noticeEncoder) async throws -> Void {
+  func saveNotices(_ notices: [Notice]?, encoder: JSONEncoder = .noticeEncoder) async throws {
     guard let notices = notices else {
       throw CancellationError()
     }
