@@ -138,7 +138,7 @@ final class ContactStoreTests: XCTestCase {
       environment: ContactEnvironment()
     )
 
-    store.send(.resetContactDataButtonTapped) {
+    store.send(.onResetContactDataButtonTapped) {
       $0.alert = .resetContactDataAlert
     }
   }
@@ -150,7 +150,7 @@ final class ContactStoreTests: XCTestCase {
       environment: ContactEnvironment()
     )
 
-    store.send(.resetContactConfirmButtonTapped) {
+    store.send(.onResetContactConfirmButtonTapped) {
       $0 = .empty
     }
     store.receive(.dismissAlert)

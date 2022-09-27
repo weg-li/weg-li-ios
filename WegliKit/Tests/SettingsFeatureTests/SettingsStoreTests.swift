@@ -29,7 +29,6 @@ final class SettingsStoreTests: XCTestCase {
     let store = TestStore(
       initialState: SettingsState(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
       reducer: settingsReducer,
@@ -54,7 +53,6 @@ final class SettingsStoreTests: XCTestCase {
     let store = TestStore(
       initialState: SettingsState(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
       reducer: settingsReducer,
@@ -79,7 +77,6 @@ final class SettingsStoreTests: XCTestCase {
     let store = TestStore(
       initialState: SettingsState(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
       reducer: settingsReducer,
@@ -104,7 +101,6 @@ final class SettingsStoreTests: XCTestCase {
     let store = TestStore(
       initialState: SettingsState(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
       reducer: settingsReducer,
@@ -129,7 +125,6 @@ final class SettingsStoreTests: XCTestCase {
     let store = TestStore(
       initialState: SettingsState(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
       reducer: settingsReducer,
@@ -156,7 +151,6 @@ final class SettingsStoreTests: XCTestCase {
     let store = TestStore(
       initialState: SettingsState(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
       reducer: settingsReducer,

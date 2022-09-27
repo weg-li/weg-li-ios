@@ -32,7 +32,7 @@ public enum Tabs: Hashable {
 public struct AppState: Equatable {
   /// Settings
   public var settings: SettingsState
-  
+  public var contact: Contact = .empty
   public var notices: ContentState<[Notice], AppAction>
   
   /// Holds a report that has not been stored or sent via mail
@@ -51,8 +51,7 @@ public struct AppState: Equatable {
   
   public var isFetchingNotices: Bool { notices == .loading }
   
-  @BindableState
-  public var selectedTab: Tabs = .notice
+  @BindableState public var selectedTab: Tabs = .notice
   
   public var alert: AlertState<AppAction>?
 }
@@ -61,7 +60,6 @@ public extension AppState {
   init(
     settings: SettingsState = .init(
       accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-      contact: .empty,
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
     notices: ContentState<[Notice], AppAction> = .loading
@@ -213,7 +211,8 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case let .contactSettingsLoaded(result):
       let contact = (try? result.value) ?? .init()
-      state.settings.contact = .init(contact: contact, alert: nil)
+      state.contact = contact
+      state.reportDraft.contactState.contact = contact
       return .none
       
     case let .storedApiTokenLoaded(result):
@@ -246,10 +245,14 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.reportDraft = ReportState(
         uuid: environment.uuid,
         images: .init(),
-        contactState: state.settings.contact,
+        contactState: .init(contact: state.contact),
         date: environment.date,
         location: .init()
       )
+      return .none
+      
+    case .report(.contact):
+      state.contact = state.reportDraft.contactState.contact
       return .none
       
     case .report:
@@ -295,7 +298,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       state.reportDraft = ReportState(
         uuid: environment.uuid,
         images: .init(),
-        contactState: state.settings.contact,
+        contactState: .init(contact: state.contact),
         date: environment.date
       )
       return .none
@@ -318,47 +321,33 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
     }
   }
 )
-  .binding()
+.binding()
 // store contact settings when changed in settings
-  .onChange(of: \.reportDraft.contactState.contact) { contact, state, _, environment in
+.onChange(of: \.contact) { contact, state, _, environment in
+  .fireAndForget {
     enum CancelID {}
-    state.settings.contact.contact = contact
-    
-    return .fireAndForget {
-      await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-        try? await environment.mainQueue.sleep(for: .seconds(0.5))
-        await environment.fileClient.saveContactSettings(contact)
-      }
+    await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try? await environment.mainQueue.sleep(for: .seconds(0.5))
+      await environment.fileClient.saveContactSettings(contact)
     }
   }
-// store contact settings when changed in report
-  .onChange(of: \.settings.contact) { contact, state, _, environment in
-    enum CancelID {}
-    state.reportDraft.contactState = contact
-    
-    return .fireAndForget {
-      await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-        try? await environment.mainQueue.sleep(for: .seconds(0.5))
-        await environment.fileClient.saveContactSettings(contact.contact)
-      }
-    }
-  }
+}
 // store usersettings when changed
-  .onChange(of: \.settings.userSettings) { settings, state, _, environment in
+.onChange(of: \.settings.userSettings) { settings, state, _, environment in
+  state.reportDraft.images.showsAllTextRecognitionResults = settings.showsAllTextRecognitionSettings
+  
+  return .fireAndForget {
     enum CancelID {}
-    state.reportDraft.images.showsAllTextRecognitionResults = settings.showsAllTextRecognitionSettings
-    
-    return .fireAndForget {
-      await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-        try? await environment.mainQueue.sleep(for: .seconds(0.5))
-        await environment.fileClient.saveUserSettings(settings)
-      }
+    await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try? await environment.mainQueue.sleep(for: .seconds(0.5))
+      await environment.fileClient.saveUserSettings(settings)
     }
   }
-  .onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, _ in
-    state.reportDraft.apiToken = accountSettings.apiToken
-    return .none
-  }
+}
+.onChange(of: \.settings.accountSettingsState.accountSettings) { accountSettings, state, _, _ in
+  state.reportDraft.apiToken = accountSettings.apiToken
+  return .none
+}
 
 // MARK: Helper
 
@@ -377,7 +366,6 @@ extension Store where State == AppState, Action == AppAction {
     initialState: .init(
       settings: .init(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init()
       ),
       notices: .results(.placeholder)

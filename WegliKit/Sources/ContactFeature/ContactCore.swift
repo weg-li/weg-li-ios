@@ -39,8 +39,8 @@ public struct ContactState: Equatable, Codable {
 
 public enum ContactStateAction: Equatable {
   case contact(ContactAction)
-  case resetContactDataButtonTapped
-  case resetContactConfirmButtonTapped
+  case onResetContactDataButtonTapped
+  case onResetContactConfirmButtonTapped
   case dismissAlert
   case onDisappear
 }
@@ -62,10 +62,10 @@ public let contactViewReducer = Reducer<ContactState, ContactStateAction, Contac
     switch action {
     case .contact:
       return .none
-    case .resetContactDataButtonTapped:
+    case .onResetContactDataButtonTapped:
       state.alert = .resetContactDataAlert
       return .none
-    case .resetContactConfirmButtonTapped:
+    case .onResetContactConfirmButtonTapped:
       state.contact = .empty
       return Effect(value: .dismissAlert)
     case .dismissAlert:
@@ -96,7 +96,7 @@ public extension AlertState where Action == ContactStateAction {
     title: TextState(L10n.Contact.Alert.title),
     primaryButton: .destructive(
       TextState(L10n.Contact.Alert.reset),
-      action: .send(.resetContactConfirmButtonTapped)
+      action: .send(.onResetContactConfirmButtonTapped)
     ),
     secondaryButton: .cancel(.init(L10n.cancel), action: .send(.dismissAlert))
   )

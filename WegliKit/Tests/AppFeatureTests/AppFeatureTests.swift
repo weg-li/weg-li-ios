@@ -84,41 +84,19 @@ final class AppStoreTests: XCTestCase {
     let newContact: ContactState = .preview
     
     await store.send(
-      .settings(
-        .contact(
-          .contact(.set(\.$firstName, newContact.contact.firstName))
-        )
-      )
-    ) {
-      $0.reportDraft.contactState.contact.firstName = newContact.contact.firstName
-      $0.settings.contact.contact.firstName = newContact.contact.firstName
-    }
-  }
-  
-  func test_updateReport_ShouldUpdateState() async {
-    let store = TestStore(
-      initialState: AppState(),
-      reducer: appReducer,
-      environment: defaultAppEnvironment()
-    )
-    
-    let newContact: ContactState = .preview
-    
-    await store.send(
       .report(
         .contact(
           .contact(.set(\.$firstName, newContact.contact.firstName))
         )
       )
     ) {
-      $0.settings.contact.contact.firstName = newContact.contact.firstName
       $0.reportDraft.contactState.contact.firstName = newContact.contact.firstName
+      $0.contact.firstName = newContact.contact.firstName
     }
   }
     
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
-    var state = AppState(reportDraft: report)
-    state.settings.contact = .preview
+    let state = AppState(reportDraft: report)
     
     let store = TestStore(
       initialState: state,
@@ -131,7 +109,7 @@ final class AppStoreTests: XCTestCase {
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(
-          contact: state.settings.contact.contact,
+          contact: .empty,
           alert: nil
         ),
         date: self.fixedDate
@@ -143,8 +121,7 @@ final class AppStoreTests: XCTestCase {
   func test_ActionStoredApiTokenLoaded() async {
     let mainQueue = DispatchQueue.test
     
-    var state = AppState(reportDraft: report)
-    state.settings.contact = .preview
+    let state = AppState(reportDraft: report)
     
     let token = "API Token"
     var keychainClient = KeychainClient.noop
@@ -162,9 +139,9 @@ final class AppStoreTests: XCTestCase {
         wegliService: wegliService
       )
     )
-    store.environment.fileClient.load = { @Sendable [contact = state.settings.contact.contact, user = state.settings.userSettings] key in
+    store.environment.fileClient.load = { @Sendable [user = state.settings.userSettings] key in
       if key == "contact-settings" {
-        return try! contact.encoded()
+        return try! Contact.preview.encoded()
       }
       if key == "user-settings" {
         return try! user.encoded()
@@ -173,17 +150,21 @@ final class AppStoreTests: XCTestCase {
     }
     
     await store.send(.appDelegate(.didFinishLaunching))
-    await store.receive(.contactSettingsLoaded(.success(report.contactState.contact)))
+    await mainQueue.advance(by: 0.5)
+    await store.receive(.contactSettingsLoaded(.success(.preview))) {
+      $0.contact = .preview
+      $0.reportDraft.contactState.contact = .preview
+    }
     await store.receive(.userSettingsLoaded(.success(state.settings.userSettings)))
-    await store.receive(.storedApiTokenLoaded(.success(token)), timeout: 200) {
+    await store.receive(.storedApiTokenLoaded(.success(token))) {
       $0.reportDraft.apiToken = token
       $0.settings.accountSettingsState.accountSettings.apiToken = token
     }
+    await store.finish()
   }
   
   func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() async {
-    var state = AppState(reportDraft: report)
-    state.settings.contact = .preview
+    let state = AppState(reportDraft: report)
     
     let didSaveNotices = ActorIsolated(false)
     
@@ -211,7 +192,6 @@ final class AppStoreTests: XCTestCase {
   
   func test_ActionOnAccountSettings_shouldPersistAccountsSettings() async {
     var state = AppState(reportDraft: report)
-    state.settings.contact = .preview
     
     let store = TestStore(
       initialState: state,
@@ -237,9 +217,9 @@ final class AppStoreTests: XCTestCase {
       reducer: appReducer,
       environment: defaultAppEnvironment(wegliService: service)
     )
-    store.environment.fileClient.load = { @Sendable [contact = state.settings.contact.contact] key in
+    store.environment.fileClient.load = { @Sendable key in
       if key == "contact-settings" {
-        return try! contact.encoded()
+        return try! Contact.preview.encoded()
       }
       fatalError()
     }

@@ -12,22 +12,18 @@ import UIKit
 public struct SettingsState: Equatable {
   public init(
     accountSettingsState: AccountSettingsState,
-    contact: ContactState,
     userSettings: UserSettings
   ) {
     self.accountSettingsState = accountSettingsState
-    self.contact = contact
     self.userSettings = userSettings
   }
   
   public var accountSettingsState: AccountSettingsState
-  public var contact: ContactState
   public var userSettings: UserSettings
 }
 
 public enum SettingsAction: Equatable {
   case accountSettings(AccountSettingsAction)
-  case contact(ContactStateAction)
   case userSettings(UserSettingsAction)
   case openLicensesRowTapped
   case openImprintTapped
@@ -65,11 +61,6 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
       AccountSettingsEnvironment(uiApplicationClient: parent.uiApplicationClient)
     }
   ),
-  contactViewReducer.pullback(
-    state: \.contact,
-    action: /SettingsAction.contact,
-    environment: { _ in ContactEnvironment() }
-  ),
   userSettingsReducer.pullback(
     state: \.userSettings,
     action: /SettingsAction.userSettings,
@@ -100,7 +91,7 @@ public let settingsReducer = Reducer<SettingsState, SettingsAction, SettingsEnvi
       return .fireAndForget {
         _ = await env.uiApplicationClient.open(env.donateLink, [:])
       }
-    case .contact, .userSettings:
+    case .userSettings:
       return .none
     }
   }
