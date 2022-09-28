@@ -1,14 +1,13 @@
 import Combine
-import ComposableArchitecture
 import CoreLocation
 import SharedModels
 
 public struct PlacesServiceClient {
-  public init(placemarks: @escaping (CLLocation) -> Effect<[Address], PlacesServiceError>) {
+  public init(placemarks: @escaping (CLLocation) async -> [Address]) {
     self.placemarks = placemarks
   }
   
-  public var placemarks: (CLLocation) -> Effect<[Address], PlacesServiceError>
+  public var placemarks: (CLLocation) async -> [Address]
 }
 
 public struct PlacesServiceError: Equatable, Error {

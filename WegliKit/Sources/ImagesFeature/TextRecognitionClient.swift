@@ -14,62 +14,70 @@ public struct TextItem: Identifiable, Hashable {
 }
 
 public struct TextRecognitionClient {
-  public var recognizeText: (PickerImageResult) -> Effect<[TextItem], VisionError>
+  public var recognizeText: (PickerImageResult) async throws -> [TextItem]
   
-  public init(recognizeText: @escaping (PickerImageResult) -> Effect<[TextItem], VisionError>) {
+  public init(recognizeText: @escaping (PickerImageResult) async throws -> [TextItem]) {
     self.recognizeText = recognizeText
-  }
-
-  public func recognizeText(
-    in image: PickerImageResult,
-    on queue: AnySchedulerOf<DispatchQueue>
-  ) -> Effect<[TextItem], VisionError> {
-    recognizeText(image)
-      .subscribe(on: queue)
-      .eraseToEffect()
   }
 }
 
 public extension TextRecognitionClient {
   static let live = Self(
     recognizeText: { image in
-      .future { callback in
-        guard let cgImage = image.asUIImage?.cgImage else {
-          callback(.failure(.missingCGImage))
-          return
-        }
-          
-        // Create a new image-request handler.
-        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-          
-        // Create a new request to recognize text.
-        let request = VNRecognizeTextRequest { request, _ in
-          guard let observations = request.results as? [VNRecognizedTextObservation] else {
-            callback(.failure(.init(message: "Observations can not be casted to VNRecognizedTextObservation")))
-            return
+      guard let cgImage = image.asUIImage?.cgImage else {
+        throw VisionError.missingCGImage
+      }
+      
+      // Create a new image-request handler.
+      let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+      
+      let task = Task(priority: .userInitiated) {
+        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<[TextItem], Error>) in
+          performRequest(with: cgImage, imageId: image.id) { request, error in
+            if let error = error {
+              cont.resume(throwing: error)
+            } else {
+              guard let observations = request.results as? [VNRecognizedTextObservation] else {
+                cont.resume(throwing: VisionError(message: "No results"))
+                return
+              }
+              
+              let textItems = observations
+                .compactMap { $0.topCandidates(1).first }
+                .map { TextItem(id: image.id, text: $0.string) }
+              
+              cont.resume(returning: textItems)
+            }
           }
-          let textItems = observations
-            .compactMap { $0.topCandidates(1).first }
-            .map { TextItem(id: image.id, text: $0.string) }
-          callback(.success(textItems))
-        }
-          
-        request.recognitionLanguages = ["de", "en"]
-        request.recognitionLevel = .accurate
-          
-        do {
-          try requestHandler.perform([request])
-        } catch {
-          callback(.failure(.init(message: error.localizedDescription)))
         }
       }
+      
+      return try await task.value
     }
   )
 }
 
+private func performRequest(
+  with image: CGImage,
+  imageId: String,
+  completion: @escaping VNRequestCompletionHandler
+) {
+  let newHandler = VNImageRequestHandler(cgImage: image)
+  
+  let newRequest = VNRecognizeTextRequest(completionHandler: completion)
+  newRequest.recognitionLevel = .accurate
+  newRequest.recognitionLanguages = ["de", "en"]
+  
+  do {
+    try newHandler.perform([newRequest])
+  } catch {
+    completion(newRequest, error)
+  }
+}
+
 public extension TextRecognitionClient {
   static let noop = Self(
-    recognizeText: { _ in .none }
+    recognizeText: { _ in [] }
   )
 }
 

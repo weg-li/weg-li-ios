@@ -1,12 +1,11 @@
 import ApiClient
-import ComposableArchitecture
 import Foundation
 import SharedModels
 
 public struct ImagesUploadClient {
-  public var uploadImages: ([UploadImageRequest]) -> Effect<Result<[ImageUploadResponse], NSError>, Never>
+  public var uploadImages: ([UploadImageRequest]) async throws -> [ImageUploadResponse]
   
-  public init(uploadImages: @escaping ([UploadImageRequest]) -> Effect<Result<[ImageUploadResponse], NSError>, Never>) {
+  public init(uploadImages: @escaping ([UploadImageRequest]) async throws -> [ImageUploadResponse]) {
     self.uploadImages = uploadImages
   }
 }

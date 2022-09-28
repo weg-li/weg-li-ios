@@ -19,8 +19,8 @@ public struct ImageState: Hashable, Identifiable {
 }
 
 public enum ImageAction: Equatable {
-  case removePhoto
-  case recognizeText
+  case onRemovePhotoButtonTapped
+  case onRecognizeTextButtonTapped
 }
 
 public struct ImageEnvironment {}
@@ -28,10 +28,10 @@ public struct ImageEnvironment {}
 /// Reducer handling actions from a single ImageView.
 public let imageReducer = Reducer<ImageState, ImageAction, ImageEnvironment> { _, action, _ in
   switch action {
-  case .removePhoto:
+  case .onRemovePhotoButtonTapped:
     return .none
     
-  case .recognizeText:
+  case .onRecognizeTextButtonTapped:
     return .none
   }
 }

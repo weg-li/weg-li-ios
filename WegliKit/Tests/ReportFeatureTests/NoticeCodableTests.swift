@@ -2,6 +2,7 @@ import Foundation
 import SharedModels
 import XCTest
 
+@MainActor
 final class NoticeCodingTests: XCTestCase {
   func test_noticeDecoding() throws {
     let rawValue = """

@@ -5,7 +5,8 @@ import MailFeature
 import MessageUI
 import XCTest
 
-class MailStoreTests: XCTestCase {
+@MainActor
+final class MailStoreTests: XCTestCase {
   func test_presentMailViewAction_shouldUpdateState() {
     let store = TestStore(
       initialState: MailViewState(

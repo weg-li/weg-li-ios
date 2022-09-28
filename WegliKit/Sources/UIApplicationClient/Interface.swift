@@ -1,15 +1,14 @@
-import ComposableArchitecture
 import UIKit.UIApplication
 
 public struct UIApplicationClient {
+  public var open: @Sendable (URL, [UIApplication.OpenExternalURLOptionsKey: Any]) async -> Bool
+  public var openSettingsURLString: @Sendable () async -> String
+  
   public init(
-    open: @escaping (URL, [UIApplication.OpenExternalURLOptionsKey: Any]) -> Effect<Bool, Never>,
-    openSettingsURLString: @escaping () -> String
+    open: @escaping @Sendable (URL, [UIApplication.OpenExternalURLOptionsKey : Any]) async -> Bool,
+    openSettingsURLString: @escaping @Sendable () async -> String
   ) {
     self.open = open
     self.openSettingsURLString = openSettingsURLString
   }
-  
-  public var open: (URL, [UIApplication.OpenExternalURLOptionsKey: Any]) -> Effect<Bool, Never>
-  public var openSettingsURLString: () -> String
 }

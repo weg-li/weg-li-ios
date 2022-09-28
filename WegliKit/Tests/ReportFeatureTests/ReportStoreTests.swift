@@ -11,17 +11,21 @@ import ImagesUploadClient
 import LocationFeature
 import MapKit
 import PlacesServiceClient
+import RegulatoryOfficeMapper
 import ReportFeature
 import SharedModels
 import XCTest
 
-class ReportStoreTests: XCTestCase {
+@MainActor
+final class ReportStoreTests: XCTestCase {
   let fixedUUID = { UUID(uuidString: "de71ce00-dead-beef-dead-beefdeadbeef")! }
   let fixedDate = { Date() }
   
   let districs = DistrictFixtures.districts
   
   var report: ReportState!
+  
+  let mainQueue = DispatchQueue.test
   
   override func setUp() {
     super.setUp()
@@ -47,7 +51,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -65,13 +69,13 @@ class ReportStoreTests: XCTestCase {
   
   // MARK: - Reducer integration tests
   
-  func test_updateContact_shouldUpdateState_andWriteContactToFile() {
-    var didWriteContactToFile = false
+  func test_updateContact_shouldUpdateState_andWriteContactToFile() async {
+    let didWriteContactToFile = ActorIsolated(false)
     
     var fileClient = FileClient.noop
-    fileClient.save = { fileName, _ in
-      didWriteContactToFile = fileName == "contact-settings"
-      return .none
+    fileClient.save = { @Sendable fileName, _ in
+      await didWriteContactToFile.setValue(fileName == "contact-settings")
+      return ()
     }
     
     let store = TestStore(
@@ -80,7 +84,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
@@ -93,17 +97,20 @@ class ReportStoreTests: XCTestCase {
     let lastName = "ROSS"
     let city = "Rosstown"
     
-    store.send(.contact(.contact(.set(\.$firstName, firstName)))) {
+    await store.send(.contact(.contact(.set(\.$firstName, firstName)))) {
       $0.contactState.contact.firstName = firstName
     }
-    store.send(.contact(.contact(.set(\.$name, lastName)))) {
+    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+    await store.send(.contact(.contact(.set(\.$name, lastName)))) {
       $0.contactState.contact.name = lastName
     }
-    store.send(.contact(.contact(.set(\.address.$city, city)))) {
+    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+    await store.send(.contact(.contact(.set(\.address.$city, city)))) {
       $0.contactState.contact.address.city = city
     }
-    
-    XCTAssertTrue(didWriteContactToFile)
+    await didWriteContactToFile.withValue({ value in
+      XCTAssertTrue(value)
+    })
   }
   
   func test_updateCar_shouldUpdateState() {
@@ -113,7 +120,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -139,7 +146,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -158,7 +165,7 @@ class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_updateImages_shouldTriggerAddressResolve() {
+  func test_updateImages_shouldTriggerAddressResolve() async {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
   
@@ -181,17 +188,12 @@ class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: reportReducer,
       environment: ReportEnvironment(
-        mainQueue: .immediate,
+        mainQueue: mainQueue.eraseToAnyScheduler(),
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(
-          authorizationStatus: { .authorizedAlways },
-          create: { _ in locationManagerSubject.eraseToEffect() },
-          locationServicesEnabled: { true },
-          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-        ),
+        locationManager: .failing,
         placeService: PlacesServiceClient(
-          placemarks: { _ in Effect(value: [expectedAddress]) }
+          placemarks: { _ in [expectedAddress] }
         ),
         regulatoryOfficeMapper: .live(),
         fileClient: .noop,
@@ -199,6 +201,10 @@ class ReportStoreTests: XCTestCase {
         date: Date.init
       )
     )
+    store.environment.locationManager.authorizationStatus = { .authorizedAlways }
+    store.environment.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+    store.environment.locationManager.locationServicesEnabled = { true }
+    store.environment.locationManager.set =  { _ in setSubject.eraseToEffect() }
     
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     
@@ -209,36 +215,40 @@ class ReportStoreTests: XCTestCase {
       creationDate: creationDate
     )
 
-    store.send(.images(.setPhotos([storedImage]))) {
+    await store.send(.images(.setPhotos([storedImage]))) {
       $0.images.isRecognizingTexts = true
       var images = self.report.images.storedPhotos
       images.append(storedImage)
       $0.images.storedPhotos = images
     }
-    store.receive(.images(.setImageCoordinate(coordinate))) {
+    await store.receive(.images(.setImageCoordinate(coordinate))) {
       $0.images.pickerResultCoordinate = coordinate
       
       $0.location.region = CoordinateRegion(center: coordinate)
       $0.location.pinCoordinate = coordinate
       $0.images.pickerResultCoordinate = coordinate
     }
-    store.receive(.images(.setImageCreationDate(creationDate))) {
+    await store.receive(.images(.setImageCreationDate(creationDate))) {
       $0.images.pickerResultDate = creationDate
       $0.date = creationDate
     }
-    store.receive(.images(.textRecognitionCompleted(.failure(.missingCGImage)))) {
-      $0.images.isRecognizingTexts = false
-    }
-    store.receive(.location(.resolveLocation(coordinate))) {
+    
+    await store.receive(.location(.resolveLocation(coordinate))) {
       $0.location.isResolvingAddress = true
     }
-    store.receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+    await mainQueue.advance(by: 1)
+    
+    await store.receive(.images(.textRecognitionCompleted(.failure(VisionError.missingCGImage)))) {
+      $0.images.isRecognizingTexts = false
+    }
+    
+    await store.receive(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.isResolvingAddress = false
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
     
-    store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
       $0.district = expectedDistrict
     }
     
@@ -275,7 +285,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -323,7 +333,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -338,7 +348,7 @@ class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() {
+  func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() async {
     let store = TestStore(
       initialState: report,
       reducer: reportReducer,
@@ -346,7 +356,7 @@ class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -361,11 +371,11 @@ class ReportStoreTests: XCTestCase {
       city: "Berlin"
     )
     
-    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+    await store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.success(districs[0]))) {
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }
   }
@@ -384,7 +394,7 @@ class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -407,16 +417,9 @@ class ReportStoreTests: XCTestCase {
         ]
       )
     }
-//    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
-//      $0.location.resolvedAddress = expectedAddress
-//    }
-//    store.receive(.mapAddressToDistrict(expectedAddress))
-//    store.receive(.mapDistrictFinished(.success(districs[0]))) {
-//      $0.district = self.districs[0]
-//    }
   }
   
-  func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() {
+  func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() async {
     let store = TestStore(
       initialState: report,
       reducer: reportReducer,
@@ -424,7 +427,7 @@ class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -439,16 +442,14 @@ class ReportStoreTests: XCTestCase {
       city: "Hamburg"
     )
     
-    store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
+    await store.send(.location(.resolveAddressFinished(.success([expectedAddress])))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.failure(.unableToMatchRegularityOffice))) {
-      $0.district = nil
-    }
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(TaskResult.failure(RegularityOfficeMapError.unableToMatchRegularityOffice)))
   }
   
-  func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() {
+  func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() async {
     let store = TestStore(
       initialState: ReportState(
         uuid: fixedUUID,
@@ -476,7 +477,7 @@ class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -492,19 +493,17 @@ class ReportStoreTests: XCTestCase {
     
     let newPostalCode = "12437"
     
-    store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
+    await store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
       $0.location.resolvedAddress = Address(
         street: "",
         postalCode: newPostalCode, city: ""
       )
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.failure(.unableToMatchRegularityOffice))) {
-      $0.district = nil
-    }
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(TaskResult.failure(RegularityOfficeMapError.unableToMatchRegularityOffice)))
   }
   
-  func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() {
+  func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() async {
     let store = TestStore(
       initialState: ReportState(
         uuid: fixedUUID,
@@ -532,7 +531,7 @@ class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -548,11 +547,11 @@ class ReportStoreTests: XCTestCase {
     )
     
     let newPostalCode = "12437"
-    store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
+    await store.send(.location(.updateGeoAddressPostalCode(newPostalCode))) {
       $0.location.resolvedAddress = expectedAddress
     }
-    store.receive(.mapAddressToDistrict(expectedAddress))
-    store.receive(.mapDistrictFinished(.success(districs[0]))) {
+    await store.receive(.mapAddressToDistrict(expectedAddress))
+    await store.receive(.mapDistrictFinished(.success(districs[0]))) {
       $0.district = self.districs[0]
     }
   }
@@ -594,7 +593,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -603,7 +602,7 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.images(.image(id: "123", action: .removePhoto))) {
+    store.send(.images(.image(id: "123", action: .onRemovePhotoButtonTapped))) {
       $0.date = testDate()
       $0.images.storedPhotos = []
       $0.location.resolvedAddress = .init()
@@ -634,7 +633,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -643,7 +642,7 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.resetButtonTapped) {
+    store.send(.onResetButtonTapped) {
       $0.alert = .resetReportAlert
     }
   }
@@ -671,7 +670,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -708,7 +707,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -745,7 +744,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -760,7 +759,7 @@ class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_action_uploadImages() {
+  func test_action_uploadImages() async {
     let responses: [ImageUploadResponse] = [
       .init(
         id: 1,
@@ -785,22 +784,16 @@ class ReportStoreTests: XCTestCase {
         directUpload: .init(url: "321", headers: [:])
       )
     ]
-    let imagesUploadClient = ImagesUploadClient(uploadImages: { _ in
-      Just(Result.success(responses))
-        .eraseToEffect()
-    })
+    let imagesUploadClient = ImagesUploadClient(uploadImages: { _ in responses })
     
     var wegliService = WegliAPIService.noop
-    wegliService.postNotice = { _ in
-      Just(Result.success(Notice.mock))
-        .eraseToEffect()
-    }
+    wegliService.postNotice = { _ in .mock }
     
-    var didRemoveImageItems = false
+    let didRemoveImageItems = ActorIsolated(false)
     var fileClient = FileClient.noop
-    fileClient.removeItem = { _ in
-      didRemoveImageItems = true
-      return .none
+    fileClient.removeItem = { @Sendable _ in
+      await didRemoveImageItems.setValue(true)
+      return ()
     }
     
     let store = TestStore(
@@ -834,7 +827,7 @@ class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
@@ -844,23 +837,26 @@ class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.uploadImages) {
+    await store.send(.onUploadImagesButtonTapped) {
       $0.uploadProgressState = "Uploading images ..."
       $0.isUploadingNotice = true
     }
-    store.receive(.uploadImagesResponse(.success(responses))) {
+    await store.receive(.uploadImagesResponse(.success(responses))) {
       $0.uploadedImagesIds = ["111", "222"]
     }
-    store.receive(.composeNoticeAndSend) {
+    await store.receive(.composeNoticeAndSend) {
       $0.uploadProgressState = "Sending notice ..."
     }
-    store.receive(.composeNoticeResponse(.success(.mock))) {
+    await store.receive(.composeNoticeResponse(.success(.mock))) {
       $0.isUploadingNotice = false
       $0.alert = .reportSent
       $0.uploadedImagesIds = []
       $0.uploadProgressState = nil
       $0.uploadedNoticeID = Notice.mock.id
     }
-    XCTAssertTrue(didRemoveImageItems)
+    await didRemoveImageItems.withValue({ value in
+      XCTAssertTrue(value)
+    })
+    
   }
 }

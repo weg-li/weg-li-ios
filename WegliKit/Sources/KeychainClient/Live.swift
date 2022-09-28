@@ -1,5 +1,4 @@
 import Combine
-import ComposableArchitecture
 import Foundation
 import KeychainSwift
 
@@ -10,16 +9,16 @@ public extension KeychainClient {
     
     return Self(
       getString: { key in
-        Effect(Just(keychain.get(key)))
+        keychain.get(key)
       },
       setString: { value, key, options in
-        Effect(Just(keychain.set(value, forKey: key, withAccess: options)))
+        keychain.set(value, forKey: key, withAccess: options)
       },
       delete: { key in
-        Effect(Just(keychain.delete(key)))
+        keychain.delete(key)
       },
       clear: {
-        Effect(Just(keychain.clear()))
+        keychain.clear()
       },
       getToken: { keychain.get(tokenKey) }
     )

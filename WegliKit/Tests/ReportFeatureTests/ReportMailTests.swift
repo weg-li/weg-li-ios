@@ -2,7 +2,8 @@ import CustomDump
 import ReportFeature
 import XCTest
 
-class ReportMailTests: XCTestCase {
+@MainActor
+final class ReportMailTests: XCTestCase {
   func test_MailGeneration() {
     let date = Date(timeIntervalSinceReferenceDate: 0)
     

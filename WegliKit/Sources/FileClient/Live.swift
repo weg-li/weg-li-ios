@@ -10,40 +10,36 @@ public extension FileClient {
 
     return Self(
       removeItem: { url in
-        .fireAndForget {
-          try? FileManager.default.removeItem(at: url)
-        }
+        try? FileManager.default.removeItem(at: url)
       },
       delete: { fileName in
-        .fireAndForget {
-          try? FileManager.default.removeItem(
-            at:
+        try? FileManager.default.removeItem(
+          at:
             documentDirectory
-              .appendingPathComponent(fileName)
-              .appendingPathExtension("json")
-          )
-        }
+            .appendingPathComponent(fileName)
+            .appendingPathExtension(fileExtensionType)
+        )
       },
       load: { fileName in
-        .catching {
-          try Data(
-            contentsOf:
+        try Data(
+          contentsOf:
             documentDirectory
-              .appendingPathComponent(fileName)
-              .appendingPathExtension("json")
-          )
-        }
+            .appendingPathComponent(fileName)
+            .appendingPathExtension(fileExtensionType)
+        )
       },
       save: { fileName, data in
-        .fireAndForget {
+        Task {
           _ = try? data.write(
             to:
-            documentDirectory
+              documentDirectory
               .appendingPathComponent(fileName)
-              .appendingPathExtension("json")
+              .appendingPathExtension(fileExtensionType)
           )
         }
       }
     )
   }
 }
+
+let fileExtensionType = "json"

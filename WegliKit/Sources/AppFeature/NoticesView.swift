@@ -18,8 +18,10 @@ public struct NoticesView: View {
     Group {
       switch viewStore.notices {
       case .loading:
-        ActivityIndicator(style: .medium, color: .gray)
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        ProgressView {
+          Text("Loading ...")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       case let .results(notices):
         List(notices) { notice in
           NoticeView(notice: notice)

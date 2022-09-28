@@ -24,24 +24,6 @@ public struct APIClient {
   /// Dispatches a Request and returns a publisher
   /// - Parameter request: Request to Dispatch
   /// - Returns: A publisher containing decoded data or an error
-  public func dispatch<R: APIRequest>(_ request: R) -> AnyPublisher<Data, NetworkRequestError> {
-    guard var urlRequest = try? request.makeRequest() else {
-      return Fail(
-        outputType: Data.self,
-        failure: NetworkRequestError.badRequest
-      )
-      .eraseToAnyPublisher()
-    }
-    addToken(to: &urlRequest)
-    
-    return networkDispatcher()
-      .dispatch(request: urlRequest)
-      .eraseToAnyPublisher()
-  }
-  
-  /// Dispatches a Request and returns a publisher
-  /// - Parameter request: Request to Dispatch
-  /// - Returns: A publisher containing decoded data or an error
   public func dispatch<R: APIRequest>(_ request: R) async throws -> Data {
     guard var urlRequest = try? request.makeRequest() else {
       throw NetworkRequestError.badRequest

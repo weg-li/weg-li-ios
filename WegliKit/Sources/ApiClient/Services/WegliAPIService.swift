@@ -1,5 +1,4 @@
 import Combine
-import ComposableArchitecture
 import Foundation
 import Helper
 import SharedModels
@@ -7,14 +6,14 @@ import SharedModels
 // Interface
 /// A Service to send a single notice and all persisted notices from the weg-li API
 public struct WegliAPIService {
-  public var getNotices: (Bool) -> Effect<[Notice], ApiError>
-  public var postNotice: (NoticeInput) -> Effect<Result<Notice, ApiError>, Never>
-  public var upload: (UploadImageRequest) async throws -> ImageUploadResponse
+  public var getNotices: @Sendable (Bool) async throws -> [Notice]
+  public var postNotice: @Sendable (NoticeInput) async throws -> Notice
+  public var upload: @Sendable (UploadImageRequest) async throws -> ImageUploadResponse
 
   public init(
-    getNotices: @escaping (Bool) -> Effect<[Notice], ApiError>,
-    postNotice: @escaping (NoticeInput) -> Effect<Result<Notice, ApiError>, Never>,
-    upload: @escaping (UploadImageRequest) async throws -> ImageUploadResponse
+    getNotices: @Sendable @escaping (Bool) async throws -> [Notice],
+    postNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
+    upload: @Sendable @escaping (UploadImageRequest) async throws -> ImageUploadResponse
   ) {
     self.getNotices = getNotices
     self.postNotice = postNotice
@@ -28,28 +27,24 @@ public extension WegliAPIService {
       getNotices: { forceReload in
         let request = GetNoticesRequest(forceReload: forceReload)
         
-        return apiClient.dispatch(request)
-          .decode(
-            type: GetNoticesRequest.ResponseDataType.self,
-            decoder: JSONDecoder.noticeDecoder
-          )
-          .mapError { ApiError(error: $0) }
-          .eraseToEffect()
+        let data = try await apiClient.dispatch(request)
+        
+        return try JSONDecoder.noticeDecoder.decode(
+          GetNoticesRequest.ResponseDataType.self,
+          from: data
+        )
       },
       postNotice: { input in
         let noticePutRequestBody = NoticePutRequestBody(notice: input)
         let body = try? JSONEncoder.noticeEncoder.encode(noticePutRequestBody)
         
         let request = SubmitNoticeRequest(body: body)
+        let data = try await apiClient.dispatch(request)
         
-        return apiClient.dispatch(request)
-          .decode(
-            type: SubmitNoticeRequest.ResponseDataType.self,
-            decoder: JSONDecoder.noticeDecoder
-          )
-          .mapError { ApiError(error: $0) }
-          .catchToEffect()
-          .eraseToEffect()
+        return try JSONDecoder.noticeDecoder.decode(
+          SubmitNoticeRequest.ResponseDataType.self,
+          from: data
+        )
       },
       upload: { imageUploadRequest in
         let responseData = try await apiClient.dispatch(imageUploadRequest)
@@ -62,15 +57,10 @@ public extension WegliAPIService {
 public extension WegliAPIService {
   static let noop = Self(
     getNotices: { _ in
-      Just([Notice.mock])
-        .setFailureType(to: ApiError.self)
-        .eraseToEffect()
+      [Notice.mock]
     },
     postNotice: { _ in
-      Just(.mock)
-        .setFailureType(to: ApiError.self)
-        .catchToEffect()
-        .eraseToEffect()
+      .mock
     },
     upload: { _ in
       ImageUploadResponse(
@@ -92,13 +82,10 @@ public extension WegliAPIService {
   
   static let failing = Self(
     getNotices: { _ in
-      Fail(error: ApiError(error: NetworkRequestError.invalidRequest))
-        .eraseToEffect()
+      throw ApiError(error: NetworkRequestError.invalidRequest)
     },
     postNotice: { _ in
-      Fail(error: ApiError(error: NetworkRequestError.invalidRequest))
-        .catchToEffect()
-        .eraseToEffect()
+      throw ApiError(error: NetworkRequestError.invalidRequest)
     },
     upload: { _ in
       throw NetworkRequestError.badRequest

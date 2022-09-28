@@ -177,7 +177,7 @@ public struct ContactView: View {
   private var resetButton: some View {
     let isButtonDisabled = viewStore.state == .empty
     return Button(
-      action: { viewStore.send(.resetContactDataButtonTapped) },
+      action: { viewStore.send(.onResetContactDataButtonTapped) },
       label: {
         Image(systemName: "arrow.counterclockwise")
           .foregroundColor(isButtonDisabled ? .gray : .red)

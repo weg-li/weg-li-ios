@@ -11,9 +11,10 @@ import SharedModels
 import UIApplicationClient
 import XCTest
 
-class LocationStoreTests: XCTestCase {
+@MainActor
+final class LocationStoreTests: XCTestCase {
   /// if location service enabled, test that locationOption selection triggers location request and address resolve
-  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve() {
+  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve() async {
     var didRequestInUseAuthorization = false
     var didRequestLocation = false
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
@@ -25,25 +26,26 @@ class LocationStoreTests: XCTestCase {
       city: Contact.preview.address.city
     )
     
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .notDetermined },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
-        requestWhenInUseAuthorization: { _ in
-          .fireAndForget { didRequestInUseAuthorization = true }
-        },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
-      placeService: PlacesServiceClient(placemarks: { _ in Effect(value: [expectedAddress]) }),
-      uiApplicationClient: .noop, mainRunLoop: .immediate
-    )
+    func env() -> LocationViewEnvironment {
+      var locationManager: LocationManager = .failing
+      locationManager.authorizationStatus = { .notDetermined }
+      locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+      locationManager.locationServicesEnabled = { true }
+      locationManager.requestLocation = { .fireAndForget { didRequestLocation = true } }
+      locationManager.requestWhenInUseAuthorization = { .fireAndForget { didRequestInUseAuthorization = true } }
+      locationManager.set = { _ in setSubject.eraseToEffect() }
+      
+      return LocationViewEnvironment(
+        locationManager: locationManager,
+        placeService: PlacesServiceClient(placemarks: { _ in [expectedAddress] }),
+        uiApplicationClient: .noop, mainRunLoop: .immediate
+      )
+    }
     
     let store = TestStore(
       initialState: LocationViewState(),
       reducer: locationReducer,
-      environment: env
+      environment: env()
     )
     
     let currentLocation = Location(
@@ -56,34 +58,31 @@ class LocationStoreTests: XCTestCase {
       verticalAccuracy: 0
     )
     
-    store.send(.onAppear)
-    // simulate user decision of segmented control
-    store.send(.setLocationOption(.currentLocation)) {
+    await store.send(.onAppear)
+    await store.send(.setLocationOption(.currentLocation)) {
       $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
-    store.receive(.locationRequested) {
+    await store.receive(.locationRequested) {
       $0.isRequestingCurrentLocation = true
     }
     XCTAssertTrue(didRequestInUseAuthorization)
     // Simulate being given authorized to access location
     locationManagerSubject.send(.didChangeAuthorization(.authorizedAlways))
     
-    store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
+    await store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
     XCTAssertTrue(didRequestLocation)
     // Simulate finding the user's current location
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
-    store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
+    await store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
       $0.isRequestingCurrentLocation = false
       $0.region = CoordinateRegion(
         center: currentLocation.coordinate
       )
     }
-    store.receive(.resolveLocation(currentLocation.coordinate)) {
-      $0.isResolvingAddress = true
-    }
-    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+    await store.receive(.resolveLocation(currentLocation.coordinate))
+    await store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }
@@ -99,16 +98,14 @@ class LocationStoreTests: XCTestCase {
     )
     locationManagerSubject.send(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst]))
     
-    store.receive(.locationManager(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst]))) {
-      $0.isRequestingCurrentLocation = false
-    }
+    await store.receive(.locationManager(.didUpdateLocations([locationWithVeryLittleDistanceChangeFromFirst])))
     
     setSubject.send(completion: .finished)
     locationManagerSubject.send(completion: .finished)
   }
   
   /// if location service enabled, test that locationOption selection triggers location request and address resolve
-  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve_whenANewLocationIsFurtherAway() {
+  func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve_whenANewLocationIsFurtherAway() async {
     var didRequestInUseAuthorization = false
     var didRequestLocation = false
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
@@ -120,20 +117,19 @@ class LocationStoreTests: XCTestCase {
       city: Contact.preview.address.city
     )
     
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .notDetermined },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
-        requestWhenInUseAuthorization: { _ in
-          .fireAndForget { didRequestInUseAuthorization = true }
-        },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
-      placeService: PlacesServiceClient(placemarks: { _ in Effect(value: [expectedAddress]) }),
+    var env = LocationViewEnvironment(
+      locationManager: .failing,
+      placeService: PlacesServiceClient(placemarks: { _ in [expectedAddress] }),
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
+    env.locationManager.authorizationStatus = { .notDetermined }
+    env.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+    env.locationManager.locationServicesEnabled = { true }
+    env.locationManager.requestLocation = { .fireAndForget { didRequestLocation = true } }
+    env.locationManager.requestWhenInUseAuthorization = {
+        .fireAndForget { didRequestInUseAuthorization = true }
+    }
+    env.locationManager.set = { _ in setSubject.eraseToEffect() }
     
     let store = TestStore(
       initialState: LocationViewState(),
@@ -151,34 +147,32 @@ class LocationStoreTests: XCTestCase {
       verticalAccuracy: 0
     )
     
-    store.send(.onAppear)
+    await store.send(.onAppear)
     // simulate user decision of segmented control
-    store.send(.setLocationOption(.currentLocation)) {
+    await store.send(.setLocationOption(.currentLocation)) {
       $0.isResolvingAddress = true
       $0.locationOption = .currentLocation
     }
-    store.receive(.locationRequested) {
+    await store.receive(.locationRequested) {
       $0.isRequestingCurrentLocation = true
     }
     XCTAssertTrue(didRequestInUseAuthorization)
     // Simulate being given authorized to access location
     locationManagerSubject.send(.didChangeAuthorization(.authorizedAlways))
     
-    store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
+    await store.receive(.locationManager(.didChangeAuthorization(.authorizedAlways)))
     XCTAssertTrue(didRequestLocation)
     // Simulate finding the user's current location
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
-    store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
+    await store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
       $0.isRequestingCurrentLocation = false
       $0.region = CoordinateRegion(
         center: currentLocation.coordinate
       )
     }
-    store.receive(.resolveLocation(currentLocation.coordinate)) {
-      $0.isResolvingAddress = true
-    }
-    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+    await store.receive(.resolveLocation(currentLocation.coordinate))
+    await store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }
@@ -194,14 +188,14 @@ class LocationStoreTests: XCTestCase {
     )
     locationManagerSubject.send(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))
     
-    store.receive(.locationManager(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))) {
+    await store.receive(.locationManager(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))) {
       $0.isRequestingCurrentLocation = false
       $0.region = .init(center: locationWithBiggerDistanceChangeFromFirst.coordinate)
     }
-    store.receive(.resolveLocation(locationWithBiggerDistanceChangeFromFirst.coordinate)) {
+    await store.receive(.resolveLocation(locationWithBiggerDistanceChangeFromFirst.coordinate)) {
       $0.isResolvingAddress = true
     }
-    store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
+    await store.receive(.resolveAddressFinished(.success([expectedAddress]))) {
       $0.isResolvingAddress = false
       $0.resolvedAddress = expectedAddress
     }
@@ -215,16 +209,16 @@ class LocationStoreTests: XCTestCase {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
     
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .denied },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { false },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
+    var env = LocationViewEnvironment(
+      locationManager: .failing,
       placeService: .noop,
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
+    env.locationManager.authorizationStatus = { .denied }
+    env.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+    env.locationManager.locationServicesEnabled = { false }
+    env.locationManager.set = { _ in setSubject.eraseToEffect() }
+    
     let store = TestStore(
       initialState: LocationViewState(),
       reducer: locationReducer,
@@ -251,19 +245,17 @@ class LocationStoreTests: XCTestCase {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
     
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .notDetermined },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        requestWhenInUseAuthorization: { _ in
-          .fireAndForget { didRequestInUseAuthorization = true }
-        },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
+    var env = LocationViewEnvironment(
+      locationManager: .failing,
       placeService: .noop,
       uiApplicationClient: .noop, mainRunLoop: .immediate
     )
+    env.locationManager.authorizationStatus = { .notDetermined }
+    env.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+    env.locationManager.locationServicesEnabled = { true }
+    env.locationManager.requestWhenInUseAuthorization = { .fireAndForget { didRequestInUseAuthorization = true } }
+    env.locationManager.set = { _ in setSubject.eraseToEffect() }
+    
     let store = TestStore(
       initialState: LocationViewState(),
       reducer: locationReducer,
@@ -291,7 +283,7 @@ class LocationStoreTests: XCTestCase {
     locationManagerSubject.send(completion: .finished)
   }
   
-  func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() {
+  func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() async {
     let store = TestStore(
       initialState: LocationViewState(
         locationOption: .manual,
@@ -301,7 +293,7 @@ class LocationStoreTests: XCTestCase {
       ),
       reducer: locationReducer,
       environment: LocationViewEnvironment(
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         uiApplicationClient: .noop, mainRunLoop: .immediate
       )
@@ -311,27 +303,27 @@ class LocationStoreTests: XCTestCase {
     let newPostalCode = Contact.preview.address.postalCode
     let newCity = Contact.preview.address.city
     
-    store.send(.updateGeoAddressStreet(newStreet)) {
+    await store.send(.updateGeoAddressStreet(newStreet)) {
       $0.resolvedAddress.street = newStreet
       XCTAssertFalse($0.resolvedAddress.isValid)
     }
-    store.send(.updateGeoAddressPostalCode(newPostalCode)) {
+    await store.send(.updateGeoAddressPostalCode(newPostalCode)) {
       $0.resolvedAddress.postalCode = newPostalCode
       XCTAssertFalse($0.resolvedAddress.isValid)
     }
-    store.send(.updateGeoAddressCity(newCity)) {
+    await store.send(.updateGeoAddressCity(newCity)) {
       $0.resolvedAddress.city = newCity
       XCTAssertTrue($0.resolvedAddress.isValid)
     }
   }
   
-  func test_goToSettingsAction_shouldOpenSettingsURL() {
-    var openedUrl: URL!
+  func test_goToSettingsAction_shouldOpenSettingsURL() async {
+    let openedUrl: ActorIsolated<URL?> = .init(nil)
     let settingsURL = "settings:weg-li//weg-li/settings"
     let uiApplicationClient: UIApplicationClient = .init(
-      open: { url, _ in
-        openedUrl = url
-        return .init(value: true)
+      open: { @Sendable url, _ in
+        await openedUrl.setValue(url)
+        return true
       },
       openSettingsURLString: { settingsURL }
     )
@@ -345,13 +337,16 @@ class LocationStoreTests: XCTestCase {
       ),
       reducer: locationReducer,
       environment: LocationViewEnvironment(
-        locationManager: LocationManager.unimplemented(),
+        locationManager: .failing,
         placeService: .noop,
         uiApplicationClient: uiApplicationClient, mainRunLoop: .immediate
       )
     )
     
-    store.send(.goToSettingsButtonTapped)
-    XCTAssertEqual(openedUrl, URL(string: settingsURL))
+    await store.send(.onGoToSettingsButtonTapped)
+    await openedUrl.withValue({ url in
+      XCTAssertEqual(url, URL(string: settingsURL))
+    })
+    
   }
 }

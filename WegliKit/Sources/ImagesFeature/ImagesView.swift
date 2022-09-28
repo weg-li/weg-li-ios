@@ -37,15 +37,14 @@ public struct ImagesView: View {
             .font(.subheadline)
             .foregroundColor(Color(.label))
             .padding(.bottom, .grid(1))
-          if viewStore.isRecognizingTexts {
-            ActivityIndicator(style: .medium, color: .gray)
-          }
         }
         if viewStore.state.licensePlates.isEmpty {
           Text("Keine")
             .italic()
             .font(.callout)
             .foregroundColor(Color(.secondaryLabel))
+        } else if viewStore.isRecognizingTexts {
+          ActivityIndicator(style: .medium, color: .gray)
         } else {
           VStack {
             ScrollView(.horizontal) {
@@ -140,7 +139,7 @@ public struct ImagesView: View {
   
   private var importButton: some View {
     Button(
-      action: { viewStore.send(.addPhotosButtonTapped) },
+      action: { viewStore.send(.onAddPhotosButtonTapped) },
       label: {
         Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
           .frame(maxWidth: .infinity)
@@ -150,7 +149,7 @@ public struct ImagesView: View {
 
   private var takePhotoButton: some View {
     Button(
-      action: { viewStore.send(.takePhotosButtonTapped) },
+      action: { viewStore.send(.onTakePhotosButtonTapped) },
       label: {
         Label(L10n.Camera.TakePhotoButton.copy, systemImage: "camera")
           .frame(maxWidth: .infinity)

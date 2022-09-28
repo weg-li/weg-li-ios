@@ -1,9 +1,8 @@
-import ComposableArchitecture
 import Photos
 
 public extension PhotoLibraryAccessClient {
   static let noop = Self(
-    requestAuthorization: { .none },
+    requestAuthorization: { .notDetermined },
     authorizationStatus: { .notDetermined }
   )
 }

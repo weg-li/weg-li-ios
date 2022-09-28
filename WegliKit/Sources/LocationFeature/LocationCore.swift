@@ -17,7 +17,7 @@ public enum UserLocationError: Error {
 
 // TCA uses Hashable structs for identifying effects
 struct LocationManagerId: Hashable {}
-struct CancelSearchId: Hashable {}
+enum CancelSearchId {}
 
 // MARK: - Location Core
 
@@ -62,14 +62,14 @@ public struct LocationViewState: Equatable, Codable {
 public enum LocationViewAction: Equatable {
   case onAppear
   case locationRequested
-  case toggleMapExpanded
-  case goToSettingsButtonTapped
-  case dismissAlertButtonTapped
+  case onToggleMapExpandedTapped
+  case onGoToSettingsButtonTapped
+  case onDismissAlertButtonTapped
   case setLocationOption(LocationOption)
   case updateRegion(CoordinateRegion?)
   case locationManager(LocationManager.Action)
   case resolveLocation(CLLocationCoordinate2D)
-  case resolveAddressFinished(Result<[Address], PlacesServiceError>)
+  case resolveAddressFinished(TaskResult<[Address]>)
   case updateGeoAddressStreet(String)
   case updateGeoAddressCity(String)
   case updateGeoAddressPostalCode(String)
@@ -90,9 +90,9 @@ public struct LocationViewEnvironment {
     self.mainRunLoop = mainRunLoop
   }
   
-  public let locationManager: ComposableCoreLocation.LocationManager
-  public let placeService: PlacesServiceClient
-  public let uiApplicationClient: UIApplicationClient
+  public var locationManager: ComposableCoreLocation.LocationManager
+  public var placeService: PlacesServiceClient
+  public var uiApplicationClient: UIApplicationClient
   public var mainRunLoop: AnySchedulerOf<DispatchQueue>
 }
 
@@ -105,7 +105,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
         .create(id: LocationManagerId())
         .map(LocationViewAction.locationManager),
       environment.locationManager
-        .setup(id: LocationManagerId())
+        .setup()
         .fireAndForget()
     )
     
@@ -118,7 +118,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     case .notDetermined:
       state.isRequestingCurrentLocation = true
       return environment.locationManager
-        .requestWhenInUseAuthorization(id: LocationManagerId())
+        .requestWhenInUseAuthorization()
         .fireAndForget()
       
     case .restricted:
@@ -131,18 +131,18 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       
     case .authorizedAlways, .authorizedWhenInUse:
       return environment.locationManager
-        .startUpdatingLocation(id: LocationManagerId())
+        .startUpdatingLocation()
         .fireAndForget()
       
     @unknown default:
       return .none
     }
     
-  case .dismissAlertButtonTapped:
+  case .onDismissAlertButtonTapped:
     state.alert = nil
     return .none
     
-  case .toggleMapExpanded:
+  case .onToggleMapExpandedTapped:
     state.isMapExpanded.toggle()
     return .none
     
@@ -166,7 +166,7 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
          .didChangeAuthorization(.authorizedWhenInUse):
       if state.isRequestingCurrentLocation {
         return environment.locationManager
-          .requestLocation(id: LocationManagerId())
+          .requestLocation()
           .fireAndForget()
       }
       return .none
@@ -212,12 +212,17 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
       latitude: coordinate.latitude,
       longitude: coordinate.longitude
     )
-    return environment.placeService
-      .placemarks(clLocation)
-      .receive(on: environment.mainRunLoop)
-      .catchToEffect(LocationViewAction.resolveAddressFinished)
-      .cancellable(id: CancelSearchId(), cancelInFlight: true)
     
+    return .task {
+      await withTaskCancellation(id: CancelSearchId.self, cancelInFlight: true) {
+        await .resolveAddressFinished(
+          TaskResult {
+            await environment.placeService.placemarks(clLocation)
+          }
+        )
+      }
+    }
+        
   case let .resolveAddressFinished(.success(address)):
     state.isResolvingAddress = false
     state.resolvedAddress = address.first ?? .init()
@@ -251,26 +256,28 @@ public let locationReducer = Reducer<LocationViewState, LocationViewAction, Loca
     }
     return .none
     
-  case .goToSettingsButtonTapped:
-    return URL(string: environment.uiApplicationClient.openSettingsURLString())
-      .map {
-        environment.uiApplicationClient.open($0, [:])
-          .fireAndForget()
-      }
-      ?? .none
+  case .onGoToSettingsButtonTapped:
+    return .fireAndForget {
+      guard let url = await URL(string: environment.uiApplicationClient.openSettingsURLString()) else { return }
+      _ = await environment.uiApplicationClient.open(url, [:])
+    }
   }
 }
 
 // MARK: - Utils
 
 extension LocationManager {
-  func setup(id: AnyHashable) -> Effect<Never, Never> {
+  /// Configures the LocationManager
+  func setup() -> Effect<Never, Never> {
     set(
-      id: id,
-      activityType: .other,
-      desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
-      distanceFilter: 100.0,
-      showsBackgroundLocationIndicator: true
+      .init(
+        activityType: .otherNavigation,
+        allowsBackgroundLocationUpdates: false,
+        desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
+        distanceFilter: 100,
+        pausesLocationUpdatesAutomatically: true,
+        showsBackgroundLocationIndicator: true
+      )
     )
   }
 }
@@ -280,7 +287,7 @@ public extension AlertState where Action == LocationViewAction {
     title: TextState(L10n.Location.Alert.provideAccessToLocationService),
     primaryButton: .default(
       TextState(L10n.Settings.title),
-      action: .send(.goToSettingsButtonTapped)
+      action: .send(.onGoToSettingsButtonTapped)
     ),
     secondaryButton: .default(TextState("OK"))
   )

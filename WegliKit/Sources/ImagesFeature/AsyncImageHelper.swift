@@ -9,21 +9,19 @@ import SwiftUI
 /// asynchronously in the background and publishes to Combine when it finishes loading a file, or if it
 /// encounters an error while loading.
 @MainActor
-class AsyncImageStore: ObservableObject {
+final class AsyncImageStore: ObservableObject {
   var url: URL
   
   /// When the store finishes loading the thumbnail, this property contains the thumbnail. If the store
   /// hasn't finished loading the thumbnail, this property contains a placeholder image.
-  @Published var thumbnailImage: UIImage
+  @Published var thumbnailImage: UIImage?
   
   /// When the store is finished loading the full-size image, this property contains the full-size image. If
   /// the store hasn't finished loading the full-size image, this property contains a placeholder image.
-  @Published var image: UIImage
+  @Published var image: UIImage?
   
   private var subscriptions: Set<AnyCancellable> = []
-  
-  private let errorImage: UIImage
-  
+    
   private let imageLoader: ImageLoader
   
   /// This initializes a data store object that loads a specified image and its corresponding thumbnail.
@@ -32,15 +30,10 @@ class AsyncImageStore: ObservableObject {
   /// until the first time your code accesses one of the image properties.
   init(
     url: URL,
-    imageLoader: ImageLoader = ImageLoader(),
-    loadingImage: UIImage = UIImage(systemName: "rectangle.fill")!.withTintColor(.gray),
-    errorImage: UIImage = UIImage(systemName: "xmark.circle")!
+    imageLoader: ImageLoader = ImageLoader()
   ) {
     self.url = url
     self.imageLoader = imageLoader
-    self.thumbnailImage = loadingImage
-    self.image = loadingImage
-    self.errorImage = errorImage
   }
   
   /// This method starts an asynchronous load of the thumbnail image. If this method doesn't find an
@@ -82,12 +75,24 @@ struct AsyncThumbnailView: View {
   }
   
   var body: some View {
-    Image(uiImage: imageStore.thumbnailImage)
-      .resizable()
-      .aspectRatio(contentMode: contentMode)
-      .task {
-        await imageStore.loadThumbnail()
+    Group {
+      if let image = imageStore.thumbnailImage {
+        Image(uiImage: image)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+      } else {
+        Rectangle()
+          .overlay {
+            ProgressView {
+              Text("Loading ...")
+                .font(.footnote)
+            }
+          }
       }
+    }
+    .task {
+      await imageStore.loadThumbnail()
+    }
   }
 }
 
@@ -102,11 +107,23 @@ struct AsyncImageView: View {
   }
   
   var body: some View {
-    Image(uiImage: imageStore.image)
-      .resizable()
-      .aspectRatio(contentMode: .fill)
-      .task {
-        await imageStore.loadImage()
+    Group {
+      if let image = imageStore.image {
+        Image(uiImage: image)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+      } else {
+        Rectangle()
+          .overlay {
+            ProgressView {
+              Text("Loading ...")
+                .font(.footnote)
+            }
+          }
       }
+    }
+    .task {
+      await imageStore.loadImage()
+    }
   }
 }

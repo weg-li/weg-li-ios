@@ -86,33 +86,7 @@ public struct ReportView: View {
         // Send notice button
         VStack {
           if !viewStore.apiToken.isEmpty {
-            VStack {
-              Button(
-                action: { viewStore.send(.uploadImages) },
-                label: {
-                  VStack(alignment: .center) {
-                    HStack {
-                      if viewStore.isUploadingNotice {
-                        ActivityIndicator(style: .medium, color: .white)
-                          .foregroundColor(.white)
-                      } else {
-                        Text("Meldung hochladen")
-                      }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                  }
-                }
-              )
-              .disabled(viewStore.isUploadingNotice)
-              .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
-              .padding()
-
-              if let uploadProgressMessage = viewStore.uploadProgressState {
-                Text(uploadProgressMessage)
-                  .font(.footnote)
-                  .foregroundColor(Color(.secondaryLabel))
-              }
-            }
+            uploadImagesButton
           } else {
             MailContentView(store: store)
               .padding()
@@ -157,9 +131,39 @@ public struct ReportView: View {
     .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
   }
   
+  private var uploadImagesButton: some View {
+    VStack {
+      Button(
+        action: { viewStore.send(.onUploadImagesButtonTapped) },
+        label: {
+          VStack(alignment: .center) {
+            HStack {
+              if viewStore.isUploadingNotice {
+                ActivityIndicator(style: .medium, color: .white)
+                  .foregroundColor(.white)
+              } else {
+                Text("Meldung hochladen")
+              }
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+          }
+        }
+      )
+      .disabled(viewStore.isUploadingNotice)
+      .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
+      .padding()
+
+      if let uploadProgressMessage = viewStore.uploadProgressState {
+        Text(uploadProgressMessage)
+          .font(.footnote)
+          .foregroundColor(Color(.secondaryLabel))
+      }
+    }
+  }
+  
   private var resetButton: some View {
     Button(
-      action: { viewStore.send(.resetButtonTapped) },
+      action: { viewStore.send(.onResetButtonTapped) },
       label: {
         Image(systemName: "arrow.counterclockwise")
           .foregroundColor(viewStore.isResetButtonDisabled ? .gray : .red)

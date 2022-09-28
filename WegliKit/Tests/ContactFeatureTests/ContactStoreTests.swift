@@ -4,7 +4,8 @@ import ComposableArchitecture
 import ContactFeature
 import XCTest
 
-class ContactStoreTests: XCTestCase {
+@MainActor
+final class ContactStoreTests: XCTestCase {
   func test_changeFirstName_shouldUpdateState() {
     let store = TestStore(
       initialState: ContactState.preview,
@@ -137,7 +138,7 @@ class ContactStoreTests: XCTestCase {
       environment: ContactEnvironment()
     )
 
-    store.send(.resetContactDataButtonTapped) {
+    store.send(.onResetContactDataButtonTapped) {
       $0.alert = .resetContactDataAlert
     }
   }
@@ -149,7 +150,7 @@ class ContactStoreTests: XCTestCase {
       environment: ContactEnvironment()
     )
 
-    store.send(.resetContactConfirmButtonTapped) {
+    store.send(.onResetContactConfirmButtonTapped) {
       $0 = .empty
     }
     store.receive(.dismissAlert)

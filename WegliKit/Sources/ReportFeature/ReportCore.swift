@@ -141,17 +141,17 @@ public enum ReportAction: BindableAction, Equatable {
   case location(LocationViewAction)
   case mail(MailViewAction)
   case mapAddressToDistrict(Address)
-  case mapDistrictFinished(Result<District, RegularityOfficeMapError>)
-  case resetButtonTapped
-  case resetConfirmButtonTapped
+  case mapDistrictFinished(TaskResult<District>)
+  case onResetButtonTapped
+  case onUploadImagesButtonTapped
+  case onResetConfirmButtonTapped
   case setShowEditDescription(Bool)
   case setShowEditContact(Bool)
   case dismissAlert
   case setDate(Date)
-  case uploadImages
-  case uploadImagesResponse(Result<[ImageUploadResponse], NSError>)
+  case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
   case composeNoticeAndSend
-  case composeNoticeResponse(Result<Notice, ApiError>)
+  case composeNoticeResponse(TaskResult<Notice>)
   case editNoticeInBrowser
 }
 
@@ -267,17 +267,13 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
   
     // Triggers district mapping after geoAddress is stored.
     case let .mapAddressToDistrict(input):
-      return environment.regulatoryOfficeMapper
-        .mapAddress(address: input, on: environment.mapAddressQueue)
-        .receive(on: environment.mainQueue)
-        .catchToEffect()
-        .map(ReportAction.mapDistrictFinished)
-        .eraseToEffect()
-        .debounce(
-          id: DebounceID(),
-          for: .seconds(environment.debounce),
-          scheduler: environment.mainQueue
+      return .task {
+        await .mapDistrictFinished(
+          TaskResult {
+            try await environment.regulatoryOfficeMapper.mapAddressToDistrict(input)
+          }
         )
+      }
       
     case let .mapDistrictFinished(.success(district)):
       state.district = district
@@ -285,7 +281,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .mapDistrictFinished(.failure(error)):
       // present alert maybe?
-      debugPrint(error.message)
+      debugPrint(error)
       return .none
       
     case let .images(imageViewAction):
@@ -309,6 +305,12 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
         
       case .setPhotos:
+        if state.images.pickerResultCoordinate == nil {
+          if let coordinate = state.location.region?.center {
+            return Effect(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
+          }
+        }
+        
         return .none
         
       case let .setImageCreationDate(date):
@@ -317,7 +319,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return .none
       
       // Handle single image remove action to reset map annotations and reset valid state.
-      case .image(_, .removePhoto):
+      case .image(_, .onRemovePhotoButtonTapped):
         if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
           state.images.pickerResultCoordinate = nil
           state.location.pinCoordinate = nil
@@ -344,7 +346,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return Effect(value: ReportAction.mapAddressToDistrict(address))
         
       case let .resolveAddressFinished(.failure(error)):
-        state.alert = .addressResolveFailed(error: error)
+        state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
         return .none
         
       // Handle manual address entering to trigger district mapping.
@@ -395,11 +397,11 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
     case .contact, .description:
       return .none
       
-    case .resetButtonTapped:
+    case .onResetButtonTapped:
       state.alert = .resetReportAlert
       return .none
       
-    case .resetConfirmButtonTapped:
+    case .onResetConfirmButtonTapped:
       // Reset report will be handled in the homeReducer
       return Effect(value: .dismissAlert)
       
@@ -419,14 +421,14 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.date = date
       return .none
       
-    case .uploadImages:
+    case .onUploadImagesButtonTapped:
       guard state.isNetworkAvailable else {
         state.alert = .init(
           title: .init("Keine Internetverbindung"),
           message: .init("Verbinde dich mit dem Internet um die Meldung hochzuladen"),
           buttons: [
             .cancel(.init(L10n.cancel)),
-            .default(.init("Wiederholen"), action: .send(.uploadImages))
+            .default(.init("Wiederholen"), action: .send(.onUploadImagesButtonTapped))
           ]
         )
         return .none
@@ -439,11 +441,13 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       state.isUploadingNotice = true
       state.uploadProgressState = "Uploading images ..."
       
-      return environment.imagesUploadClient.uploadImages(imageUploadRequests)
-        .subscribe(on: environment.backgroundQueue)
-        .receive(on: environment.mainQueue)
-        .map(ReportAction.uploadImagesResponse)
-        .eraseToEffect()
+      return .task {
+        await .uploadImagesResponse(
+          TaskResult {
+            try await environment.imagesUploadClient.uploadImages(imageUploadRequests)
+          }
+        )
+      }
       
     case let .uploadImagesResponse(.success(imageInputFromUpload)):
       state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
@@ -459,10 +463,13 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
       state.uploadProgressState = "Sending notice ..."
       
-      return environment.wegliService.postNotice(notice)
-        .receive(on: environment.mainQueue)
-        .map(ReportAction.composeNoticeResponse)
-        .eraseToEffect()
+      return .task { [notice] in
+        await .composeNoticeResponse(
+          TaskResult {
+            try await environment.wegliService.postNotice(notice)
+          }
+        )
+      }
       
     case let .composeNoticeResponse(.success(response)):
       state.isUploadingNotice = false
@@ -474,16 +481,19 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
       let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
       return .fireAndForget {
-        imageURLs.forEach {
-          environment.fileClient.removeItem($0)
-            .ignoreFailure()
-            .eraseToEffect()
-        }
+        await withTaskGroup(of: Void.self, body: { group in
+          imageURLs.forEach { url in
+            group.addTask(priority: .background) {
+              try? await environment.fileClient.removeItem(url)
+            }
+          }
+          debugPrint("removed items")
+        })
       }
       
     case let .composeNoticeResponse(.failure(error)):
       state.isUploadingNotice = false
-      state.alert = .sendNoticeFailed(error: error)
+      state.alert = .sendNoticeFailed(error: error as! ApiError)
       state.uploadProgressState = nil
       return .none
       
@@ -492,20 +502,22 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return .none
       }
       let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
-      return environment.uiApplicationClient
-        .open(editURL, [:])
-        .fireAndForget()
+      return .fireAndForget {
+        _ = await environment.uiApplicationClient.open(editURL, [:])
+      }
+      
     }
   }
 )
 .binding()
 .onChange(of: \.contactState.contact) { contact, _, _, environment in
-  struct SaveDebounceId: Hashable {}
-  
-  return environment.fileClient
-    .saveContactSettings(contact, on: environment.backgroundQueue)
-    .fireAndForget()
-    .debounce(id: SaveDebounceId(), for: .seconds(1), scheduler: environment.mainQueue)
+  enum CancelID {}
+  return .fireAndForget {
+    try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try await environment.mainQueue.sleep(for: .seconds(0.3))
+      await environment.fileClient.saveContactSettings(contact)
+    }
+  }
 }
 
 // MARK: - Helper
@@ -562,7 +574,7 @@ public extension AlertState where Action == ReportAction {
     title: TextState(L10n.Report.Alert.title),
     primaryButton: .destructive(
       TextState(L10n.Report.Alert.reset),
-      action: .send(.resetConfirmButtonTapped)
+      action: .send(.onResetConfirmButtonTapped)
     ),
     secondaryButton: .cancel(
       .init(L10n.cancel),
@@ -574,7 +586,7 @@ public extension AlertState where Action == ReportAction {
     title: .init("Meldung hinzugefügt"),
     message: .init("Meldung wurde deinem Account hinzugefügt. Gehe zu `weg.li` um die Anzeige abzusenden (z.Z. noch nicht über die App möglich)"),
     buttons: [
-      .default(.init("Ok"), action: .send(.resetConfirmButtonTapped)),
+      .default(.init("Ok"), action: .send(.onResetConfirmButtonTapped)),
       .default(.init("Gehe zu `weg.li`"), action: .send(.editNoticeInBrowser))
     ]
   )
@@ -619,25 +631,6 @@ public let mapperQueue = DispatchQueue(
   qos: .userInitiated,
   attributes: .concurrent
 )
-
-public extension FileClient {
-  func loadNotices(decoder: JSONDecoder = .noticeDecoder) -> Effect<Result<[Notice], NSError>, Never> {
-    load([Notice].self, from: noticesFileName, with: decoder)
-  }
-  
-  func saveNotices(
-    _ notices: [Notice]?,
-    on queue: AnySchedulerOf<DispatchQueue>,
-    encoder: JSONEncoder = .noticeEncoder
-  ) -> Effect<Never, Never> {
-    guard let notices = notices else {
-      return .none
-    }
-    return save(notices, to: noticesFileName, on: queue, with: encoder)
-  }
-}
-
-let noticesFileName = "notices"
 
 public extension SharedModels.NoticeInput {
   init(_ reportState: ReportState) {

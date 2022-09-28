@@ -33,13 +33,13 @@ public struct ImageView: View {
           }
           
           Button {
-            viewStore.send(.recognizeText)
+            viewStore.send(.onRecognizeTextButtonTapped)
           } label: {
             Label("Nummernschild erkennen", systemImage: "text.magnifyingglass")
           }
           
           Button {
-            viewStore.send(.removePhoto, animation: .easeOut(duration: 0.2))
+            viewStore.send(.onRemovePhotoButtonTapped, animation: .easeOut(duration: 0.2))
           } label: {
             Label("Löschen", systemImage: "trash")
           }
@@ -66,12 +66,16 @@ public struct ImageView: View {
               .padding()
             }
           } else {
-            ActivityIndicator(style: .medium, color: .gray)
+            ProgressView {
+              Text("Loading ...")
+            }
           }
         }
       
     } else {
-      ActivityIndicator(style: .medium, color: .gray)
+      ProgressView {
+        Text("Loading ...")
+      }
     }
   }
 }

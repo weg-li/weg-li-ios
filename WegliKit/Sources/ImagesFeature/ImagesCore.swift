@@ -63,19 +63,19 @@ public struct ImagesViewState: Equatable, Codable {
 }
 
 public enum ImagesViewAction: Equatable {
+  case onAddPhotosButtonTapped
+  case onTakePhotosButtonTapped
   case setPhotos([PickerImageResult?])
-  case addPhotosButtonTapped
   case setShowImagePicker(Bool)
+  case setShowCamera(Bool)
   case requestPhotoLibraryAccess
   case requestPhotoLibraryAccessResult(PhotoLibraryAuthorizationStatus)
-  case takePhotosButtonTapped
-  case setShowCamera(Bool)
   case requestCameraAccess
-  case requestCameraAccessResult(Bool)
+  case requestCameraAccessResult(TaskResult<Bool>)
   case setImageCoordinate(CLLocationCoordinate2D?)
   case setImageCreationDate(Date?)
   case dismissAlert
-  case textRecognitionCompleted(Result<[TextItem], VisionError>)
+  case textRecognitionCompleted(TaskResult<[TextItem]>)
   case selectedTextItem(TextItem)
   case image(id: String, action: ImageAction)
 }
@@ -85,7 +85,7 @@ public struct ImagesViewEnvironment {
   public var backgroundQueue: AnySchedulerOf<DispatchQueue>
   public var cameraAccessClient: CameraAccessClient
   public let photoLibraryAccessClient: PhotoLibraryAccessClient
-  public let textRecognitionClient: TextRecognitionClient
+  public var textRecognitionClient: TextRecognitionClient
   public let distanceFilter: Double = 50
   
   public init(
@@ -106,7 +106,7 @@ public struct ImagesViewEnvironment {
 /// Reducer handling actions from ImagesView combined with the single Image reducer.
 public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesViewEnvironment> { state, action, env in
   switch action {
-  case .addPhotosButtonTapped:
+  case .onAddPhotosButtonTapped:
     switch env.photoLibraryAccessClient.authorizationStatus() {
     case .notDetermined:
       return Effect(value: .requestPhotoLibraryAccess)
@@ -124,12 +124,12 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .none
     
   case .requestPhotoLibraryAccess:
-    return env.photoLibraryAccessClient
-      .requestAuthorization()
-      .receive(on: env.mainQueue)
-      .map(ImagesViewAction.requestPhotoLibraryAccessResult)
-      .eraseToEffect()
-    
+    return .task {
+      .requestPhotoLibraryAccessResult(
+        await env.photoLibraryAccessClient.requestAuthorization()
+      )
+    }
+        
   case let .requestPhotoLibraryAccessResult(status):
     switch status {
     case .authorized, .limited:
@@ -144,7 +144,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
       return .none
     }
 
-  case .takePhotosButtonTapped:
+  case .onTakePhotosButtonTapped:
     switch env.cameraAccessClient.authorizationStatus() {
     case .authorized:
       return Effect(value: .setShowCamera(true))
@@ -154,7 +154,6 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     case .notDetermined:
       return Effect(value: .requestCameraAccess)
     case .restricted:
-      // TODO: How to handle this?
       return .none
     @unknown default:
       return .none
@@ -165,14 +164,17 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .none
 
   case .requestCameraAccess:
-    return env.cameraAccessClient
-      .requestAuthorization()
-      .receive(on: env.mainQueue)
-      .map(ImagesViewAction.requestCameraAccessResult)
-      .eraseToEffect()
+    return .task {
+      await .requestCameraAccessResult(
+        TaskResult {
+          await env.cameraAccessClient.requestAuthorization()
+        }
+      )
+    }
 
-  case let .requestCameraAccessResult(success):
-    if success {
+  case let .requestCameraAccessResult(result):
+    let userDidGrantAccess = (try? result.value) ?? false
+    if userDidGrantAccess {
       return Effect(value: .setShowCamera(true))
     }
     return .none
@@ -192,16 +194,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     return .merge(
       Effect(value: .setImageCoordinate(images.imageCoordinates.first)),
       Effect(value: .setImageCreationDate(images.imageCreationDates.first)),
-      .merge(
-        images.map { image in
-          env.textRecognitionClient.recognizeText(in: image, on: env.backgroundQueue)
-            .receive(on: env.mainQueue)
-            .catchToEffect()
-            .delay(for: 0.2, scheduler: env.mainQueue)
-            .map(ImagesViewAction.textRecognitionCompleted)
-            .eraseToEffect()
-        }
-      )
+      .textRecognition(in: images, client: env.textRecognitionClient)
     )
     
   case let .textRecognitionCompleted(.success(items)):
@@ -255,7 +248,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     state.pickerResultDate = date
     return .none
     
-  case let .image(id, .removePhoto):
+  case let .image(id, .onRemovePhotoButtonTapped):
     // filter storedPhotos by image ID which removes the selected one.
     let photos = state.storedPhotos
       .compactMap { $0 }
@@ -285,7 +278,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     }
     return .merge(effects)
     
-  case let .image(id, .recognizeText):
+  case let .image(id, .onRecognizeTextButtonTapped):
     let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
     guard
       let image = unwrappedPhotos.first(where: { $0.id == id })
@@ -296,13 +289,14 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     
     state.isRecognizingTexts = true
     
-    return env.textRecognitionClient
-      .recognizeText(in: image, on: env.backgroundQueue)
-      .receive(on: env.mainQueue)
-      .catchToEffect()
-      .delay(for: 0.2, scheduler: env.mainQueue)
-      .map(ImagesViewAction.textRecognitionCompleted)
-      .eraseToEffect()
+    return Effect.task {
+      await ImagesViewAction.textRecognitionCompleted(
+        TaskResult {
+          try await env.mainQueue.sleep(for: .milliseconds(200))
+          return try await env.textRecognitionClient.recognizeText(image)
+        }
+      )
+    }
     
   case .image:
     return .none
@@ -310,6 +304,39 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
   case .dismissAlert:
     state.alert = nil
     return .none
+  }
+}
+
+// MARK: Helper
+
+
+private extension Effect {
+  static func textRecognition(
+    in images: [PickerImageResult],
+    client: TextRecognitionClient
+  ) -> Effect<ImagesViewAction, Never> {
+    .task {
+      await withThrowingTaskGroup(of: [TextItem].self) { group in
+        for image in images {
+          group.addTask {
+            try await client.recognizeText(image)
+          }
+        }
+        
+        do {
+          var results: [[TextItem]] = []
+          
+          for try await result in group {
+            results.append(result)
+          }
+          
+          let flattenedResults = results.flatMap { $0 }
+          return ImagesViewAction.textRecognitionCompleted(.success(flattenedResults))
+        } catch {
+          return ImagesViewAction.textRecognitionCompleted(.failure(error))
+        }
+      }
+    }
   }
 }
 
@@ -326,7 +353,7 @@ private func isMatches(_ regex: String, _ string: String) -> Bool {
   return false
 }
 
-private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$"
+private let germanLicensePlateRegex = "^[a-zA-ZÄÖÜ]{1,3}.[a-zA-Z]{1,2} \\d{1,4}[A-Z]{0,1}$" // TODO: Do swift regex
 
 extension String {
   func withReplacedCharacters(_ characters: String, by separator: String) -> String {

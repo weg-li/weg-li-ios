@@ -39,22 +39,6 @@ public struct SettingsView: View {
       }
       
       Section(header: Label("Allgemein", systemImage: "hammer.fill")) {
-        NavigationLink(
-          destination: ContactView(
-            store: store.scope(
-              state: \.contact,
-              action: SettingsAction.contact
-            )
-          ),
-          label: {
-            HStack {
-              Label(L10n.Contact.widgetTitle, systemImage: "person.fill")
-                .labelStyle(.titleOnly)
-              Spacer()
-            }
-          }
-        )
-        
         Toggle(
           isOn: viewStore.binding(
             get: { $0.userSettings.showsAllTextRecognitionSettings },
@@ -183,7 +167,6 @@ struct SettingsView_Previews: PreviewProvider {
           store: .init(
             initialState: .init(
               accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-              contact: .preview,
               userSettings: .init(showsAllTextRecognitionSettings: false)
             ),
             reducer: .empty,

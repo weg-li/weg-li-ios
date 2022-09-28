@@ -5,15 +5,13 @@ import Foundation
 import ImagesFeature
 import XCTest
 
-class CameraAccessTests: XCTestCase {
+@MainActor
+final class CameraAccessTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
 
-  func test_cameraButtonTapped_shouldRequestAccess_andPresentCamera_whenAuthorised() {
-    let subject = CurrentValueSubject<Bool, Never>(true)
+  func test_cameraButtonTapped_shouldRequestAccess_andPresentCamera_whenAuthorised() async {
     let accessClient = CameraAccessClient(
-      requestAuthorization: {
-        Effect(subject)
-      },
+      requestAuthorization: { true },
       authorizationStatus: { .notDetermined }
     )
 
@@ -32,12 +30,11 @@ class CameraAccessTests: XCTestCase {
       )
     )
 
-    store.send(.takePhotosButtonTapped)
-    store.receive(.requestCameraAccess)
-    store.receive(.requestCameraAccessResult(true))
-    store.receive(.setShowCamera(true)) {
+    await store.send(.onTakePhotosButtonTapped)
+    await store.receive(.requestCameraAccess)
+    await store.receive(.requestCameraAccessResult(.success(true)))
+    await store.receive(.setShowCamera(true)) {
       $0.showCamera = true
     }
-    subject.send(completion: .finished)
   }
 }
