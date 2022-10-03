@@ -8,11 +8,11 @@ public extension ImagesUploadClient {
     googleUploadService: GoogleUploadService = .live()
   ) -> Self {
     Self(
-      uploadImages: { requests in
+      uploadImages: { results in
         try await withThrowingTaskGroup(of: ImageUploadResponse.self) { group in
-          for request in requests {
+          for result in results {
             group.addTask {
-              let gcloudUploadResponse = try await wegliService.upload(request)
+              let gcloudUploadResponse = try await wegliService.upload(result)
               
               guard let directUploadURL = URL(string: gcloudUploadResponse.directUpload.url) else {
                 return gcloudUploadResponse
@@ -26,7 +26,7 @@ public extension ImagesUploadClient {
               try await googleUploadService.upload(
                 directUploadURLComponents?.url,
                 directUploadURLComponents?.queryItems,
-                request.imageData,
+                result.jpegData,
                 gcloudUploadResponse.directUpload.headers
               )
               

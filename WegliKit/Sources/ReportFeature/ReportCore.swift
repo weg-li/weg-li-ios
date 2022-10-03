@@ -434,9 +434,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         return .none
       }
       
-      let imageUploadRequests = state.images.imageStates.map {
-        UploadImageRequest(pickerResult: $0.image)
-      }
+      let results = state.images.imageStates.map { $0.image }
       
       state.isUploadingNotice = true
       state.uploadProgressState = "Uploading images ..."
@@ -444,7 +442,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       return .task {
         await .uploadImagesResponse(
           TaskResult {
-            try await environment.imagesUploadClient.uploadImages(imageUploadRequests)
+            try await environment.imagesUploadClient.uploadImages(results)
           }
         )
       }

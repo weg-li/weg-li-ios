@@ -4,20 +4,14 @@ enum APIRequestBuildError: Error {
   case invalidURL
 }
 
-public protocol APIRequest {
-  associatedtype ResponseDataType: Codable
-  var endpoint: Endpoint { get }
-  var httpMethod: HTTPMethod { get }
-  var headers: HTTPHeaders? { get }
-  var queryItems: [URLQueryItem] { get set }
-  var body: Data? { get }
-  var cachePolicy: URLRequest.CachePolicy { get set }
-  func makeRequest() throws -> URLRequest
-}
-
-public extension APIRequest {
-  var queryItems: [String: String] { [:] }
-  var cachePolicy: URLRequest.CachePolicy { .useProtocolCachePolicy }
+public struct Request {
+//  associatedtype ResponseDataType: Codable
+  let endpoint: Endpoint
+  let httpMethod: HTTPMethod
+  var headers: [String: String] = [:]
+  var queryItems: [URLQueryItem] = []
+  var body: Data? = nil
+  var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
   
   func makeRequest() throws -> URLRequest {
     var components = URLComponents()
@@ -52,4 +46,14 @@ extension URLRequest {
       addValue(header.key, forHTTPHeaderField: header.value)
     }
   }
+}
+
+public extension Request {
+    static func get(_ endpoint: Endpoint, query: [URLQueryItem] = []) -> Request {
+      Request(endpoint: endpoint, httpMethod: .get, queryItems: query)
+    }
+    
+    static func post(_ endpoint: Endpoint, body: Data?) -> Request {
+      Request(endpoint: endpoint, httpMethod: .post, body: body)
+    }
 }

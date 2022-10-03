@@ -24,7 +24,7 @@ public struct APIClient {
   /// Dispatches a Request and returns a publisher
   /// - Parameter request: Request to Dispatch
   /// - Returns: A publisher containing decoded data or an error
-  public func dispatch<R: APIRequest>(_ request: R) async throws -> Data {
+  public func dispatch(_ request: Request) async throws -> Data {
     guard var urlRequest = try? request.makeRequest() else {
       throw NetworkRequestError.badRequest
     }

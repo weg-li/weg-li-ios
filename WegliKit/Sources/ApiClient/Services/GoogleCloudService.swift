@@ -4,9 +4,9 @@ import Helper
 import SharedModels
 
 public struct GoogleUploadService {
-  public var upload: (URL?, [URLQueryItem]?, Data?, [String: String]) async throws -> Void
+  public var upload: @Sendable (URL?, [URLQueryItem]?, Data?, [String: String]) async throws -> Void
 
-  public init(upload: @escaping (URL?, [URLQueryItem]?, Data?, [String: String]) async throws -> Void) {
+  public init(upload: @Sendable @escaping (URL?, [URLQueryItem]?, Data?, [String: String]) async throws -> Void) {
     self.upload = upload
   }
 }

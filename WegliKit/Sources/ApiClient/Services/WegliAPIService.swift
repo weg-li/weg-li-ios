@@ -8,16 +8,19 @@ import SharedModels
 public struct WegliAPIService {
   public var getNotices: @Sendable (Bool) async throws -> [Notice]
   public var postNotice: @Sendable (NoticeInput) async throws -> Notice
-  public var upload: @Sendable (UploadImageRequest) async throws -> ImageUploadResponse
+  public var upload: @Sendable (PickerImageResult) async throws -> ImageUploadResponse
+  public var submitNotice: @Sendable (NoticeInput) async throws -> Notice
 
   public init(
     getNotices: @Sendable @escaping (Bool) async throws -> [Notice],
     postNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
-    upload: @Sendable @escaping (UploadImageRequest) async throws -> ImageUploadResponse
+    upload: @Sendable @escaping (PickerImageResult) async throws -> ImageUploadResponse,
+    submitNotice: @Sendable @escaping (NoticeInput) async throws -> Notice
   ) {
     self.getNotices = getNotices
     self.postNotice = postNotice
     self.upload = upload
+    self.submitNotice = submitNotice
   }
 }
 
@@ -25,30 +28,27 @@ public extension WegliAPIService {
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
       getNotices: { forceReload in
-        let request = GetNoticesRequest(forceReload: forceReload)
+        let data = try await apiClient.dispatch(.getNotices(forceReload: forceReload))
         
-        let data = try await apiClient.dispatch(request)
-        
-        return try JSONDecoder.noticeDecoder.decode(
-          GetNoticesRequest.ResponseDataType.self,
-          from: data
-        )
+        return try JSONDecoder.noticeDecoder.decode([Notice].self, from: data)
       },
       postNotice: { input in
         let noticePutRequestBody = NoticePutRequestBody(notice: input)
         let body = try? JSONEncoder.noticeEncoder.encode(noticePutRequestBody)
         
-        let request = SubmitNoticeRequest(body: body)
-        let data = try await apiClient.dispatch(request)
+        let data = try await apiClient.dispatch(.createNotice(body: body))
         
-        return try JSONDecoder.noticeDecoder.decode(
-          SubmitNoticeRequest.ResponseDataType.self,
-          from: data
-        )
+        return try JSONDecoder.noticeDecoder.decode(Notice.self, from: data)
       },
-      upload: { imageUploadRequest in
-        let responseData = try await apiClient.dispatch(imageUploadRequest)
+      upload: { imagePickerResult in
+        let input: ImageUploadInput? = .make(from: imagePickerResult)
+        let body = try? JSONEncoder.noticeEncoder.encode(input)
+          
+        let responseData = try await apiClient.dispatch(.post(.uploads, body: body))
         return try JSONDecoder.noticeDecoder.decode(ImageUploadResponse.self, from: responseData)
+      },
+      submitNotice: { notice in
+        fatalError()
       }
     )
   }
@@ -77,7 +77,8 @@ public extension WegliAPIService {
           headers: [:]
         )
       )
-    }
+    },
+    submitNotice: { _ in .mock }
   )
   
   static let failing = Self(
@@ -89,6 +90,7 @@ public extension WegliAPIService {
     },
     upload: { _ in
       throw NetworkRequestError.badRequest
-    }
+    },
+    submitNotice: { _ in fatalError() }
   )
 }
