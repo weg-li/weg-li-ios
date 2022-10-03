@@ -45,7 +45,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .upToNextMajor(from: "0.34.0")),
-    .package(url: "https://github.com/pointfreeco/composable-core-location", .upToNextMajor(from: "0.1.0")),
+    .package(url: "https://github.com/pointfreeco/composable-core-location", exact: "0.1.0"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
     .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))

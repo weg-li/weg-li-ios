@@ -97,170 +97,183 @@ public struct LocationViewEnvironment {
 }
 
 /// LocationReducer handling setup, location widget actions, alert presentation and reverse geo coding the user location.
-public let locationReducer = Reducer<LocationViewState, LocationViewAction, LocationViewEnvironment> { state, action, environment in
-  switch action {
-  case .onAppear:
-    return .merge(
-      environment.locationManager
-        .create(id: LocationManagerId())
-        .map(LocationViewAction.locationManager),
-      environment.locationManager
-        .setup()
-        .fireAndForget()
-    )
-    
-  case .locationRequested:
-    guard environment.locationManager.locationServicesEnabled() else {
-      state.alert = .servicesOff
-      return .none
-    }
-    switch environment.locationManager.authorizationStatus() {
-    case .notDetermined:
-      state.isRequestingCurrentLocation = true
-      return environment.locationManager
-        .requestWhenInUseAuthorization()
-        .fireAndForget()
-      
-    case .restricted:
-      state.alert = .goToSettingsAlert
-      return .none
-      
-    case .denied:
-      state.alert = .goToSettingsAlert
-      return .none
-      
-    case .authorizedAlways, .authorizedWhenInUse:
-      return environment.locationManager
-        .startUpdatingLocation()
-        .fireAndForget()
-      
-    @unknown default:
-      return .none
-    }
-    
-  case .onDismissAlertButtonTapped:
-    state.alert = nil
-    return .none
-    
-  case .onToggleMapExpandedTapped:
-    state.isMapExpanded.toggle()
-    return .none
-    
-  case let .setLocationOption(value):
-    state.locationOption = value
-    switch value {
-    case .fromPhotos:
-      state.isResolvingAddress = false
-      return .none
-    case .currentLocation:
-      state.isResolvingAddress = true
-      return Effect(value: .locationRequested)
-    case .manual:
-      state.isResolvingAddress = false
-      return .none
-    }
-    
-  case let .locationManager(locationManagerAction):
-    switch locationManagerAction {
-    case .didChangeAuthorization(.authorizedAlways),
-         .didChangeAuthorization(.authorizedWhenInUse):
-      if state.isRequestingCurrentLocation {
-        return environment.locationManager
-          .requestLocation()
+public let locationReducer = Reducer.combine(
+  locationManagerReducer
+    .pullback(state: \.self, action: /LocationViewAction.locationManager, environment: { $0 }),
+  Reducer<LocationViewState, LocationViewAction, LocationViewEnvironment> { state, action, environment in
+    switch action {
+    case .onAppear:
+      return .merge(
+        environment.locationManager
+          .create(id: LocationManagerId())
+          .map(LocationViewAction.locationManager),
+        environment.locationManager
+          .setup()
           .fireAndForget()
+      )
+      
+    case .locationRequested:
+      guard environment.locationManager.locationServicesEnabled() else {
+        state.alert = .servicesOff
+        return .none
       }
+      switch environment.locationManager.authorizationStatus() {
+      case .notDetermined:
+        state.isRequestingCurrentLocation = true
+        return environment.locationManager
+          .requestWhenInUseAuthorization(id: LocationManagerId())
+          .fireAndForget()
+        
+      case .restricted:
+        state.alert = .goToSettingsAlert
+        return .none
+        
+      case .denied:
+        state.alert = .goToSettingsAlert
+        return .none
+        
+      case .authorizedAlways, .authorizedWhenInUse:
+        return environment.locationManager
+          .startUpdatingLocation(id: LocationManagerId())
+          .fireAndForget()
+        
+      @unknown default:
+        return .none
+      }
+      
+    case .onDismissAlertButtonTapped:
+      state.alert = nil
       return .none
       
-    case .didChangeAuthorization(.denied):
-      if state.isRequestingCurrentLocation {
-        state.isRequestingCurrentLocation = false
-        state.alert = .provideAuth
-      }
+    case .onToggleMapExpandedTapped:
+      state.isMapExpanded.toggle()
       return .none
       
-    case let .didUpdateLocations(locations):
-      state.isRequestingCurrentLocation = false
+    case let .setLocationOption(value):
+      state.locationOption = value
+      switch value {
+      case .fromPhotos:
+        state.isResolvingAddress = false
+        return .none
+      case .currentLocation:
+        state.isResolvingAddress = true
+        return Effect(value: .locationRequested)
+      case .manual:
+        state.isResolvingAddress = false
+        return .none
+      }
+      
+    case let .locationManager(.didUpdateLocations(locations)):
       guard let location = locations.first else {
         return .none
       }
       
-      if let region = state.region {
-        guard
-          location.coordinate != region.center.asCLLocationCoordinate2D,
-          region.asMKCoordinateRegion.center.distance(from: location.coordinate) > 100
-        else {
-          return .none
-        }
-        state.region = CoordinateRegion(center: location.coordinate)
-        return Effect(value: LocationViewAction.resolveLocation(location.coordinate))
-      } else {
-        state.region = CoordinateRegion(center: location.coordinate)
-        return Effect(value: LocationViewAction.resolveLocation(location.coordinate))
+      guard let region = state.region else {
+        let region = CoordinateRegion(center: location.coordinate)
+        state.region = region
+        return Effect(value: LocationViewAction.resolveLocation(region.center.asCLLocationCoordinate2D))
       }
-            
-    case let .didFailWithError(error):
-      debugPrint(error.localizedDescription)
+      
+      guard
+        region.asMKCoordinateRegion.center.distance(from: location.coordinate) > 100
+      else {
+        return .none
+      }
+      
+      state.region = .init(center: location.coordinate)
+      return Effect(value: LocationViewAction.resolveLocation(location.coordinate))
+      
+    case .locationManager:
       return .none
       
-    default:
+    case let .resolveLocation(coordinate): // reverse geo code coordinate to address
+      state.isResolvingAddress = true
+      let clLocation = CLLocation(
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude
+      )
+      
+      return .task {
+        await withTaskCancellation(id: CancelSearchId.self, cancelInFlight: true) {
+          await .resolveAddressFinished(
+            TaskResult {
+              await environment.placeService.placemarks(clLocation)
+            }
+          )
+        }
+      }
+      
+    case let .resolveAddressFinished(.success(address)):
+      state.isResolvingAddress = false
+      state.resolvedAddress = address.first ?? .init()
       return .none
-    }
-    
-  case let .resolveLocation(coordinate): // reverse geo code coordinate to address
-    state.isResolvingAddress = true
-    let clLocation = CLLocation(
-      latitude: coordinate.latitude,
-      longitude: coordinate.longitude
-    )
-    
-    return .task {
-      await withTaskCancellation(id: CancelSearchId.self, cancelInFlight: true) {
-        await .resolveAddressFinished(
-          TaskResult {
-            await environment.placeService.placemarks(clLocation)
-          }
-        )
+    case let .resolveAddressFinished(.failure(error)):
+      debugPrint(error)
+      state.alert = .reverseGeoCodingFailed
+      state.isResolvingAddress = false
+      return .none
+      
+    case let .updateRegion(region):
+      state.region = region
+      return .none
+      
+    case let .updateGeoAddressStreet(street):
+      state.resolvedAddress.street = street
+      return .none
+    case let .updateGeoAddressCity(city):
+      state.resolvedAddress.city = city
+      return .none
+    case let .updateGeoAddressPostalCode(postalCode):
+      state.resolvedAddress.postalCode = postalCode
+      return .none
+      
+    case .setResolvedLocation:
+      return .none
+      
+    case let .setPinCoordinate(coordinate):
+      if state.locationOption == .currentLocation {
+        state.pinCoordinate = coordinate
+      }
+      return .none
+      
+    case .onGoToSettingsButtonTapped:
+      return .fireAndForget {
+        guard let url = await URL(string: environment.uiApplicationClient.openSettingsURLString()) else { return }
+        _ = await environment.uiApplicationClient.open(url, [:])
       }
     }
-        
-  case let .resolveAddressFinished(.success(address)):
-    state.isResolvingAddress = false
-    state.resolvedAddress = address.first ?? .init()
-    return .none
-  case let .resolveAddressFinished(.failure(error)):
-    debugPrint(error)
-    state.alert = .reverseGeoCodingFailed
-    state.isResolvingAddress = false
-    return .none
-    
-  case let .updateRegion(region):
-    state.region = region
-    return .none
-    
-  case let .updateGeoAddressStreet(street):
-    state.resolvedAddress.street = street
-    return .none
-  case let .updateGeoAddressCity(city):
-    state.resolvedAddress.city = city
-    return .none
-  case let .updateGeoAddressPostalCode(postalCode):
-    state.resolvedAddress.postalCode = postalCode
-    return .none
-    
-  case .setResolvedLocation:
-    return .none
-    
-  case let .setPinCoordinate(coordinate):
-    if state.locationOption == .currentLocation {
-      state.pinCoordinate = coordinate
+  }
+)
+
+
+private let locationManagerReducer = Reducer<LocationViewState, LocationManager.Action, LocationViewEnvironment> { state, action, environment in
+  switch action {
+  case .didChangeAuthorization(.authorizedAlways),
+      .didChangeAuthorization(.authorizedWhenInUse):
+    if state.isRequestingCurrentLocation {
+      return environment.locationManager
+        .requestLocation(id: LocationManagerId())
+        .fireAndForget()
     }
     return .none
     
-  case .onGoToSettingsButtonTapped:
-    return .fireAndForget {
-      guard let url = await URL(string: environment.uiApplicationClient.openSettingsURLString()) else { return }
-      _ = await environment.uiApplicationClient.open(url, [:])
+  case .didChangeAuthorization(.denied):
+    if state.isRequestingCurrentLocation {
+      state.isRequestingCurrentLocation = false
+      state.alert = .provideAuth
     }
+    return .none
+    
+  case let .didUpdateLocations(locations):
+    state.isRequestingCurrentLocation = false
+    return .none
+    
+  case let .didFailWithError(error):
+    debugPrint(error.localizedDescription)
+    return .none
+    
+  default:
+    return .none
   }
 }
 
@@ -270,14 +283,13 @@ extension LocationManager {
   /// Configures the LocationManager
   func setup() -> Effect<Never, Never> {
     set(
-      .init(
-        activityType: .otherNavigation,
-        allowsBackgroundLocationUpdates: false,
-        desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
-        distanceFilter: 100,
-        pausesLocationUpdatesAutomatically: true,
-        showsBackgroundLocationIndicator: true
-      )
+      id: LocationManagerId(),
+      activityType: .otherNavigation,
+      allowsBackgroundLocationUpdates: false,
+      desiredAccuracy: kCLLocationAccuracyNearestTenMeters,
+      distanceFilter: 100,
+      pausesLocationUpdatesAutomatically: true,
+      showsBackgroundLocationIndicator: true
     )
   }
 }

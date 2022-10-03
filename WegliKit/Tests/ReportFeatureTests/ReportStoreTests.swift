@@ -51,7 +51,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -84,7 +84,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,
@@ -120,7 +120,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -146,7 +146,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -191,7 +191,12 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: mainQueue.eraseToAnyScheduler(),
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(
+          authorizationStatus: { .authorizedAlways },
+          create: { _ in locationManagerSubject.eraseToEffect() },
+          locationServicesEnabled: { true },
+          set: { _,_ in setSubject.eraseToEffect() }
+        ),
         placeService: PlacesServiceClient(
           placemarks: { _ in [expectedAddress] }
         ),
@@ -201,10 +206,6 @@ final class ReportStoreTests: XCTestCase {
         date: Date.init
       )
     )
-    store.environment.locationManager.authorizationStatus = { .authorizedAlways }
-    store.environment.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
-    store.environment.locationManager.locationServicesEnabled = { true }
-    store.environment.locationManager.set =  { _ in setSubject.eraseToEffect() }
     
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     
@@ -285,7 +286,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -333,7 +334,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -356,7 +357,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -394,7 +395,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -427,7 +428,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -477,7 +478,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -531,7 +532,7 @@ final class ReportStoreTests: XCTestCase {
         mainQueue: .immediate,
         backgroundQueue: .immediate,
         mapAddressQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -593,7 +594,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .live(districs),
         fileClient: .noop,
@@ -633,7 +634,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -670,7 +671,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -707,7 +708,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -744,7 +745,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: .noop,
@@ -827,7 +828,7 @@ final class ReportStoreTests: XCTestCase {
       environment: ReportEnvironment(
         mainQueue: .immediate,
         backgroundQueue: .immediate,
-        locationManager: .failing,
+        locationManager: .unimplemented(),
         placeService: .noop,
         regulatoryOfficeMapper: .noop,
         fileClient: fileClient,

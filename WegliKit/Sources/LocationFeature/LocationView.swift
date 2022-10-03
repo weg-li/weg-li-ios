@@ -129,6 +129,7 @@ public struct LocationView: View {
       if viewStore.showActivityIndicator {
         HStack {
           ProgressView()
+            .padding(.trailing, 4)
           Text("Suche Adresse ...")
         }
       } else if !viewStore.showActivityIndicator, viewStore.address == .init() {
