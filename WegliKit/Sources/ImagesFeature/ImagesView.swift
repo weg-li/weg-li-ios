@@ -104,6 +104,7 @@ public struct ImagesView: View {
             send: ImagesViewAction.setPhotos
           )
         )
+        .edgesIgnoringSafeArea(.vertical)
       }
     )
   }

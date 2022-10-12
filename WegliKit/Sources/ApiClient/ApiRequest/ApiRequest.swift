@@ -5,10 +5,9 @@ enum APIRequestBuildError: Error {
 }
 
 public struct Request {
-//  associatedtype ResponseDataType: Codable
   let endpoint: Endpoint
   let httpMethod: HTTPMethod
-  var headers: [String: String] = [:]
+  var headers: [String: String] = ["Content-Type": "application/json"]
   var queryItems: [URLQueryItem] = []
   var body: Data? = nil
   var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
@@ -28,7 +27,7 @@ public struct Request {
     }
     var request = URLRequest(url: url)
     request.httpMethod = httpMethod.rawValue
-    request.addHeaders(headers)
+    request.allHTTPHeaderFields = headers
     if let body = body {
       request.httpBody = body
     }
@@ -37,23 +36,16 @@ public struct Request {
   }
 }
 
-extension URLRequest {
-  mutating func addHeaders(_ httpHeaders: HTTPHeaders?) {
-    guard let headers = httpHeaders else {
-      return
-    }
-    for header in headers {
-      addValue(header.key, forHTTPHeaderField: header.value)
-    }
-  }
-}
-
 public extension Request {
-    static func get(_ endpoint: Endpoint, query: [URLQueryItem] = []) -> Request {
-      Request(endpoint: endpoint, httpMethod: .get, queryItems: query)
-    }
-    
-    static func post(_ endpoint: Endpoint, body: Data?) -> Request {
-      Request(endpoint: endpoint, httpMethod: .post, body: body)
-    }
+  static func get(_ endpoint: Endpoint, query: [URLQueryItem] = []) -> Request {
+    Request(endpoint: endpoint, httpMethod: .get, queryItems: query)
+  }
+  
+  static func post(_ endpoint: Endpoint, body: Data?) -> Request {
+    Request(endpoint: endpoint, httpMethod: .post, body: body)
+  }
+  
+  static func patch(_ endpoint: Endpoint, body: Data?) -> Request {
+    Request(endpoint: endpoint, httpMethod: .patch, body: body)
+  }
 }

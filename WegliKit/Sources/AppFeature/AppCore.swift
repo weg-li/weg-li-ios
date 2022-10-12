@@ -118,7 +118,7 @@ public struct AppEnvironment {
   public var fileClient: FileClient
   public let keychainClient: KeychainClient
   public var apiClient: APIClient
-  public let wegliService: WegliAPIService
+  public var wegliService: WegliAPIService
   public let pathMonitorClient: PathMonitorClient
   
   public var date: () -> Date
@@ -285,6 +285,10 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       ? .empty(.emptyNotices())
       : .results(notices)
       
+      guard !notices.isEmpty else  {
+        return .none
+      }
+      
       return .fireAndForget {
         try await environment.fileClient.saveNotices(notices)
       }
@@ -326,9 +330,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 .onChange(of: \.contact) { contact, state, _, environment in
   .fireAndForget {
     enum CancelID {}
-    await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-      try? await environment.mainQueue.sleep(for: .seconds(0.5))
-      await environment.fileClient.saveContactSettings(contact)
+    try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try await environment.mainQueue.sleep(for: .seconds(0.3))
+      try await environment.fileClient.saveContactSettings(contact)
     }
   }
 }
@@ -338,9 +342,9 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
   
   return .fireAndForget {
     enum CancelID {}
-    await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-      try? await environment.mainQueue.sleep(for: .seconds(0.5))
-      await environment.fileClient.saveUserSettings(settings)
+    try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+      try await environment.mainQueue.sleep(for: .seconds(0.3))
+      try await environment.fileClient.saveUserSettings(settings)
     }
   }
 }

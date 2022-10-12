@@ -82,11 +82,10 @@ struct AsyncThumbnailView: View {
           .aspectRatio(contentMode: .fill)
       } else {
         Rectangle()
+          .fill(.gray)
           .overlay {
-            ProgressView {
-              Text("Loading ...")
-                .font(.footnote)
-            }
+            ProgressView()
+              .progressViewStyle(CircularProgressViewStyle(tint: .white))
           }
       }
     }

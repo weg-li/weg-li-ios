@@ -163,6 +163,35 @@ final class AppStoreTests: XCTestCase {
     await store.finish()
   }
   
+  func test_ActionFetchNoticeResponse_shouldNotStoreNoticeToFileClientWhenResponseIsEmpty() async {
+    let state = AppState(reportDraft: report)
+    let mainQueue = DispatchQueue.test
+    
+    let didSaveNotices = ActorIsolated(false)
+    
+    var fileClient = FileClient.noop
+    fileClient.save = { @Sendable _, _ in
+      await didSaveNotices.setValue(true)
+      return ()
+    }
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: appReducer,
+      environment: defaultAppEnvironment(
+        mainQueue: mainQueue.eraseToAnyScheduler(),
+        fileClient: fileClient
+      )
+    )
+    
+    await store.send(.fetchNoticesResponse(.success([]))) {
+      $0.notices = .empty(.emptyNotices())
+    }
+    await didSaveNotices.withValue { value in
+      XCTAssertFalse(value)
+    }
+  }
+  
   func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() async {
     let state = AppState(reportDraft: report)
     
@@ -177,21 +206,22 @@ final class AppStoreTests: XCTestCase {
     let store = TestStore(
       initialState: state,
       reducer: appReducer,
-      environment: defaultAppEnvironment(fileClient: fileClient)
+      environment: defaultAppEnvironment(
+        fileClient: fileClient
+      )
     )
+    store.environment.wegliService.getNotices = { _ in .placeholder }
     
-    await store.send(.fetchNoticesResponse(.success([]))) {
-      $0.notices = .empty(.emptyNotices())
-      XCTAssertFalse($0.isFetchingNotices)
+    await store.send(.fetchNoticesResponse(.success(.placeholder))) {
+      $0.notices = .results(.placeholder)
     }
-    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 2)
-    await didSaveNotices.withValue({ value in
+    await didSaveNotices.withValue { value in
       XCTAssertTrue(value)
-    })
+    }
   }
   
   func test_ActionOnAccountSettings_shouldPersistAccountsSettings() async {
-    var state = AppState(reportDraft: report)
+    let state = AppState(reportDraft: report)
     
     let store = TestStore(
       initialState: state,

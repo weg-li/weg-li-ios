@@ -557,7 +557,7 @@ final class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_removeImage_shouldSetResolvedCoordinateToNil_whenPhotosIsEmptyAfterDelete() {
+  func test_removeImage_shouldSetResolvedCoordinateToNil_whenPhotosIsEmptyAfterDelete() async {
     let images = [
       PickerImageResult(
         id: "123",
@@ -603,11 +603,9 @@ final class ReportStoreTests: XCTestCase {
       )
     )
     
-    store.send(.images(.image(id: "123", action: .onRemovePhotoButtonTapped))) {
-      $0.date = testDate()
+    await store.send(.images(.image(id: "123", action: .onRemovePhotoButtonTapped)))
+    await store.receive(.images(.justSetPhotos([]))) {
       $0.images.storedPhotos = []
-      $0.location.resolvedAddress = .init()
-      $0.images.pickerResultCoordinate = nil
     }
   }
   
@@ -849,9 +847,9 @@ final class ReportStoreTests: XCTestCase {
       $0.uploadProgressState = "Sending notice ..."
     }
     await store.receive(.composeNoticeResponse(.success(.mock))) {
+      $0.canSubmitNotice = true
       $0.isUploadingNotice = false
-      $0.alert = .reportSent
-      $0.uploadedImagesIds = []
+      $0.uploadedImagesIds = ["111", "222"]
       $0.uploadProgressState = nil
       $0.uploadedNoticeID = Notice.mock.id
     }

@@ -28,27 +28,33 @@ public extension WegliAPIService {
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
       getNotices: { forceReload in
-        let data = try await apiClient.dispatch(.getNotices(forceReload: forceReload))
+        let data = try await apiClient.send(.getNotices(forceReload: forceReload))
         
-        return try JSONDecoder.noticeDecoder.decode([Notice].self, from: data)
+        return try data.decoded(decoder: .noticeDecoder)
       },
       postNotice: { input in
         let noticePutRequestBody = NoticePutRequestBody(notice: input)
-        let body = try? JSONEncoder.noticeEncoder.encode(noticePutRequestBody)
+        let body = try noticePutRequestBody.encoded(encoder: .noticeEncoder)
         
-        let data = try await apiClient.dispatch(.createNotice(body: body))
+        let data = try await apiClient.send(.createNotice(body: body))
         
-        return try JSONDecoder.noticeDecoder.decode(Notice.self, from: data)
+        return try data.decoded(decoder: .noticeDecoder)
       },
       upload: { imagePickerResult in
         let input: ImageUploadInput? = .make(from: imagePickerResult)
-        let body = try? JSONEncoder.noticeEncoder.encode(input)
-          
-        let responseData = try await apiClient.dispatch(.post(.uploads, body: body))
-        return try JSONDecoder.noticeDecoder.decode(ImageUploadResponse.self, from: responseData)
+        let body = try input?.encoded(encoder: .noticeEncoder)
+
+        let request: Request = .post(.uploads, body: body)
+        let responseData = try await apiClient.send(request)
+        return try responseData.decoded(decoder: .noticeDecoder)
       },
       submitNotice: { notice in
-        fatalError()
+        let noticePutRequestBody = NoticePutRequestBody(notice: notice)
+        let body = try noticePutRequestBody.encoded(encoder: .noticeEncoder)
+        
+        let data = try await apiClient.send(.post(.submitNotices, body: body))
+        
+        return try data.decoded(decoder: .noticeDecoder)
       }
     )
   }

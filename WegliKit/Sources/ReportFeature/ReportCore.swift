@@ -56,6 +56,9 @@ public struct ReportState: Equatable {
   public var isNetworkAvailable = true
   public var isUploadingNotice = false
   
+  public var canSubmitNotice = false
+  public var isSubmittingNotice = false
+  
   public var uploadedNoticeID: String?
   
   public func isModified() -> Bool {
@@ -152,6 +155,8 @@ public enum ReportAction: BindableAction, Equatable {
   case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
   case composeNoticeAndSend
   case composeNoticeResponse(TaskResult<Notice>)
+  case submitNotice
+  case submitNoticeResponse(TaskResult<Notice>)
   case editNoticeInBrowser
 }
 
@@ -471,9 +476,9 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
       
     case let .composeNoticeResponse(.success(response)):
       state.isUploadingNotice = false
-      state.alert = .reportSent
-      state.uploadedImagesIds.removeAll()
       state.uploadProgressState = nil
+      
+      state.canSubmitNotice = true
       
       state.uploadedNoticeID = response.token
       
@@ -504,6 +509,32 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
         _ = await environment.uiApplicationClient.open(editURL, [:])
       }
       
+    case .submitNotice:
+      let notice = NoticeInput(state)
+      
+      state.isSubmittingNotice = true
+      
+      return .task { [notice] in
+        await .submitNoticeResponse(
+          TaskResult {
+            try await environment.wegliService.submitNotice(notice)
+          }
+        )
+      }
+      
+    case let .submitNoticeResponse(.success(result)):
+      state.isSubmittingNotice = false
+      state.uploadedImagesIds.removeAll()
+
+      state.alert = .reportSent
+      return .none
+    
+    case let .submitNoticeResponse(.failure(error)):
+      state.isSubmittingNotice = false
+
+      state.alert = .sendNoticeFailed(error: error as! ApiError)
+      return .none
+      
     }
   }
 )
@@ -513,7 +544,7 @@ public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>
   return .fireAndForget {
     try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
       try await environment.mainQueue.sleep(for: .seconds(0.3))
-      await environment.fileClient.saveContactSettings(contact)
+      try await environment.fileClient.saveContactSettings(contact)
     }
   }
 }
@@ -581,8 +612,8 @@ public extension AlertState where Action == ReportAction {
   )
   
   static let reportSent = Self(
-    title: .init("Meldung hinzugefügt"),
-    message: .init("Meldung wurde deinem Account hinzugefügt. Gehe zu `weg.li` um die Anzeige abzusenden (z.Z. noch nicht über die App möglich)"),
+    title: .init("Meldung gesendet"),
+    message: .init("Deine Meldung wurde an die Behörden gesendet."),
     buttons: [
       .default(.init("Ok"), action: .send(.onResetConfirmButtonTapped)),
       .default(.init("Gehe zu `weg.li`"), action: .send(.editNoticeInBrowser))

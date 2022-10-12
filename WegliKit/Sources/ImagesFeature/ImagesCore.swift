@@ -66,6 +66,7 @@ public enum ImagesViewAction: Equatable {
   case onAddPhotosButtonTapped
   case onTakePhotosButtonTapped
   case setPhotos([PickerImageResult?])
+  case justSetPhotos([PickerImageResult])
   case setShowImagePicker(Bool)
   case setShowCamera(Bool)
   case requestPhotoLibraryAccess
@@ -248,12 +249,28 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
     state.pickerResultDate = date
     return .none
     
+  case let .justSetPhotos(photos):
+    state.storedPhotos = photos
+    return .none
+    
   case let .image(id, .onRemovePhotoButtonTapped):
     // filter storedPhotos by image ID which removes the selected one.
     let photos = state.storedPhotos
       .compactMap { $0 }
       .filter { $0.id != id }
-    state.storedPhotos = photos
+    
+    var effects: [Effect<ImagesViewAction, Never>] = []
+    
+    if !photos.isEmpty {
+      state.storedPhotos = photos
+    } else {
+      effects.append(
+        Effect.run(operation: { send in
+          try await env.mainQueue.sleep(for: .milliseconds(800))
+          await send(.justSetPhotos(photos), animation: .easeOut)
+        })
+      )
+    }
     
     let filterTextItems = state.recognizedTextItems
       .compactMap { $0 }
@@ -262,7 +279,7 @@ public let imagesReducer = Reducer<ImagesViewState, ImagesViewAction, ImagesView
 
     state.licensePlates.removeAll(where: { $0.id == id })
     
-    var effects: [Effect<ImagesViewAction, Never>] = []
+    
     
     let imageCoordinates = state.storedPhotos.compactMap { $0 }.imageCoordinates
     if !imageCoordinates.isEmpty, let firstCoordinate = imageCoordinates.first {

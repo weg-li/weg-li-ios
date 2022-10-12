@@ -50,10 +50,10 @@ actor ImageLoader {
       
     } catch {
       if let loaderError = error as? ImageLoaderError {
-        debugPrint(loaderError.errorDescription ?? loaderError.localizedDescription)
+        logger.debug("\(loaderError.errorDescription ?? loaderError.localizedDescription)")
         throw loaderError
       } else {
-        debugPrint(error.localizedDescription)
+        logger.debug("\(error.localizedDescription)")
         throw error
       }
     }
@@ -83,10 +83,10 @@ actor ImageLoader {
       return image
     } catch {
       if let loaderError = error as? ImageLoaderError {
-        debugPrint(loaderError.errorDescription ?? loaderError.localizedDescription)
+        logger.debug("\(loaderError.errorDescription ?? loaderError.localizedDescription)")
         throw loaderError
       } else {
-        debugPrint(error.localizedDescription)
+        logger.debug("\(error.localizedDescription)")
         throw error
       }
     }

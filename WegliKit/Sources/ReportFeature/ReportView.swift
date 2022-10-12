@@ -86,38 +86,90 @@ public struct ReportView: View {
         // Send notice button
         VStack {
           if !viewStore.apiToken.isEmpty {
-            uploadImagesButton
+            VStack(spacing: .grid(1)) {
+              Button(
+                action: { viewStore.send(.onUploadImagesButtonTapped) },
+                label: {
+                  VStack(alignment: .center) {
+                    HStack {
+                      if viewStore.isUploadingNotice {
+                        ProgressView()
+                          .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                      } else {
+                        Label("Meldung hochladen", systemImage: "arrow.up.doc.fill")
+                      }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                  }
+                }
+              )
+              .disabled(viewStore.isUploadingNotice)
+              .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
+              .padding([.horizontal])
+              .padding(.vertical, .grid(1))
+              
+              Button(
+                action: { viewStore.send(.submitNotice) },
+                label: {
+                  VStack(alignment: .center) {
+                    if viewStore.isSubmittingNotice {
+                      ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                      Label("Anzeige erstatten", systemImage: "paperplane.fill")
+                    }
+                  }
+                  .frame(maxWidth: .infinity, alignment: .center)
+                }
+              )
+              .disabled(viewStore.canSubmitNotice)
+              .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.canSubmitNotice))
+              .padding([.horizontal])
+              .padding(.vertical, .grid(1))
+            }
           } else {
             MailContentView(store: store)
               .padding()
           }
           
-          if !viewStore.state.isReportValid {
-            VStack(spacing: .grid(2)) {
-              Text(L10n.Mail.readyToSubmitErrorCopy)
-                .fontWeight(.semibold)
-              VStack(spacing: .grid(1)) {
-                if !viewStore.state.images.isValid {
-                  Text(L10n.Report.Error.images.asBulletPoint)
-                }
-                if !viewStore.state.location.resolvedAddress.isValid {
-                  Text(L10n.Report.Error.location.asBulletPoint)
-                }
-                if !viewStore.state.description.isValid {
-                  Text(L10n.Report.Error.description.asBulletPoint)
-                }
-                if !viewStore.state.contactState.isValid {
-                  Text(L10n.Report.Error.contact.asBulletPoint)
+          VStack {
+            VStack {
+              Text("1. Lade zuerst deine Meldung hoch").bold()
+              Text("2. Erstatte die Anzeige").bold()
+            }
+            .padding()
+            .overlay(
+              RoundedRectangle(cornerRadius: 6)
+                .stroke(Color(uiColor: .lightGray), lineWidth: 1)
+            )
+            
+            if !viewStore.state.isReportValid {
+              VStack(spacing: .grid(2)) {
+                Text(L10n.Mail.readyToSubmitErrorCopy)
+                  .fontWeight(.semibold)
+                VStack(spacing: .grid(1)) {
+                  if !viewStore.state.images.isValid {
+                    Text(L10n.Report.Error.images.asBulletPoint)
+                  }
+                  if !viewStore.state.location.resolvedAddress.isValid {
+                    Text(L10n.Report.Error.location.asBulletPoint)
+                  }
+                  if !viewStore.state.description.isValid {
+                    Text(L10n.Report.Error.description.asBulletPoint)
+                  }
+                  if !viewStore.state.contactState.isValid {
+                    Text(L10n.Report.Error.contact.asBulletPoint)
+                  }
                 }
               }
+              .accessibilityElement(children: .combine)
+              .foregroundColor(.red)
+              .font(.callout)
+              .multilineTextAlignment(.center)
+              .padding(.bottom)
             }
-            .accessibilityElement(children: .combine)
-            .foregroundColor(.red)
-            .font(.callout)
-            .multilineTextAlignment(.center)
-            .padding(.bottom)
           }
-        }
+          }
       }
       .disabled(viewStore.isUploadingNotice)
     }
@@ -129,36 +181,6 @@ public struct ReportView: View {
       }
     }
     .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
-  }
-  
-  private var uploadImagesButton: some View {
-    VStack {
-      Button(
-        action: { viewStore.send(.onUploadImagesButtonTapped) },
-        label: {
-          VStack(alignment: .center) {
-            HStack {
-              if viewStore.isUploadingNotice {
-                ActivityIndicator(style: .medium, color: .white)
-                  .foregroundColor(.white)
-              } else {
-                Text("Meldung hochladen")
-              }
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-          }
-        }
-      )
-      .disabled(viewStore.isUploadingNotice)
-      .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
-      .padding()
-
-      if let uploadProgressMessage = viewStore.uploadProgressState {
-        Text(uploadProgressMessage)
-          .font(.footnote)
-          .foregroundColor(Color(.secondaryLabel))
-      }
-    }
   }
   
   private var resetButton: some View {
