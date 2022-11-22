@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.6
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -345,7 +345,7 @@ package.targets.append(
       dependencies: [
         "SharedModels",
         "SettingsFeature",
-        .tca
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .testTarget(

@@ -6,34 +6,23 @@ import XCTest
 
 @MainActor
 final class SettingsStoreTests: XCTestCase {
-//  var defaultEnvironment = SettingsEnvironment(
-//    uiApplicationClient: .init(
-//      open: { _, _ in false },
-//      openSettingsURLString: { "" }
-//    ),
-//    keychainClient: .noop,
-//    mainQueue: .immediate
-//  )
-  
   func test_setOpenLicensesRow_shouldCallURL() async {
     let openedUrl = ActorIsolated<URL?>(nil)
     let settingsURL = "settings:weg-li//weg-li/settings"
     
-    var env = defaultEnvironment
-    env.uiApplicationClient.openSettingsURLString = { settingsURL }
-    env.uiApplicationClient.open = { @Sendable url, _ in
-      await openedUrl.setValue(url)
-      return true
-    }
     
     let store = TestStore(
-      initialState: SettingsState(
+      initialState: SettingsDomain.State(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
-      reducer: settingsReducer,
-      environment: env
+      reducer: SettingsDomain()
     )
+    store.dependencies.applicationClient.openSettingsURLString = { settingsURL }
+    store.dependencies.applicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return true
+    }
     
     await store.send(.openLicensesRowTapped)
     await openedUrl.withValue({ url in
@@ -44,20 +33,17 @@ final class SettingsStoreTests: XCTestCase {
   func test_setOpenImprintRow_shouldCallURL() async {
     let openedUrl = ActorIsolated<URL?>(nil)
     
-    var env = defaultEnvironment
-    env.uiApplicationClient.open = { @Sendable url, _ in
-      await openedUrl.setValue(url)
-      return .init(true)
-    }
-    
     let store = TestStore(
-      initialState: SettingsState(
+      initialState: SettingsDomain.State(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
-      reducer: settingsReducer,
-      environment: env
+      reducer: SettingsDomain()
     )
+    store.dependencies.applicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
+    }
     
     await store.send(.openImprintTapped)
     await openedUrl.withValue({ [link = env.imprintLink] url in
@@ -68,20 +54,17 @@ final class SettingsStoreTests: XCTestCase {
   func test_setOpenGitHubRow_shouldCallURL() async {
     let openedUrl = ActorIsolated<URL?>(nil)
     
-    var env = defaultEnvironment
-    env.uiApplicationClient.open = { @Sendable url, _ in
-      await openedUrl.setValue(url)
-      return .init(true)
-    }
-    
     let store = TestStore(
-      initialState: SettingsState(
+      initialState: SettingsDomain.State(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
-      reducer: settingsReducer,
-      environment: env
+      reducer: SettingsDomain()
     )
+    store.dependencies.applicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
+    }
     
     await store.send(.openGitHubProjectTapped)
     await openedUrl.withValue({ [link = env.gitHubProjectLink] url in
@@ -92,20 +75,17 @@ final class SettingsStoreTests: XCTestCase {
   func test_donateTapped_shouldCallURL() async {
     let openedUrl = ActorIsolated<URL?>(nil)
     
-    var env = defaultEnvironment
-    env.uiApplicationClient.open = { @Sendable url, _ in
-      await openedUrl.setValue(url)
-      return .init(true)
-    }
-    
     let store = TestStore(
-      initialState: SettingsState(
+      initialState: SettingsDomain.State(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
-      reducer: settingsReducer,
-      environment: env
+      reducer: SettingsDomain()
     )
+    store.dependencies.applicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
+    }
     
     await store.send(.donateTapped)
     await openedUrl.withValue({ [link = env.donateLink] url in
@@ -117,19 +97,18 @@ final class SettingsStoreTests: XCTestCase {
     var env = defaultEnvironment
     
     let didWriteTokenToKeyChain = ActorIsolated<Bool>(false)
-    env.keychainClient.setString = { @Sendable [self] _, _, _ in
-      await didWriteTokenToKeyChain.setValue(true)
-      return true
-    }
     
     let store = TestStore(
-      initialState: SettingsState(
+      initialState: SettingsDomain.State(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
-      reducer: settingsReducer,
-      environment: env
+      reducer: SettingsDomain()
     )
+    store.dependencies.keychainClient.setString = { @Sendable [self] _, _, _ in
+      await didWriteTokenToKeyChain.setValue(true)
+      return true
+    }
     
     await store.send(.accountSettings(.setApiToken("TOKEN"))) {
       $0.accountSettingsState.accountSettings.apiToken = "TOKEN"
@@ -142,20 +121,17 @@ final class SettingsStoreTests: XCTestCase {
   func test_action_openUserSettings_shouldCallURL() async {
     let openedUrl = ActorIsolated<URL?>(nil)
     
-    var env = defaultEnvironment
-    env.uiApplicationClient.open = { @Sendable url, _ in
-      await openedUrl.setValue(url)
-      return .init(true)
-    }
-    
     let store = TestStore(
-      initialState: SettingsState(
+      initialState: SettingsDomain.State(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
         userSettings: .init(showsAllTextRecognitionSettings: false)
       ),
-      reducer: settingsReducer,
-      environment: env
+      reducer: SettingsDomain()
     )
+    store.dependencies.applicationClient.open = { @Sendable url, _ in
+      await openedUrl.setValue(url)
+      return .init(true)
+    }
     
     await store.send(.accountSettings(.openUserSettings))
     await openedUrl.withValue({ url in

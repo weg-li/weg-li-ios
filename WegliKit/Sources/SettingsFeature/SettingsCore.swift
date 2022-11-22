@@ -13,8 +13,8 @@ import UIKit
 public struct SettingsDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.applicationClient) var applicationClient
-  @Dependency(\.keychainClient) var keychainClient
+  @Dependency(\.applicationClient) public var applicationClient
+  @Dependency(\.keychainClient) public var keychainClient
   // swiftlint:disable force_unwrapping
   public let imprintLink = URL(string: "https://www.weg.li/imprint")!
   public let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
