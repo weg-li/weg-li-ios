@@ -20,14 +20,14 @@ final class CameraAccessTests: XCTestCase {
         showCamera: false,
         storedPhotos: []
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: accessClient,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.mainQueue = scheduler
+        values.cameraAccessClient = accessClient
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient = .noop
+        
+      }
     )
 
     await store.send(.onTakePhotosButtonTapped)

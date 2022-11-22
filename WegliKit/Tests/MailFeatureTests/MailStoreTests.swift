@@ -9,13 +9,12 @@ import XCTest
 final class MailStoreTests: XCTestCase {
   func test_presentMailViewAction_shouldUpdateState() {
     let store = TestStore(
-      initialState: MailViewState(
+      initialState: MailDomain.State(
         mailComposeResult: nil,
         mail: .init(),
         isPresentingMailContent: false
       ),
-      reducer: mailViewReducer,
-      environment: MailViewEnvironment()
+      reducer: MailDomain()
     )
     
     store.send(.presentMailContentView(true)) {
@@ -25,13 +24,12 @@ final class MailStoreTests: XCTestCase {
   
   func test_setMailResult_shouldUpdateState() {
     let store = TestStore(
-      initialState: MailViewState(
+      initialState: MailDomain.State(
         mailComposeResult: nil,
         mail: .init(),
         isPresentingMailContent: false
       ),
-      reducer: mailViewReducer,
-      environment: MailViewEnvironment()
+      reducer: MailDomain()
     )
     
     let result = MFMailComposeResult(rawValue: 2)!
