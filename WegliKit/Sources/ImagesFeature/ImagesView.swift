@@ -8,10 +8,10 @@ import Styleguide
 import SwiftUI
 
 public struct ImagesView: View {
-  let store: Store<ImagesViewState, ImagesViewAction>
-  @ObservedObject private var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
+  let store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<ImagesViewDomain.State, ImagesViewDomain.Action>
   
-  public init(store: Store<ImagesViewState, ImagesViewAction>) {
+  public init(store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -73,17 +73,17 @@ public struct ImagesView: View {
     .sheet(
       isPresented: viewStore.binding(
         get: \.showImagePicker,
-        send: ImagesViewAction.setShowImagePicker
+        send: ImagesViewDomain.Action.setShowImagePicker
       ),
       content: {
         ImagePicker(
           isPresented: viewStore.binding(
             get: \.showImagePicker,
-            send: ImagesViewAction.setShowImagePicker
+            send: ImagesViewDomain.Action.setShowImagePicker
           ),
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
-            send: ImagesViewAction.setPhotos
+            send: ImagesViewDomain.Action.setPhotos
           )
         )
       }
@@ -91,17 +91,17 @@ public struct ImagesView: View {
     .fullScreenCover(
       isPresented: viewStore.binding(
         get: \.showCamera,
-        send: ImagesViewAction.setShowCamera
+        send: ImagesViewDomain.Action.setShowCamera
       ),
       content: {
         CameraView(
           isPresented: viewStore.binding(
             get: \.showCamera,
-            send: ImagesViewAction.setShowCamera
+            send: ImagesViewDomain.Action.setShowCamera
           ),
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
-            send: ImagesViewAction.setPhotos
+            send: ImagesViewDomain.Action.setPhotos
           )
         )
         .edgesIgnoringSafeArea(.vertical)

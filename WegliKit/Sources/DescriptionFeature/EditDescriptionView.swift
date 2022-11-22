@@ -11,10 +11,10 @@ public struct EditDescriptionView: View {
   @Environment(\.presentationMode) var presentationMode
   @Environment(\.isSearching) var isSearching
   
-  let store: Store<DescriptionState, DescriptionAction>
-  @ObservedObject private var viewStore: ViewStore<DescriptionState, DescriptionAction>
+  let store: Store<DescriptionDomain.State, DescriptionDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<DescriptionDomain.State, DescriptionDomain.Action>
   
-  public init(store: Store<DescriptionState, DescriptionAction>) {
+  public init(store: Store<DescriptionDomain.State, DescriptionDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -66,7 +66,7 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.licenseplateNumber,
       text: viewStore.binding(
         get: \.licensePlateNumber,
-        send: DescriptionAction.setLicensePlateNumber
+        send: DescriptionDomain.Action.setLicensePlateNumber
       )
     )
     .disableAutocorrection(true)
@@ -77,7 +77,7 @@ public struct EditDescriptionView: View {
     NavigationLink(
       isActive: viewStore.binding(
         get: \.presentCarBrandSelection,
-        send: DescriptionAction.presentBrandSelectionView
+        send: DescriptionDomain.Action.presentBrandSelectionView
       ),
       destination: {
         List {
@@ -104,7 +104,7 @@ public struct EditDescriptionView: View {
         }.searchable(
           text: viewStore.binding(
             get: \.carBrandSearchText,
-            send: DescriptionAction.setCarBrandSearchText
+            send: DescriptionDomain.Action.setCarBrandSearchText
           ),
           placement: .navigationBarDrawer(displayMode: .always)
         )
@@ -130,11 +130,11 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.carColor,
       selection: viewStore.binding(
         get: \.selectedColor,
-        send: DescriptionAction.setColor
+        send: DescriptionDomain.Action.setColor
       )
     ) {
-      ForEach(1 ..< DescriptionState.colors.count, id: \.self) {
-        Text(DescriptionState.colors[$0].value)
+      ForEach(1 ..< DescriptionDomain.State.colors.count, id: \.self) {
+        Text(DescriptionDomain.State.colors[$0].value)
           .contentShape(Rectangle())
           .tag($0)
           .foregroundColor(Color(.label))
@@ -146,7 +146,7 @@ public struct EditDescriptionView: View {
     NavigationLink(
       isActive: viewStore.binding(
         get: \.presentChargeSelection,
-        send: DescriptionAction.presentChargeSelectionView
+        send: DescriptionDomain.Action.presentChargeSelectionView
       ),
       destination: {
         List {
@@ -164,7 +164,7 @@ public struct EditDescriptionView: View {
         .searchable(
           text: viewStore.binding(
             get: \.chargeTypeSearchText,
-            send: DescriptionAction.setChargeTypeSearchText
+            send: DescriptionDomain.Action.setChargeTypeSearchText
           ),
           placement: .navigationBarDrawer(displayMode: .always)
         )
@@ -191,7 +191,7 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.length,
       selection: viewStore.binding(
         get: \.selectedDuration,
-        send: DescriptionAction.setDuration
+        send: DescriptionDomain.Action.setDuration
       )
     ) {
       ForEach(viewStore.times, id: \.self) { time in

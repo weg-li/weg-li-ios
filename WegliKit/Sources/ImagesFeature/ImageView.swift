@@ -12,10 +12,10 @@ public struct ImageView: View {
   @State private var showImageView = false
   @State private var scale: CGFloat = 1
   
-  let store: Store<ImageState, ImageAction>
-  @ObservedObject private var viewStore: ViewStore<ImageState, ImageAction>
+  let store: Store<ImageDomain.State, ImageDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<ImageDomain.State, ImageDomain.Action>
   
-  public init(store: Store<ImageState, ImageAction>) {
+  public init(store: Store<ImageDomain.State, ImageDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -96,13 +96,12 @@ private extension View {
 struct ImageView_Previews: PreviewProvider {
   static var previews: some View {
     ImageView(
-      store: Store<ImageState, ImageAction>(
+      store: Store<ImageDomain.State, ImageDomain.Action>(
         initialState: .init(
           id: .init(),
           image: PickerImageResult(uiImage: UIImage(systemName: "pencil")!)! // swiftlint:disable:this force_unwrapping
         ),
-        reducer: .empty,
-        environment: ImageEnvironment()
+        reducer: ImageDomain()
       )
     )
   }

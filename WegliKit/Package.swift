@@ -57,7 +57,9 @@ let package = Package(
       dependencies: [
         "Helper",
         "KeychainClient",
-        "SharedModels"
+        "SharedModels",
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
       ]
     ),
     .target(
@@ -71,15 +73,15 @@ let package = Package(
         "SettingsFeature",
         "SharedModels",
         "Styleguide",
-        .product(
-          name: "ComposableArchitecture",
-          package: "swift-composable-architecture"
-        )
+        .tca
       ]
     ),
     .target(
       name: "CameraAccessClient",
-      dependencies: []
+      dependencies: [
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
+      ]
     ),
     .target(
       name: "ContactFeature",
@@ -87,10 +89,7 @@ let package = Package(
         "L10n",
         "SharedModels",
         "Styleguide",
-        .product(
-          name: "ComposableArchitecture",
-          package: "swift-composable-architecture"
-        )
+        .tca
       ]
     ),
     .target(
@@ -101,7 +100,7 @@ let package = Package(
         "L10n",
         "SharedModels",
         "Styleguide",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ],
       resources: [.process("Resources")]
     ),
@@ -109,13 +108,15 @@ let package = Package(
       name: "FileClient",
       dependencies: [
         "Helper",
-        "SharedModels"
+        "SharedModels",
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
       ]
     ),
     .target(
       name: "Helper",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .target(
@@ -127,14 +128,16 @@ let package = Package(
         "PhotoLibraryAccessClient",
         "SharedModels",
         "Styleguide",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .target(
       name: "ImagesUploadClient",
       dependencies: [
         "ApiClient",
-        "SharedModels"
+        "SharedModels",
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
       ]
     ),
     .target(
@@ -142,7 +145,7 @@ let package = Package(
       dependencies: [
         .product(name: "KeychainSwift", package: "keychain-swift"),
         .product(name: "Dependencies", package: "swift-composable-architecture"),
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+        .testOverlay
       ]
     ),
     .target(
@@ -157,14 +160,8 @@ let package = Package(
         "SharedModels",
         "Styleguide",
         "UIApplicationClient",
-        .product(
-          name: "ComposableArchitecture",
-          package: "swift-composable-architecture"
-        ),
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        )
+        .tca,
+        .locationClient
       ]
     ),
     .target(
@@ -172,27 +169,37 @@ let package = Package(
       dependencies: [
         "L10n",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .target(
       name: "PathMonitorClient",
-      dependencies: []
+      dependencies: [
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
+      ]
     ),
     .target(
       name: "PhotoLibraryAccessClient",
-      dependencies: []
+      dependencies: [
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
+      ]
     ),
     .target(
       name: "PlacesServiceClient",
       dependencies: [
-        "SharedModels"
+        "SharedModels",
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
       ]
     ),
     .target(
       name: "RegulatoryOfficeMapper",
       dependencies: [
-        "SharedModels"
+        "SharedModels",
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .testOverlay
       ],
       resources: [.process("Resources")]
     ),
@@ -213,11 +220,8 @@ let package = Package(
         "PlacesServiceClient",
         "RegulatoryOfficeMapper",
         "SharedModels",
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        ),
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .locationClient,
+        .tca
       ]
     ),
     .target(
@@ -231,7 +235,7 @@ let package = Package(
         "SharedModels",
         "Styleguide",
         "UIApplicationClient",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .target(
@@ -253,7 +257,7 @@ let package = Package(
       name: "UIApplicationClient",
       dependencies: [
         .product(name: "Dependencies", package: "swift-composable-architecture"),
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+        .testOverlay
       ]
     )
   ]
@@ -272,7 +276,7 @@ package.targets.append(
         "ImagesFeature",
         "ReportFeature",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ],
       exclude: [
         "AppFeatureTests.swift.plist"
@@ -282,14 +286,14 @@ package.targets.append(
       name: "ContactFeatureTests",
       dependencies: [
         "ContactFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .testTarget(
       name: "DescriptionFeatureTests",
       dependencies: [
         "DescriptionFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .testTarget(
@@ -300,11 +304,8 @@ package.targets.append(
         "L10n",
         "PhotoLibraryAccessClient",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        )
+        .tca,
+        .locationClient
       ]
     ),
     .testTarget(
@@ -314,11 +315,8 @@ package.targets.append(
         "PlacesServiceClient",
         "SharedModels",
         "UIApplicationClient",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        )
+        .tca,
+        .locationClient
       ]
     ),
     .testTarget(
@@ -326,7 +324,7 @@ package.targets.append(
       dependencies: [
         "MailFeature",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .tca,
         .product(name: "CustomDump", package: "swift-custom-dump")
       ]
     ),
@@ -338,7 +336,7 @@ package.targets.append(
         "PlacesServiceClient",
         "ReportFeature",
         "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .tca,
         .product(name: "CustomDump", package: "swift-custom-dump")
       ]
     ),
@@ -347,7 +345,7 @@ package.targets.append(
       dependencies: [
         "SharedModels",
         "SettingsFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .testTarget(
@@ -365,3 +363,11 @@ package.targets.append(
     )
   ]
 )
+
+
+extension Target.Dependency {
+  static let tca = product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+  static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")
+//  static let dependencies = product(name: "Dependencies", package: "swift-composable-architecture")
+  static let testOverlay = product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+}

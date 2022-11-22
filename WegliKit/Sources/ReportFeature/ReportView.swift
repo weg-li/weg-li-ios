@@ -11,10 +11,13 @@ import Styleguide
 import SwiftUI
 
 public struct ReportView: View {
-  private let store: Store<ReportState, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<ReportState, ReportAction>
+  public typealias S = ReportDomain.State
+  public typealias A = ReportDomain.Action
+  
+  private let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<S, A>
     
-  public init(store: Store<ReportState, ReportAction>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -30,7 +33,7 @@ public struct ReportView: View {
           ImagesView(
             store: store.scope(
               state: \.images,
-              action: ReportAction.images
+              action: A.images
             )
           )
         }
@@ -45,7 +48,7 @@ public struct ReportView: View {
               L10n.date,
               selection: viewStore.binding(
                 get: \.date,
-                send: ReportAction.setDate
+                send: A.setDate
               )
             )
             .labelsHidden()
@@ -66,7 +69,7 @@ public struct ReportView: View {
           LocationView(
             store: store.scope(
               state: \.location,
-              action: ReportAction.location
+              action: A.location
             )
           )
         }
@@ -157,7 +160,7 @@ public struct ReportView: View {
                   if !viewStore.state.description.isValid {
                     Text(L10n.Report.Error.description.asBulletPoint)
                   }
-                  if !viewStore.state.contactState.isValid {
+                  if !viewStore.state.contactState.contact.isValid {
                     Text(L10n.Report.Error.contact.asBulletPoint)
                   }
                 }

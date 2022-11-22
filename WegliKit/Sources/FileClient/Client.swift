@@ -1,6 +1,15 @@
+import Dependencies
 import Foundation
 import Helper
 import SharedModels
+
+extension DependencyValues {
+  public var fileClient: FileClient {
+    get { self[FileClient.self] }
+    set { self[FileClient.self] = newValue }
+  }
+}
+
 
 // MARK: Interface
 

@@ -1,5 +1,3 @@
-// Created for weg-li in 2021.
-
 import SwiftUI
 import UIKit.UIColor
 

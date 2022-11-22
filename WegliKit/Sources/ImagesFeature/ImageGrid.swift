@@ -5,10 +5,13 @@ import SharedModels
 import SwiftUI
 
 public struct ImageGrid: View {
-  let store: Store<ImagesViewState, ImagesViewAction>
-  @ObservedObject var viewStore: ViewStore<ImagesViewState, ImagesViewAction>
+  public typealias S = ImagesViewDomain.State
+  public typealias A = ImagesViewDomain.Action
   
-  public init(store: Store<ImagesViewState, ImagesViewAction>) {
+  let store: Store<S, A>
+  @ObservedObject var viewStore: ViewStore<S, A>
+  
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -22,10 +25,7 @@ public struct ImageGrid: View {
   public var body: some View {
     LazyVGrid(columns: gridItemLayout, spacing: 12) {
       ForEachStore(
-        store.scope(
-          state: \.imageStates,
-          action: ImagesViewAction.image
-        ),
+        store.scope(state: \.imageStates, action: A.image),
         content: ImageView.init
       )
     }
@@ -36,7 +36,7 @@ public struct ImageGrid: View {
 struct ImageGrid_Previews: PreviewProvider {
   static var previews: some View {
     ImageGrid(
-      store: Store<ImagesViewState, ImagesViewAction>(
+      store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>(
         initialState: .init(
           showImagePicker: false,
           storedPhotos: [
@@ -48,8 +48,7 @@ struct ImageGrid_Previews: PreviewProvider {
           ],
           coordinateFromImagePicker: .zero
         ),
-        reducer: .empty,
-        environment: ImageEnvironment()
+        reducer: ImagesViewDomain()
       )
     )
   }

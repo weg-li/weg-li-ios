@@ -4,7 +4,7 @@ import KeychainSwift
 import XCTestDynamicOverlay
 
 extension KeychainClient: TestDependencyKey {
-  static let noop = Self(
+  public static let noop = Self(
     getString: { _ in nil },
     setString: { _, _, _ in false },
     delete: { _ in false },

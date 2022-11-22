@@ -6,9 +6,12 @@ import SharedModels
 import SwiftUI
 
 public struct MailView: UIViewControllerRepresentable {
-  @ObservedObject private var viewStore: ViewStore<MailViewState, MailViewAction>
+  public typealias S = MailDomain.State
+  public typealias A = MailDomain.Action
   
-  public init(store: Store<MailViewState, MailViewAction>) {
+  @ObservedObject private var viewStore: ViewStore<S, A>
+  
+  public init(store: Store<S, A>) {
     self.viewStore = ViewStore(store)
   }
   
@@ -46,11 +49,11 @@ public struct MailView: UIViewControllerRepresentable {
     Coordinator(
       isShowing: viewStore.binding(
         get: \.isPresentingMailContent,
-        send: MailViewAction.presentMailContentView
+        send: A.presentMailContentView
       ),
       result: viewStore.binding(
         get: \.mailComposeResult,
-        send: MailViewAction.setMailResult
+        send: A.setMailResult
       ),
       mail: viewStore.mail
     )

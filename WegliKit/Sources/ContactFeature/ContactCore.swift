@@ -21,17 +21,6 @@ public struct ContactViewDomain: ReducerProtocol {
     
     @BindableState public var contact: Contact
     @BindableState public var alert: AlertState<Action>?
-    
-    public var isValid: Bool {
-      [
-        contact.firstName,
-        contact.name,
-        contact.address.street,
-        contact.address.city
-      ].allSatisfy { !$0.isEmpty }
-      && contact.address.postalCode.isNumeric
-      && contact.address.postalCode.count == 5
-    }
   }
   
   public enum Action: Equatable {

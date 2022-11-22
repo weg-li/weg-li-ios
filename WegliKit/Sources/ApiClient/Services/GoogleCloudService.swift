@@ -1,7 +1,16 @@
 import Combine
+import Dependencies
 import Foundation
 import Helper
 import SharedModels
+import XCTestDynamicOverlay
+
+extension DependencyValues {
+  public var googleUploadService: GoogleUploadService {
+    get { self[GoogleUploadService.self] }
+    set { self[GoogleUploadService.self] = newValue }
+  }
+}
 
 public struct GoogleUploadService {
   public var upload: @Sendable (URL?, [URLQueryItem]?, Data?, [String: String]) async throws -> Void
@@ -34,8 +43,12 @@ public extension GoogleUploadService {
   }
 }
 
-public extension GoogleUploadService {
-  static let noop = Self(
+extension GoogleUploadService: TestDependencyKey {
+  public static let noop = Self(
     upload: { _, _, _, _ in }
+  )
+  
+  public static var testValue: GoogleUploadService = Self(
+    upload: unimplemented("\(Self.self).upload")
   )
 }

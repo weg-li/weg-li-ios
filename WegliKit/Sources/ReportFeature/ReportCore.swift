@@ -20,109 +20,468 @@ import SharedModels
 import SwiftUI
 import UIApplicationClient
 
-// MARK: - Report Core
-
-public struct ReportState: Equatable {
-  public var id: String
-  public var images: ImagesViewState
-  public var contactState: ContactState
-  public var district: District?
+public struct ReportDomain: ReducerProtocol {
+  public init() {}
   
-  public var date: Date
-  public var description: DescriptionState
-  public var location: LocationViewState
-  public var mail: MailViewState
+  @Dependency(\.mainQueue) public var mainQueue
+  //  @Dependency(\.) public var backgroundQueue: AnySchedulerOf<DispatchQueue>
+  //  @Dependency(\.) public var mapAddressQueue: AnySchedulerOf<DispatchQueue>
+  @Dependency(\.locationManager) public var locationManager
+  @Dependency(\.placesServiceClient) public var placeService
+  @Dependency(\.regulatoryOfficeMapper) public var regulatoryOfficeMapper
+  @Dependency(\.fileClient) public var fileClient
+  @Dependency(\.pathMonitorClient) public var pathMonitorClient
+  @Dependency(\.imagesUploadClient) public var imagesUploadClient
+  @Dependency(\.apiService) public var wegliService
+  @Dependency(\.applicationClient) public var uiApplicationClient
+  @Dependency(\.date) public var date
   
-  public var alert: AlertState<ReportAction>?
+  public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
   
-  public var showEditDescription = false
-  public var showEditContact = false
+  let debounce = 0.5
+  let postalCodeMinumimCharacters = 5
   
-  public var apiToken = ""
-  
-  public var uploadedImagesIds: [String] = []
-  public var uploadProgressState: String?
-  
-  public var isPhotosValid: Bool { !images.storedPhotos.isEmpty }
-  public var isContactValid: Bool { contactState.isValid }
-  public var isDescriptionValid: Bool { description.isValid }
-  public var isLocationValid: Bool { location.resolvedAddress.isValid }
-  public var isResetButtonDisabled: Bool {
-    location.resolvedAddress == .init()
+  public struct State: Equatable {
+    public var id: String
+    public var images: ImagesViewDomain.State
+    public var contactState: ContactViewDomain.State
+    public var district: District?
+    
+    public var date: Date
+    public var description: DescriptionDomain.State
+    public var location: LocationDomain.State
+    public var mail: MailDomain.State
+    
+    public var alert: AlertState<Action>?
+    
+    public var showEditDescription = false
+    public var showEditContact = false
+    
+    public var apiToken = ""
+    
+    public var uploadedImagesIds: [String] = []
+    public var uploadProgressState: String?
+    
+    public var isPhotosValid: Bool { !images.storedPhotos.isEmpty }
+    public var isContactValid: Bool { contactState.contact.isValid }
+    public var isDescriptionValid: Bool { description.isValid }
+    public var isLocationValid: Bool { location.resolvedAddress.isValid }
+    public var isResetButtonDisabled: Bool {
+      location.resolvedAddress == .init()
       && images.storedPhotos.isEmpty
       && description == .init()
-  }
-
-  public var isNetworkAvailable = true
-  public var isUploadingNotice = false
-  
-  public var canSubmitNotice = false
-  public var isSubmittingNotice = false
-  
-  public var uploadedNoticeID: String?
-  
-  public func isModified() -> Bool {
-    district != nil
+    }
+    
+    public var isNetworkAvailable = true
+    public var isUploadingNotice = false
+    
+    public var canSubmitNotice = false
+    public var isSubmittingNotice = false
+    
+    public var uploadedNoticeID: String?
+    
+    public func isModified() -> Bool {
+      district != nil
       || isPhotosValid
-      || contactState.isValid
+      || contactState.contact.isValid
       || location != .init()
       || description != .init()
-  }
-  
-  public var isReportValid: Bool {
-    images.isValid
-      && contactState.isValid
+    }
+    
+    public var isReportValid: Bool {
+      images.isValid
+      && contactState.contact.isValid
       && description.isValid
       && location.resolvedAddress.isValid
+    }
+    
+    internal init(
+      id: String,
+      images: ImagesViewDomain.State,
+      contactState: ContactViewDomain.State,
+      district: District? = nil,
+      date: Date,
+      description: DescriptionDomain.State,
+      location: LocationDomain.State,
+      mail: MailDomain.State,
+      alert: AlertState<Action>? = nil,
+      showEditDescription: Bool = false,
+      showEditContact: Bool = false,
+      apiToken: String = "",
+      uploadedImagesIds: [String] = [],
+      uploadProgressState: String? = nil,
+      isNetworkAvailable: Bool = true,
+      isUploadingNotice: Bool = false
+    ) {
+      self.id = id
+      self.images = images
+      self.contactState = contactState
+      self.district = district
+      self.date = date
+      self.description = description
+      self.location = location
+      self.mail = mail
+      self.alert = alert
+      self.showEditDescription = showEditDescription
+      self.showEditContact = showEditContact
+      self.apiToken = apiToken
+      self.uploadedImagesIds = uploadedImagesIds
+      self.uploadProgressState = uploadProgressState
+      self.isNetworkAvailable = isNetworkAvailable
+      self.isUploadingNotice = isUploadingNotice
+    }
   }
   
-  internal init(
-    id: String,
-    images: ImagesViewState,
-    contactState: ContactState,
-    district: District? = nil,
-    date: Date,
-    description: DescriptionState,
-    location: LocationViewState,
-    mail: MailViewState,
-    alert: AlertState<ReportAction>? = nil,
-    showEditDescription: Bool = false,
-    showEditContact: Bool = false,
-    apiToken: String = "",
-    uploadedImagesIds: [String] = [],
-    uploadProgressState: String? = nil,
-    isNetworkAvailable: Bool = true,
-    isUploadingNotice: Bool = false
-  ) {
-    self.id = id
-    self.images = images
-    self.contactState = contactState
-    self.district = district
-    self.date = date
-    self.description = description
-    self.location = location
-    self.mail = mail
-    self.alert = alert
-    self.showEditDescription = showEditDescription
-    self.showEditContact = showEditContact
-    self.apiToken = apiToken
-    self.uploadedImagesIds = uploadedImagesIds
-    self.uploadProgressState = uploadProgressState
-    self.isNetworkAvailable = isNetworkAvailable
-    self.isUploadingNotice = isUploadingNotice
+  public enum Action: BindableAction, Equatable {
+    case binding(BindingAction<State>)
+    case onAppear
+    case images(ImagesViewDomain.Action)
+    case contact(ContactViewDomain.Action)
+    case description(DescriptionDomain.Action)
+    case location(LocationDomain.Action)
+    case mail(MailDomain.Action)
+    case mapAddressToDistrict(Address)
+    case mapDistrictFinished(TaskResult<District>)
+    case onResetButtonTapped
+    case onUploadImagesButtonTapped
+    case onResetConfirmButtonTapped
+    case setShowEditDescription(Bool)
+    case setShowEditContact(Bool)
+    case dismissAlert
+    case setDate(Date)
+    case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
+    case composeNoticeAndSend
+    case composeNoticeResponse(TaskResult<Notice>)
+    case submitNotice
+    case submitNoticeResponse(TaskResult<Notice>)
+    case editNoticeInBrowser
+  }
+  
+  public var body: some ReducerProtocol<State, Action> {
+    Scope(state: \.images, action: /Action.images) {
+      ImagesViewDomain()
+    }
+    
+    Scope(state: \.description, action: /Action.description) {
+      DescriptionDomain()
+    }
+    
+    Scope(state: \.contactState, action: /Action.contact) {
+      ContactViewDomain()
+    }
+    
+    Scope(state: \.location, action: /Action.location) {
+      LocationDomain()
+    }
+    
+    Scope(state: \.mail, action: /Action.mail) {
+      MailDomain()
+    }
+    
+    BindingReducer()
+    
+    Reduce<State, Action> { state, action in
+      switch action {
+      case .binding:
+        return .none
+        
+      case .onAppear:
+        return .none
+        
+        // Triggers district mapping after geoAddress is stored.
+      case let .mapAddressToDistrict(input):
+        return .task {
+          await .mapDistrictFinished(
+            TaskResult {
+              try await regulatoryOfficeMapper.mapAddressToDistrict(input)
+            }
+          )
+        }
+        
+      case let .mapDistrictFinished(.success(district)):
+        state.district = district
+        return .none
+        
+      case let .mapDistrictFinished(.failure(error)):
+        // present alert maybe?
+        debugPrint(error)
+        return .none
+        
+      case let .images(imageViewAction):
+        switch imageViewAction {
+          // After the images coordinate was set trigger resolve location and map to district.
+        case let .setImageCoordinate(coordinate):
+          guard let coordinate = coordinate, !state.images.storedPhotos.isEmpty else {
+            state.alert = .noPhotoCoordinate
+            return .none
+          }
+          
+          state.location.region = CoordinateRegion(center: coordinate)
+          state.images.pickerResultCoordinate = coordinate
+          state.location.pinCoordinate = coordinate
+          
+          guard state.isNetworkAvailable else {
+            state.alert = .noInternetConnection(coordinate: state.location.pinCoordinate!)
+            return .none
+          }
+          
+          return Effect(value: Action.location(.resolveLocation(coordinate)))
+          
+        case .setPhotos:
+          if state.images.pickerResultCoordinate == nil {
+            if let coordinate = state.location.region?.center {
+              return Effect(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
+            }
+          }
+          
+          return .none
+          
+        case let .setImageCreationDate(date):
+          // set report date from selected photos
+          state.date = date ?? Date()
+          return .none
+          
+          // Handle single image remove action to reset map annotations and reset valid state.
+        case .image(_, .onRemovePhotoButtonTapped):
+          if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
+            state.images.pickerResultCoordinate = nil
+            state.location.pinCoordinate = nil
+            state.location.resolvedAddress = .init()
+            state.date = date.callAsFunction()
+          }
+          return .none
+          
+        case let .selectedTextItem(textItem):
+          state.description.licensePlateNumber = textItem.text.uppercased()
+          return .none
+          
+        default:
+          return .none
+        }
+        
+      case let .location(locationAction):
+        switch locationAction {
+          // Trigger district mapping after address is resolved.
+        case let .resolveAddressFinished(.success(resolvedAddresses)):
+          guard let address = resolvedAddresses.first else {
+            return .none
+          }
+          return Effect(value: .mapAddressToDistrict(address))
+          
+        case let .resolveAddressFinished(.failure(error)):
+          state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
+          return .none
+          
+          // Handle manual address entering to trigger district mapping.
+        case let .updateGeoAddressPostalCode(postalCode):
+          guard postalCode.count == postalCodeMinumimCharacters, postalCode.isNumeric else {
+            return .none
+          }
+          return Effect(value: .mapAddressToDistrict(state.location.resolvedAddress))
+          
+        case .updateGeoAddressCity:
+          return Effect(value: .mapAddressToDistrict(state.location.resolvedAddress))
+          
+        case let .setLocationOption(option) where option == .fromPhotos:
+          if !state.images.storedPhotos.isEmpty, let coordinate = state.images.pickerResultCoordinate {
+            return Effect(value: .location(.resolveLocation(coordinate)))
+          } else {
+            return .none
+          }
+          
+        case let .setPinCoordinate(coordinate):
+          guard let coordinate = coordinate, state.location.locationOption == .currentLocation else { return .none }
+          return Effect(value: .location(.resolveLocation(coordinate)))
+          
+        default:
+          return .none
+        }
+        
+        // Compose mail when send mail button was tapped.
+      case .mail(.submitButtonTapped):
+        guard canSendMail() else {
+          state.alert = .noMailAccount
+          return .none
+        }
+        
+        guard let district = state.district else {
+          return .none
+        }
+        state.mail.mail.address = district.email
+        state.mail.mail.body = state.createMailBody()
+        state.mail.mail.attachmentData = state.images.storedPhotos
+          .compactMap { $0?.imageUrl }
+          .compactMap { try? Data(contentsOf: $0) }
+        return Effect(value: .mail(.presentMailContentView(true)))
+        
+      case .mail:
+        return .none
+        
+      case .contact:
+        let contact = state.contactState.contact
+        
+        return .fireAndForget {
+          enum CancelID {}
+          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+            try await mainQueue.sleep(for: .seconds(0.3))
+            try await fileClient.saveContactSettings(contact)
+          }
+        }
+        
+      case .description:
+        return .none
+        
+      case .onResetButtonTapped:
+        state.alert = .resetReportAlert
+        return .none
+        
+      case .onResetConfirmButtonTapped:
+        // Reset report will be handled in the homeReducer
+        return Effect(value: .dismissAlert)
+        
+      case let .setShowEditDescription(value):
+        state.showEditDescription = value
+        return .none
+        
+      case let .setShowEditContact(value):
+        state.showEditContact = value
+        return .none
+        
+      case .dismissAlert:
+        state.alert = nil
+        return .none
+        
+      case let .setDate(date):
+        state.date = date
+        return .none
+        
+      case .onUploadImagesButtonTapped:
+        guard state.isNetworkAvailable else {
+          state.alert = .init(
+            title: .init("Keine Internetverbindung"),
+            message: .init("Verbinde dich mit dem Internet um die Meldung hochzuladen"),
+            buttons: [
+              .cancel(.init(L10n.cancel)),
+              .default(.init("Wiederholen"), action: .send(.onUploadImagesButtonTapped))
+            ]
+          )
+          return .none
+        }
+        
+        let results = state.images.imageStates.map { $0.image }
+        
+        state.isUploadingNotice = true
+        state.uploadProgressState = "Uploading images ..."
+        
+        return .task {
+          await .uploadImagesResponse(
+            TaskResult {
+              try await imagesUploadClient.uploadImages(results)
+            }
+          )
+        }
+        
+      case let .uploadImagesResponse(.success(imageInputFromUpload)):
+        state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
+        return Effect(value: .composeNoticeAndSend)
+        
+      case let .uploadImagesResponse(.failure(error)):
+        return Effect(value: .composeNoticeResponse(.failure(ApiError(error: error))))
+        
+      case .composeNoticeAndSend:
+        var notice = NoticeInput(state)
+        notice.photos = state.uploadedImagesIds
+        state.isUploadingNotice = true
+        
+        state.uploadProgressState = "Sending notice ..."
+        
+        return .task { [notice] in
+          await .composeNoticeResponse(
+            TaskResult {
+              try await wegliService.postNotice(notice)
+            }
+          )
+        }
+        
+      case let .composeNoticeResponse(.success(response)):
+        state.isUploadingNotice = false
+        state.uploadProgressState = nil
+        
+        state.canSubmitNotice = true
+        
+        state.uploadedNoticeID = response.token
+        
+        let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
+        return .fireAndForget {
+          await withTaskGroup(of: Void.self, body: { group in
+            imageURLs.forEach { url in
+              group.addTask(priority: .background) {
+                try? await fileClient.removeItem(url)
+              }
+            }
+            debugPrint("removed items")
+          })
+        }
+        
+      case let .composeNoticeResponse(.failure(error)):
+        state.isUploadingNotice = false
+        state.alert = .sendNoticeFailed(error: error as! ApiError)
+        state.uploadProgressState = nil
+        return .none
+        
+      case .editNoticeInBrowser:
+        guard let id = state.uploadedNoticeID else {
+          return .none
+        }
+        let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
+        return .fireAndForget {
+          _ = await uiApplicationClient.open(editURL, [:])
+        }
+        
+      case .submitNotice:
+        let notice = NoticeInput(state)
+        
+        state.isSubmittingNotice = true
+        
+        return .task { [notice] in
+          await .submitNoticeResponse(
+            TaskResult {
+              try await wegliService.submitNotice(notice)
+            }
+          )
+        }
+        
+      case .submitNoticeResponse(.success):
+        state.isSubmittingNotice = false
+        state.uploadedImagesIds.removeAll()
+        
+        state.alert = .reportSent
+        return .none
+        
+      case let .submitNoticeResponse(.failure(error)):
+        state.isSubmittingNotice = false
+        
+        state.alert = .sendNoticeFailed(error: error as! ApiError)
+        return .none
+        
+      }
+    }
   }
 }
 
-public extension ReportState {
+
+
+
+public extension ReportDomain.State {
   init(
     uuid: @escaping () -> UUID,
-    images: ImagesViewState,
-    contactState: ContactState,
+    images: ImagesViewDomain.State = .init(),
+    contactState: ContactViewDomain.State = .empty,
     district: District? = nil,
     date: () -> Date,
-    description: DescriptionState = DescriptionState(),
-    location: LocationViewState = LocationViewState(),
-    mail: MailViewState = MailViewState()
+    description: DescriptionDomain.State = .init(),
+    location: LocationDomain.State = .init(),
+    mail: MailDomain.State = .init()
   ) {
     self.id = uuid().uuidString
     self.images = images
@@ -135,424 +494,13 @@ public extension ReportState {
   }
 }
 
-public enum ReportAction: BindableAction, Equatable {
-  case binding(BindingAction<ReportState>)
-  case onAppear
-  case images(ImagesViewAction)
-  case contact(ContactStateAction)
-  case description(DescriptionAction)
-  case location(LocationViewAction)
-  case mail(MailViewAction)
-  case mapAddressToDistrict(Address)
-  case mapDistrictFinished(TaskResult<District>)
-  case onResetButtonTapped
-  case onUploadImagesButtonTapped
-  case onResetConfirmButtonTapped
-  case setShowEditDescription(Bool)
-  case setShowEditContact(Bool)
-  case dismissAlert
-  case setDate(Date)
-  case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
-  case composeNoticeAndSend
-  case composeNoticeResponse(TaskResult<Notice>)
-  case submitNotice
-  case submitNoticeResponse(TaskResult<Notice>)
-  case editNoticeInBrowser
-}
-
-public struct ReportEnvironment {
-  public init(
-    mainQueue: AnySchedulerOf<DispatchQueue>,
-    backgroundQueue: AnySchedulerOf<DispatchQueue>,
-    mapAddressQueue: AnySchedulerOf<DispatchQueue> = mapperQueue.eraseToAnyScheduler(),
-    locationManager: LocationManager,
-    placeService: PlacesServiceClient,
-    regulatoryOfficeMapper: RegulatoryOfficeMapper,
-    fileClient: FileClient,
-    wegliService: WegliAPIService,
-    uiApplicationClient: UIApplicationClient = .live,
-    date: @escaping () -> Date,
-    pathMonitorClient: PathMonitorClient = .live(queue: .main),
-    imagesUploadClient: ImagesUploadClient = .live()
-  ) {
-    self.mainQueue = mainQueue
-    self.backgroundQueue = backgroundQueue
-    self.mapAddressQueue = mapAddressQueue
-    self.locationManager = locationManager
-    self.placeService = placeService
-    self.regulatoryOfficeMapper = regulatoryOfficeMapper
-    self.fileClient = fileClient
-    self.pathMonitorClient = pathMonitorClient
-    self.imagesUploadClient = imagesUploadClient
-    self.wegliService = wegliService
-    self.uiApplicationClient = uiApplicationClient
-    
-    self.date = date
-  }
-  
-  public var mainQueue: AnySchedulerOf<DispatchQueue>
-  public var backgroundQueue: AnySchedulerOf<DispatchQueue>
-  public var mapAddressQueue: AnySchedulerOf<DispatchQueue>
-  public var locationManager: LocationManager
-  public var placeService: PlacesServiceClient
-  public var regulatoryOfficeMapper: RegulatoryOfficeMapper
-  public let fileClient: FileClient
-  public let pathMonitorClient: PathMonitorClient
-  public let imagesUploadClient: ImagesUploadClient
-  public let wegliService: WegliAPIService
-  public let uiApplicationClient: UIApplicationClient
-  public var date: () -> Date
-  
-  public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
-  
-  let debounce = 0.5
-  let postalCodeMinumimCharacters = 5
-}
 
 struct ObserveConnectionIdentifier: Hashable {}
 
-/// Combined reducer that is used in the ReportView and combing descending reducers.
-public let reportReducer = Reducer<ReportState, ReportAction, ReportEnvironment>.combine(
-  imagesReducer.pullback(
-    state: \.images,
-    action: /ReportAction.images,
-    environment: {
-      ImagesViewEnvironment(
-        mainQueue: $0.mainQueue,
-        backgroundQueue: $0.backgroundQueue,
-        cameraAccessClient: .live(),
-        photoLibraryAccessClient: .live(),
-        textRecognitionClient: .live
-      )
-    }
-  ),
-  descriptionReducer.pullback(
-    state: \.description,
-    action: /ReportAction.description,
-    environment: {
-      DescriptionEnvironment(
-        mainQueue: $0.mainQueue,
-        backgroundQueue: $0.backgroundQueue,
-        fileClient: $0.fileClient
-      )
-    }
-  ),
-  contactViewReducer.pullback(
-    state: \.contactState,
-    action: /ReportAction.contact,
-    environment: { _ in ContactEnvironment() }
-  ),
-  locationReducer.pullback(
-    state: \.location,
-    action: /ReportAction.location,
-    environment: {
-      LocationViewEnvironment(
-        locationManager: $0.locationManager,
-        placeService: $0.placeService,
-        uiApplicationClient: .live,
-        mainRunLoop: $0.mainQueue
-      )
-    }
-  ),
-  mailViewReducer.pullback(
-    state: \.mail,
-    action: /ReportAction.mail,
-    environment: { _ in MailViewEnvironment() }
-  ),
-  Reducer { state, action, environment in
-    struct LocationManagerId: Hashable {}
-    struct DebounceID: Hashable {}
-    
-    switch action {
-    case .binding:
-      return .none
-      
-    case .onAppear:
-      return .none
-  
-    // Triggers district mapping after geoAddress is stored.
-    case let .mapAddressToDistrict(input):
-      return .task {
-        await .mapDistrictFinished(
-          TaskResult {
-            try await environment.regulatoryOfficeMapper.mapAddressToDistrict(input)
-          }
-        )
-      }
-      
-    case let .mapDistrictFinished(.success(district)):
-      state.district = district
-      return .none
-      
-    case let .mapDistrictFinished(.failure(error)):
-      // present alert maybe?
-      debugPrint(error)
-      return .none
-      
-    case let .images(imageViewAction):
-      switch imageViewAction {
-      // After the images coordinate was set trigger resolve location and map to district.
-      case let .setImageCoordinate(coordinate):
-        guard let coordinate = coordinate, !state.images.storedPhotos.isEmpty else {
-          state.alert = .noPhotoCoordinate
-          return .none
-        }
-        
-        state.location.region = CoordinateRegion(center: coordinate)
-        state.images.pickerResultCoordinate = coordinate
-        state.location.pinCoordinate = coordinate
-        
-        guard state.isNetworkAvailable else {
-          state.alert = .noInternetConnection(coordinate: state.location.pinCoordinate!)
-          return .none
-        }
-        
-        return Effect(value: ReportAction.location(.resolveLocation(coordinate)))
-        
-      case .setPhotos:
-        if state.images.pickerResultCoordinate == nil {
-          if let coordinate = state.location.region?.center {
-            return Effect(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
-          }
-        }
-        
-        return .none
-        
-      case let .setImageCreationDate(date):
-        // set report date from selected photos
-        state.date = date ?? Date()
-        return .none
-      
-      // Handle single image remove action to reset map annotations and reset valid state.
-      case .image(_, .onRemovePhotoButtonTapped):
-        if state.images.storedPhotos.isEmpty, state.location.locationOption == .fromPhotos {
-          state.images.pickerResultCoordinate = nil
-          state.location.pinCoordinate = nil
-          state.location.resolvedAddress = .init()
-          state.date = environment.date()
-        }
-        return .none
-        
-      case let .selectedTextItem(textItem):
-        state.description.licensePlateNumber = textItem.text.uppercased()
-        return .none
-        
-      default:
-        return .none
-      }
-      
-    case let .location(locationAction):
-      switch locationAction {
-      // Trigger district mapping after address is resolved.
-      case let .resolveAddressFinished(.success(resolvedAddresses)):
-        guard let address = resolvedAddresses.first else {
-          return .none
-        }
-        return Effect(value: ReportAction.mapAddressToDistrict(address))
-        
-      case let .resolveAddressFinished(.failure(error)):
-        state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
-        return .none
-        
-      // Handle manual address entering to trigger district mapping.
-      case let .updateGeoAddressPostalCode(postalCode):
-        guard postalCode.count == environment.postalCodeMinumimCharacters, postalCode.isNumeric else {
-          return .none
-        }
-        return Effect(value: ReportAction.mapAddressToDistrict(state.location.resolvedAddress))
-        
-      case let .updateGeoAddressCity(city):
-        return Effect(value: ReportAction.mapAddressToDistrict(state.location.resolvedAddress))
-        
-      case let .setLocationOption(option) where option == .fromPhotos:
-        if !state.images.storedPhotos.isEmpty, let coordinate = state.images.pickerResultCoordinate {
-          return Effect(value: .location(.resolveLocation(coordinate)))
-        } else {
-          return .none
-        }
-        
-      case let .setPinCoordinate(coordinate):
-        guard let coordinate = coordinate, state.location.locationOption == .currentLocation else { return .none }
-        return Effect(value: .location(.resolveLocation(coordinate)))
-        
-      default:
-        return .none
-      }
-      
-    // Compose mail when send mail button was tapped.
-    case .mail(.submitButtonTapped):
-      guard environment.canSendMail() else {
-        state.alert = .noMailAccount
-        return .none
-      }
-      
-      guard let district = state.district else {
-        return .none
-      }
-      state.mail.mail.address = district.email
-      state.mail.mail.body = state.createMailBody()
-      state.mail.mail.attachmentData = state.images.storedPhotos
-        .compactMap { $0?.imageUrl }
-        .compactMap { try? Data(contentsOf: $0) }
-      return Effect(value: ReportAction.mail(.presentMailContentView(true)))
-  
-    case .mail:
-      return .none
-      
-    case .contact, .description:
-      return .none
-      
-    case .onResetButtonTapped:
-      state.alert = .resetReportAlert
-      return .none
-      
-    case .onResetConfirmButtonTapped:
-      // Reset report will be handled in the homeReducer
-      return Effect(value: .dismissAlert)
-      
-    case let .setShowEditDescription(value):
-      state.showEditDescription = value
-      return .none
-      
-    case let .setShowEditContact(value):
-      state.showEditContact = value
-      return .none
-      
-    case .dismissAlert:
-      state.alert = nil
-      return .none
-      
-    case let .setDate(date):
-      state.date = date
-      return .none
-      
-    case .onUploadImagesButtonTapped:
-      guard state.isNetworkAvailable else {
-        state.alert = .init(
-          title: .init("Keine Internetverbindung"),
-          message: .init("Verbinde dich mit dem Internet um die Meldung hochzuladen"),
-          buttons: [
-            .cancel(.init(L10n.cancel)),
-            .default(.init("Wiederholen"), action: .send(.onUploadImagesButtonTapped))
-          ]
-        )
-        return .none
-      }
-      
-      let results = state.images.imageStates.map { $0.image }
-      
-      state.isUploadingNotice = true
-      state.uploadProgressState = "Uploading images ..."
-      
-      return .task {
-        await .uploadImagesResponse(
-          TaskResult {
-            try await environment.imagesUploadClient.uploadImages(results)
-          }
-        )
-      }
-      
-    case let .uploadImagesResponse(.success(imageInputFromUpload)):
-      state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
-      return Effect(value: .composeNoticeAndSend)
-      
-    case let .uploadImagesResponse(.failure(error)):
-      return Effect(value: .composeNoticeResponse(.failure(ApiError(error: error))))
-      
-    case .composeNoticeAndSend:
-      var notice = NoticeInput(state)
-      notice.photos = state.uploadedImagesIds
-      state.isUploadingNotice = true
-      
-      state.uploadProgressState = "Sending notice ..."
-      
-      return .task { [notice] in
-        await .composeNoticeResponse(
-          TaskResult {
-            try await environment.wegliService.postNotice(notice)
-          }
-        )
-      }
-      
-    case let .composeNoticeResponse(.success(response)):
-      state.isUploadingNotice = false
-      state.uploadProgressState = nil
-      
-      state.canSubmitNotice = true
-      
-      state.uploadedNoticeID = response.token
-      
-      let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
-      return .fireAndForget {
-        await withTaskGroup(of: Void.self, body: { group in
-          imageURLs.forEach { url in
-            group.addTask(priority: .background) {
-              try? await environment.fileClient.removeItem(url)
-            }
-          }
-          debugPrint("removed items")
-        })
-      }
-      
-    case let .composeNoticeResponse(.failure(error)):
-      state.isUploadingNotice = false
-      state.alert = .sendNoticeFailed(error: error as! ApiError)
-      state.uploadProgressState = nil
-      return .none
-      
-    case .editNoticeInBrowser:
-      guard let id = state.uploadedNoticeID else {
-        return .none
-      }
-      let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
-      return .fireAndForget {
-        _ = await environment.uiApplicationClient.open(editURL, [:])
-      }
-      
-    case .submitNotice:
-      let notice = NoticeInput(state)
-      
-      state.isSubmittingNotice = true
-      
-      return .task { [notice] in
-        await .submitNoticeResponse(
-          TaskResult {
-            try await environment.wegliService.submitNotice(notice)
-          }
-        )
-      }
-      
-    case let .submitNoticeResponse(.success(result)):
-      state.isSubmittingNotice = false
-      state.uploadedImagesIds.removeAll()
-
-      state.alert = .reportSent
-      return .none
-    
-    case let .submitNoticeResponse(.failure(error)):
-      state.isSubmittingNotice = false
-
-      state.alert = .sendNoticeFailed(error: error as! ApiError)
-      return .none
-      
-    }
-  }
-)
-.binding()
-.onChange(of: \.contactState.contact) { contact, _, _, environment in
-  enum CancelID {}
-  return .fireAndForget {
-    try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-      try await environment.mainQueue.sleep(for: .seconds(0.3))
-      try await environment.fileClient.saveContactSettings(contact)
-    }
-  }
-}
-
 // MARK: - Helper
 
-public extension ReportState {
-  static let preview = ReportState(
+public extension ReportDomain.State {
+  static let preview = Self(
     uuid: UUID.init,
     images: .init(
       showImagePicker: false,
@@ -579,7 +527,7 @@ public extension ReportState {
   )
 }
 
-public extension AlertState where Action == ReportAction {
+public extension AlertState where Action == ReportDomain.Action {
   static func noInternetConnection(coordinate: CLLocationCoordinate2D) -> Self {
     Self(
       title: .init("Keine Internetverbindung"),
@@ -662,7 +610,7 @@ public let mapperQueue = DispatchQueue(
 )
 
 public extension SharedModels.NoticeInput {
-  init(_ reportState: ReportState) {
+  init(_ reportState: ReportDomain.State) {
     self.init(
       token: reportState.id,
       status: "open",
@@ -673,7 +621,7 @@ public extension SharedModels.NoticeInput {
       longitude: reportState.location.pinCoordinate?.longitude ?? 0,
       registration: reportState.description.licensePlateNumber,
       brand: reportState.description.selectedBrand?.title ?? "",
-      color: DescriptionState.colors[reportState.description.selectedColor].key,
+      color: DescriptionDomain.State.colors[reportState.description.selectedColor].key,
       charge: reportState.description.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
@@ -692,7 +640,7 @@ public extension SharedModels.NoticeInput {
 }
 
 public extension SharedModels.Notice {
-  init(_ reportState: ReportState) {
+  init(_ reportState: ReportDomain.State) {
     self.init(
       token: reportState.id,
       status: "open",
@@ -703,7 +651,7 @@ public extension SharedModels.Notice {
       longitude: reportState.location.pinCoordinate?.longitude ?? 0,
       registration: reportState.description.licensePlateNumber,
       brand: reportState.description.selectedBrand?.title ?? "",
-      color: DescriptionState.colors[reportState.description.selectedColor].key,
+      color: DescriptionDomain.State.colors[reportState.description.selectedColor].key,
       charge: reportState.description.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
