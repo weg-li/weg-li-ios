@@ -1,80 +1,19 @@
-import ApiClient
 import ComposableArchitecture
 import Foundation
 import SharedModels
 import Styleguide
 import SwiftUI
-import UIApplicationClient
-
-public struct AccountSettings: Equatable {
-  @BindableState
-  public var apiToken: String
-  
-  public init(apiToken: String) {
-    self.apiToken = apiToken
-  }
-}
-
-// MARK: State
-
-public struct AccountSettingsState: Equatable {
-  public var accountSettings: AccountSettings
-  
-  public var isNetworkRequestInProgress = false
-  public var apiTestRequestResult: Bool?
-  
-  public init(accountSettings: AccountSettings) {
-    self.accountSettings = accountSettings
-  }
-}
-
-// MARK: Actions
-
-public enum AccountSettingsAction: Equatable {
-  case setApiToken(String)
-  case openUserSettings
-}
-
-// MARK: Environment
-
-public struct AccountSettingsEnvironment {
-  public init(uiApplicationClient: UIApplicationClient) {
-    self.uiApplicationClient = uiApplicationClient
-  }
-
-  public let uiApplicationClient: UIApplicationClient
-  public let userLink = URL(string: "https://www.weg.li/user")!
-}
-
-// MARK: Reducer
-
-public let accountSettingsReducer =
-  Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment>.combine(
-    Reducer<AccountSettingsState, AccountSettingsAction, AccountSettingsEnvironment> {
-      state, action, environment in
-      switch action {
-      case let .setApiToken(token):
-        state.accountSettings.apiToken = token
-        return .none
-      
-      case .openUserSettings:
-        return .fireAndForget(priority: .userInitiated) {
-          _ = await environment.uiApplicationClient.open(environment.userLink, [:])
-        }
-      }
-    }
-  )
-
-private typealias S = AccountSettingsState
-private typealias A = AccountSettingsAction
 
 // MARK: - View
 
 public struct AccountSettingsView: View {
-  let store: Store<AccountSettingsState, AccountSettingsAction>
-  @ObservedObject var viewStore: ViewStore<AccountSettingsState, AccountSettingsAction>
+  public typealias S = AccountSettingsDomain.State
+  public typealias A = AccountSettingsDomain.Action
   
-  public init(store: Store<AccountSettingsState, AccountSettingsAction>) {
+  let store: Store<S, A>
+  @ObservedObject var viewStore: ViewStore<S, A>
+  
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -90,7 +29,7 @@ public struct AccountSettingsView: View {
               "",
               text: viewStore.binding(
                 get: \.accountSettings.apiToken,
-                send: AccountSettingsAction.setApiToken
+                send: A.setApiToken
               )
             )
             .placeholder(when: viewStore.state.accountSettings.apiToken.isEmpty, placeholder: {
@@ -198,10 +137,7 @@ struct AccountSettingsView_Previews: PreviewProvider {
     AccountSettingsView(
       store: .init(
         initialState: .init(accountSettings: .init(apiToken: "")),
-        reducer: accountSettingsReducer,
-        environment: .init(
-          uiApplicationClient: .noop
-        )
+        reducer: AccountSettingsDomain()
       )
     )
   }

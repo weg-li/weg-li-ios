@@ -8,12 +8,12 @@ import Styleguide
 import SwiftUI
 
 public struct ContactDetailsView: View {
-  let store: Store<Contact, ContactAction>
-  @ObservedObject private var viewStore: ViewStore<Contact, ContactAction>
+  let store: Store<ContactDomain.State, ContactDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<ContactDomain.State, ContactDomain.Action>
   
   @FocusState private var focusedField: RowType?
   
-  public init(store: Store<Contact, ContactAction>) {
+  public init(store: Store<ContactDomain.State, ContactDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -148,10 +148,13 @@ public struct ContactDetailsView: View {
 }
 
 public struct ContactView: View {
-  let store: Store<ContactState, ContactStateAction>
-  @ObservedObject private var viewStore: ViewStore<ContactState, ContactStateAction>
+  public typealias Action = ContactViewDomain.Action
+  public typealias State = ContactViewDomain.State
   
-  public init(store: Store<ContactState, ContactStateAction>) {
+  let store: Store<State, Action>
+  @ObservedObject private var viewStore: ViewStore<State, Action>
+  
+  public init(store: Store<State, Action>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -160,7 +163,7 @@ public struct ContactView: View {
     ContactDetailsView(
       store: store.scope(
         state: \.contact,
-        action: ContactStateAction.contact
+        action: Action.contact
       )
     )
     .textFieldStyle(PlainTextFieldStyle())

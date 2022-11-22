@@ -569,7 +569,7 @@ public extension ReportState {
     ),
     date: { Date(timeIntervalSince1970: 1_580_624_207) },
     description: .init(
-      licensePlateNumber: "       ",
+      licensePlateNumber: "XX-XX-123",
       selectedColor: 3,
       selectedBrand: .init("Opel"),
       selectedDuration: 5,

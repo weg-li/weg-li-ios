@@ -83,7 +83,7 @@ public struct ReportView: View {
           isCompleted: viewStore.isContactValid
         ) { ContactWidget(store: store.scope(state: { $0 })) }
         
-        // Send notice button
+        // Send notice buttons
         VStack {
           if !viewStore.apiToken.isEmpty {
             VStack(spacing: .grid(1)) {

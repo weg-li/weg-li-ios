@@ -1,5 +1,13 @@
+import Dependencies
 import Foundation
 import KeychainSwift
+
+extension DependencyValues {
+  public var keychainClient: KeychainClient {
+    get { self[KeychainClient.self] }
+    set { self[KeychainClient.self] = newValue }
+  }
+}
 
 public struct KeychainClient {
   public var getString: @Sendable (String) async -> String?

@@ -48,7 +48,8 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/composable-core-location", exact: "0.1.0"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
-    .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))
+    .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0")
   ],
   targets: [
     .target(
@@ -139,7 +140,9 @@ let package = Package(
     .target(
       name: "KeychainClient",
       dependencies: [
-        .product(name: "KeychainSwift", package: "keychain-swift")
+        .product(name: "KeychainSwift", package: "keychain-swift"),
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
       ]
     ),
     .target(
@@ -248,7 +251,10 @@ let package = Package(
     ),
     .target(
       name: "UIApplicationClient",
-      dependencies: []
+      dependencies: [
+        .product(name: "Dependencies", package: "swift-composable-architecture"),
+        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+      ]
     )
   ]
 )
