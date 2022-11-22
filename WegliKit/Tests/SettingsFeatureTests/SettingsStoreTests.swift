@@ -6,14 +6,14 @@ import XCTest
 
 @MainActor
 final class SettingsStoreTests: XCTestCase {
-  var defaultEnvironment = SettingsEnvironment(
-    uiApplicationClient: .init(
-      open: { _, _ in false },
-      openSettingsURLString: { "" }
-    ),
-    keychainClient: .noop,
-    mainQueue: .immediate
-  )
+//  var defaultEnvironment = SettingsEnvironment(
+//    uiApplicationClient: .init(
+//      open: { _, _ in false },
+//      openSettingsURLString: { "" }
+//    ),
+//    keychainClient: .noop,
+//    mainQueue: .immediate
+//  )
   
   func test_setOpenLicensesRow_shouldCallURL() async {
     let openedUrl = ActorIsolated<URL?>(nil)

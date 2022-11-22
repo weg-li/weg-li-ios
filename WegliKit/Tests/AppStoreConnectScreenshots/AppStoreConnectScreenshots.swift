@@ -94,7 +94,7 @@ class AppStoreConnectScreenshots: XCTestCase {
   func test_EditDescriptionViewScreenshot() {
     let view = EditDescriptionView(
       store: .init(
-        initialState: ReportState.preview.description,
+        initialState: ReportDomain.State.preview.description,
         reducer: .empty,
         environment: ()
       )
@@ -111,7 +111,7 @@ class AppStoreConnectScreenshots: XCTestCase {
 
 extension Notice {
   static var report2: Notice {
-    let report = ReportState(
+    let report = ReportDomain.State(
       uuid: UUID.init,
       images: .init(
         showImagePicker: false,

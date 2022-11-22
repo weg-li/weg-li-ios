@@ -16,7 +16,7 @@ final class CameraAccessTests: XCTestCase {
     )
 
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showCamera: false,
         storedPhotos: []
       ),

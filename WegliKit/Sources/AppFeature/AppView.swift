@@ -84,7 +84,7 @@ struct MainView_Previews: PreviewProvider {
 extension Notice {
   var displayColor: String? {
     guard let safeColor = color else { return nil }
-    return DescriptionState.colors.first { color in
+    return DescriptionDomain.State.colors.first { color in
       color.key.lowercased() == safeColor.lowercased()
     }?.value
   }

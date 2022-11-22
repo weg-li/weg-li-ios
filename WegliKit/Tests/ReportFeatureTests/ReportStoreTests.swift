@@ -23,16 +23,16 @@ final class ReportStoreTests: XCTestCase {
   
   let districs = DistrictFixtures.districts
   
-  var report: ReportState!
+  var report: ReportDomain.State!
   
   let mainQueue = DispatchQueue.test
   
   override func setUp() {
     super.setUp()
     
-    report = ReportState(
+    report = ReportDomain.State(
       uuid: fixedUUID,
-      images: ImagesViewState(
+      images: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!)!],
         coordinateFromImagePicker: .zero
@@ -260,9 +260,9 @@ final class ReportStoreTests: XCTestCase {
   func test_submitButtonTap_createsMail_andPresentsMailView() {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
-        images: ImagesViewState(
+        images: ImagesViewDomain.State(
           showImagePicker: false,
           storedPhotos: [PickerImageResult(uiImage: image)!],
           coordinateFromImagePicker: .zero
@@ -276,9 +276,9 @@ final class ReportStoreTests: XCTestCase {
           isMapExpanded: false,
           isResolvingAddress: false,
           resolvedAddress: .init(
-            street: ReportState.preview.contactState.contact.address.street,
-            postalCode: ReportState.preview.contactState.contact.address.postalCode,
-            city: ReportState.preview.contactState.contact.address.city
+            street: ReportDomain.State.preview.contactState.contact.address.street,
+            postalCode: ReportDomain.State.preview.contactState.contact.address.postalCode,
+            city: ReportDomain.State.preview.contactState.contact.address.city
           )
         )
       ),
@@ -308,9 +308,9 @@ final class ReportStoreTests: XCTestCase {
   func test_submitButtonTap_createsMail_butShowsError() {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
-        images: ImagesViewState(
+        images: ImagesViewDomain.State(
           showImagePicker: false,
           storedPhotos: [PickerImageResult(uiImage: image)!],
           coordinateFromImagePicker: .zero
@@ -324,9 +324,9 @@ final class ReportStoreTests: XCTestCase {
           isMapExpanded: false,
           isResolvingAddress: false,
           resolvedAddress: .init(
-            street: ReportState.preview.contactState.contact.address.street,
-            postalCode: ReportState.preview.contactState.contact.address.postalCode,
-            city: ReportState.preview.contactState.contact.address.city
+            street: ReportDomain.State.preview.contactState.contact.address.street,
+            postalCode: ReportDomain.State.preview.contactState.contact.address.postalCode,
+            city: ReportDomain.State.preview.contactState.contact.address.city
           )
         )
       ),
@@ -452,9 +452,9 @@ final class ReportStoreTests: XCTestCase {
   
   func test_imagesAction_shouldFail_whenOnlyPostalCodeEnteredManually() async {
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
-        images: ImagesViewState(
+        images: ImagesViewDomain.State(
           showImagePicker: false,
           storedPhotos: [],
           coordinateFromImagePicker: .zero
@@ -506,9 +506,9 @@ final class ReportStoreTests: XCTestCase {
   
   func test_imagesAction_shouldSucceed_whenOnlyPostalCodeAndCityEnteredManually() async {
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
-        images: ImagesViewState(
+        images: ImagesViewDomain.State(
           showImagePicker: false,
           storedPhotos: [],
           coordinateFromImagePicker: .zero
@@ -568,9 +568,9 @@ final class ReportStoreTests: XCTestCase {
     let testDate = { Date(timeIntervalSinceReferenceDate: 0) }
     
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
-        images: ImagesViewState(
+        images: ImagesViewDomain.State(
           showImagePicker: false,
           storedPhotos: images,
           coordinateFromImagePicker: coordinate
@@ -611,7 +611,7 @@ final class ReportStoreTests: XCTestCase {
   
   func test_resetDataButtonTap_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -648,7 +648,7 @@ final class ReportStoreTests: XCTestCase {
   
   func test_setShowContact_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -685,7 +685,7 @@ final class ReportStoreTests: XCTestCase {
   
   func test_setShowDescription_shouldPresentAnAlert() {
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -720,9 +720,9 @@ final class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_selectedLicensePlate_shouldSetDescriptionState() {
+  func test_selectedLicensePlate_shouldSetDescriptionDomain.State() {
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
         images: .init(),
         contactState: .empty,
@@ -796,7 +796,7 @@ final class ReportStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: ReportState(
+      initialState: ReportDomain.State(
         uuid: fixedUUID,
         images: .init(
           alert: nil,

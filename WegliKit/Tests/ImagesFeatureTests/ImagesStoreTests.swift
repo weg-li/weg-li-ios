@@ -45,7 +45,7 @@ final class ImagesStoreTests: XCTestCase {
     ]
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
@@ -109,7 +109,7 @@ final class ImagesStoreTests: XCTestCase {
     let storableImage2 = PickerImageResult(id: id2, uiImage: image2)
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [storableImage1, storableImage2],
         coordinateFromImagePicker: .zero
@@ -131,7 +131,7 @@ final class ImagesStoreTests: XCTestCase {
   
   func test_selectMultiplePhotos_shouldAddPhotosAndSetCoordinate() async throws {
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
@@ -180,7 +180,7 @@ final class ImagesStoreTests: XCTestCase {
   
   func test_selectMultiplePhotos_withSmallCoordinateUpdateShouldOnlySetCoordinateOnce() async {
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
@@ -233,7 +233,7 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
@@ -263,7 +263,7 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
@@ -294,7 +294,7 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
@@ -318,7 +318,7 @@ final class ImagesStoreTests: XCTestCase {
   
   func test_dismissAlert_shouldUpdateState() {
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         alert: AlertState(title: TextState(L10n.Photos.Alert.accessDenied)),
         showImagePicker: false,
         storedPhotos: [],
@@ -347,7 +347,7 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero

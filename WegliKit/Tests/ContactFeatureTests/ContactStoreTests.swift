@@ -8,9 +8,8 @@ import XCTest
 final class ContactStoreTests: XCTestCase {
   func test_changeFirstName_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
     
     let newFirstName = "Bob"
@@ -21,9 +20,8 @@ final class ContactStoreTests: XCTestCase {
   
   func test_changeName_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newName = "Ross"
@@ -38,9 +36,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_changePhone_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newPhone = "0301234"
@@ -51,9 +48,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_changeStreet_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newStreet = "Bob's street"
@@ -64,9 +60,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_changeCity_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newCity = "Bob's city"
@@ -77,9 +72,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_changePostalCode_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newPostalCode = "55500"
@@ -90,9 +84,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_changeDateOfBirth_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newValue = "01.01.2992"
@@ -103,9 +96,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_changeAddressAddition_shouldUpdateState() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     let newValue = "Hinterhaus"
@@ -116,9 +108,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_setEmptyValues_shouldInvalidContact() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     store.send(.contact(.set(\.address.$postalCode, ""))) {
@@ -127,15 +118,14 @@ final class ContactStoreTests: XCTestCase {
     store.send(.contact(.set(\.$name, ""))) {
       $0.contact.name = ""
 
-      XCTAssertFalse($0.isValid)
+      XCTAssertFalse($0.contact.isValid)
     }
   }
 
   func test_resetData_ButtonTap_PresentAnAlert() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     store.send(.onResetContactDataButtonTapped) {
@@ -145,9 +135,8 @@ final class ContactStoreTests: XCTestCase {
 
   func test_resetData_ConfirmButtonTap_shouldResetTheState_andDismissAlert() {
     let store = TestStore(
-      initialState: ContactState.preview,
-      reducer: contactViewReducer,
-      environment: ContactEnvironment()
+      initialState: ContactViewDomain.State.preview,
+      reducer: ContactViewDomain()
     )
 
     store.send(.onResetContactConfirmButtonTapped) {

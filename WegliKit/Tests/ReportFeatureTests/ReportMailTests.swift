@@ -7,7 +7,7 @@ final class ReportMailTests: XCTestCase {
   func test_MailGeneration() {
     let date = Date(timeIntervalSinceReferenceDate: 0)
     
-    let report = ReportState(
+    let report = ReportDomain.State(
       uuid: { UUID(uuidString: "de71ce00-dead-beef-dead-beefdeadbeef")! },
       images: .init(
         alert: nil,

@@ -36,7 +36,7 @@ public struct AppState: Equatable {
   public var notices: ContentState<[Notice], AppAction>
   
   /// Holds a report that has not been stored or sent via mail
-  public var reportDraft: ReportState = .init(
+  public var reportDraft: ReportDomain.State = .init(
     uuid: UUID.init,
     images: .init(),
     contactState: .empty,
@@ -242,7 +242,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       return Effect(value: AppAction.reportSaved)
       
     case .report(.onResetConfirmButtonTapped):
-      state.reportDraft = ReportState(
+      state.reportDraft = ReportDomain.State(
         uuid: environment.uuid,
         images: .init(),
         contactState: .init(contact: state.contact),
@@ -299,7 +299,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
       
     case .reportSaved:
       // Reset report draft after it was saved
-      state.reportDraft = ReportState(
+      state.reportDraft = ReportDomain.State(
         uuid: environment.uuid,
         images: .init(),
         contactState: .init(contact: state.contact),
@@ -362,7 +362,7 @@ extension AppState {
 }
 
 public extension Array where Element == Notice {
-  static let placeholder: [Element] = Array(repeating: Notice(ReportState.preview), count: 6)
+  static let placeholder: [Element] = Array(repeating: Notice(ReportDomain.State.preview), count: 6)
 }
 
 extension Store where State == AppState, Action == AppAction {

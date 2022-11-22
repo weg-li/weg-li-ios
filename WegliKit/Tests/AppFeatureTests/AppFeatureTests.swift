@@ -27,7 +27,7 @@ final class AppStoreTests: XCTestCase {
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
   var userDefaults: UserDefaults!
   
-  var report: ReportState!
+  var report: ReportDomain.State!
   
   func defaultAppEnvironment(
     mainQueue: AnySchedulerOf<DispatchQueue> = .immediate,
@@ -56,9 +56,9 @@ final class AppStoreTests: XCTestCase {
   override func setUp() {
     super.setUp()
     
-    report = ReportState(
+    report = ReportDomain.State(
       uuid: fixedUUID,
-      images: ImagesViewState(
+      images: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!)!],
         coordinateFromImagePicker: .zero
@@ -81,7 +81,7 @@ final class AppStoreTests: XCTestCase {
       environment: defaultAppEnvironment()
     )
     
-    let newContact: ContactState = .preview
+    let newContact: ContactDomain.State = .preview
     
     await store.send(
       .report(
@@ -105,7 +105,7 @@ final class AppStoreTests: XCTestCase {
     )
     
     store.send(.report(.onResetConfirmButtonTapped)) {
-      $0.reportDraft = ReportState(
+      $0.reportDraft = ReportDomain.State(
         uuid: self.fixedUUID,
         images: .init(),
         contactState: .init(
@@ -316,7 +316,7 @@ final class AppStoreTests: XCTestCase {
 }
 
 extension AppState {
-  init(reportDraft: ReportState) {
+  init(reportDraft: ReportDomain.State) {
     self.init()
     self.reportDraft = reportDraft
   }
