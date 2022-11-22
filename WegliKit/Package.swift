@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -7,7 +7,7 @@ let package = Package(
   name: "WegliKit",
   defaultLocalization: "de",
   platforms: [
-    .iOS(.v15)
+    .iOS(.v16)
   ],
   products: [
     .library(
@@ -86,6 +86,7 @@ let package = Package(
     .target(
       name: "ContactFeature",
       dependencies: [
+        "FileClient",
         "L10n",
         "SharedModels",
         "Styleguide",
@@ -221,7 +222,8 @@ let package = Package(
         "RegulatoryOfficeMapper",
         "SharedModels",
         .locationClient,
-        .tca
+        .tca,
+        .testOverlay
       ]
     ),
     .target(
@@ -235,7 +237,7 @@ let package = Package(
         "SharedModels",
         "Styleguide",
         "UIApplicationClient",
-        .tca
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
       ]
     ),
     .target(
@@ -286,6 +288,7 @@ package.targets.append(
       name: "ContactFeatureTests",
       dependencies: [
         "ContactFeature",
+        "FileClient",
         .tca
       ]
     ),
@@ -345,7 +348,7 @@ package.targets.append(
       dependencies: [
         "SharedModels",
         "SettingsFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .testTarget(

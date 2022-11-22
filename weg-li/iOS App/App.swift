@@ -29,8 +29,7 @@ struct WegliApp: App {
 final class AppDelegate: NSObject, UIApplicationDelegate {
   let store = Store(
     initialState: .init(),
-    reducer: appReducer,
-    environment: .live
+    reducer: AppDomain()
   )
   lazy var viewStore = ViewStore(
     self.store.scope(state: { _ in () }),

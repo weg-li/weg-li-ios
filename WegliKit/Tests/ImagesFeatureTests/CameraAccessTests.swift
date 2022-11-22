@@ -22,7 +22,7 @@ final class CameraAccessTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = ImmediateClock()
         values.cameraAccessClient = accessClient
         values.photoLibraryAccessClient = .noop
         values.textRecognitionClient = .noop

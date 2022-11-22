@@ -19,7 +19,6 @@ public extension UUID {
   static let reportId = Self(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!
 }
 
-
 @MainActor
 final class AppStoreTests: XCTestCase {
   let fixedUUID = { UUID.reportId }
@@ -28,30 +27,6 @@ final class AppStoreTests: XCTestCase {
   var userDefaults: UserDefaults!
   
   var report: ReportDomain.State!
-  
-  func defaultAppEnvironment(
-    mainQueue: AnySchedulerOf<DispatchQueue> = .immediate,
-    backgroundQueue: AnySchedulerOf<DispatchQueue> = .immediate,
-    fileClient: FileClient = .noop,
-    keychainClient: KeychainClient = .noop,
-    apiClient: APIClient = .noop,
-    wegliService: WegliAPIService = .noop,
-    pathMonitorClient: PathMonitorClient = .satisfied,
-    date: @escaping () -> Date = { Date(timeIntervalSinceReferenceDate: 0) },
-    uuid: @escaping () -> UUID = { UUID.reportId }
-  ) -> AppEnvironment {
-    AppEnvironment(
-      mainQueue: mainQueue,
-      backgroundQueue: backgroundQueue,
-      fileClient: fileClient,
-      keychainClient: keychainClient,
-      apiClient: apiClient,
-      wegliService: wegliService,
-      pathMonitorClient: pathMonitorClient,
-      date: date,
-      uuid: uuid
-    )
-  }
   
   override func setUp() {
     super.setUp()
@@ -76,33 +51,33 @@ final class AppStoreTests: XCTestCase {
   
   func test_updateContact_ShouldUpdateState() async {
     let store = TestStore(
-      initialState: AppState(),
-      reducer: appReducer,
-      environment: defaultAppEnvironment()
+      initialState: AppDomain.State(),
+      reducer: AppDomain()
     )
+    store.dependencies.fileClient = .noop
+    store.dependencies.suspendingClock = ImmediateClock()
     
     let newContact: ContactDomain.State = .preview
     
     await store.send(
       .report(
         .contact(
-          .contact(.set(\.$firstName, newContact.contact.firstName))
+          .contact(.set(\.$firstName, newContact.firstName))
         )
       )
     ) {
-      $0.reportDraft.contactState.contact.firstName = newContact.contact.firstName
-      $0.contact.firstName = newContact.contact.firstName
+      $0.reportDraft.contactState.contact.firstName = newContact.firstName
+      $0.contact.firstName = newContact.firstName
     }
   }
     
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
-    let state = AppState(reportDraft: report)
-    
     let store = TestStore(
-      initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment()
+      initialState: AppDomain.State(reportDraft: report),
+      reducer: AppDomain()
     )
+    store.dependencies.uuid = .constant(.reportId)
+    store.dependencies.date = .constant(fixedDate())
     
     store.send(.report(.onResetConfirmButtonTapped)) {
       $0.reportDraft = ReportDomain.State(
@@ -119,9 +94,9 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_ActionStoredApiTokenLoaded() async {
-    let mainQueue = DispatchQueue.test
+    let clock = TestClock()
     
-    let state = AppState(reportDraft: report)
+    let state = AppDomain.State(reportDraft: report)
     
     let token = "API Token"
     var keychainClient = KeychainClient.noop
@@ -132,14 +107,14 @@ final class AppStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment(
-        mainQueue: mainQueue.eraseToAnyScheduler(),
-        keychainClient: keychainClient,
-        wegliService: wegliService
-      )
+      reducer: AppDomain(),
+      prepareDependencies: { dependencies in
+        dependencies.keychainClient = keychainClient
+        dependencies.apiService = wegliService
+        dependencies.suspendingClock = clock
+      }
     )
-    store.environment.fileClient.load = { @Sendable [user = state.settings.userSettings] key in
+    store.dependencies.fileClient.load = { @Sendable [user = state.settings.userSettings] key in
       if key == "contact-settings" {
         return try! Contact.preview.encoded()
       }
@@ -150,7 +125,7 @@ final class AppStoreTests: XCTestCase {
     }
     
     await store.send(.appDelegate(.didFinishLaunching))
-    await mainQueue.advance(by: 0.5)
+    await clock.advance(by: .seconds(0.5))
     await store.receive(.contactSettingsLoaded(.success(.preview))) {
       $0.contact = .preview
       $0.reportDraft.contactState.contact = .preview
@@ -164,9 +139,6 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_ActionFetchNoticeResponse_shouldNotStoreNoticeToFileClientWhenResponseIsEmpty() async {
-    let state = AppState(reportDraft: report)
-    let mainQueue = DispatchQueue.test
-    
     let didSaveNotices = ActorIsolated(false)
     
     var fileClient = FileClient.noop
@@ -176,12 +148,12 @@ final class AppStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment(
-        mainQueue: mainQueue.eraseToAnyScheduler(),
-        fileClient: fileClient
-      )
+      initialState: .init(reportDraft: report),
+      reducer: AppDomain(),
+      prepareDependencies: { dependencies in
+        dependencies.suspendingClock = ImmediateClock()
+        dependencies.fileClient = fileClient
+      }
     )
     
     await store.send(.fetchNoticesResponse(.success([]))) {
@@ -193,9 +165,7 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() async {
-    let state = AppState(reportDraft: report)
-    
-    let didSaveNotices = ActorIsolated(false)
+   let didSaveNotices = ActorIsolated(false)
     
     var fileClient = FileClient.noop
     fileClient.save = { @Sendable _, _ in
@@ -204,13 +174,11 @@ final class AppStoreTests: XCTestCase {
     }
     
     let store = TestStore(
-      initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment(
-        fileClient: fileClient
-      )
+      initialState: .init(reportDraft: report),
+      reducer: AppDomain()
     )
-    store.environment.wegliService.getNotices = { _ in .placeholder }
+    store.dependencies.fileClient = fileClient
+    store.dependencies.apiService.getNotices = { _ in .placeholder }
     
     await store.send(.fetchNoticesResponse(.success(.placeholder))) {
       $0.notices = .results(.placeholder)
@@ -221,13 +189,12 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_ActionOnAccountSettings_shouldPersistAccountsSettings() async {
-    let state = AppState(reportDraft: report)
-    
     let store = TestStore(
-      initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment()
+      initialState: .init(reportDraft: report),
+      reducer: AppDomain()
     )
+    store.dependencies.keychainClient = .noop
+    store.dependencies.suspendingClock = ImmediateClock()
     
     await store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
       $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
@@ -236,18 +203,18 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() async {
-    var state = AppState(reportDraft: report)
+    var state = AppDomain.State(reportDraft: report)
     state.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
-    
-    var service = WegliAPIService.noop
-    service.getNotices = { _ in [.mock] }
     
     let store = TestStore(
       initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment(wegliService: service)
+      reducer: AppDomain()
     )
-    store.environment.fileClient.load = { @Sendable key in
+    store.dependencies.keychainClient = .noop
+    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.apiService.getNotices = { _ in [.mock] }
+    store.dependencies.fileClient.save = { @Sendable _ ,_ in () }
+    store.dependencies.fileClient.load = { @Sendable key in
       if key == "contact-settings" {
         return try! Contact.preview.encoded()
       }
@@ -263,9 +230,8 @@ final class AppStoreTests: XCTestCase {
   
   func test_Action_onAppear_shouldPresentNoTokenErrorState() {
     let store = TestStore(
-      initialState: AppState(reportDraft: report),
-      reducer: appReducer,
-      environment: defaultAppEnvironment()
+      initialState: .init(reportDraft: report),
+      reducer: AppDomain()
     )
     
     store.send(.onAppear) {
@@ -280,13 +246,12 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_Action_fetchNotices_shouldNotReload_whenElementsHaveBeenLoaded_andNoForceReload() {
-    var state = AppState(reportDraft: report)
+    var state = AppDomain.State(reportDraft: report)
     state.notices = .results([.mock])
     
     let store = TestStore(
       initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment()
+      reducer: AppDomain()
     )
     
     store.send(.fetchNotices(forceReload: false))
@@ -294,17 +259,15 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_Action_fetchNotices_shouldReload_whenElementsHaveBeenLoaded_andForceReload() async {
-    var state = AppState(reportDraft: report)
+    var state = AppDomain.State(reportDraft: report)
     state.notices = .results([.placeholder])
-    
-    var service = WegliAPIService.noop
-    service.getNotices = { _ in [.mock] }
     
     let store = TestStore(
       initialState: state,
-      reducer: appReducer,
-      environment: defaultAppEnvironment(wegliService: service)
+      reducer: AppDomain()
     )
+    store.dependencies.apiService.getNotices = { _ in [.mock] }
+    store.dependencies.fileClient.save = { @Sendable _, _ in () }
     
     await store.send(.fetchNotices(forceReload: true)) {
       $0.notices = .loading
@@ -315,7 +278,7 @@ final class AppStoreTests: XCTestCase {
   }
 }
 
-extension AppState {
+extension AppDomain.State {
   init(reportDraft: ReportDomain.State) {
     self.init()
     self.reportDraft = reportDraft

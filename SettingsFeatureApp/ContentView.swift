@@ -10,12 +10,7 @@ struct ContentView: View {
           contact: .empty,
           userSettings: .init()
         ),
-        reducer: settingsReducer,
-        environment: .init(
-          uiApplicationClient: .live,
-          keychainClient: .live(),
-          mainQueue: .main
-        )
+        reducer: SettingsDomain()
       )
     )
   }

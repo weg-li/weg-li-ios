@@ -16,9 +16,9 @@ public struct SettingsDomain: ReducerProtocol {
   @Dependency(\.applicationClient) public var applicationClient
   @Dependency(\.keychainClient) public var keychainClient
   // swiftlint:disable force_unwrapping
-  public let imprintLink = URL(string: "https://www.weg.li/imprint")!
-  public let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
-  public let donateLink = URL(string: "https://www.weg.li/donate")!
+  static public let imprintLink = URL(string: "https://www.weg.li/imprint")!
+  static public let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
+  static public let donateLink = URL(string: "https://www.weg.li/donate")!
   // swiftlint:enable force_unwrapping
   
   public struct State: Equatable {
@@ -67,15 +67,15 @@ public struct SettingsDomain: ReducerProtocol {
         
       case .openImprintTapped:
         return .fireAndForget {
-          _ = await applicationClient.open(imprintLink, [:])
+          _ = await applicationClient.open(Self.imprintLink, [:])
         }
       case .openGitHubProjectTapped:
         return .fireAndForget {
-          _ = await applicationClient.open(gitHubProjectLink, [:])
+          _ = await applicationClient.open(Self.gitHubProjectLink, [:])
         }
       case .donateTapped:
         return .fireAndForget {
-          _ = await applicationClient.open(donateLink, [:])
+          _ = await applicationClient.open(Self.donateLink, [:])
         }
       case .userSettings:
         return .none

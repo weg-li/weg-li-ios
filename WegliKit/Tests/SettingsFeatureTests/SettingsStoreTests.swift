@@ -46,7 +46,7 @@ final class SettingsStoreTests: XCTestCase {
     }
     
     await store.send(.openImprintTapped)
-    await openedUrl.withValue({ [link = env.imprintLink] url in
+    await openedUrl.withValue({ [link = SettingsDomain.imprintLink] url in
       XCTAssertEqual(url, link)
     })
   }
@@ -67,7 +67,7 @@ final class SettingsStoreTests: XCTestCase {
     }
     
     await store.send(.openGitHubProjectTapped)
-    await openedUrl.withValue({ [link = env.gitHubProjectLink] url in
+    await openedUrl.withValue({ [link = SettingsDomain.gitHubProjectLink] url in
       XCTAssertEqual(url, link)
     })
   }
@@ -88,14 +88,12 @@ final class SettingsStoreTests: XCTestCase {
     }
     
     await store.send(.donateTapped)
-    await openedUrl.withValue({ [link = env.donateLink] url in
+    await openedUrl.withValue({ [link = SettingsDomain.donateLink] url in
       XCTAssertEqual(url, link)
     })
   }
   
   func test_action_accountSettings_setApiToken_shouldPersistToken() async {
-    var env = defaultEnvironment
-    
     let didWriteTokenToKeyChain = ActorIsolated<Bool>(false)
     
     let store = TestStore(
@@ -105,10 +103,11 @@ final class SettingsStoreTests: XCTestCase {
       ),
       reducer: SettingsDomain()
     )
-    store.dependencies.keychainClient.setString = { @Sendable [self] _, _, _ in
+    store.dependencies.keychainClient.setString = { @Sendable _, _, _ in
       await didWriteTokenToKeyChain.setValue(true)
       return true
     }
+    store.dependencies.suspendingClock = ImmediateClock()
     
     await store.send(.accountSettings(.setApiToken("TOKEN"))) {
       $0.accountSettingsState.accountSettings.apiToken = "TOKEN"

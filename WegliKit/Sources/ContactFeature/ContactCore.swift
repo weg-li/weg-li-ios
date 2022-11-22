@@ -2,6 +2,7 @@
 
 import ComposableArchitecture
 import Contacts
+import FileClient
 import Foundation
 import Helper
 import L10n
@@ -9,6 +10,9 @@ import SharedModels
 
 public struct ContactViewDomain: ReducerProtocol {
   public init() {}
+  
+  @Dependency(\.suspendingClock) var clock
+  @Dependency(\.fileClient) var fileClient
   
   public struct State: Equatable {
     public init(
@@ -39,7 +43,15 @@ public struct ContactViewDomain: ReducerProtocol {
     Reduce<State, Action> { state, action in
       switch action {
       case .contact:
-        return .none
+        let contact = state.contact
+        return .fireAndForget {
+          enum CancelID {}
+          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+            try await clock.sleep(for: .seconds(0.3))
+            try await fileClient.saveContactSettings(contact)
+          }
+        }
+
       case .onResetContactDataButtonTapped:
         state.alert = .resetContactDataAlert
         return .none

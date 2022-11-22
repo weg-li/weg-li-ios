@@ -10,7 +10,7 @@ import SwiftUI
 public struct DescriptionDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.mainQueue) public var mainQueue
+  @Dependency(\.suspendingClock) public var clock
   @Dependency(\.fileClient) public var fileClient
   
   public struct State: Equatable {
@@ -159,7 +159,7 @@ public struct DescriptionDomain: ReducerProtocol {
         
         return .concatenate(
           .task {
-            try await mainQueue.sleep(for: .milliseconds(500))
+            try await clock.sleep(for: .seconds(0.5))
             return .sortFavoritedCharges
           },
           .fireAndForget(priority: .userInitiated) {

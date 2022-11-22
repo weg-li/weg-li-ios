@@ -6,7 +6,7 @@ public struct AccountSettingsDomain: ReducerProtocol {
   
   @Dependency(\.keychainClient) var keychainClient
   @Dependency(\.applicationClient) var applicationClient
-  @Dependency(\.mainQueue) var mainQueue
+  @Dependency(\.suspendingClock) var clock
   
   public let userLink = URL(string: "https://www.weg.li/user")!
   
@@ -34,7 +34,7 @@ public struct AccountSettingsDomain: ReducerProtocol {
         enum CancelID {}
         
         await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-          try? await mainQueue.sleep(for: .seconds(0.3))
+          try? await clock.sleep(for: .seconds(0.3))
           _ = await keychainClient.setApiToken(token)
         }
       }

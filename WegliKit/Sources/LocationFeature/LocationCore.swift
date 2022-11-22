@@ -13,7 +13,6 @@ import UIApplicationClient
 public struct LocationDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.mainQueue) public var mainQueue
   @Dependency(\.placesServiceClient) public var placesServiceClient
   @Dependency(\.locationManager) public var locationManager
   @Dependency(\.applicationClient) public var applicationClient

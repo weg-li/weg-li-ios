@@ -11,11 +11,14 @@ import Styleguide
 import SwiftUI
 
 public struct AppView: View {
-  private let store: Store<AppState, AppAction>
-  @ObservedObject private var viewStore: ViewStore<AppState, AppAction>
+  public typealias S = AppDomain.State
+  public typealias A = AppDomain.Action
+  
+  private let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<S, A>
   @Environment(\.horizontalSizeClass) var horizontalSizeClass
   
-  public init(store: Store<AppState, AppAction>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -40,7 +43,7 @@ public struct AppView: View {
         ReportView(
           store: store.scope(
             state: \.reportDraft,
-            action: AppAction.report
+            action: A.report
           )
         )
       }
@@ -52,7 +55,7 @@ public struct AppView: View {
         SettingsView(
           store: store.scope(
             state: \.settings,
-            action: AppAction.settings
+            action: A.settings
           )
         )
       }
@@ -66,7 +69,7 @@ public struct AppView: View {
 
 struct MainView_Previews: PreviewProvider {
   static var previews: some View {
-    var appState = AppState()
+    var appState = AppDomain.State()
     appState.notices = .results(.placeholder)
     
     return Preview {

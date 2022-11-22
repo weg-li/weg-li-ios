@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor
 final class ImagesStoreTests: XCTestCase {
-  let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
+  let clock = TestClock()
   
   func test_addPhoto_shouldUpdateState() async {
     let creationDate: Date = .init(timeIntervalSince1970: 0)
@@ -52,7 +52,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = .immediate
+        values.suspendingClock = ImmediateClock()
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
         values.textRecognitionClient = .init(recognizeText: { _ in [textItems.removeFirst()] })
@@ -115,7 +115,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = .immediate
+        values.suspendingClock = ImmediateClock()
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
         values.textRecognitionClient = .noop
@@ -136,7 +136,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = .immediate
+        values.suspendingClock = ImmediateClock()
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
         values.textRecognitionClient.recognizeText = { _ in [] }
@@ -183,7 +183,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
         values.textRecognitionClient = .noop
@@ -235,7 +235,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
         values.textRecognitionClient = .noop
@@ -264,7 +264,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
         values.textRecognitionClient = .noop
@@ -294,7 +294,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
         values.textRecognitionClient = .noop
@@ -318,7 +318,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
         values.textRecognitionClient = .noop
@@ -345,7 +345,7 @@ final class ImagesStoreTests: XCTestCase {
       ),
       reducer: ImagesViewDomain(),
       prepareDependencies: { values in
-        values.mainQueue = scheduler
+        values.suspendingClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
         values.textRecognitionClient = .noop

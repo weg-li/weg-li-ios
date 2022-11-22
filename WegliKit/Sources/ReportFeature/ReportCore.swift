@@ -19,13 +19,12 @@ import RegulatoryOfficeMapper
 import SharedModels
 import SwiftUI
 import UIApplicationClient
+import XCTestDynamicOverlay
 
 public struct ReportDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.mainQueue) public var mainQueue
-  //  @Dependency(\.) public var backgroundQueue: AnySchedulerOf<DispatchQueue>
-  //  @Dependency(\.) public var mapAddressQueue: AnySchedulerOf<DispatchQueue>
+  @Dependency(\.suspendingClock) public var clock
   @Dependency(\.locationManager) public var locationManager
   @Dependency(\.placesServiceClient) public var placeService
   @Dependency(\.regulatoryOfficeMapper) public var regulatoryOfficeMapper
@@ -35,8 +34,7 @@ public struct ReportDomain: ReducerProtocol {
   @Dependency(\.apiService) public var wegliService
   @Dependency(\.applicationClient) public var uiApplicationClient
   @Dependency(\.date) public var date
-  
-  public var canSendMail: () -> Bool = MFMailComposeViewController.canSendMail
+  @Dependency(\.mailComposeClient) public var mailComposeClient
   
   let debounce = 0.5
   let postalCodeMinumimCharacters = 5
@@ -74,7 +72,6 @@ public struct ReportDomain: ReducerProtocol {
     
     public var isNetworkAvailable = true
     public var isUploadingNotice = false
-    
     public var canSubmitNotice = false
     public var isSubmittingNotice = false
     
@@ -203,7 +200,7 @@ public struct ReportDomain: ReducerProtocol {
         return .none
         
       case let .mapDistrictFinished(.failure(error)):
-        // present alert maybe?
+        // face error to user?
         debugPrint(error)
         return .none
         
@@ -299,7 +296,7 @@ public struct ReportDomain: ReducerProtocol {
         
         // Compose mail when send mail button was tapped.
       case .mail(.submitButtonTapped):
-        guard canSendMail() else {
+        guard mailComposeClient.canSendMail() else {
           state.alert = .noMailAccount
           return .none
         }
@@ -323,7 +320,7 @@ public struct ReportDomain: ReducerProtocol {
         return .fireAndForget {
           enum CancelID {}
           try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-            try await mainQueue.sleep(for: .seconds(0.3))
+            try await clock.sleep(for: .seconds(0.3))
             try await fileClient.saveContactSettings(contact)
           }
         }
@@ -665,4 +662,24 @@ public extension SharedModels.Notice {
   }
   
   static let placeholder = Self(.preview)
+}
+
+
+extension DependencyValues {
+  public var mailComposeClient: MailComposeClient {
+    get { self[MailComposeClient.self] }
+    set { self[MailComposeClient.self] = newValue }
+  }
+}
+
+public struct MailComposeClient {
+  public var canSendMail: () -> Bool
+}
+
+extension MailComposeClient {
+  static let live = Self(canSendMail: MFMailComposeViewController.canSendMail)
+}
+
+extension MailComposeClient: TestDependencyKey {
+  public static var testValue = Self(canSendMail: unimplemented())
 }

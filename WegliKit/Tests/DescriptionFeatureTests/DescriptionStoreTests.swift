@@ -111,7 +111,7 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: DescriptionDomain(),
       prepareDependencies: { values in
-        values.mainQueue = .immediate
+        values.suspendingClock = ImmediateClock()
         values.fileClient = .noop
       }
     )
@@ -123,7 +123,7 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_onAppear_shouldUpdateCharges() async {
     var fileClient = FileClient.noop
-    fileClient.load = { _ in
+    fileClient.load = { @Sendable _ in
       .init(
         try! JSONEncoder().encode(["0"])
       )
@@ -139,7 +139,7 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: DescriptionDomain(),
       prepareDependencies: { values in
-        values.mainQueue = .immediate
+        values.suspendingClock = ImmediateClock()
         values.fileClient = fileClient
       }
     )
@@ -163,7 +163,7 @@ final class DescriptionStoreTests: XCTestCase {
   }
   
   func test_actionToggleChargeFavorite() async {
-    let testQueue = DispatchQueue.test
+    let clock = TestClock()
     
     let didWriteFiles = ActorIsolated(false)
     var fileClient = FileClient.noop
@@ -186,7 +186,7 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: DescriptionDomain(),
       prepareDependencies: { values in
-        values.mainQueue = testQueue.eraseToAnyScheduler()
+        values.suspendingClock = clock
         values.fileClient = fileClient
       }
     )
@@ -200,7 +200,7 @@ final class DescriptionStoreTests: XCTestCase {
     
     
     
-    await testQueue.advance(by: .milliseconds(1001))
+    await clock.advance(by: .milliseconds(1001))
     await store.receive(.sortFavoritedCharges) {
       $0.charges = [
         Charge(id: "2", text: "Text", isFavorite: true, isSelected: false),

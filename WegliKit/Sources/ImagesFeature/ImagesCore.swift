@@ -14,7 +14,7 @@ import UIKit
 public struct ImagesViewDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.mainQueue) public var mainQueue
+  @Dependency(\.suspendingClock) public var clock
   @Dependency(\.cameraAccessClient) public var cameraAccessClient
   @Dependency(\.photoLibraryAccessClient) public var photoLibraryAccessClient
   @Dependency(\.textRecognitionClient) public var textRecognitionClient
@@ -243,7 +243,7 @@ public struct ImagesViewDomain: ReducerProtocol {
       } else {
         effects.append(
           Effect.run(operation: { send in
-            try await mainQueue.sleep(for: .milliseconds(800))
+            try await clock.sleep(for: .milliseconds(800))
             await send(.justSetPhotos(photos), animation: .easeOut)
           })
         )
@@ -286,7 +286,7 @@ public struct ImagesViewDomain: ReducerProtocol {
       return Effect.task {
         await Action.textRecognitionCompleted(
           TaskResult {
-            try await mainQueue.sleep(for: .milliseconds(200))
+            try await clock.sleep(for: .milliseconds(200))
             return try await textRecognitionClient.recognizeText(image)
           }
         )
