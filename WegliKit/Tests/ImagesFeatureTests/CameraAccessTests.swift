@@ -16,18 +16,18 @@ final class CameraAccessTests: XCTestCase {
     )
 
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showCamera: false,
         storedPhotos: []
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: accessClient,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.cameraAccessClient = accessClient
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient = .noop
+        
+      }
     )
 
     await store.send(.onTakePhotosButtonTapped)

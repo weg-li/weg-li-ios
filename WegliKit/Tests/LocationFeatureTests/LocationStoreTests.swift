@@ -26,26 +26,24 @@ final class LocationStoreTests: XCTestCase {
       city: Contact.preview.address.city
     )
     
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .notDetermined },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
-        requestWhenInUseAuthorization: { _ in
-          .fireAndForget { didRequestInUseAuthorization = true }
-        },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
-      placeService: PlacesServiceClient(placemarks: { _ in [expectedAddress] }),
-      uiApplicationClient: .noop,
-      mainRunLoop: .immediate
-    )
-    
     let store = TestStore(
-      initialState: LocationViewState(),
-      reducer: locationReducer,
-      environment: env
+      initialState: LocationDomain.State(),
+      reducer: LocationDomain(),
+      prepareDependencies: { values in
+        values.locationManager = .unimplemented(
+          authorizationStatus: { .notDetermined },
+          create: { _ in locationManagerSubject.eraseToEffect() },
+          locationServicesEnabled: { true },
+          requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
+          requestWhenInUseAuthorization: { _ in
+            .fireAndForget { didRequestInUseAuthorization = true }
+          },
+          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+        )
+        values.placesServiceClient = PlacesServiceClient(placemarks: { _ in [expectedAddress] })
+        values.applicationClient = .previewValue
+        values.mainRunLoop = .immediate
+      }
     )
     
     let currentLocation = Location(
@@ -77,7 +75,6 @@ final class LocationStoreTests: XCTestCase {
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
     await store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
-      $0.isRequestingCurrentLocation = false
       $0.region = CoordinateRegion(
         center: currentLocation.coordinate
       )
@@ -117,27 +114,25 @@ final class LocationStoreTests: XCTestCase {
       postalCode: Contact.preview.address.postalCode,
       city: Contact.preview.address.city
     )
-    
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .notDetermined },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
-        requestWhenInUseAuthorization: { _ in
-          .fireAndForget { didRequestInUseAuthorization = true }
-        },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
-      placeService: PlacesServiceClient(placemarks: { _ in [expectedAddress] }),
-      uiApplicationClient: .noop,
-      mainRunLoop: .immediate
-    )
-    
+        
     let store = TestStore(
-      initialState: LocationViewState(),
-      reducer: locationReducer,
-      environment: env
+      initialState: LocationDomain.State(),
+      reducer: LocationDomain(),
+      prepareDependencies: { values in
+        values.locationManager = .unimplemented(
+          authorizationStatus: { .notDetermined },
+          create: { _ in locationManagerSubject.eraseToEffect() },
+          locationServicesEnabled: { true },
+          requestLocation: { _ in .fireAndForget { didRequestLocation = true } },
+          requestWhenInUseAuthorization: { _ in
+            .fireAndForget { didRequestInUseAuthorization = true }
+          },
+          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+        )
+        values.placesServiceClient = PlacesServiceClient(placemarks: { _ in [expectedAddress] })
+        values.applicationClient = .previewValue
+        values.mainRunLoop = .immediate
+      }
     )
     
     let currentLocation = Location(
@@ -169,7 +164,6 @@ final class LocationStoreTests: XCTestCase {
     locationManagerSubject.send(.didUpdateLocations([currentLocation]))
     
     await store.receive(.locationManager(.didUpdateLocations([currentLocation]))) {
-      $0.isRequestingCurrentLocation = false
       $0.region = CoordinateRegion(
         center: currentLocation.coordinate
       )
@@ -192,7 +186,6 @@ final class LocationStoreTests: XCTestCase {
     locationManagerSubject.send(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))
     
     await store.receive(.locationManager(.didUpdateLocations([locationWithBiggerDistanceChangeFromFirst]))) {
-      $0.isRequestingCurrentLocation = false
       $0.region = .init(center: locationWithBiggerDistanceChangeFromFirst.coordinate)
     }
     await store.receive(.resolveLocation(locationWithBiggerDistanceChangeFromFirst.coordinate)) {
@@ -212,20 +205,20 @@ final class LocationStoreTests: XCTestCase {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
     
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .denied },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { false },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
-      placeService: .noop,
-      uiApplicationClient: .noop, mainRunLoop: .immediate
-    )
     let store = TestStore(
-      initialState: LocationViewState(),
-      reducer: locationReducer,
-      environment: env
+      initialState: LocationDomain.State(),
+      reducer: LocationDomain(),
+      prepareDependencies: { values in
+        values.locationManager = .unimplemented(
+          authorizationStatus: { .denied },
+          create: { _ in locationManagerSubject.eraseToEffect() },
+          locationServicesEnabled: { false },
+          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+        )
+        values.placesServiceClient = .noop
+        values.applicationClient = .previewValue
+        values.mainRunLoop = .immediate
+      }
     )
     
     store.send(.onAppear)
@@ -247,24 +240,24 @@ final class LocationStoreTests: XCTestCase {
     var didRequestInUseAuthorization = false
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()
-    
-    let env = LocationViewEnvironment(
-      locationManager: .unimplemented(
-        authorizationStatus: { .notDetermined },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        requestWhenInUseAuthorization: { _ in
-          .fireAndForget { didRequestInUseAuthorization = true }
-        },
-        set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
-      ),
-      placeService: .noop,
-      uiApplicationClient: .noop, mainRunLoop: .immediate
-    )
+
     let store = TestStore(
-      initialState: LocationViewState(),
-      reducer: locationReducer,
-      environment: env
+      initialState: LocationDomain.State(),
+      reducer: LocationDomain(),
+      prepareDependencies: { values in
+        values.locationManager = .unimplemented(
+          authorizationStatus: { .notDetermined },
+          create: { _ in locationManagerSubject.eraseToEffect() },
+          locationServicesEnabled: { true },
+          requestWhenInUseAuthorization: { _ in
+            .fireAndForget { didRequestInUseAuthorization = true }
+          },
+          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+        )
+        values.placesServiceClient = .noop
+        values.applicationClient = .previewValue
+        values.mainRunLoop = .immediate
+      }
     )
     store.send(.onAppear)
     // simulate user decision of segmented control
@@ -290,18 +283,19 @@ final class LocationStoreTests: XCTestCase {
   
   func test_manuallEnteringOfAddress_updatesState_andSetsLocationToValid() {
     let store = TestStore(
-      initialState: LocationViewState(
+      initialState: LocationDomain.State(
         locationOption: .manual,
         isMapExpanded: false,
         isResolvingAddress: false,
         resolvedAddress: .init(address: .init())
       ),
-      reducer: locationReducer,
-      environment: LocationViewEnvironment(
-        locationManager: LocationManager.unimplemented(),
-        placeService: .noop,
-        uiApplicationClient: .noop, mainRunLoop: .immediate
-      )
+      reducer: LocationDomain(),
+      prepareDependencies: { values in
+        values.locationManager = .unimplemented()
+        values.placesServiceClient = .noop
+        values.applicationClient = .previewValue
+        values.mainRunLoop = .immediate
+      }
     )
     
     let newStreet = Contact.preview.address.street
@@ -334,18 +328,19 @@ final class LocationStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: LocationViewState(
+      initialState: LocationDomain.State(
         locationOption: .manual,
         isMapExpanded: false,
         isResolvingAddress: false,
         resolvedAddress: .init(address: .init())
       ),
-      reducer: locationReducer,
-      environment: LocationViewEnvironment(
-        locationManager: LocationManager.unimplemented(),
-        placeService: .noop,
-        uiApplicationClient: uiApplicationClient, mainRunLoop: .immediate
-      )
+      reducer: LocationDomain(),
+      prepareDependencies: { values in
+        values.locationManager = .unimplemented()
+        values.placesServiceClient = .noop
+        values.applicationClient = uiApplicationClient
+        values.mainRunLoop = .immediate
+      }
     )
     
     await store.send(.onGoToSettingsButtonTapped)

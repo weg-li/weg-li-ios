@@ -1,7 +1,7 @@
 import Foundation
 
 public struct ImageUploadResponse: Codable, Equatable {
-  public let id: Int
+  public var id: Int?
   public let key: String
   public let filename: String
   public let contentType: String

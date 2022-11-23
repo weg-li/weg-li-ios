@@ -12,23 +12,21 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_setCarColor_shouldUpdateState() async {
     let store = TestStore(
-      initialState: DescriptionState(),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
+      initialState: DescriptionDomain.State(),
+      reducer: DescriptionDomain()
     )
     
     await store.send(.setColor(1)) { state in
       state.selectedColor = 1
       
-      XCTAssertEqual(DescriptionState.colors[1].value, "Beige")
+      XCTAssertEqual(DescriptionDomain.State.colors[1].value, "Beige")
     }
   }
   
   func test_setCarType_shouldUpdateState() async {
     let store = TestStore(
-      initialState: DescriptionState(selectedColor: 1),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
+      initialState: DescriptionDomain.State(selectedColor: 1),
+      reducer: DescriptionDomain()
     )
     
     await store.send(.setBrand(brand)) { state in
@@ -38,13 +36,12 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_setCarLicensePlate_shouldUpdateState() async {
     let store = TestStore(
-      initialState: DescriptionState(
+      initialState: DescriptionDomain.State(
         licensePlateNumber: "",
         selectedColor: 1,
         selectedBrand: brand
       ),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
+      reducer: DescriptionDomain()
     )
     
     await store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
@@ -54,13 +51,12 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_selectCharge_shouldUpdateState() async {
     let store = TestStore(
-      initialState: DescriptionState(
+      initialState: DescriptionDomain.State(
         licensePlateNumber: "",
         selectedColor: 1,
         selectedBrand: brand
       ),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
+      reducer: DescriptionDomain()
     )
     
     let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
@@ -71,13 +67,12 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_selectDuration_shouldUpdateState() async {
     let store = TestStore(
-      initialState: DescriptionState(
+      initialState: DescriptionDomain.State(
         licensePlateNumber: "",
         selectedColor: 1,
         selectedBrand: brand
       ),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
+      reducer: DescriptionDomain()
     )
     
     await store.send(.setDuration(1)) { state in
@@ -87,7 +82,7 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_setCarLicensePlate_shouldUpdateState_andSetItValid() async {
     let store = TestStore(
-      initialState: DescriptionState(
+      initialState: DescriptionDomain.State(
         licensePlateNumber: "",
         selectedColor: 1,
         selectedBrand: brand,
@@ -95,8 +90,7 @@ final class DescriptionStoreTests: XCTestCase {
         selectedCharge: .init(id: "12", text: "213", isFavorite: false, isSelected: false),
         blockedOthers: false
       ),
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(backgroundQueue: .failing)
+      reducer: DescriptionDomain()
     )
     
     await store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
@@ -107,7 +101,7 @@ final class DescriptionStoreTests: XCTestCase {
   }
   
   func test_actionSetChargeTypeSearchText_shouldUpdateCharges() async {
-    let state = DescriptionState(
+    let state = DescriptionDomain.State(
       licensePlateNumber: "",
       selectedColor: 1,
       selectedBrand: brand
@@ -115,12 +109,11 @@ final class DescriptionStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(
-        mainQueue: .immediate,
-        backgroundQueue: .immediate,
-        fileClient: .noop
-      )
+      reducer: DescriptionDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.fileClient = .noop
+      }
     )
     
     await store.send(.setChargeTypeSearchText("query")) {
@@ -130,13 +123,13 @@ final class DescriptionStoreTests: XCTestCase {
   
   func test_onAppear_shouldUpdateCharges() async {
     var fileClient = FileClient.noop
-    fileClient.load = { _ in
+    fileClient.load = { @Sendable _ in
       .init(
         try! JSONEncoder().encode(["0"])
       )
     }
     
-    let state = DescriptionState(
+    let state = DescriptionDomain.State(
       licensePlateNumber: "",
       selectedColor: 1,
       selectedBrand: brand
@@ -144,15 +137,14 @@ final class DescriptionStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(
-        mainQueue: .immediate,
-        backgroundQueue: .immediate,
-        fileClient: fileClient
-      )
+      reducer: DescriptionDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.fileClient = fileClient
+      }
     )
     
-    let charges = DescriptionState.charges.map {
+    let charges = DescriptionDomain.State.charges.map {
       Charge(
         id: $0.key,
         text: $0.value,
@@ -171,7 +163,7 @@ final class DescriptionStoreTests: XCTestCase {
   }
   
   func test_actionToggleChargeFavorite() async {
-    let testQueue = DispatchQueue.test
+    let clock = TestClock()
     
     let didWriteFiles = ActorIsolated(false)
     var fileClient = FileClient.noop
@@ -180,7 +172,7 @@ final class DescriptionStoreTests: XCTestCase {
       return ()
     }
     
-    var state = DescriptionState(
+    var state = DescriptionDomain.State(
       licensePlateNumber: "",
       selectedColor: 1,
       selectedBrand: brand
@@ -192,12 +184,11 @@ final class DescriptionStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: descriptionReducer,
-      environment: DescriptionEnvironment(
-        mainQueue: testQueue.eraseToAnyScheduler(),
-        backgroundQueue: .immediate,
-        fileClient: fileClient
-      )
+      reducer: DescriptionDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.fileClient = fileClient
+      }
     )
     
     await store.send(.toggleChargeFavorite(charge2)) {
@@ -209,7 +200,7 @@ final class DescriptionStoreTests: XCTestCase {
     
     
     
-    await testQueue.advance(by: .milliseconds(1001))
+    await clock.advance(by: .milliseconds(1001))
     await store.receive(.sortFavoritedCharges) {
       $0.charges = [
         Charge(id: "2", text: "Text", isFavorite: true, isSelected: false),

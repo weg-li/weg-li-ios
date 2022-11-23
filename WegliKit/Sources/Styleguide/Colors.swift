@@ -1,11 +1,9 @@
-// Created for weg-li in 2021.
-
 import SwiftUI
 import UIKit.UIColor
 
 public extension Color {
-  static var wegliBlue: Self { Self(UIColor.wegliBlue) }
-  static var gitHubBannerForeground: Self { Self(UIColor.gitHubBannerForeground)
+  static var wegliBlue: Self { Self(uiColor: .wegliBlue) }
+  static var gitHubBannerForeground: Self { Self(uiColor: .gitHubBannerForeground)
   }
 
   static var gitHubBannerBackground: Self {

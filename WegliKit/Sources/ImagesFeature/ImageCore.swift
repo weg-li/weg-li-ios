@@ -4,34 +4,35 @@ import ComposableArchitecture
 import Foundation
 import SharedModels
 
-public struct ImageState: Hashable, Identifiable {
-  public init(id: String = UUID().uuidString, image: PickerImageResult) {
-    self.id = id
-    self.image = image
-  }
-
-  public let id: String
-  public let image: PickerImageResult
+public struct ImageDomain: ReducerProtocol {
+  public init() {}
   
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}
+  public struct State: Hashable, Identifiable {
+    public init(id: String = UUID().uuidString, image: PickerImageResult) {
+      self.id = id
+      self.image = image
+    }
 
-public enum ImageAction: Equatable {
-  case onRemovePhotoButtonTapped
-  case onRecognizeTextButtonTapped
-}
-
-public struct ImageEnvironment {}
-
-/// Reducer handling actions from a single ImageView.
-public let imageReducer = Reducer<ImageState, ImageAction, ImageEnvironment> { _, action, _ in
-  switch action {
-  case .onRemovePhotoButtonTapped:
-    return .none
+    public let id: String
+    public let image: PickerImageResult
     
-  case .onRecognizeTextButtonTapped:
-    return .none
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(id)
+    }
+  }
+  
+  public enum Action: Equatable {
+    case onRemovePhotoButtonTapped
+    case onRecognizeTextButtonTapped
+  }
+  
+  public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+    switch action {
+    case .onRemovePhotoButtonTapped:
+      return .none
+      
+    case .onRecognizeTextButtonTapped:
+      return .none
+    }
   }
 }

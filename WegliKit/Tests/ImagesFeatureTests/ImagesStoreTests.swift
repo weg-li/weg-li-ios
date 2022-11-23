@@ -11,7 +11,7 @@ import XCTest
 
 @MainActor
 final class ImagesStoreTests: XCTestCase {
-  let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
+  let clock = TestClock()
   
   func test_addPhoto_shouldUpdateState() async {
     let creationDate: Date = .init(timeIntervalSince1970: 0)
@@ -45,19 +45,18 @@ final class ImagesStoreTests: XCTestCase {
     ]
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: .immediate,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .init(recognizeText: { _ in [textItems.removeFirst()] })
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient = .init(recognizeText: { _ in [textItems.removeFirst()] })
+      }
     )
     
     await store.send(.setPhotos([pencilImage, trashImage, heartImage])) {
@@ -109,19 +108,18 @@ final class ImagesStoreTests: XCTestCase {
     let storableImage2 = PickerImageResult(id: id2, uiImage: image2)
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [storableImage1, storableImage2],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: .immediate,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient = .noop
+      }
     )
     
     store.send(.image(id: id1, action: .onRemovePhotoButtonTapped)) {
@@ -131,21 +129,19 @@ final class ImagesStoreTests: XCTestCase {
   
   func test_selectMultiplePhotos_shouldAddPhotosAndSetCoordinate() async throws {
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: .immediate,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient.recognizeText = { _ in [] }
+      }
     )
-    store.environment.textRecognitionClient.recognizeText = { _ in [] }
       
     let creationDate: Date = .init(timeIntervalSince1970: 0)
     let coordinate: CoordinateRegion.Coordinate = .init(latitude: 23.32, longitude: 13.31)
@@ -180,19 +176,18 @@ final class ImagesStoreTests: XCTestCase {
   
   func test_selectMultiplePhotos_withSmallCoordinateUpdateShouldOnlySetCoordinateOnce() async {
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient = .noop
+      }
     )
     
     let creationDate: Date = .init(timeIntervalSince1970: 0)
@@ -233,19 +228,18 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: accessClient,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = accessClient
+        values.textRecognitionClient = .noop
+      }
     )
     
     await store.send(.onAddPhotosButtonTapped)
@@ -263,19 +257,18 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: accessClient,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = accessClient
+        values.textRecognitionClient = .noop
+      }
     )
     
     await store.send(.onAddPhotosButtonTapped)
@@ -294,19 +287,18 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: accessClient,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = accessClient
+        values.textRecognitionClient = .noop
+      }
     )
     
     await store.send(.onAddPhotosButtonTapped)
@@ -318,20 +310,19 @@ final class ImagesStoreTests: XCTestCase {
   
   func test_dismissAlert_shouldUpdateState() {
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         alert: AlertState(title: TextState(L10n.Photos.Alert.accessDenied)),
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: .noop,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = .noop
+        values.textRecognitionClient = .noop
+      }
     )
     
     store.send(.dismissAlert) {
@@ -347,19 +338,18 @@ final class ImagesStoreTests: XCTestCase {
     )
     
     let store = TestStore(
-      initialState: ImagesViewState(
+      initialState: ImagesViewDomain.State(
         showImagePicker: false,
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: imagesReducer,
-      environment: ImagesViewEnvironment(
-        mainQueue: scheduler,
-        backgroundQueue: .immediate,
-        cameraAccessClient: .mock,
-        photoLibraryAccessClient: accessClient,
-        textRecognitionClient: .noop
-      )
+      reducer: ImagesViewDomain(),
+      prepareDependencies: { values in
+        values.continuousClock = clock
+        values.cameraAccessClient = .mock
+        values.photoLibraryAccessClient = accessClient
+        values.textRecognitionClient = .noop
+      }
     )
     
     await store.send(.onAddPhotosButtonTapped)

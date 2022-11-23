@@ -1,4 +1,12 @@
+import Dependencies
 import UIKit.UIApplication
+
+extension DependencyValues {
+  public var applicationClient: UIApplicationClient {
+    get { self[UIApplicationClient.self] }
+    set { self[UIApplicationClient.self] = newValue }
+  }
+}
 
 public struct UIApplicationClient {
   public var open: @Sendable (URL, [UIApplication.OpenExternalURLOptionsKey: Any]) async -> Bool

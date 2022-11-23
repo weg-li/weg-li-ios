@@ -1,14 +1,16 @@
 import Combine
+import Dependencies
 import Foundation
 import SharedModels
 
-public struct RegulatoryOfficeMapper {
-  init(
-    mapAddressToDistrict: @escaping (Address) async throws -> District
-  ) {
-    self.mapAddressToDistrict = mapAddressToDistrict
+extension DependencyValues {
+  public var regulatoryOfficeMapper: RegulatoryOfficeMapper {
+    get { self[RegulatoryOfficeMapper.self] }
+    set { self[RegulatoryOfficeMapper.self] = newValue }
   }
-  
+}
+
+public struct RegulatoryOfficeMapper {
   public var mapAddressToDistrict: (Address) async throws -> District
 }
 

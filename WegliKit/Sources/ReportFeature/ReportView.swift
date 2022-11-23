@@ -11,10 +11,13 @@ import Styleguide
 import SwiftUI
 
 public struct ReportView: View {
-  private let store: Store<ReportState, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<ReportState, ReportAction>
+  public typealias S = ReportDomain.State
+  public typealias A = ReportDomain.Action
+  
+  private let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<S, A>
     
-  public init(store: Store<ReportState, ReportAction>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -30,7 +33,7 @@ public struct ReportView: View {
           ImagesView(
             store: store.scope(
               state: \.images,
-              action: ReportAction.images
+              action: A.images
             )
           )
         }
@@ -45,7 +48,7 @@ public struct ReportView: View {
               L10n.date,
               selection: viewStore.binding(
                 get: \.date,
-                send: ReportAction.setDate
+                send: A.setDate
               )
             )
             .labelsHidden()
@@ -66,7 +69,7 @@ public struct ReportView: View {
           LocationView(
             store: store.scope(
               state: \.location,
-              action: ReportAction.location
+              action: A.location
             )
           )
         }
@@ -83,43 +86,81 @@ public struct ReportView: View {
           isCompleted: viewStore.isContactValid
         ) { ContactWidget(store: store.scope(state: { $0 })) }
         
-        // Send notice button
+        // Send notice buttons
         VStack {
           if !viewStore.apiToken.isEmpty {
-            uploadImagesButton
+            VStack(spacing: .grid(1)) {
+              Button(
+                action: { viewStore.send(.onSubmitButtonTapped) },
+                label: {
+                  VStack(alignment: .center) {
+                    if viewStore.isSubmittingNotice {
+                      ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                      Label("Meldung senden", systemImage: "arrow.up.doc.fill")
+                        .font(.body.bold())
+                    }
+                  }
+                  .frame(maxWidth: .infinity, alignment: .center)
+                }
+              )
+              .disabled(viewStore.canSubmitNotice || viewStore.isSubmittingNotice)
+              .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.canSubmitNotice))
+              .padding([.horizontal])
+              .padding(.vertical, .grid(1))
+              
+              
+            }
           } else {
             MailContentView(store: store)
               .padding()
           }
           
-          if !viewStore.state.isReportValid {
-            VStack(spacing: .grid(2)) {
-              Text(L10n.Mail.readyToSubmitErrorCopy)
-                .fontWeight(.semibold)
-              VStack(spacing: .grid(1)) {
-                if !viewStore.state.images.isValid {
-                  Text(L10n.Report.Error.images.asBulletPoint)
-                }
-                if !viewStore.state.location.resolvedAddress.isValid {
-                  Text(L10n.Report.Error.location.asBulletPoint)
-                }
-                if !viewStore.state.description.isValid {
-                  Text(L10n.Report.Error.description.asBulletPoint)
-                }
-                if !viewStore.state.contactState.isValid {
-                  Text(L10n.Report.Error.contact.asBulletPoint)
+          VStack {
+            if let district = viewStore.district {
+              VStack {
+                Text("Meldung wird gesendet an:")
+                Text(district.email).bold()
+              }
+              .frame(maxWidth: .infinity)
+              .font(.body)
+              .padding()
+              .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                  .stroke(Color(uiColor: .lightGray), lineWidth: 1)
+              )
+            }
+            
+            if !viewStore.state.isReportValid {
+              VStack(spacing: .grid(2)) {
+                Text(L10n.Mail.readyToSubmitErrorCopy)
+                  .fontWeight(.semibold)
+                VStack(spacing: .grid(1)) {
+                  if !viewStore.state.images.isValid {
+                    Text(L10n.Report.Error.images.asBulletPoint)
+                  }
+                  if !viewStore.state.location.resolvedAddress.isValid {
+                    Text(L10n.Report.Error.location.asBulletPoint)
+                  }
+                  if !viewStore.state.description.isValid {
+                    Text(L10n.Report.Error.description.asBulletPoint)
+                  }
+                  if !viewStore.state.contactState.contact.isValid {
+                    Text(L10n.Report.Error.contact.asBulletPoint)
+                  }
                 }
               }
+              .accessibilityElement(children: .combine)
+              .foregroundColor(.red)
+              .font(.callout)
+              .multilineTextAlignment(.center)
+              .padding(.bottom)
             }
-            .accessibilityElement(children: .combine)
-            .foregroundColor(.red)
-            .font(.callout)
-            .multilineTextAlignment(.center)
-            .padding(.bottom)
           }
+          .padding()
         }
       }
-      .disabled(viewStore.isUploadingNotice)
     }
     .onAppear { viewStore.send(.onAppear) }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
@@ -129,36 +170,6 @@ public struct ReportView: View {
       }
     }
     .navigationBarTitle(L10n.Report.navigationBarTitle, displayMode: .inline)
-  }
-  
-  private var uploadImagesButton: some View {
-    VStack {
-      Button(
-        action: { viewStore.send(.onUploadImagesButtonTapped) },
-        label: {
-          VStack(alignment: .center) {
-            HStack {
-              if viewStore.isUploadingNotice {
-                ActivityIndicator(style: .medium, color: .white)
-                  .foregroundColor(.white)
-              } else {
-                Text("Meldung hochladen")
-              }
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-          }
-        }
-      )
-      .disabled(viewStore.isUploadingNotice)
-      .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
-      .padding()
-
-      if let uploadProgressMessage = viewStore.uploadProgressState {
-        Text(uploadProgressMessage)
-          .font(.footnote)
-          .foregroundColor(Color(.secondaryLabel))
-      }
-    }
   }
   
   private var resetButton: some View {
@@ -177,14 +188,13 @@ public struct ReportView: View {
 
 struct ReportForm_Previews: PreviewProvider {
   static var previews: some View {
-    Preview {
-      ReportView(
-        store: .init(
+   Preview {
+     ReportView(store:
+        .init(
           initialState: .preview,
-          reducer: .empty,
-          environment: ()
+          reducer: ReportDomain()
         )
-      )
+     )
     }
   }
 }

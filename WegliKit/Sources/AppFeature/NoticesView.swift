@@ -6,10 +6,13 @@ import Styleguide
 import SwiftUI
 
 public struct NoticesView: View {
-  let store: Store<AppState, AppAction>
-  @ObservedObject var viewStore: ViewStore<AppState, AppAction>
+  public typealias S = AppDomain.State
+  public typealias A = AppDomain.Action
   
-  public init(store: Store<AppState, AppAction>) {
+  let store: Store<S, A>
+  @ObservedObject var viewStore: ViewStore<S, A>
+  
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -62,7 +65,7 @@ public struct NoticesView: View {
   }
   
   @ViewBuilder
-  private func emptyStateView(_ emptyState: EmptyState<AppAction>) -> some View {
+  private func emptyStateView(_ emptyState: EmptyState<AppDomain.Action>) -> some View {
     VStack(alignment: .center, spacing: .grid(3)) {
       Image(systemName: "doc.richtext")
         .font(Font.system(.largeTitle))

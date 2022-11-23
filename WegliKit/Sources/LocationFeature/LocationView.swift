@@ -19,7 +19,7 @@ public struct LocationView: View {
     let showActivityIndicator: Bool
     let pinCoordinate: CLLocationCoordinate2D?
     
-    public init(state: LocationViewState) {
+    public init(state: LocationDomain.State) {
       self.locationOption = state.locationOption
       self.region = state.region
       self.isMapExpanded = state.isMapExpanded
@@ -30,10 +30,10 @@ public struct LocationView: View {
     }
   }
   
-  let store: Store<LocationViewState, LocationViewAction>
-  @ObservedObject private var viewStore: ViewStore<ViewState, LocationViewAction>
+  let store: Store<LocationDomain.State, LocationDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<ViewState, LocationDomain.Action>
   
-  public init(store: Store<LocationViewState, LocationViewAction>) {
+  public init(store: Store<LocationDomain.State, LocationDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(
       store.scope(
@@ -48,7 +48,7 @@ public struct LocationView: View {
       Picker(
         selection: viewStore.binding(
           get: \.locationOption,
-          send: LocationViewAction.setLocationOption
+          send: LocationDomain.Action.setLocationOption
         ),
         label: Text("")
       ) {
@@ -64,7 +64,7 @@ public struct LocationView: View {
             L10n.Location.Placeholder.street,
             text: viewStore.binding(
               get: \.address.street,
-              send: LocationViewAction.updateGeoAddressStreet
+              send: LocationDomain.Action.updateGeoAddressStreet
             )
           )
           .keyboardType(RowType.street.keyboardType)
@@ -73,7 +73,7 @@ public struct LocationView: View {
             L10n.Location.Placeholder.postalCode,
             text: viewStore.binding(
               get: \.address.postalCode,
-              send: LocationViewAction.updateGeoAddressPostalCode
+              send: LocationDomain.Action.updateGeoAddressPostalCode
             )
           )
           .keyboardType(RowType.zipCode.keyboardType)
@@ -82,7 +82,7 @@ public struct LocationView: View {
             L10n.Location.Placeholder.city,
             text: viewStore.binding(
               get: \.address.city,
-              send: LocationViewAction.updateGeoAddressCity
+              send: LocationDomain.Action.updateGeoAddressCity
             )
           )
           .keyboardType(RowType.city.keyboardType)
@@ -96,12 +96,12 @@ public struct LocationView: View {
           MapView(
             region: viewStore.binding(
               get: \.region,
-              send: LocationViewAction.updateRegion
+              send: LocationDomain.Action.updateRegion
             ),
             showsLocation: viewStore.locationOption == .currentLocation,
             pinCoordinate: viewStore.binding(
               get: \.pinCoordinate,
-              send: LocationViewAction.setPinCoordinate
+              send: LocationDomain.Action.setPinCoordinate
             )
           )
           .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -117,9 +117,9 @@ public struct LocationView: View {
     .alert(
       store.scope(
         state: { $0.alert },
-        action: { _ in LocationViewAction.onDismissAlertButtonTapped }
+        action: { _ in LocationDomain.Action.onDismissAlertButtonTapped }
       ),
-      dismiss: LocationViewAction.onDismissAlertButtonTapped
+      dismiss: LocationDomain.Action.onDismissAlertButtonTapped
     )
     .onAppear { viewStore.send(.onAppear) }
   }

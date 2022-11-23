@@ -59,7 +59,7 @@ struct MapView: UIViewRepresentable {
     Coordinator(self)
   }
   
-  class Coordinator: NSObject, MKMapViewDelegate {
+  final class Coordinator: NSObject, MKMapViewDelegate {
     var parent: MapView
     init(_ parent: MapView) {
       self.parent = parent

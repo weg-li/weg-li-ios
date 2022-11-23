@@ -2,10 +2,13 @@
 
 import Combine
 import Foundation
+import Dependencies
 import SharedModels
 
-public extension RegulatoryOfficeMapper {
-  static func live(_ districts: [District] = .all) -> Self {
+extension RegulatoryOfficeMapper: DependencyKey {
+  public static var liveValue: RegulatoryOfficeMapper = live()
+  
+  public static func live(_ districts: [District] = .all) -> Self {
     Self(
       mapAddressToDistrict: { address in
         let task = Task(priority: .userInitiated) {

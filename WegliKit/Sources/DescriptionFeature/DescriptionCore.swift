@@ -7,211 +7,200 @@ import Helper
 import SharedModels
 import SwiftUI
 
-public struct DescriptionState: Equatable {
-  public init(
-    licensePlateNumber: String = "",
-    selectedColor: Int = 0,
-    selectedBrand: CarBrand? = nil,
-    selectedDuration: Int = 0,
-    selectedCharge: Charge? = nil,
-    blockedOthers: Bool = false,
-    vehicleEmpty: Bool = false,
-    hazardLights: Bool = false,
-    expiredTuv: Bool = false,
-    expiredEco: Bool = false
-  ) {
-    self.licensePlateNumber = licensePlateNumber
-    self.selectedColor = selectedColor
-    self.selectedBrand = selectedBrand
-    self.selectedDuration = selectedDuration
-    self.selectedCharge = selectedCharge
-    self.blockedOthers = blockedOthers
-    self.vehicleEmpty = vehicleEmpty
-    self.hazardLights = hazardLights
-    self.expiredTuv = expiredTuv
-    self.expiredEco = expiredEco
-  }
+public struct DescriptionDomain: ReducerProtocol {
+  public init() {}
   
-  public var licensePlateNumber: String
-  public var selectedColor: Int
-  public var selectedBrand: CarBrand?
-  public var selectedDuration: Int
-  public var selectedCharge: Charge?
-  @BindableState public var blockedOthers = false
-  @BindableState public var vehicleEmpty = false
-  @BindableState public var hazardLights = false
-  @BindableState public var expiredTuv = false
-  @BindableState public var expiredEco = false
-  @BindableState public var note = ""
+  @Dependency(\.continuousClock) public var clock
+  @Dependency(\.fileClient) public var fileClient
   
-  public var chargeTypeSearchText = ""
-  public var carBrandSearchText = ""
-  
-  public var presentChargeSelection = false
-  public var presentCarBrandSelection = false
-  
-  public var charges: IdentifiedArrayOf<Charge> = []
-  
-  var carBrandSearchResults: IdentifiedArrayOf<CarBrand> {
-    if carBrandSearchText.isEmpty {
-      return Self.brands
-    } else {
-      return Self.brands.filter { $0.title.lowercased().contains(carBrandSearchText.lowercased()) }
-    }
-  }
-  
-  var chargesSearchResults: IdentifiedArrayOf<Charge> {
-    if chargeTypeSearchText.isEmpty {
-      return charges
-    } else {
-      return charges.filter { $0.text.lowercased().contains(chargeTypeSearchText.lowercased()) }
-    }
-  }
-}
-
-public enum DescriptionAction: BindableAction, Equatable {
-  case binding(BindingAction<DescriptionState>)
-  case onAppear
-  case setLicensePlateNumber(String)
-  case setBrand(CarBrand)
-  case setColor(Int)
-  case setCharge(Charge)
-  case setDuration(Int)
-  case setChargeTypeSearchText(String)
-  case setCarBrandSearchText(String)
-  case toggleChargeFavorite(Charge)
-  case sortFavoritedCharges
-  case favoriteChargesLoaded(TaskResult<[String]>)
-  case presentChargeSelectionView(Bool)
-  case presentBrandSelectionView(Bool)
-}
-
-public struct DescriptionEnvironment {
-  var mainQueue: AnySchedulerOf<DispatchQueue>
-  var backgroundQueue: AnySchedulerOf<DispatchQueue>
-  var fileClient: FileClient
-  
-  public init(
-    mainQueue: AnySchedulerOf<DispatchQueue> = .main,
-    backgroundQueue: AnySchedulerOf<DispatchQueue>,
-    fileClient: FileClient = .live
-  ) {
-    self.mainQueue = mainQueue
-    self.backgroundQueue = backgroundQueue
-    self.fileClient = fileClient
-  }
-}
-
-/// Reducer handing actions from EditDescriptionView.
-public let descriptionReducer = Reducer<DescriptionState, DescriptionAction, DescriptionEnvironment> { state, action, environment in
-  switch action {
-  case .binding:
-    return .none
-      
-  case .onAppear:
-    return .task {
-      await .favoriteChargesLoaded(TaskResult { try await environment.fileClient.loadFavoriteCharges() })
+  public struct State: Equatable {
+    public init(
+      licensePlateNumber: String = "",
+      selectedColor: Int = 0,
+      selectedBrand: CarBrand? = nil,
+      selectedDuration: Int = 0,
+      selectedCharge: Charge? = nil,
+      blockedOthers: Bool = false,
+      vehicleEmpty: Bool = false,
+      hazardLights: Bool = false,
+      expiredTuv: Bool = false,
+      expiredEco: Bool = false
+    ) {
+      self.licensePlateNumber = licensePlateNumber
+      self.selectedColor = selectedColor
+      self.selectedBrand = selectedBrand
+      self.selectedDuration = selectedDuration
+      self.selectedCharge = selectedCharge
+      self.blockedOthers = blockedOthers
+      self.vehicleEmpty = vehicleEmpty
+      self.hazardLights = hazardLights
+      self.expiredTuv = expiredTuv
+      self.expiredEco = expiredEco
     }
     
-  case let .setLicensePlateNumber(value):
-    state.licensePlateNumber = value
-    return .none
-      
-  case let .setBrand(value):
-    state.selectedBrand = value
-    state.presentCarBrandSelection = false
-    return .none
-      
-  case let .setColor(value):
-    state.selectedColor = value
-    return .none
-      
-  case let .setCharge(value):
-    state.selectedCharge = value
-    state.presentChargeSelection = false
-    return .none
-      
-  case let .setDuration(value):
-    state.selectedDuration = value
-    return .none
-      
-  case let .setChargeTypeSearchText(query):
-    state.chargeTypeSearchText = query
-    return .none
-      
-  case let .setCarBrandSearchText(query):
-    state.carBrandSearchText = query
-    return .none
-      
-  case let .toggleChargeFavorite(charge):
-    var charge = charge
-    charge.isFavorite.toggle()
-    charge.isSelected = charge.id == state.selectedCharge?.id
-    guard let index = state.charges.firstIndex(where: { $0.id == charge.id }) else {
-      return .none
-    }
-    state.charges.update(charge, at: index)
-      
-    let ids = state.charges.filter(\.isFavorite).map(\.id)
+    public var licensePlateNumber: String
+    public var selectedColor: Int
+    public var selectedBrand: CarBrand?
+    public var selectedDuration: Int
+    public var selectedCharge: Charge?
+    @BindableState public var blockedOthers = false
+    @BindableState public var vehicleEmpty = false
+    @BindableState public var hazardLights = false
+    @BindableState public var expiredTuv = false
+    @BindableState public var expiredEco = false
+    @BindableState public var note = ""
     
-    return .concatenate(
-      .task {
-        try await environment.mainQueue.sleep(for: .milliseconds(500))
-        return .sortFavoritedCharges
-      },
-      .fireAndForget(priority: .userInitiated) {
-        try await environment.fileClient.saveFavoriteCharges(ids)
+    public var chargeTypeSearchText = ""
+    public var carBrandSearchText = ""
+    
+    public var presentChargeSelection = false
+    public var presentCarBrandSelection = false
+    
+    public var charges: IdentifiedArrayOf<Charge> = []
+    
+    var carBrandSearchResults: IdentifiedArrayOf<CarBrand> {
+      if carBrandSearchText.isEmpty {
+        return Self.brands
+      } else {
+        return Self.brands.filter { $0.title.lowercased().contains(carBrandSearchText.lowercased()) }
       }
-    )
-      
-  case .sortFavoritedCharges:
-    state.charges.sort { $0.isFavorite && !$1.isFavorite }
-    return .none
-      
-  case let .favoriteChargesLoaded(result):
-    let chargeIds = (try? result.value) ?? []
-      
-    let charges = DescriptionState.charges.map {
-      Charge(
-        id: $0.key,
-        text: $0.value,
-        isFavorite: chargeIds.contains($0.key),
-        isSelected: false
-      )
     }
-    state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
-      
-    return Effect(value: .sortFavoritedCharges)
-      
-  case let .presentChargeSelectionView(value):
-    state.chargeTypeSearchText = ""
-    state.presentChargeSelection = value
-    return .none
-      
-  case let .presentBrandSelectionView(value):
-    state.carBrandSearchText = ""
-    state.presentCarBrandSelection = value
-    return .none
+    
+    var chargesSearchResults: IdentifiedArrayOf<Charge> {
+      if chargeTypeSearchText.isEmpty {
+        return charges
+      } else {
+        return charges.filter { $0.text.lowercased().contains(chargeTypeSearchText.lowercased()) }
+      }
+    }
+    
+    public var isValid: Bool {
+      let arguments = [
+        !licensePlateNumber.isEmpty,
+        selectedColor != 0,
+        selectedBrand != nil,
+        selectedDuration != 0,
+        selectedCharge != nil
+      ]
+      return arguments.allSatisfy { $0 == true }
+    }
+  }
+  
+  public enum Action: BindableAction, Equatable {
+    case binding(BindingAction<State>)
+    case onAppear
+    case setLicensePlateNumber(String)
+    case setBrand(CarBrand)
+    case setColor(Int)
+    case setCharge(Charge)
+    case setDuration(Int)
+    case setChargeTypeSearchText(String)
+    case setCarBrandSearchText(String)
+    case toggleChargeFavorite(Charge)
+    case sortFavoritedCharges
+    case favoriteChargesLoaded(TaskResult<[String]>)
+    case presentChargeSelectionView(Bool)
+    case presentBrandSelectionView(Bool)
+  }
+  
+  public var body: some ReducerProtocol<State, Action> {
+    BindingReducer()
+    
+    Reduce<State, Action> { state, action in
+      switch action {
+      case .binding:
+        return .none
+          
+      case .onAppear:
+        return .task {
+          await .favoriteChargesLoaded(TaskResult { try await fileClient.loadFavoriteCharges() })
+        }
+        
+      case let .setLicensePlateNumber(value):
+        state.licensePlateNumber = value
+        return .none
+          
+      case let .setBrand(value):
+        state.selectedBrand = value
+        state.presentCarBrandSelection = false
+        return .none
+          
+      case let .setColor(value):
+        state.selectedColor = value
+        return .none
+          
+      case let .setCharge(value):
+        state.selectedCharge = value
+        state.presentChargeSelection = false
+        return .none
+          
+      case let .setDuration(value):
+        state.selectedDuration = value
+        return .none
+          
+      case let .setChargeTypeSearchText(query):
+        state.chargeTypeSearchText = query
+        return .none
+          
+      case let .setCarBrandSearchText(query):
+        state.carBrandSearchText = query
+        return .none
+          
+      case let .toggleChargeFavorite(charge):
+        var charge = charge
+        charge.isFavorite.toggle()
+        charge.isSelected = charge.id == state.selectedCharge?.id
+        guard let index = state.charges.firstIndex(where: { $0.id == charge.id }) else {
+          return .none
+        }
+        state.charges.update(charge, at: index)
+          
+        let ids = state.charges.filter(\.isFavorite).map(\.id)
+        
+        return .concatenate(
+          .task {
+            try await clock.sleep(for: .seconds(0.5))
+            return .sortFavoritedCharges
+          },
+          .fireAndForget(priority: .userInitiated) {
+            try await fileClient.saveFavoriteCharges(ids)
+          }
+        )
+          
+      case .sortFavoritedCharges:
+        state.charges.sort { $0.isFavorite && !$1.isFavorite }
+        return .none
+          
+      case let .favoriteChargesLoaded(result):
+        let chargeIds = (try? result.value) ?? []
+          
+        let charges = State.charges.map {
+          Charge(
+            id: $0.key,
+            text: $0.value,
+            isFavorite: chargeIds.contains($0.key),
+            isSelected: false
+          )
+        }
+        state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
+          
+        return Effect(value: .sortFavoritedCharges)
+          
+      case let .presentChargeSelectionView(value):
+        state.chargeTypeSearchText = ""
+        state.presentChargeSelection = value
+        return .none
+          
+      case let .presentBrandSelectionView(value):
+        state.carBrandSearchText = ""
+        state.presentCarBrandSelection = value
+        return .none
+      }
+    }
   }
 }
-.binding()
 
-extension DescriptionState: Codable {}
-
-public extension DescriptionState {
-  var isValid: Bool {
-    let arguments = [
-      !licensePlateNumber.isEmpty,
-      selectedColor != 0,
-      selectedBrand != nil,
-      selectedDuration != 0,
-      selectedCharge != nil
-    ]
-    return arguments.allSatisfy { $0 == true }
-  }
-}
-
-public extension DescriptionState {
+public extension DescriptionDomain.State {
   static let bundle = Bundle.module
   
   static let charges: [(key: String, value: String)] = {

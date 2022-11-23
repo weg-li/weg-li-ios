@@ -12,22 +12,20 @@ public struct ContactWidget: View {
     let isResetButtonDisabled: Bool
     let contact: Contact
     let showEditScreen: Bool
-    let fullName: String
-    let city: String
+    var fullName: String { contact.fullName }
+    var city: String { contact.address.city }
     
-    init(state: ReportState) {
+    init(state: ReportDomain.State) {
       self.isResetButtonDisabled = state.contactState == .empty
       self.contact = state.contactState.contact
       self.showEditScreen = state.showEditContact
-      self.fullName = state.contactState.contact.fullName
-      self.city = state.contactState.contact.address.humanReadableCity
     }
   }
   
-  public let store: Store<ReportState, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
+  public let store: Store<ReportDomain.State, ReportDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
   
-  public init(store: Store<ReportState, ReportAction>) {
+  public init(store: Store<ReportDomain.State, ReportDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
@@ -70,13 +68,13 @@ public struct ContactWidget: View {
     .sheet(
       isPresented: viewStore.binding(
         get: \.showEditScreen,
-        send: ReportAction.setShowEditContact
+        send: ReportDomain.Action.setShowEditContact
       ), content: {
         NavigationView {
           ContactView(
             store: store.scope(
-              state: { $0.contactState },
-              action: ReportAction.contact
+              state: \.contactState,
+              action: ReportDomain.Action.contact
             )
           )
           .accessibilityAddTraits([.isModal])

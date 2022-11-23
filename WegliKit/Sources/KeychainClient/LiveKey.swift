@@ -1,8 +1,11 @@
 import Combine
+import Dependencies
 import Foundation
 import KeychainSwift
 
-public extension KeychainClient {
+extension KeychainClient: DependencyKey {
+  public static var liveValue: KeychainClient { .live() }
+  
   static func live(synchronizable: Bool = false) -> Self {
     let keychain = KeychainSwift(keyPrefix: "weg-li")
     keychain.synchronizable = synchronizable

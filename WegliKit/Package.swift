@@ -7,7 +7,7 @@ let package = Package(
   name: "WegliKit",
   defaultLocalization: "de",
   platforms: [
-    .iOS(.v15)
+    .iOS(.v16)
   ],
   products: [
     .library(
@@ -48,98 +48,105 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/composable-core-location", exact: "0.1.0"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
-    .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0"))
+    .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0")
   ],
   targets: [
     .target(
       name: "ApiClient",
       dependencies: [
-        "Helper",
-        "KeychainClient",
-        "SharedModels"
+        .helper,
+        .keychainClient,
+        .models,
+        .dependencies,
+        .testOverlay
       ]
     ),
     .target(
       name: "AppFeature",
       dependencies: [
-        "ApiClient",
-        "FileClient",
-        "KeychainClient",
-        "L10n",
+        .apiClient,
+        .fileClient,
+        .keychainClient,
+        .l10n,
         "ReportFeature",
         "SettingsFeature",
-        "SharedModels",
-        "Styleguide",
-        .product(
-          name: "ComposableArchitecture",
-          package: "swift-composable-architecture"
-        )
+        .models,
+        .styleguide,
+        .tca
       ]
     ),
     .target(
       name: "CameraAccessClient",
-      dependencies: []
+      dependencies: [
+        .dependencies,
+        .testOverlay
+      ]
     ),
     .target(
       name: "ContactFeature",
       dependencies: [
-        "L10n",
-        "SharedModels",
-        "Styleguide",
-        .product(
-          name: "ComposableArchitecture",
-          package: "swift-composable-architecture"
-        )
+        .fileClient,
+        .l10n,
+        .models,
+        .styleguide,
+        .tca
       ]
     ),
     .target(
       name: "DescriptionFeature",
       dependencies: [
-        "FileClient",
-        "Helper",
-        "L10n",
-        "SharedModels",
-        "Styleguide",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .fileClient,
+        .helper,
+        .l10n,
+        .models,
+        .styleguide,
+        .tca
       ],
       resources: [.process("Resources")]
     ),
     .target(
       name: "FileClient",
       dependencies: [
-        "Helper",
-        "SharedModels"
+        .helper,
+        .models,
+        .dependencies,
+        .testOverlay
       ]
     ),
     .target(
       name: "Helper",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .target(
       name: "ImagesFeature",
       dependencies: [
         "CameraAccessClient",
-        "Helper",
-        "L10n",
+        .helper,
+        .l10n,
         "PhotoLibraryAccessClient",
-        "SharedModels",
-        "Styleguide",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .models,
+        .styleguide,
+        .tca
       ]
     ),
     .target(
       name: "ImagesUploadClient",
       dependencies: [
-        "ApiClient",
-        "SharedModels"
+        .apiClient,
+        .models,
+        .dependencies,
+        .testOverlay
       ]
     ),
     .target(
       name: "KeychainClient",
       dependencies: [
-        .product(name: "KeychainSwift", package: "keychain-swift")
+        .product(name: "KeychainSwift", package: "keychain-swift"),
+        .dependencies,
+        .testOverlay
       ]
     ),
     .target(
@@ -148,107 +155,112 @@ let package = Package(
     .target(
       name: "LocationFeature",
       dependencies: [
-        "L10n",
-        "Helper",
-        "PlacesServiceClient",
-        "SharedModels",
-        "Styleguide",
-        "UIApplicationClient",
-        .product(
-          name: "ComposableArchitecture",
-          package: "swift-composable-architecture"
-        ),
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        )
+        .l10n,
+        .helper,
+        .placesServiceClient,
+        .models,
+        .styleguide,
+        .applicationClient,
+        .tca,
+        .locationClient
       ]
     ),
     .target(
       name: "MailFeature",
       dependencies: [
-        "L10n",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .l10n,
+        .models,
+        .tca
       ]
     ),
     .target(
       name: "PathMonitorClient",
-      dependencies: []
+      dependencies: [
+        .dependencies,
+        .testOverlay
+      ]
     ),
     .target(
       name: "PhotoLibraryAccessClient",
-      dependencies: []
+      dependencies: [
+        .dependencies,
+        .testOverlay
+      ]
     ),
     .target(
       name: "PlacesServiceClient",
       dependencies: [
-        "SharedModels"
+        .models,
+        .dependencies,
+        .testOverlay
       ]
     ),
     .target(
       name: "RegulatoryOfficeMapper",
       dependencies: [
-        "SharedModels"
+        .models,
+        .dependencies,
+        .testOverlay
       ],
       resources: [.process("Resources")]
     ),
     .target(
       name: "ReportFeature",
       dependencies: [
-        "ApiClient",
+        .apiClient,
         "ContactFeature",
         "DescriptionFeature",
-        "FileClient",
-        "Helper",
+        .fileClient,
+        .helper,
         "ImagesUploadClient",
         "ImagesFeature",
-        "L10n",
+        .l10n,
         "LocationFeature",
         "MailFeature",
         "PathMonitorClient",
-        "PlacesServiceClient",
+        .placesServiceClient,
         "RegulatoryOfficeMapper",
-        "SharedModels",
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        ),
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .models,
+        .locationClient,
+        .tca,
+        .testOverlay
       ]
     ),
     .target(
       name: "SettingsFeature",
       dependencies: [
-        "ApiClient",
+        .apiClient,
         "ContactFeature",
-        "Helper",
-        "KeychainClient",
-        "L10n",
-        "SharedModels",
-        "Styleguide",
-        "UIApplicationClient",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .helper,
+        .keychainClient,
+        .l10n,
+        .models,
+        .styleguide,
+        .applicationClient,
+        .tca
       ]
     ),
     .target(
       name: "SharedModels",
       dependencies: [
-        "Helper",
-        "L10n"
+        .helper,
+        .l10n
       ]
     ),
     .target(
       name: "Styleguide",
       dependencies: [
-        "L10n",
-        "Helper"
+        .l10n,
+        .helper
       ],
       resources: [.process("Resources")]
     ),
     .target(
       name: "UIApplicationClient",
-      dependencies: []
+      dependencies: [
+        .dependencies,
+        .testOverlay
+      ]
     )
   ]
 )
@@ -265,8 +277,8 @@ package.targets.append(
         "DescriptionFeature",
         "ImagesFeature",
         "ReportFeature",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .models,
+        .tca
       ],
       exclude: [
         "AppFeatureTests.swift.plist"
@@ -276,14 +288,15 @@ package.targets.append(
       name: "ContactFeatureTests",
       dependencies: [
         "ContactFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .fileClient,
+        .tca
       ]
     ),
     .testTarget(
       name: "DescriptionFeatureTests",
       dependencies: [
         "DescriptionFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .testTarget(
@@ -291,36 +304,30 @@ package.targets.append(
       dependencies: [
         "CameraAccessClient",
         "ImagesFeature",
-        "L10n",
+        .l10n,
         "PhotoLibraryAccessClient",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        )
+        .models,
+        .tca,
+        .locationClient
       ]
     ),
     .testTarget(
       name: "LocationFeatureTests",
       dependencies: [
         "LocationFeature",
-        "PlacesServiceClient",
-        "SharedModels",
-        "UIApplicationClient",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-        .product(
-          name: "ComposableCoreLocation",
-          package: "composable-core-location"
-        )
+        .placesServiceClient,
+        .models,
+        .applicationClient,
+        .tca,
+        .locationClient
       ]
     ),
     .testTarget(
       name: "MailFeatureTests",
       dependencies: [
         "MailFeature",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .models,
+        .tca,
         .product(name: "CustomDump", package: "swift-custom-dump")
       ]
     ),
@@ -329,19 +336,19 @@ package.targets.append(
       dependencies: [
         "ImagesFeature",
         "LocationFeature",
-        "PlacesServiceClient",
+        .placesServiceClient,
         "ReportFeature",
-        "SharedModels",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .models,
+        .tca,
         .product(name: "CustomDump", package: "swift-custom-dump")
       ]
     ),
     .testTarget(
       name: "SettingsFeatureTests",
       dependencies: [
-        "SharedModels",
+        .models,
         "SettingsFeature",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+        .tca
       ]
     ),
     .testTarget(
@@ -359,3 +366,21 @@ package.targets.append(
     )
   ]
 )
+
+
+extension Target.Dependency {
+  static let apiClient = byName(name: "ApiClient")
+  static let models = byName(name: "SharedModels")
+  static let helper = byName(name: "Helper")
+  static let fileClient = byName(name: "FileClient")
+  static let keychainClient = byName(name: "KeychainClient")
+  static let l10n = byName(name: "L10n")
+  static let applicationClient = byName(name: "UIApplicationClient")
+  static let styleguide = byName(name: "Styleguide")
+  static let placesServiceClient = byName(name: "PlacesServiceClient")
+  
+  static let tca = product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+  static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")
+  static let dependencies = product(name: "Dependencies", package: "swift-composable-architecture")
+  static let testOverlay = product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+}

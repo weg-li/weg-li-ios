@@ -21,6 +21,18 @@ public struct Contact: Equatable, Codable {
   @BindableState public var address: Address
   @BindableState public var phone: String
   @BindableState public var dateOfBirth: String
+  
+  public var isValid: Bool {
+    [
+      firstName,
+      name,
+      address.street,
+      address.city
+    ].allSatisfy { !$0.isEmpty }
+    && address.postalCode.isNumeric
+    && address.postalCode.count == 5
+  }
+  
 }
 
 // MARK: Helper

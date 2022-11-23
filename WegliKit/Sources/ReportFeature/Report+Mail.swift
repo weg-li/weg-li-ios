@@ -3,7 +3,7 @@ import Foundation
 import Helper
 import SharedModels
 
-public extension ReportState {
+public extension ReportDomain.State {
   // swiftlint:disable:next function_body_length
   func createMailBody() -> String {
     """
@@ -17,7 +17,7 @@ public extension ReportState {
     
     Marke: \(description.selectedBrand?.title ?? "")
     
-    Farbe: \(DescriptionState.colors[description.selectedColor].value)
+    Farbe: \(DescriptionDomain.State.colors[description.selectedColor].value)
     
     Adresse:
     \(location.resolvedAddress.humanReadableAddress())

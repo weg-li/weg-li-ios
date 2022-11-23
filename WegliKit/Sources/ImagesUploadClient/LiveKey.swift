@@ -1,21 +1,24 @@
 import ApiClient
+import Dependencies
 import Foundation
 import SharedModels
 
-public extension ImagesUploadClient {
+extension ImagesUploadClient: DependencyKey {
+  public static var liveValue: ImagesUploadClient = .live()
+  
   static func live(
-    wegliService: WegliAPIService = .live(),
-    googleUploadService: GoogleUploadService = .live()
+    wegliService: APIService = .liveValue,
+    googleUploadService: GoogleUploadService = .liveValue
   ) -> Self {
     Self(
       uploadImages: { results in
         try await withThrowingTaskGroup(of: ImageUploadResponse.self) { group in
           for result in results {
             group.addTask {
-              let gcloudUploadResponse = try await wegliService.upload(result)
+              let uploadResponse = try await wegliService.upload(result)
               
-              guard let directUploadURL = URL(string: gcloudUploadResponse.directUpload.url) else {
-                return gcloudUploadResponse
+              guard let directUploadURL = URL(string: uploadResponse.directUpload.url) else {
+                return uploadResponse
               }
               let directUploadURLComponents = URLComponents(
                 url: directUploadURL,
@@ -27,10 +30,10 @@ public extension ImagesUploadClient {
                 directUploadURLComponents?.url,
                 directUploadURLComponents?.queryItems,
                 result.jpegData,
-                gcloudUploadResponse.directUpload.headers
+                uploadResponse.directUpload.headers
               )
               
-              return gcloudUploadResponse
+              return uploadResponse
             }
           }
           

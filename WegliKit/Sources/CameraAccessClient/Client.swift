@@ -1,4 +1,16 @@
+import Dependencies
 import Photos
+
+extension DependencyValues {
+  public var cameraAccessClient: CameraAccessClient {
+    get { self[CameraAccessClient.self] }
+    set { self[CameraAccessClient.self] = newValue }
+  }
+}
+
+
+// MARK: Client interface
+
 
 public typealias CameraAuthorizationStatus = AVAuthorizationStatus
 

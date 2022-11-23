@@ -1,8 +1,11 @@
+import Dependencies
 import Foundation
 
 // MARK: Live
 
-public extension FileClient {
+extension FileClient: DependencyKey {
+  public static var liveValue = Self.live
+  
   static var live: Self {
     let documentDirectory = FileManager.default
       .urls(for: .documentDirectory, in: .userDomainMask)

@@ -1,4 +1,16 @@
+import Dependencies
 import Photos
+
+extension DependencyValues {
+  public var photoLibraryAccessClient: PhotoLibraryAccessClient {
+    get { self[PhotoLibraryAccessClient.self] }
+    set { self[PhotoLibraryAccessClient.self] = newValue }
+  }
+}
+
+
+// MARK: Client interface
+
 
 public typealias PhotoLibraryAuthorizationStatus = PHAuthorizationStatus
 

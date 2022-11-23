@@ -2,96 +2,90 @@
 
 import ComposableArchitecture
 import Contacts
+import FileClient
 import Foundation
 import Helper
 import L10n
 import SharedModels
 
-public struct ContactState: Equatable, Codable {
-  public init(
-    contact: Contact = .empty,
-    alert: AlertState<ContactStateAction>? = nil
-  ) {
-    self.contact = contact
-    self.alert = alert
-  }
-  
-  @BindableState public var contact: Contact
-  @BindableState public var alert: AlertState<ContactStateAction>?
-  
-  public var isValid: Bool {
-    [
-      contact.firstName,
-      contact.name,
-      contact.address.street,
-      contact.address.city
-    ].allSatisfy { !$0.isEmpty }
-      && contact.address.postalCode.isNumeric
-      && contact.address.postalCode.count == 5
-  }
-  
-  enum CodingKeys: String, CodingKey {
-    case contact
-  }
-}
-
-// MARK: - Action
-
-public enum ContactStateAction: Equatable {
-  case contact(ContactAction)
-  case onResetContactDataButtonTapped
-  case onResetContactConfirmButtonTapped
-  case dismissAlert
-  case onDisappear
-}
-
-// MARK: - Environment
-
-public struct ContactEnvironment {
+public struct ContactViewDomain: ReducerProtocol {
   public init() {}
-}
+  
+  @Dependency(\.continuousClock) var clock
+  @Dependency(\.fileClient) var fileClient
+  
+  public struct State: Equatable {
+    public init(
+      contact: Contact = .empty,
+      alert: AlertState<Action>? = nil
+    ) {
+      self.contact = contact
+      self.alert = alert
+    }
+    
+    @BindableState public var contact: Contact
+    @BindableState public var alert: AlertState<Action>?
+  }
+  
+  public enum Action: Equatable {
+    case contact(ContactDomain.Action)
+    case onResetContactDataButtonTapped
+    case onResetContactConfirmButtonTapped
+    case dismissAlert
+    case onDisappear
+  }
+  
+  public var body: some ReducerProtocol<State, Action> {
+    Scope(state: \.contact, action: /Action.contact) {
+      ContactDomain()
+    }
+    
+    Reduce<State, Action> { state, action in
+      switch action {
+      case .contact:
+        let contact = state.contact
+        return .fireAndForget {
+          enum CancelID {}
+          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+            try await clock.sleep(for: .seconds(0.3))
+            try await fileClient.saveContactSettings(contact)
+          }
+        }
 
-/// Reducer handling ContactView actions
-public let contactViewReducer = Reducer<ContactState, ContactStateAction, ContactEnvironment>.combine(
-  contactReducer.pullback(
-    state: \.contact,
-    action: /ContactStateAction.contact,
-    environment: { _ in .init() }
-  ),
-  Reducer { state, action, _ in
-    switch action {
-    case .contact:
-      return .none
-    case .onResetContactDataButtonTapped:
-      state.alert = .resetContactDataAlert
-      return .none
-    case .onResetContactConfirmButtonTapped:
-      state.contact = .empty
-      return Effect(value: .dismissAlert)
-    case .dismissAlert:
-      state.alert = nil
-      return .none
-    case .onDisappear:
-      return .none
+      case .onResetContactDataButtonTapped:
+        state.alert = .resetContactDataAlert
+        return .none
+      case .onResetContactConfirmButtonTapped:
+        state.contact = .empty
+        return Effect(value: .dismissAlert)
+      case .dismissAlert:
+        state.alert = nil
+        return .none
+      case .onDisappear:
+        return .none
+      }
     }
   }
-)
-
-public enum ContactAction: BindableAction, Equatable {
-  case binding(BindingAction<Contact>)
 }
 
-public let contactReducer = Reducer<Contact, ContactAction, ContactEnvironment> { _, action, _ in
-  switch action {
-  case .binding:
-    return .none
+
+public struct ContactDomain: ReducerProtocol {
+  public init() {}
+  
+  public typealias State = Contact
+  
+  public enum Action: BindableAction, Equatable {
+    case binding(BindingAction<State>)
+  }
+  
+  public var body: some ReducerProtocol<State, Action> {
+    BindingReducer()
   }
 }
-.binding()
 
 // MARK: Helper
 
-public extension AlertState where Action == ContactStateAction {
+public extension AlertState where Action == ContactViewDomain.Action {
   static let resetContactDataAlert = Self(
     title: TextState(L10n.Contact.Alert.title),
     primaryButton: .destructive(
@@ -102,11 +96,9 @@ public extension AlertState where Action == ContactStateAction {
   )
 }
 
-public extension ContactState {
-  static let empty = Self(
-    contact: .empty, alert: nil
-  )
-  
+public extension ContactViewDomain.State {
+  static let empty = Self(contact: .empty, alert: nil)
+
   static let preview = Self(
     contact: .init(
       firstName: RowType.firstName.placeholder,

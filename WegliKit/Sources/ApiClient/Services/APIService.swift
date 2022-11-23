@@ -1,11 +1,20 @@
 import Combine
+import Dependencies
 import Foundation
 import Helper
 import SharedModels
+import XCTestDynamicOverlay
 
-// Interface
+extension DependencyValues {
+  public var apiService: APIService {
+    get { self[APIService.self] }
+    set { self[APIService.self] = newValue }
+  }
+}
+
+
 /// A Service to send a single notice and all persisted notices from the weg-li API
-public struct WegliAPIService {
+public struct APIService {
   public var getNotices: @Sendable (Bool) async throws -> [Notice]
   public var postNotice: @Sendable (NoticeInput) async throws -> Notice
   public var upload: @Sendable (PickerImageResult) async throws -> ImageUploadResponse
@@ -24,38 +33,46 @@ public struct WegliAPIService {
   }
 }
 
-public extension WegliAPIService {
+extension APIService: DependencyKey {
+  public static var liveValue: APIService = .live()
+  
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
       getNotices: { forceReload in
-        let data = try await apiClient.dispatch(.getNotices(forceReload: forceReload))
+        let data = try await apiClient.send(.getNotices(forceReload: forceReload))
         
-        return try JSONDecoder.noticeDecoder.decode([Notice].self, from: data)
+        return try data.decoded(decoder: .noticeDecoder)
       },
       postNotice: { input in
         let noticePutRequestBody = NoticePutRequestBody(notice: input)
-        let body = try? JSONEncoder.noticeEncoder.encode(noticePutRequestBody)
+        let body = try noticePutRequestBody.encoded(encoder: .noticeEncoder)
         
-        let data = try await apiClient.dispatch(.createNotice(body: body))
+        let data = try await apiClient.send(.createNotice(body: body))
         
-        return try JSONDecoder.noticeDecoder.decode(Notice.self, from: data)
+        return try data.decoded(decoder: .noticeDecoder)
       },
       upload: { imagePickerResult in
         let input: ImageUploadInput? = .make(from: imagePickerResult)
-        let body = try? JSONEncoder.noticeEncoder.encode(input)
-          
-        let responseData = try await apiClient.dispatch(.post(.uploads, body: body))
-        return try JSONDecoder.noticeDecoder.decode(ImageUploadResponse.self, from: responseData)
+        let body = try input?.encoded(encoder: .noticeEncoder)
+
+        let request: Request = .post(.uploads, body: body)
+        let responseData = try await apiClient.send(request)
+        return try responseData.decoded(decoder: .noticeDecoder)
       },
       submitNotice: { notice in
-        fatalError()
+        let noticePutRequestBody = NoticePutRequestBody(notice: notice)
+        let body = try noticePutRequestBody.encoded(encoder: .noticeEncoder)
+        
+        let data = try await apiClient.send(.post(.submitNotices, body: body))
+        
+        return try data.decoded(decoder: .noticeDecoder)
       }
     )
   }
 }
 
-public extension WegliAPIService {
-  static let noop = Self(
+extension APIService: TestDependencyKey {
+  public static let noop = Self(
     getNotices: { _ in
       [Notice.mock]
     },
@@ -81,7 +98,7 @@ public extension WegliAPIService {
     submitNotice: { _ in .mock }
   )
   
-  static let failing = Self(
+  public static let failing = Self(
     getNotices: { _ in
       throw ApiError(error: NetworkRequestError.invalidRequest)
     },
@@ -92,5 +109,12 @@ public extension WegliAPIService {
       throw NetworkRequestError.badRequest
     },
     submitNotice: { _ in fatalError() }
+  )
+  
+  public static var testValue: APIService = Self(
+    getNotices: unimplemented("\(Self.self).getNotices"),
+    postNotice: unimplemented("\(Self.self).postNotice"),
+    upload: unimplemented("\(Self.self).upload"),
+    submitNotice: unimplemented("\(Self.self).submitNotice")
   )
 }

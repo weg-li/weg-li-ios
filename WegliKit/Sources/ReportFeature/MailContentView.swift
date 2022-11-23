@@ -19,22 +19,22 @@ struct MailContentView: View {
     let isDescriptionValid: Bool
     let isContactValid: Bool
     
-    init(state: ReportState) {
+    init(state: ReportDomain.State) {
       self.districtName = state.district?.name
       self.isImagesValid = state.images.isValid
       self.isLocationValid = state.location.resolvedAddress.isValid
       self.isDescriptionValid = state.description.isValid
-      self.isContactValid = state.contactState.isValid
+      self.isContactValid = state.contactState.contact.isValid
       
       self.isSubmitButtonDisabled = !state.isReportValid
       self.isMailComposerPresented = state.mail.isPresentingMailContent
     }
   }
   
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
-  let store: Store<ReportState, ReportAction>
+  @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
+  let store: Store<ReportDomain.State, ReportDomain.Action>
   
-  init(store: Store<ReportState, ReportAction>) {
+  init(store: Store<ReportDomain.State, ReportDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
@@ -63,12 +63,12 @@ struct MailContentView: View {
     }
     .sheet(isPresented: viewStore.binding(
       get: \.isMailComposerPresented,
-      send: { ReportAction.mail(.presentMailContentView($0)) }
+      send: { ReportDomain.Action.mail(.presentMailContentView($0)) }
     )) {
       MailView(
         store: store.scope(
           state: \.mail,
-          action: ReportAction.mail
+          action: ReportDomain.Action.mail
         )
       )
     }
@@ -86,17 +86,7 @@ struct MailContentView_Previews: PreviewProvider {
           contactState: .preview,
           date: Date.init
         ),
-        reducer: reportReducer,
-        environment: ReportEnvironment(
-          mainQueue: .failing,
-          backgroundQueue: .failing,
-          locationManager: .live,
-          placeService: .noop,
-          regulatoryOfficeMapper: .live(),
-          fileClient: .noop,
-          wegliService: .noop,
-          date: Date.init
-        )
+        reducer: ReportDomain()
       )
     )
   }

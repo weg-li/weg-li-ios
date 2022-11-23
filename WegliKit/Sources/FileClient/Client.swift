@@ -1,6 +1,15 @@
+import Dependencies
 import Foundation
 import Helper
 import SharedModels
+
+extension DependencyValues {
+  public var fileClient: FileClient {
+    get { self[FileClient.self] }
+    set { self[FileClient.self] = newValue }
+  }
+}
+
 
 // MARK: Interface
 
@@ -24,11 +33,9 @@ public struct FileClient {
     _ data: A,
     to fileName: String,
     with encoder: JSONEncoder = JSONEncoder()
-  ) async -> Swift.Void {
-    Task(priority: .background) {
-      let data = try data.encoded(encoder: encoder)
-      try await self.save(fileName, data)
-    }
+  ) async throws {
+    let data = try data.encoded(encoder: encoder)
+    try await self.save(fileName, data)
   }
 }
 
@@ -38,8 +45,8 @@ public extension FileClient {
     try await load(Contact.self, from: contactSettingsFileName)
   }
 
-  func saveContactSettings(_ contact: Contact) async {
-    await save(contact, to: contactSettingsFileName)
+  func saveContactSettings(_ contact: Contact) async throws {
+    try await save(contact, to: contactSettingsFileName)
   }
   
   func loadFavoriteCharges() async throws -> [String] {
@@ -47,15 +54,15 @@ public extension FileClient {
   }
   
   func saveFavoriteCharges(_ favorites: [String]) async throws {
-    await save(favorites, to: favoriteChargesIdsFileName)
+    try await save(favorites, to: favoriteChargesIdsFileName)
   }
   
   func loadUserSettings() async throws -> UserSettings {
     try await load(UserSettings.self, from: userSettingsFilenName)
   }
   
-  func saveUserSettings(_ settings: UserSettings) async {
-    await save(settings, to: userSettingsFilenName)
+  func saveUserSettings(_ settings: UserSettings) async throws {
+    try await save(settings, to: userSettingsFilenName)
   }
   
   func loadNotices(decoder: JSONDecoder = .noticeDecoder) async throws -> [Notice] {
@@ -66,7 +73,7 @@ public extension FileClient {
     guard let notices = notices else {
       throw CancellationError()
     }
-    return await save(notices, to: noticesFileName, with: encoder)
+    return try await save(notices, to: noticesFileName, with: encoder)
   }
 }
 

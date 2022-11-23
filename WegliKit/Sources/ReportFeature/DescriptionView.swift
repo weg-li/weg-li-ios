@@ -11,25 +11,25 @@ import SwiftUI
 
 public struct DescriptionView: View {
   struct ViewState: Equatable {
-    let description: DescriptionState
+    let description: DescriptionDomain.State
     let chargeType: String
     let brand: String
     let color: String
     let showEditScreen: Bool
     
-    init(state: ReportState) {
+    init(state: ReportDomain.State) {
       self.description = state.description
       self.brand = state.description.selectedBrand?.title ?? ""
-      self.color = DescriptionState.colors[state.description.selectedColor].value
+      self.color = DescriptionDomain.State.colors[state.description.selectedColor].value
       self.chargeType = state.description.selectedCharge?.text ?? ""
       self.showEditScreen = state.showEditDescription
     }
   }
   
-  let store: Store<ReportState, ReportAction>
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportAction>
+  let store: Store<ReportDomain.State, ReportDomain.Action>
+  @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
   
-  public init(store: Store<ReportState, ReportAction>) {
+  public init(store: Store<ReportDomain.State, ReportDomain.Action>) {
     self.store = store
     self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
@@ -97,12 +97,12 @@ public struct DescriptionView: View {
     .sheet(
       isPresented: viewStore.binding(
         get: \.showEditScreen,
-        send: ReportAction.setShowEditDescription
+        send: ReportDomain.Action.setShowEditDescription
       ), content: {
         EditDescriptionView(
           store: store.scope(
             state: \.description,
-            action: ReportAction.description
+            action: ReportDomain.Action.description
           )
         )
         .accessibilityAddTraits([.isModal])
@@ -135,26 +135,15 @@ public struct DescriptionView: View {
   }
 }
 
-struct DescriptionWidgetView_Previews: PreviewProvider {
-  static var previews: some View {
-    Preview {
-      Widget(
-        title: Text("Beschreibung"),
-        isCompleted: true
-      ) {
-        DescriptionView(
-          store: .init(
-            initialState: ReportState(
-              uuid: UUID.init,
-              images: ImagesViewState(),
-              contactState: .preview,
-              date: Date.init
-            ),
-            reducer: .empty,
-            environment: ()
-          )
-        )
-      }
-    }
-  }
-}
+//struct DescriptionWidgetView_Previews: PreviewProvider {
+//  static var previews: some View {
+//    Preview {
+//      DescriptionView(
+//        store: .init(
+//          initialState: ReportDomain.State(uuid: UUID.init, date: Date.init),
+//          reducer: DescriptionDomain()
+//        )
+//      )
+//    }
+//  }
+//}

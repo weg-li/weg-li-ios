@@ -8,12 +8,15 @@ import Styleguide
 import SwiftUI
 
 public struct SettingsView: View {
+  public typealias S = SettingsDomain.State
+  public typealias A = SettingsDomain.Action
+  
   @Environment(\.colorScheme) private var colorScheme
   
-  let store: Store<SettingsState, SettingsAction>
-  @ObservedObject private var viewStore: ViewStore<SettingsState, SettingsAction>
+  let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<S, A>
   
-  public init(store: Store<SettingsState, SettingsAction>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -25,7 +28,7 @@ public struct SettingsView: View {
           destination: AccountSettingsView(
             store: store.scope(
               state: \.accountSettingsState,
-              action: SettingsAction.accountSettings
+              action: A.accountSettings
             )
           ),
           label: {
@@ -41,12 +44,32 @@ public struct SettingsView: View {
       Section(header: Label("Allgemein", systemImage: "hammer.fill")) {
         Toggle(
           isOn: viewStore.binding(
-            get: { $0.userSettings.showsAllTextRecognitionSettings },
-            send: { SettingsAction.userSettings(.setShowsAllTextRecognitionResults($0)) }
+            get: \.userSettings.showsAllTextRecognitionSettings,
+            send: { A.userSettings(.setShowsAllTextRecognitionResults($0)) }
           ),
           label: {
             Label("Alle Ergebnisse der Nummernschild Erkennung anzeigen", systemImage: "text.magnifyingglass")
               .labelStyle(.titleOnly)
+          }
+        )
+        
+        Toggle(
+          isOn: viewStore.binding(
+            get: \.userSettings.alwaysSendNotice,
+            send: { A.userSettings(.onAlwaysSendNotice($0)) }
+          ),
+          label: {
+            VStack(alignment: .leading) {
+              Text("Meldung immer direkt senden")
+                .font(.body)
+                .padding(.bottom)
+              Text(
+                viewStore.state.userSettings.alwaysSendNotice
+                ? "Die Meldung wird direkt an die Behörde gesendet."
+                : "Die Meldung wird hochgeladen und du kannst sie noch einmal auf der Webseite prüfen bevor du sie versendest."
+              )
+              .font(.subheadline)
+            }
           }
         )
       }
@@ -169,12 +192,7 @@ struct SettingsView_Previews: PreviewProvider {
               accountSettingsState: .init(accountSettings: .init(apiToken: "")),
               userSettings: .init(showsAllTextRecognitionSettings: false)
             ),
-            reducer: .empty,
-            environment: SettingsEnvironment(
-              uiApplicationClient: .live,
-              keychainClient: .noop,
-              mainQueue: .failing
-            )
+            reducer: SettingsDomain()
           )
         )
       }

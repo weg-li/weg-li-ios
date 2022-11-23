@@ -24,7 +24,7 @@ public struct APIClient {
   /// Dispatches a Request and returns a publisher
   /// - Parameter request: Request to Dispatch
   /// - Returns: A publisher containing decoded data or an error
-  public func dispatch(_ request: Request) async throws -> Data {
+  public func send(_ request: Request) async throws -> Data {
     guard var urlRequest = try? request.makeRequest() else {
       throw NetworkRequestError.badRequest
     }
@@ -33,8 +33,8 @@ public struct APIClient {
   }
 }
 
-public extension APIClient {
-  static let live = Self(networkDispatcher: { .live }, tokenStore: { .live() })
+extension APIClient {
+  static let live = Self(networkDispatcher: { .live }, tokenStore: { .liveValue })
   static let noop = Self(networkDispatcher: { .noop }, tokenStore: { .noop })
 }
 

@@ -2,16 +2,18 @@ import ComposableArchitecture
 import SharedModels
 import SwiftUI
 import Vision
+import XCTestDynamicOverlay
 
-public struct TextItem: Identifiable, Hashable {
-  public var id: String = UUID().uuidString
-  public var text = ""
-  
-  public init(id: String, text: String) {
-    self.id = id
-    self.text = text
+extension DependencyValues {
+  public var textRecognitionClient: TextRecognitionClient {
+    get { self[TextRecognitionClient.self] }
+    set { self[TextRecognitionClient.self] = newValue }
   }
 }
+
+
+// MARK: Client interface
+
 
 public struct TextRecognitionClient {
   public var recognizeText: (PickerImageResult) async throws -> [TextItem]
@@ -21,7 +23,9 @@ public struct TextRecognitionClient {
   }
 }
 
-public extension TextRecognitionClient {
+extension TextRecognitionClient: DependencyKey {
+  public static var liveValue: TextRecognitionClient = live
+  
   static let live = Self(
     recognizeText: { image in
       guard let cgImage = image.asUIImage?.cgImage else {
@@ -75,10 +79,25 @@ private func performRequest(
   }
 }
 
-public extension TextRecognitionClient {
-  static let noop = Self(
+extension TextRecognitionClient: TestDependencyKey {
+  public static let noop = Self(
     recognizeText: { _ in [] }
   )
+  
+  public static var testValue: TextRecognitionClient = Self(
+    recognizeText: unimplemented("\(Self.self).recognizeText", placeholder: [])
+  )
+}
+
+// MARK: Helper
+public struct TextItem: Identifiable, Hashable {
+  public var id: String = UUID().uuidString
+  public var text = ""
+  
+  public init(id: String, text: String) {
+    self.id = id
+    self.text = text
+  }
 }
 
 public struct VisionError: Equatable, Error {
