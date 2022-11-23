@@ -23,7 +23,9 @@ public struct TextRecognitionClient {
   }
 }
 
-public extension TextRecognitionClient {
+extension TextRecognitionClient: DependencyKey {
+  public static var liveValue: TextRecognitionClient = live
+  
   static let live = Self(
     recognizeText: { image in
       guard let cgImage = image.asUIImage?.cgImage else {

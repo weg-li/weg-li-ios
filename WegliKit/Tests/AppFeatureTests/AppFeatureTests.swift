@@ -102,7 +102,7 @@ final class AppStoreTests: XCTestCase {
     var keychainClient = KeychainClient.noop
     keychainClient.getString = { _ in token }
     
-    var wegliService = WegliAPIService.noop
+    var wegliService = APIService.noop
     wegliService.getNotices = { _ in [.mock]}
     
     let store = TestStore(

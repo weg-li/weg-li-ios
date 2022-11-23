@@ -5,17 +5,6 @@ import Combine
 import Foundation
 import SwiftUI
 
-struct ImageLoaderKey: EnvironmentKey {
-    static let defaultValue = ImageLoader()
-}
-
-extension EnvironmentValues {
-    var imageLoader: ImageLoader {
-        get { self[ImageLoaderKey.self] }
-        set { self[ImageLoaderKey.self ] = newValue}
-    }
-}
-
 /// This view displays a thumbnail from a URL. It begins loading the thumbnail asynchronously when
 /// it first appears on screen. While loading, this view displays a placeholder image. If it encounters an error,
 /// it displays an error image. You must call the `load()` function to start asynchronous loading.
@@ -23,12 +12,14 @@ struct AsyncThumbnailView: View {
   let url: URL
   let contentMode: ContentMode
   
+  private let imageLoader: ImageActor.ImageLoader
+  
   @State private var image: UIImage?
-  @Environment(\.imageLoader) private var imageLoader
   
   init(url: URL, contentMode: ContentMode = .fill) {
     self.url = url
     self.contentMode = contentMode
+    self.imageLoader = ImageActor.shared
   }
   
   var body: some View {
@@ -59,9 +50,12 @@ struct AsyncThumbnailView: View {
 struct AsyncImageView: View {
   let url: URL
   @State private var image: UIImage?
-  @Environment(\.imageLoader) private var imageLoader
+  private let imageLoader: ImageActor.ImageLoader
   
-  init(url: URL) { self.url = url }
+  init(url: URL) {
+    self.url = url
+    self.imageLoader = ImageActor.shared
+  }
   
   var body: some View {
     Group {

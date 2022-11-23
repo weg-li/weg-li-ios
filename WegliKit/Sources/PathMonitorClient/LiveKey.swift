@@ -1,6 +1,9 @@
+import Dependencies
 import Network
 
-public extension PathMonitorClient {
+extension PathMonitorClient: DependencyKey {
+  public static var liveValue: PathMonitorClient = Self.live(queue: .main)
+  
   static func live(queue: DispatchQueue) -> Self {
     let monitor = NWPathMonitor()
     monitor.start(queue: queue)

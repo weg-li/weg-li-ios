@@ -1,6 +1,9 @@
+import Dependencies
 import Photos
 
-public extension PhotoLibraryAccessClient {
+extension PhotoLibraryAccessClient: DependencyKey {
+  public static var liveValue: PhotoLibraryAccessClient { .live() }
+  
   static func live(accessLevel: PHAccessLevel = .readWrite) -> Self {
     Self(
       requestAuthorization: {

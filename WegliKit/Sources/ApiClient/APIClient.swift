@@ -33,8 +33,8 @@ public struct APIClient {
   }
 }
 
-public extension APIClient {
-  static let live = Self(networkDispatcher: { .live }, tokenStore: { .live() })
+extension APIClient {
+  static let live = Self(networkDispatcher: { .live }, tokenStore: { .liveValue })
   static let noop = Self(networkDispatcher: { .noop }, tokenStore: { .noop })
 }
 

@@ -1,7 +1,10 @@
 import CoreLocation
+import Dependencies
 import SharedModels
 
-public extension PlacesServiceClient {
+extension PlacesServiceClient: DependencyKey {
+  public static var liveValue: PlacesServiceClient = Self.live
+  
   static let live = Self(
     placemarks: { location in
       do {

@@ -1,11 +1,14 @@
 import ApiClient
+import Dependencies
 import Foundation
 import SharedModels
 
-public extension ImagesUploadClient {
+extension ImagesUploadClient: DependencyKey {
+  public static var liveValue: ImagesUploadClient = .live()
+  
   static func live(
-    wegliService: WegliAPIService = .live(),
-    googleUploadService: GoogleUploadService = .live()
+    wegliService: APIService = .liveValue,
+    googleUploadService: GoogleUploadService = .liveValue
   ) -> Self {
     Self(
       uploadImages: { results in

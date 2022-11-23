@@ -6,15 +6,15 @@ import SharedModels
 import XCTestDynamicOverlay
 
 extension DependencyValues {
-  public var apiService: WegliAPIService {
-    get { self[WegliAPIService.self] }
-    set { self[WegliAPIService.self] = newValue }
+  public var apiService: APIService {
+    get { self[APIService.self] }
+    set { self[APIService.self] = newValue }
   }
 }
 
 
 /// A Service to send a single notice and all persisted notices from the weg-li API
-public struct WegliAPIService {
+public struct APIService {
   public var getNotices: @Sendable (Bool) async throws -> [Notice]
   public var postNotice: @Sendable (NoticeInput) async throws -> Notice
   public var upload: @Sendable (PickerImageResult) async throws -> ImageUploadResponse
@@ -33,7 +33,9 @@ public struct WegliAPIService {
   }
 }
 
-public extension WegliAPIService {
+extension APIService: DependencyKey {
+  public static var liveValue: APIService = .live()
+  
   static func live(apiClient: APIClient = .live) -> Self {
     Self(
       getNotices: { forceReload in
@@ -69,7 +71,7 @@ public extension WegliAPIService {
   }
 }
 
-extension WegliAPIService: TestDependencyKey {
+extension APIService: TestDependencyKey {
   public static let noop = Self(
     getNotices: { _ in
       [Notice.mock]
@@ -109,7 +111,7 @@ extension WegliAPIService: TestDependencyKey {
     submitNotice: { _ in fatalError() }
   )
   
-  public static var testValue: WegliAPIService = Self(
+  public static var testValue: APIService = Self(
     getNotices: unimplemented("\(Self.self).getNotices"),
     postNotice: unimplemented("\(Self.self).postNotice"),
     upload: unimplemented("\(Self.self).upload"),

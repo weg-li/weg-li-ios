@@ -1,6 +1,9 @@
+import Dependencies
 import Photos
 
-public extension CameraAccessClient {
+extension CameraAccessClient: DependencyKey {
+  public static var liveValue: CameraAccessClient = .live()
+  
   static func live() -> Self {
     Self(
       requestAuthorization: { await AVCaptureDevice.requestAccess(for: .video) },

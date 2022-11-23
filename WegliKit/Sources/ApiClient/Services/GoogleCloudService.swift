@@ -20,7 +20,9 @@ public struct GoogleUploadService {
   }
 }
 
-public extension GoogleUploadService {
+extension GoogleUploadService: DependencyKey {
+  public static var liveValue: GoogleUploadService = .live()
+  
   static func live(networkDispatcher: NetworkDispatcher = .live) -> Self {
     Self(
       upload: { url, _, body, headers in

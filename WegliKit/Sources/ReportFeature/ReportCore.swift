@@ -92,7 +92,7 @@ public struct ReportDomain: ReducerProtocol {
       && location.resolvedAddress.isValid
     }
     
-    internal init(
+    init(
       id: String,
       images: ImagesViewDomain.State,
       contactState: ContactViewDomain.State,

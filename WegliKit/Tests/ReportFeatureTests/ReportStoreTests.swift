@@ -652,7 +652,7 @@ final class ReportStoreTests: XCTestCase {
     ]
     let imagesUploadClient = ImagesUploadClient(uploadImages: { _ in responses })
     
-    var wegliService = WegliAPIService.noop
+    var wegliService = APIService.noop
     wegliService.postNotice = { _ in .mock }
     
     let didRemoveImageItems = ActorIsolated(false)
