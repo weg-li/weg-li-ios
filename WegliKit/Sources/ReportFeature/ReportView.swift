@@ -91,44 +91,26 @@ public struct ReportView: View {
           if !viewStore.apiToken.isEmpty {
             VStack(spacing: .grid(1)) {
               Button(
-                action: { viewStore.send(.onUploadImagesButtonTapped) },
-                label: {
-                  VStack(alignment: .center) {
-                    HStack {
-                      if viewStore.isUploadingNotice {
-                        ProgressView()
-                          .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                      } else {
-                        Label("Meldung hochladen", systemImage: "arrow.up.doc.fill")
-                      }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                  }
-                }
-              )
-              .disabled(viewStore.isUploadingNotice)
-              .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.isReportValid))
-              .padding([.horizontal])
-              .padding(.vertical, .grid(1))
-              
-              Button(
-                action: { viewStore.send(.submitNotice) },
+                action: { viewStore.send(.onSubmitButtonTapped) },
                 label: {
                   VStack(alignment: .center) {
                     if viewStore.isSubmittingNotice {
                       ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     } else {
-                      Label("Anzeige erstatten", systemImage: "paperplane.fill")
+                      Label("Meldung senden", systemImage: "arrow.up.doc.fill")
+                        .font(.body.bold())
                     }
                   }
                   .frame(maxWidth: .infinity, alignment: .center)
                 }
               )
-              .disabled(viewStore.canSubmitNotice)
+              .disabled(viewStore.canSubmitNotice || viewStore.isSubmittingNotice)
               .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.canSubmitNotice))
               .padding([.horizontal])
               .padding(.vertical, .grid(1))
+              
+              
             }
           } else {
             MailContentView(store: store)
@@ -136,15 +118,19 @@ public struct ReportView: View {
           }
           
           VStack {
-            VStack {
-              Text("1. Lade zuerst deine Meldung hoch").bold()
-              Text("2. Erstatte die Anzeige").bold()
+            if let district = viewStore.district {
+              VStack {
+                Text("Meldung wird gesendet an:")
+                Text(district.email).bold()
+              }
+              .frame(maxWidth: .infinity)
+              .font(.body)
+              .padding()
+              .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                  .stroke(Color(uiColor: .lightGray), lineWidth: 1)
+              )
             }
-            .padding()
-            .overlay(
-              RoundedRectangle(cornerRadius: 6)
-                .stroke(Color(uiColor: .lightGray), lineWidth: 1)
-            )
             
             if !viewStore.state.isReportValid {
               VStack(spacing: .grid(2)) {
@@ -172,9 +158,9 @@ public struct ReportView: View {
               .padding(.bottom)
             }
           }
-          }
+          .padding()
+        }
       }
-      .disabled(viewStore.isUploadingNotice)
     }
     .onAppear { viewStore.send(.onAppear) }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
@@ -202,14 +188,13 @@ public struct ReportView: View {
 
 struct ReportForm_Previews: PreviewProvider {
   static var previews: some View {
-    Preview {
-      ReportView(
-        store: .init(
+   Preview {
+     ReportView(store:
+        .init(
           initialState: .preview,
-          reducer: .empty,
-          environment: ()
+          reducer: ReportDomain()
         )
-      )
+     )
     }
   }
 }

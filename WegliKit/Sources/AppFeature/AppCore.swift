@@ -158,6 +158,7 @@ public struct AppDomain: ReducerProtocol {
         case .userSettings:
           // store usersettings when changed
           state.reportDraft.images.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
+          state.reportDraft.alwaysSendNotice = state.settings.userSettings.alwaysSendNotice
           return .none
         
         case .accountSettings:

@@ -62,12 +62,13 @@ public struct SettingsView: View {
             VStack(alignment: .leading) {
               Text("Meldung immer direkt senden")
                 .font(.body)
+                .padding(.bottom)
               Text(
                 viewStore.state.userSettings.alwaysSendNotice
                 ? "Die Meldung wird direkt an die Behörde gesendet."
                 : "Die Meldung wird hochgeladen und du kannst sie noch einmal auf der Webseite prüfen bevor du sie versendest."
               )
-              .font(.callout)
+              .font(.subheadline)
             }
           }
         )

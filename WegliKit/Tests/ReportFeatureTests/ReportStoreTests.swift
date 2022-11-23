@@ -625,7 +625,7 @@ final class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_action_uploadImages() async {
+  func test_action_onSubmitButtonTapped() async {
     let responses: [ImageUploadResponse] = [
       .init(
         id: 1,
@@ -662,33 +662,36 @@ final class ReportStoreTests: XCTestCase {
       return ()
     }
     
-    let store = TestStore(
-      initialState: ReportDomain.State(
-        uuid: fixedUUID,
-        images: .init(
-          alert: nil,
-          showImagePicker: false,
-          storedPhotos: [
-            .init(id: "1", uiImage: .add, imageUrl: .some(.init(string: "URL")!)),
-            .init(id: "2", uiImage: .actions, imageUrl: .some(.init(string: "URL")!))
-          ],
-          coordinateFromImagePicker: nil,
-          dateFromImagePicker: nil
-        ),
-        contactState: .empty,
-        district: nil,
-        date: fixedDate,
-        description: .init(),
-        location: .init(
-          locationOption: .fromPhotos,
-          isMapExpanded: false,
-          isResolvingAddress: false,
-          resolvedAddress: .init(
-            street: "TestStrasse 3",
-            postalCode: "1243", city: "Berlin"
-          )
-        )
+    var state: ReportDomain.State = ReportDomain.State(
+      uuid: fixedUUID,
+      images: .init(
+        alert: nil,
+        showImagePicker: false,
+        storedPhotos: [
+          .init(id: "1", uiImage: .add, imageUrl: .some(.init(string: "URL")!)),
+          .init(id: "2", uiImage: .actions, imageUrl: .some(.init(string: "URL")!))
+        ],
+        coordinateFromImagePicker: nil,
+        dateFromImagePicker: nil
       ),
+      contactState: .empty,
+      district: nil,
+      date: fixedDate,
+      description: .init(),
+      location: .init(
+        locationOption: .fromPhotos,
+        isMapExpanded: false,
+        isResolvingAddress: false,
+        resolvedAddress: .init(
+          street: "TestStrasse 3",
+          postalCode: "1243", city: "Berlin"
+        )
+      )
+    )
+    state.alwaysSendNotice = true
+    
+    let store = TestStore(
+      initialState: state,
       reducer: ReportDomain(),
       prepareDependencies: { values in
         values.continuousClock = ImmediateClock()
@@ -700,23 +703,21 @@ final class ReportStoreTests: XCTestCase {
         values.imagesUploadClient = imagesUploadClient
       }
     )
+    store.dependencies.apiService.submitNotice = { _ in .mock }
     
-    await store.send(.onUploadImagesButtonTapped) {
-      $0.uploadProgressState = "Uploading images ..."
-      $0.isUploadingNotice = true
+    await store.send(.onSubmitButtonTapped) {
+      $0.isSubmittingNotice = true
     }
+    await store.receive(.uploadImages)
     await store.receive(.uploadImagesResponse(.success(responses))) {
       $0.uploadedImagesIds = ["111", "222"]
     }
-    await store.receive(.composeNoticeAndSend) {
-      $0.uploadProgressState = "Sending notice ..."
-    }
-    await store.receive(.composeNoticeResponse(.success(.mock))) {
-      $0.canSubmitNotice = true
-      $0.isUploadingNotice = false
-      $0.uploadedImagesIds = ["111", "222"]
-      $0.uploadProgressState = nil
-      $0.uploadedNoticeID = Notice.mock.id
+    await store.receive(.composeNotice)
+    
+    await store.receive(.submitNoticeResponse(.success(.mock))) {
+      $0.isSubmittingNotice = false
+      $0.alert = .reportSent
+      $0.uploadedImagesIds = []
     }
     await didRemoveImageItems.withValue({ value in
       XCTAssertTrue(value)

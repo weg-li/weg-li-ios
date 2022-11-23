@@ -56,6 +56,7 @@ public struct ReportDomain: ReducerProtocol {
     public var showEditContact = false
     
     public var apiToken = ""
+    public var alwaysSendNotice = true
     
     public var uploadedImagesIds: [String] = []
     public var uploadProgressState: String?
@@ -71,8 +72,7 @@ public struct ReportDomain: ReducerProtocol {
     }
     
     public var isNetworkAvailable = true
-    public var isUploadingNotice = false
-    public var canSubmitNotice = false
+    public var canSubmitNotice: Bool { isReportValid }
     public var isSubmittingNotice = false
     
     public var uploadedNoticeID: String?
@@ -106,9 +106,7 @@ public struct ReportDomain: ReducerProtocol {
       showEditContact: Bool = false,
       apiToken: String = "",
       uploadedImagesIds: [String] = [],
-      uploadProgressState: String? = nil,
-      isNetworkAvailable: Bool = true,
-      isUploadingNotice: Bool = false
+      isNetworkAvailable: Bool = true
     ) {
       self.id = id
       self.images = images
@@ -123,9 +121,7 @@ public struct ReportDomain: ReducerProtocol {
       self.showEditContact = showEditContact
       self.apiToken = apiToken
       self.uploadedImagesIds = uploadedImagesIds
-      self.uploadProgressState = uploadProgressState
       self.isNetworkAvailable = isNetworkAvailable
-      self.isUploadingNotice = isUploadingNotice
     }
   }
   
@@ -139,17 +135,19 @@ public struct ReportDomain: ReducerProtocol {
     case mail(MailDomain.Action)
     case mapAddressToDistrict(Address)
     case mapDistrictFinished(TaskResult<District>)
+
     case onResetButtonTapped
-    case onUploadImagesButtonTapped
+    case onSubmitButtonTapped
     case onResetConfirmButtonTapped
+    
     case setShowEditDescription(Bool)
     case setShowEditContact(Bool)
     case dismissAlert
     case setDate(Date)
+    case uploadImages
     case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
-    case composeNoticeAndSend
-    case composeNoticeResponse(TaskResult<Notice>)
-    case submitNotice
+    case composeNotice
+    case postNoticeResponse(TaskResult<Notice>)
     case submitNoticeResponse(TaskResult<Notice>)
     case editNoticeInBrowser
   }
@@ -235,7 +233,7 @@ public struct ReportDomain: ReducerProtocol {
           
         case let .setImageCreationDate(date):
           // set report date from selected photos
-          state.date = date ?? Date()
+          state.date = date ?? self.date.now
           return .none
           
           // Handle single image remove action to reset map annotations and reset valid state.
@@ -352,23 +350,24 @@ public struct ReportDomain: ReducerProtocol {
         state.date = date
         return .none
         
-      case .onUploadImagesButtonTapped:
+      case .onSubmitButtonTapped:
         guard state.isNetworkAvailable else {
           state.alert = .init(
             title: .init("Keine Internetverbindung"),
-            message: .init("Verbinde dich mit dem Internet um die Meldung hochzuladen"),
+            message: .init("Verbinde dich mit dem Internet um die Meldung zu versenden"),
             buttons: [
               .cancel(.init(L10n.cancel)),
-              .default(.init("Wiederholen"), action: .send(.onUploadImagesButtonTapped))
+              .default(.init("Wiederholen"), action: .send(.onSubmitButtonTapped))
             ]
           )
           return .none
         }
         
-        let results = state.images.imageStates.map { $0.image }
+        state.isSubmittingNotice = true
+        return EffectTask(value: .uploadImages)
         
-        state.isUploadingNotice = true
-        state.uploadProgressState = "Uploading images ..."
+      case .uploadImages:
+        let results = state.images.imageStates.map { $0.image }
         
         return .task {
           await .uploadImagesResponse(
@@ -380,32 +379,34 @@ public struct ReportDomain: ReducerProtocol {
         
       case let .uploadImagesResponse(.success(imageInputFromUpload)):
         state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
-        return Effect(value: .composeNoticeAndSend)
+        return Effect(value: .composeNotice)
         
       case let .uploadImagesResponse(.failure(error)):
-        return Effect(value: .composeNoticeResponse(.failure(ApiError(error: error))))
+        state.isSubmittingNotice = false
+        return Effect(value: .postNoticeResponse(.failure(ApiError(error: error))))
         
-      case .composeNoticeAndSend:
+      case .composeNotice:
         var notice = NoticeInput(state)
         notice.photos = state.uploadedImagesIds
-        state.isUploadingNotice = true
-        
-        state.uploadProgressState = "Sending notice ..."
-        
-        return .task { [notice] in
-          await .composeNoticeResponse(
-            TaskResult {
-              try await wegliService.postNotice(notice)
-            }
-          )
+                
+        return .task { [notice, alwaysSendNotice = state.alwaysSendNotice] in
+          if alwaysSendNotice {
+            return await .submitNoticeResponse(
+              TaskResult {
+                try await wegliService.submitNotice(notice)
+              }
+            )
+          } else {
+            return await .postNoticeResponse(
+              TaskResult {
+                try await wegliService.postNotice(notice)
+              }
+            )
+          }
         }
         
-      case let .composeNoticeResponse(.success(response)):
-        state.isUploadingNotice = false
-        state.uploadProgressState = nil
-        
-        state.canSubmitNotice = true
-        
+      case let .postNoticeResponse(.success(response)):
+        state.isSubmittingNotice = false
         state.uploadedNoticeID = response.token
         
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
@@ -420,9 +421,11 @@ public struct ReportDomain: ReducerProtocol {
           })
         }
         
-      case let .composeNoticeResponse(.failure(error)):
-        state.isUploadingNotice = false
-        state.alert = .sendNoticeFailed(error: error as! ApiError)
+      case let .postNoticeResponse(.failure(error)):
+        state.isSubmittingNotice = false
+        if let apiError = error as? ApiError {
+          state.alert = .sendNoticeFailed(error: apiError)
+        }
         state.uploadProgressState = nil
         return .none
         
@@ -434,26 +437,24 @@ public struct ReportDomain: ReducerProtocol {
         return .fireAndForget {
           _ = await uiApplicationClient.open(editURL, [:])
         }
-        
-      case .submitNotice:
-        let notice = NoticeInput(state)
-        
-        state.isSubmittingNotice = true
-        
-        return .task { [notice] in
-          await .submitNoticeResponse(
-            TaskResult {
-              try await wegliService.submitNotice(notice)
-            }
-          )
-        }
-        
+
       case .submitNoticeResponse(.success):
         state.isSubmittingNotice = false
         state.uploadedImagesIds.removeAll()
         
         state.alert = .reportSent
-        return .none
+        
+        let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
+        return .fireAndForget {
+          await withTaskGroup(of: Void.self, body: { group in
+            imageURLs.forEach { url in
+              group.addTask(priority: .background) {
+                try? await fileClient.removeItem(url)
+              }
+            }
+            debugPrint("removed items")
+          })
+        }
         
       case let .submitNoticeResponse(.failure(error)):
         state.isSubmittingNotice = false
@@ -570,7 +571,7 @@ public extension AlertState where Action == ReportDomain.Action {
       title: .init("Meldung konnte nicht gesendet werden"),
       message: .init("Fehler: \(error.message)"),
       buttons: [
-        .default(.init(verbatim: "Erneut senden"), action: .send(.composeNoticeAndSend)),
+        .default(.init(verbatim: "Erneut senden"), action: .send(.composeNotice)),
         .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
       ]
     )
