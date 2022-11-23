@@ -10,7 +10,7 @@ import SwiftUI
 public struct DescriptionDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.suspendingClock) public var clock
+  @Dependency(\.continuousClock) public var clock
   @Dependency(\.fileClient) public var fileClient
   
   public struct State: Equatable {

@@ -30,7 +30,7 @@ public enum Tabs: Hashable {
 public struct AppDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.suspendingClock) public var clock
+  @Dependency(\.continuousClock) public var clock
   @Dependency(\.fileClient) public var fileClient
   @Dependency(\.keychainClient) public var keychainClient
   @Dependency(\.apiService) public var apiService

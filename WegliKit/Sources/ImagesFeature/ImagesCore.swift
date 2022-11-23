@@ -14,7 +14,7 @@ import UIKit
 public struct ImagesViewDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.suspendingClock) public var clock
+  @Dependency(\.continuousClock) public var clock
   @Dependency(\.cameraAccessClient) public var cameraAccessClient
   @Dependency(\.photoLibraryAccessClient) public var photoLibraryAccessClient
   @Dependency(\.textRecognitionClient) public var textRecognitionClient

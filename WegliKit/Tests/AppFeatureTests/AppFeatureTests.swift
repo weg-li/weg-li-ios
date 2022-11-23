@@ -55,7 +55,7 @@ final class AppStoreTests: XCTestCase {
       reducer: AppDomain()
     )
     store.dependencies.fileClient = .noop
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
     
     let newContact: ContactDomain.State = .preview
     
@@ -111,7 +111,7 @@ final class AppStoreTests: XCTestCase {
       prepareDependencies: { dependencies in
         dependencies.keychainClient = keychainClient
         dependencies.apiService = wegliService
-        dependencies.suspendingClock = clock
+        dependencies.continuousClock = clock
       }
     )
     store.dependencies.fileClient.load = { @Sendable [user = state.settings.userSettings] key in
@@ -151,7 +151,7 @@ final class AppStoreTests: XCTestCase {
       initialState: .init(reportDraft: report),
       reducer: AppDomain(),
       prepareDependencies: { dependencies in
-        dependencies.suspendingClock = ImmediateClock()
+        dependencies.continuousClock = ImmediateClock()
         dependencies.fileClient = fileClient
       }
     )
@@ -194,7 +194,7 @@ final class AppStoreTests: XCTestCase {
       reducer: AppDomain()
     )
     store.dependencies.keychainClient = .noop
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
     
     await store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
       $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
@@ -211,7 +211,7 @@ final class AppStoreTests: XCTestCase {
       reducer: AppDomain()
     )
     store.dependencies.keychainClient = .noop
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
     store.dependencies.apiService.getNotices = { _ in [.mock] }
     store.dependencies.fileClient.save = { @Sendable _ ,_ in () }
     store.dependencies.fileClient.load = { @Sendable key in

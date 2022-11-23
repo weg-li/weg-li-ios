@@ -111,7 +111,7 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: DescriptionDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = ImmediateClock()
+        values.continuousClock = ImmediateClock()
         values.fileClient = .noop
       }
     )
@@ -139,7 +139,7 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: DescriptionDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = ImmediateClock()
+        values.continuousClock = ImmediateClock()
         values.fileClient = fileClient
       }
     )
@@ -186,7 +186,7 @@ final class DescriptionStoreTests: XCTestCase {
       initialState: state,
       reducer: DescriptionDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = clock
+        values.continuousClock = clock
         values.fileClient = fileClient
       }
     )

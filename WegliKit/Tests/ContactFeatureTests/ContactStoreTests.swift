@@ -22,7 +22,7 @@ final class ContactStoreTests: XCTestCase {
     )
     store.dependencies.fileClient = fileClient
     let clock = TestClock()
-    store.dependencies.suspendingClock = clock
+    store.dependencies.continuousClock = clock
     
     let newFirstName = "Bob"
     await store.send(.contact(.set(\.$firstName, newFirstName))) {
@@ -39,7 +39,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newName = "Ross"
     await store.send(.contact(.set(\.$name, newName))) {
@@ -58,7 +58,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newPhone = "0301234"
     await store.send(.contact(.set(\.$phone, newPhone))) {
@@ -73,7 +73,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newStreet = "Bob's street"
     await store.send(.contact(.set(\.address.$street, newStreet))) {
@@ -88,7 +88,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newCity = "Bob's city"
     await store.send(.contact(.set(\.address.$city, newCity))) {
@@ -103,7 +103,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newPostalCode = "55500"
     await store.send(.contact(.set(\.address.$postalCode, newPostalCode))) {
@@ -118,7 +118,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newValue = "01.01.2992"
     await store.send(.contact(.set(\.$dateOfBirth, newValue))) {
@@ -133,7 +133,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
 
     let newValue = "Hinterhaus"
     await store.send(.contact(.set(\.address.$addition, newValue))) {
@@ -148,7 +148,7 @@ final class ContactStoreTests: XCTestCase {
       reducer: ContactViewDomain()
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
     
     await store.send(.contact(.set(\.address.$postalCode, ""))) {
       $0.contact.address.postalCode = ""

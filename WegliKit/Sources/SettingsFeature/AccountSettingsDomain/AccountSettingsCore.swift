@@ -6,7 +6,7 @@ public struct AccountSettingsDomain: ReducerProtocol {
   
   @Dependency(\.keychainClient) var keychainClient
   @Dependency(\.applicationClient) var applicationClient
-  @Dependency(\.suspendingClock) var clock
+  @Dependency(\.continuousClock) var clock
   
   public let userLink = URL(string: "https://www.weg.li/user")!
   

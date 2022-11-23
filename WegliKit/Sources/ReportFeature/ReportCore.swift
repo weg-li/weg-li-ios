@@ -24,7 +24,7 @@ import XCTestDynamicOverlay
 public struct ReportDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.suspendingClock) public var clock
+  @Dependency(\.continuousClock) public var clock
   @Dependency(\.locationManager) public var locationManager
   @Dependency(\.placesServiceClient) public var placeService
   @Dependency(\.regulatoryOfficeMapper) public var regulatoryOfficeMapper

@@ -49,7 +49,7 @@ final class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: ReportDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = ImmediateClock()
+        values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented()
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop
@@ -78,7 +78,7 @@ final class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: ReportDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = ImmediateClock()
+        values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented()
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop
@@ -134,7 +134,7 @@ final class ReportStoreTests: XCTestCase {
       initialState: report,
       reducer: ReportDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = ImmediateClock()
+        values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented()
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop
@@ -177,7 +177,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     let clock = TestClock()
-    store.dependencies.suspendingClock = clock
+    store.dependencies.continuousClock = clock
     store.dependencies.locationManager = .unimplemented(
         authorizationStatus: { .authorizedAlways },
         create: { _ in locationManagerSubject.eraseToEffect() },
@@ -507,7 +507,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
     
     
     await store.send(.images(.image(id: "123", action: .onRemovePhotoButtonTapped)))
@@ -691,7 +691,7 @@ final class ReportStoreTests: XCTestCase {
       ),
       reducer: ReportDomain(),
       prepareDependencies: { values in
-        values.suspendingClock = ImmediateClock()
+        values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented()
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop

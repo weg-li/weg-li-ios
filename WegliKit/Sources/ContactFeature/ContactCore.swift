@@ -11,7 +11,7 @@ import SharedModels
 public struct ContactViewDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.suspendingClock) var clock
+  @Dependency(\.continuousClock) var clock
   @Dependency(\.fileClient) var fileClient
   
   public struct State: Equatable {

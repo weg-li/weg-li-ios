@@ -107,7 +107,7 @@ final class SettingsStoreTests: XCTestCase {
       await didWriteTokenToKeyChain.setValue(true)
       return true
     }
-    store.dependencies.suspendingClock = ImmediateClock()
+    store.dependencies.continuousClock = ImmediateClock()
     
     await store.send(.accountSettings(.setApiToken("TOKEN"))) {
       $0.accountSettingsState.accountSettings.apiToken = "TOKEN"
