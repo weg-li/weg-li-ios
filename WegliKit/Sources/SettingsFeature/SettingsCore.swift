@@ -13,8 +13,11 @@ import UIKit
 public struct SettingsDomain: ReducerProtocol {
   public init() {}
   
-  @Dependency(\.applicationClient) public var applicationClient
-  @Dependency(\.keychainClient) public var keychainClient
+  @Dependency(\.applicationClient) var applicationClient
+  @Dependency(\.keychainClient) var keychainClient
+  @Dependency(\.fileClient) var fileClient
+  @Dependency(\.continuousClock) var clock
+  
   // swiftlint:disable force_unwrapping
   static public let imprintLink = URL(string: "https://www.weg.li/imprint")!
   static public let gitHubProjectLink = URL(string: "https://github.com/weg-li/weg-li-ios")!
@@ -78,7 +81,14 @@ public struct SettingsDomain: ReducerProtocol {
           _ = await applicationClient.open(Self.donateLink, [:])
         }
       case .userSettings:
-        return .none
+        let userSettings = state.userSettings
+        return .fireAndForget {
+          enum CancelID {}
+          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+            try await clock.sleep(for: .seconds(0.3))
+            try await fileClient.saveUserSettings(userSettings)
+          }
+        }
       }
     }
   }

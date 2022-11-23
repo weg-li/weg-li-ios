@@ -137,4 +137,27 @@ final class SettingsStoreTests: XCTestCase {
       XCTAssertEqual(url, URL(string: "https://www.weg.li/user")!)
     })
   }
+  
+  func test_updateUserSettings_ShouldWriteToFileClient() async {
+    let clock = TestClock()
+    
+    let didSaveUserSettings = ActorIsolated(false)
+    
+    let store = TestStore(
+      initialState: SettingsDomain.State(
+        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
+        userSettings: .init(showsAllTextRecognitionSettings: false)
+      ),
+      reducer: SettingsDomain()
+    )
+    store.dependencies.continuousClock = clock
+    store.dependencies.fileClient.save = { @Sendable _, _ in
+      await didSaveUserSettings.setValue(true)
+    }
+    
+    await store.send(.userSettings(.onAlwaysSendNotice(true)))
+    await clock.advance(by: .seconds(0.3))
+    await didSaveUserSettings.withValue { XCTAssertTrue($0) }
+    await store.finish()
+  }
 }

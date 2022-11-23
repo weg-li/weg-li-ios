@@ -9,12 +9,17 @@ public struct UserSettingsDomain: ReducerProtocol {
  
   public enum Action: Equatable {
     case setShowsAllTextRecognitionResults(Bool)
+    case onAlwaysSendNotice(Bool)
   }
   
   public func reduce(into state: inout UserSettings, action: Action) -> EffectTask<Action> {
     switch action {
-    case let .setShowsAllTextRecognitionResults(value):
+    case .setShowsAllTextRecognitionResults(let value):
       state.showsAllTextRecognitionSettings = value
+      return .none
+      
+    case .onAlwaysSendNotice(let value):
+      state.alwaysSendNotice = value
       return .none
     }
   }

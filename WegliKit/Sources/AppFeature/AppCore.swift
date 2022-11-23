@@ -158,14 +158,7 @@ public struct AppDomain: ReducerProtocol {
         case .userSettings:
           // store usersettings when changed
           state.reportDraft.images.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
-          let userSettins = state.settings.userSettings
-          return .fireAndForget {
-            enum CancelID {}
-            try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-              try await clock.sleep(for: .seconds(0.3))
-              try await fileClient.saveUserSettings(userSettins)
-            }
-          }
+          return .none
         
         case .accountSettings:
           state.reportDraft.apiToken = state.settings.accountSettingsState.accountSettings.apiToken
