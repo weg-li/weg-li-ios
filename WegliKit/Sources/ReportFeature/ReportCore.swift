@@ -681,6 +681,7 @@ extension MailComposeClient {
   static let live = Self(canSendMail: MFMailComposeViewController.canSendMail)
 }
 
-extension MailComposeClient: TestDependencyKey {
-  public static var testValue = Self(canSendMail: unimplemented())
+extension MailComposeClient: DependencyKey {
+  public static let liveValue = Self { MFMailComposeViewController.canSendMail() }
+  public static let testValue = Self(canSendMail: unimplemented())
 }

@@ -75,33 +75,6 @@ public struct AccountSettingsView: View {
               )
               .buttonStyle(.bordered)
               .accessibilityAddTraits([.isLink])
-              
-              VStack(alignment: .center, spacing: .grid(2)) {
-                Text("Die App supported aktuell folgende Operationen")
-                  .multilineTextAlignment(.leading)
-                
-                VStack(alignment: .leading, spacing: .grid(1)) {
-                  HStack {
-                    Text("Meldungen abrufen")
-                    Image(systemName: "checkmark.circle")
-                  }
-                  HStack {
-                    Text("Meldungen hochladen/anlegen")
-                    Image(systemName: "checkmark.circle")
-                  }
-                  HStack {
-                    Text("Meldungen versenden")
-                    Image(systemName: "x.circle")
-                  }
-                }
-                
-                Text("Um deine Meldung zu versenden musst du aktuell noch die Webseite nutzen")
-                  .multilineTextAlignment(.leading)
-                  .fixedSize(horizontal: false, vertical: true)
-              }
-              .padding(.top, .grid(2))
-              .foregroundColor(Color(.secondaryLabel))
-              .font(.footnote)
             }
             .padding(.grid(2))
             .overlay(
