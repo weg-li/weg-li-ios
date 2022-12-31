@@ -70,8 +70,18 @@ public struct AppDomain: ReducerProtocol {
       case edit(Notice)
       case alert(AlertState<AlertAction>)
     }
-    public enum AlertAction {
+    public enum AlertAction: Equatable {
+      case errorMessage(String)
       case dismiss
+    }
+    
+    var selectedNotice: Notice? {
+      switch destination {
+      case .edit(let notice):
+        return notice
+      default:
+        return nil
+      }
     }
   }
   
@@ -89,9 +99,9 @@ public struct AppDomain: ReducerProtocol {
     case onAppear
     case observeConnection
     case observeConnectionResponse(NetworkPath)
-    case dismissAlert
     case setNavigationDestination(State.Destination?)
     case onSaveNoticeButtonTapped
+    case editNoticeResponse(TaskResult<Notice>)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -267,19 +277,29 @@ public struct AppDomain: ReducerProtocol {
       case let .observeConnectionResponse(networkPath):
         state.isNetworkAvailable = networkPath.status == .satisfied
         return .none
-        
-      case .dismissAlert:
-//        state.alert = nil
-        return .none
-        
+
       case .setNavigationDestination(let value):
         state.destination = value
         return .none
         
       case .onSaveNoticeButtonTapped:
         state.isSendingEditedNotice = true
+        return .task { [notice = state.selectedNotice] in
+          await .editNoticeResponse(
+            TaskResult {
+              try await apiService.patchNotice(notice!)
+            }
+          )
+        }
         
-        return .none
+      case .editNoticeResponse(let response):
+        switch response {
+        case .success:
+          return .task { .fetchNotices(forceReload: true) }
+        case .failure(let error):
+          state.destination = .alert(.init(title: TextState(error.localizedDescription)))
+          return .none
+        }
       }
     }
   }
