@@ -62,7 +62,18 @@ public struct AppView: View {
       .tabItem { Label(L10n.Settings.title, systemImage: "gearshape") }
       .tag(Tabs.settings)
     }
-    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
+    .alert(
+      unwrapping: viewStore.binding(
+        get: \.destination,
+        send: A.setNavigationDestination
+      ),
+      case: /S.Destination.alert
+    ) { action in
+      switch action {
+      case .dismiss:
+        viewStore.send(.setNavigationDestination(nil))
+      }
+    }
     .navigationViewStyle(StackNavigationViewStyle())
   }
 }

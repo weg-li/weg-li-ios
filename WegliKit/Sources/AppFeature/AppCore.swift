@@ -61,8 +61,18 @@ public struct AppDomain: ReducerProtocol {
     public var isFetchingNotices: Bool { notices == .loading }
     
     @BindableState public var selectedTab: Tabs = .notice
+    @BindableState public var editNotice: Notice?
     
-    public var alert: AlertState<Action>?
+    public var isSendingEditedNotice = false
+    public var destination: Destination?
+    
+    public enum Destination: Equatable {
+      case edit(Notice)
+      case alert(AlertState<AlertAction>)
+    }
+    public enum AlertAction {
+      case dismiss
+    }
   }
   
   public enum Action: Equatable, BindableAction {
@@ -80,6 +90,8 @@ public struct AppDomain: ReducerProtocol {
     case observeConnection
     case observeConnectionResponse(NetworkPath)
     case dismissAlert
+    case setNavigationDestination(State.Destination?)
+    case onSaveNoticeButtonTapped
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -199,7 +211,7 @@ public struct AppDomain: ReducerProtocol {
         
       case let .fetchNotices(forceReload):
         guard state.isNetworkAvailable else {
-          state.alert = .noInternetConnection
+//          state.destination = .alert(.noInternetConnection)
           state.notices = .empty(.emptyNotices())
           return .none
         }
@@ -220,9 +232,7 @@ public struct AppDomain: ReducerProtocol {
         }
         
       case let .fetchNoticesResponse(.success(notices)):
-        state.notices = notices.isEmpty
-        ? .empty(.emptyNotices())
-        : .results(notices)
+        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
         
         guard !notices.isEmpty else  {
           return .none
@@ -259,7 +269,16 @@ public struct AppDomain: ReducerProtocol {
         return .none
         
       case .dismissAlert:
-        state.alert = nil
+//        state.alert = nil
+        return .none
+        
+      case .setNavigationDestination(let value):
+        state.destination = value
+        return .none
+        
+      case .onSaveNoticeButtonTapped:
+        state.isSendingEditedNotice = true
+        
         return .none
       }
     }

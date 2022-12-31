@@ -99,13 +99,23 @@ public struct DescriptionView: View {
         get: \.showEditScreen,
         send: ReportDomain.Action.setShowEditDescription
       ), content: {
-        EditDescriptionView(
-          store: store.scope(
-            state: \.description,
-            action: ReportDomain.Action.description
+        NavigationStack {
+          EditDescriptionView(
+            store: store.scope(
+              state: \.description,
+              action: ReportDomain.Action.description
+            )
           )
-        )
-        .accessibilityAddTraits([.isModal])
+          .accessibilityAddTraits([.isModal])
+          .navigationTitle(Text(L10n.Description.widgetTitle))
+          .navigationBarTitleDisplayMode(.inline)
+          .navigationBarItems(
+            leading: Button(
+              action: { viewStore.send(.setShowEditDescription(false)) },
+              label: { Text(L10n.Button.close) }
+            )
+          )          
+        }
       }
     )
   }

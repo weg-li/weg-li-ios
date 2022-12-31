@@ -502,7 +502,7 @@ public extension ReportDomain.State {
     uuid: UUID.init,
     images: .init(
       showImagePicker: false,
-      storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
+      storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "swift")!)!] // swiftlint:disable:this force_unwrapping
     ),
     contactState: .preview,
     district: District(
@@ -665,6 +665,71 @@ public extension SharedModels.Notice {
   static let placeholder = Self(.preview)
 }
 
+extension ReportDomain.State {
+  public init(_ model: SharedModels.Notice) {
+    self.id = model.id
+    self.images = .init(
+      alert: nil,
+      showCamera: false,
+      showImagePicker: false,
+      storedPhotos: model.photos?.compactMap { noticePhoto in
+        PickerImageResult(
+          id: UUID().uuidString,
+          imageUrl: URL(string: noticePhoto.url)
+        )
+      } ?? [],
+      coordinateFromImagePicker: nil,
+      dateFromImagePicker: model.date
+    )
+    self.contactState = .empty
+    self.district = nil
+    self.date = model.createdAt ?? Date()
+    self.description = .init(
+      licensePlateNumber: model.registration ?? "",
+      selectedColor: model.color.flatMap { color -> Int in
+        let colors = DescriptionDomain.State.colors
+        guard let index = colors.firstIndex(where: { color == $0.value }) else { return 0 }
+        return index
+      } ?? 0,
+      selectedBrand: model.brand.flatMap { brand -> CarBrand in
+        let brands = DescriptionDomain.State.brands
+        guard let index = brands.firstIndex(where: { brand == $0.title }) else { return CarBrand("") }
+        return brands[index]
+      } ?? CarBrand(""),
+      selectedDuration: model.duration.flatMap { Int($0) } ?? 0,
+      selectedCharge: model.charge.flatMap { chargeIdentifier -> Charge? in
+        let charges = DescriptionDomain.State.charges
+        guard let index = charges.firstIndex(where: { chargeIdentifier == $0.value }) else { return nil }
+        let value = charges[index]
+        return Charge(id: UUID().uuidString, text: value.value, isFavorite: false, isSelected: false)
+      },
+      blockedOthers: true,
+      vehicleEmpty: model.vehicleEmpty,
+      hazardLights: model.hazardLights,
+      expiredTuv: model.expiredTuv,
+      expiredEco: model.expiredEco
+    )
+    self.location = .init(
+      locationOption: .manual,
+      isMapExpanded: false,
+      isResolvingAddress: false,
+      resolvedAddress: .init(),
+      pinCoordinate: nil,
+      isRequestingCurrentLocation: false,
+      region: nil
+    )
+    self.mail = .init()
+    self.alert = nil
+    self.showEditDescription = false
+    self.showEditContact = false
+    self.apiToken = ""
+    self.uploadedImagesIds = []
+    self.isNetworkAvailable = false
+  }
+}
+
+
+// MARK: - MailComposeClient Dependency
 
 extension DependencyValues {
   public var mailComposeClient: MailComposeClient {

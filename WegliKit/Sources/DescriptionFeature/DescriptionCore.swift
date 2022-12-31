@@ -206,9 +206,7 @@ public extension DescriptionDomain.State {
   static let charges: [(key: String, value: String)] = {
     var all = bundle.decode([String: String].self, from: "charges.json")
       .compactMap { $0 }
-      .sorted { a, b -> Bool in
-        a.value < b.value
-      }
+      .sorted { $0.value < $1.value }
     return all
   }()
   
@@ -218,9 +216,7 @@ public extension DescriptionDomain.State {
       keyDecodingStrategy: .convertFromSnakeCase
     )
     .compactMap { $0 }
-    .sorted { a, b -> Bool in
-      a.value < b.value
-    }
+    .sorted { $0.value < $1.value }
     all.insert(("", ""), at: 0) // insert empty object for picker to start without initial selection
     return all
   }()

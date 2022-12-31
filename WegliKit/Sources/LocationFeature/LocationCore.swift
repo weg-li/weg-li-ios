@@ -301,7 +301,7 @@ extension CLLocationCoordinate2D {
 
 enum LocationManagerKey: DependencyKey {
   static let liveValue = LocationManager.live
-  static let testValue = LocationManager.unimplemented()
+  static let testValue = LocationManager.live 
 }
 
 public extension DependencyValues {

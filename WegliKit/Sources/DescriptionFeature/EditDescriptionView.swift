@@ -20,45 +20,40 @@ public struct EditDescriptionView: View {
   }
   
   public var body: some View {
-    NavigationView {
-      Form {
-        Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
-          licensePlateView
-
-          carBrandView
-
-          carColorView
-        }
-        .padding(.top, .grid(1))
-        .textFieldStyle(PlainTextFieldStyle())
+    VStack {
+      Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
+        licensePlateView
         
-        Section(header: Text(L10n.Description.Section.Violation.copy)) {
-          chargeTypeView
-
-          chargeDurationView
-
-          blockedOthersView
-          
-          vehicleEmptyView
-          
-          hazardLightsView
-          
-          expiredTuvView
-          
-          expiredEcoView
-        }
+        carBrandView
         
-        Section(header: Text("Hinweise")) {
-          TextEditor(text: viewStore.binding(\.$note))
-            .font(.body)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-        }
+        carColorView
       }
-      .onAppear { viewStore.send(.onAppear) }
-      .navigationTitle(Text(L10n.Description.widgetTitle))
-      .navigationBarTitleDisplayMode(.inline)
-      .navigationBarItems(leading: closeButton)
+      .padding(.top, .grid(1))
+      .textFieldStyle(PlainTextFieldStyle())
+      
+      Section(header: Text(L10n.Description.Section.Violation.copy)) {
+        chargeTypeView
+        
+        chargeDurationView
+        
+        blockedOthersView
+        
+        vehicleEmptyView
+        
+        hazardLightsView
+        
+        expiredTuvView
+        
+        expiredEcoView
+      }
+      
+      Section(header: Text("Hinweise")) {
+        TextEditor(text: viewStore.binding(\.$note))
+          .font(.body)
+          .clipShape(RoundedRectangle(cornerRadius: 4))
+      }
     }
+    .onAppear { viewStore.send(.onAppear) }
   }
   
   var licensePlateView: some View {
@@ -234,13 +229,6 @@ public struct EditDescriptionView: View {
     ToggleButton(
       label: "Die Umwelt-Plakette fehlte oder war ungültig",
       isOn: viewStore.binding(\.$expiredEco)
-    )
-  }
-  
-  var closeButton: some View {
-    Button(
-      action: { presentationMode.wrappedValue.dismiss() },
-      label: { Text(L10n.Button.close) }
     )
   }
 }

@@ -27,6 +27,10 @@ public struct NoticeView: View {
               .padding(.bottom, .grid(1))
           }
           
+          Text(notice.street ?? "⚡️")
+          Text(notice.city ?? "⚡️")
+          Text(notice.zip ?? "⚡️")
+          
           HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
             Image(systemName: "waveform.path.ecg")
               .font(.title2)

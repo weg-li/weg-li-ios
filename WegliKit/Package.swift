@@ -49,7 +49,8 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
     .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0")
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0"),
+    .package(url: "https://github.com/pointfreeco/swiftui-navigation.git", from: "0.4.0")
   ],
   targets: [
     .target(
@@ -73,7 +74,8 @@ let package = Package(
         "SettingsFeature",
         .models,
         .styleguide,
-        .tca
+        .tca,
+        .navigation
       ]
     ),
     .target(
@@ -383,4 +385,5 @@ extension Target.Dependency {
   static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")
   static let dependencies = product(name: "Dependencies", package: "swift-composable-architecture")
   static let testOverlay = product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+  static let navigation = product(name: "SwiftUINavigation", package: "swiftui-navigation")
 }
