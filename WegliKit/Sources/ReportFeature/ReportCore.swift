@@ -45,15 +45,15 @@ public struct ReportDomain: ReducerProtocol {
     public var contactState: ContactViewDomain.State
     public var district: District?
     
-    public var date: Date
+    @BindableState public var date: Date
     public var description: DescriptionDomain.State
     public var location: LocationDomain.State
     public var mail: MailDomain.State
     
     public var alert: AlertState<Action>?
     
-    public var showEditDescription = false
-    public var showEditContact = false
+    @BindableState public var showEditDescription = false
+    @BindableState public var showEditContact = false
     
     public var apiToken = ""
     public var alwaysSendNotice = true
@@ -140,10 +140,7 @@ public struct ReportDomain: ReducerProtocol {
     case onSubmitButtonTapped
     case onResetConfirmButtonTapped
     
-    case setShowEditDescription(Bool)
-    case setShowEditContact(Bool)
     case dismissAlert
-    case setDate(Date)
     case uploadImages
     case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
     case composeNotice
@@ -334,20 +331,8 @@ public struct ReportDomain: ReducerProtocol {
         // Reset report will be handled in the homeReducer
         return Effect(value: .dismissAlert)
         
-      case let .setShowEditDescription(value):
-        state.showEditDescription = value
-        return .none
-        
-      case let .setShowEditContact(value):
-        state.showEditContact = value
-        return .none
-        
       case .dismissAlert:
         state.alert = nil
-        return .none
-        
-      case let .setDate(date):
-        state.date = date
         return .none
         
       case .onSubmitButtonTapped:

@@ -13,12 +13,6 @@ public struct EditNoticeDomain: ReducerProtocol {
   public init() {}
   
   public struct State: Equatable {
-//    @BindableState public var registration: String
-//    @BindableState public var brand: String
-//    @BindableState public var color: String
-//    @BindableState public var charge: String
-//    @BindableState public var note: String
-    
     public var description: DescriptionDomain.State
     
     @BindableState public var createdAt: Date
@@ -27,7 +21,13 @@ public struct EditNoticeDomain: ReducerProtocol {
     @BindableState public var city: String
     @BindableState public var zip: String
     
-    init(description: DescriptionDomain.State, createdAt: Date, street: String, city: String, zip: String) {
+    init(
+      description: DescriptionDomain.State,
+      createdAt: Date,
+      street: String,
+      city: String,
+      zip: String
+    ) {
       self.description = description
       self.createdAt = createdAt
       self.street = street
@@ -60,6 +60,7 @@ public struct EditNoticeDomain: ReducerProtocol {
   public enum Action: Equatable, BindableAction {
     case binding(BindingAction<EditNoticeDomain.State>)
     case updateCreatedAtDate(Date)
+    case description(DescriptionDomain.Action)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -102,34 +103,16 @@ struct EditNoticeView: View {
 //        }
 //      }
       
-      Section {
-        EditDescriptionView(
-          store: .init(
-            initialState: viewStore.description,
-            reducer: DescriptionDomain()
-          )
-        )
-        
-//        TextField(
-//          L10n.Description.Row.licenseplateNumber,
-//          text: viewStore.binding(\.$registration)
+//      Section {
+//        EditDescriptionView(
+//          store: .init(
+//            initialState: viewStore.description,
+//            reducer: DescriptionDomain()
+//          )
 //        )
-//        TextField(
-//          L10n.Description.Row.carType,
-//          text: viewStore.binding(\.$brand)
-//        )
-//        TextField(
-//          L10n.Description.Row.carColor,
-//          text: viewStore.binding(\.$color)
-//        )
-//        TextField(
-//          L10n.Description.Row.chargeType,
-//          text: viewStore.binding(\.$charge)
-//        )
-        
-      } header: {
-        sectionHeader("Bescreibung")
-      }
+//      } header: {
+//        sectionHeader("Bescreibung")
+//      }
             
       Section {
         VStack(alignment: .leading) {
@@ -148,7 +131,7 @@ struct EditNoticeView: View {
         }
         .textFieldStyle(.roundedBorder)
       } header: {
-        sectionHeader("Adresse")
+        SectionHeader(text: "Adresse")
       }
       
       Section {
@@ -158,34 +141,22 @@ struct EditNoticeView: View {
         )
         .labelsHidden()
       } header: {
-        sectionHeader("Datum")
+        SectionHeader(text: "Datum")
       }
-      
-//      EditDescriptionView(
-//        store: store.scope(
-//          state: \.description,
-//          action: A.description
-//        )
-//      )
     }
-  }
-  
-  @ViewBuilder
-  func sectionHeader(_ text: String) -> some View {
-    SectionHeader(text: text)
   }
 }
 
-//struct SwiftUIView_Previews: PreviewProvider {
-//  static var previews: some View {
-//    EditNoticeView(
-//      store: .init(
-//        initialState: .preview,
-//        reducer: ReportDomain()
-//      )
-//    )
-//  }
-//}
+struct SwiftUIView_Previews: PreviewProvider {
+  static var previews: some View {
+    EditNoticeView(
+      store: .init(
+        initialState: EditNoticeDomain.State(notice: .mock),
+        reducer: EditNoticeDomain()
+      )
+    )
+  }
+}
 
 
 extension EditNoticeDomain.State {
@@ -195,10 +166,5 @@ extension EditNoticeDomain.State {
     self.city = notice.city ?? ""
     self.zip = notice.zip ?? ""
     self.description = .init(model: notice)
-//    self.charge = notice.charge ?? ""
-//    self.note = notice.note ?? ""
-//    self.color = notice.color ?? ""
-//    self.registration = notice.registration ?? ""
-//    self.brand = notice.brand ?? ""
   }
 }

@@ -10,6 +10,9 @@ import Styleguide
 import SwiftUI
 
 public struct DescriptionView: View {
+  public typealias S = ReportDomain.State
+  public typealias A = ReportDomain.Action
+  
   struct ViewState: Equatable {
     let description: DescriptionDomain.State
     let chargeType: String
@@ -17,7 +20,7 @@ public struct DescriptionView: View {
     let color: String
     let showEditScreen: Bool
     
-    init(state: ReportDomain.State) {
+    init(state: S) {
       self.description = state.description
       self.brand = state.description.carBrandSelection.selectedBrand?.title ?? ""
       self.color = DescriptionDomain.colors[state.description.selectedColor].value
@@ -26,10 +29,10 @@ public struct DescriptionView: View {
     }
   }
   
-  let store: Store<ReportDomain.State, ReportDomain.Action>
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
+  let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<ViewState, A>
   
-  public init(store: Store<ReportDomain.State, ReportDomain.Action>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store.scope(state: ViewState.init))
   }
@@ -76,7 +79,7 @@ public struct DescriptionView: View {
       .accessibilityElement(children: .combine)
       
       Button(
-        action: { viewStore.send(.setShowEditDescription(true)) },
+        action: { viewStore.send(.set(\.$showEditDescription, true)) },
         label: {
           Label(L10n.Description.EditButton.copy, systemImage: "square.and.pencil")
             .contentShape(Rectangle())
@@ -87,37 +90,10 @@ public struct DescriptionView: View {
       .buttonStyle(.bordered)
       .padding(.top)
       .accessibilityAction {
-        viewStore.send(.setShowEditDescription(true))
+        viewStore.send(.set(\.$showEditDescription, true))
       }
     }
     .contentShape(Rectangle())
-    .onTapGesture {
-      viewStore.send(.setShowEditDescription(true))
-    }
-    .sheet(
-      isPresented: viewStore.binding(
-        get: \.showEditScreen,
-        send: ReportDomain.Action.setShowEditDescription
-      ), content: {
-        NavigationStack {
-          EditDescriptionView(
-            store: store.scope(
-              state: \.description,
-              action: ReportDomain.Action.description
-            )
-          )
-          .accessibilityAddTraits([.isModal])
-          .navigationTitle(Text(L10n.Description.widgetTitle))
-          .navigationBarTitleDisplayMode(.inline)
-          .navigationBarItems(
-            leading: Button(
-              action: { viewStore.send(.setShowEditDescription(false)) },
-              label: { Text(L10n.Button.close) }
-            )
-          )          
-        }
-      }
-    )
   }
   
   func toggleRow(label: String, value: Bool) -> some View {
@@ -145,15 +121,15 @@ public struct DescriptionView: View {
   }
 }
 
-//struct DescriptionWidgetView_Previews: PreviewProvider {
-//  static var previews: some View {
-//    Preview {
-//      DescriptionView(
-//        store: .init(
-//          initialState: ReportDomain.State(uuid: UUID.init, date: Date.init),
-//          reducer: DescriptionDomain()
-//        )
-//      )
-//    }
-//  }
-//}
+struct DescriptionWidgetView_Previews: PreviewProvider {
+  static var previews: some View {
+    Preview {
+      DescriptionView(
+        store: .init(
+          initialState: .preview,
+          reducer: ReportDomain()
+        )
+      )
+    }
+  }
+}

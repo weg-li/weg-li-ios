@@ -185,7 +185,7 @@ public struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
   static var previews: some View {
     Preview {
-      NavigationView {
+      NavigationStack {
         SettingsView(
           store: .init(
             initialState: .init(

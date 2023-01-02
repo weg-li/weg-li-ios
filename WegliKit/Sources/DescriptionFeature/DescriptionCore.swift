@@ -64,6 +64,23 @@ public struct DescriptionDomain: ReducerProtocol {
       ]
       return arguments.allSatisfy { $0 == true }
     }
+    
+    public var time: String { Times.times[selectedDuration] ?? "" }
+    
+    var times: [Int] {
+      Array(
+        Times.times.sorted(by: { $0.0 < $1.0 })
+          .map(\.key)
+          .dropFirst()
+      )
+    }
+    
+    public func timeInterval(from startDate: Date) -> String {
+      guard let interval = Times.interval(value: selectedDuration, from: startDate) else {
+        return time
+      }
+      return "\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!) (\(time))"
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -172,25 +189,6 @@ public extension DescriptionDomain {
   }()
 }
  
-public extension DescriptionDomain.State {
-  var time: String { Times.times[selectedDuration] ?? "" }
-  
-  var times: [Int] {
-    Array(
-      Times.times.sorted(by: { $0.0 < $1.0 })
-        .map(\.key)
-        .dropFirst()
-    )
-  }
-  
-  func timeInterval(from startDate: Date) -> String {
-    guard let interval = Times.interval(value: selectedDuration, from: startDate) else {
-      return time
-    }
-    return "\(DateIntervalFormatter.reportTimeFormatter.string(from: interval)!) (\(time))"
-  }
-}
-
 public struct CarBrand: Identifiable, Equatable, Codable {
   public var id: String = UUID().uuidString
   public let title: String

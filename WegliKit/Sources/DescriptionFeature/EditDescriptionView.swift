@@ -33,7 +33,6 @@ public struct EditDescriptionView: View {
       } header: {
         SectionHeader(text: L10n.Description.Section.Vehicle.copy)
       }
-      .padding(.top, .grid(1))
       .textFieldStyle(.plain)
       
       Section {

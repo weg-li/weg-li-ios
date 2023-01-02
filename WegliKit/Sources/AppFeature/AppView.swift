@@ -26,7 +26,7 @@ public struct AppView: View {
   public var body: some View {
     TabView(selection: viewStore.binding(\.$selectedTab)) {
       // Notices
-      NavigationView {
+      NavigationStack {
         NoticesView(store: viewStore.isFetchingNotices ? .placeholder : self.store)
           .redacted(reason: viewStore.isFetchingNotices ? .placeholder : [])
           .refreshable {
@@ -39,7 +39,7 @@ public struct AppView: View {
       .tag(Tabs.notices)
       
       // New Notice
-      NavigationView {
+      NavigationStack {
         ReportView(
           store: store.scope(
             state: \.reportDraft,
@@ -51,7 +51,7 @@ public struct AppView: View {
       .tag(Tabs.notice)
       
       // Settings
-      NavigationView {
+      NavigationStack {
         SettingsView(
           store: store.scope(
             state: \.settings,

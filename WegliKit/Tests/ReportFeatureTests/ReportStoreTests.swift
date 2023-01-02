@@ -58,7 +58,7 @@ final class ReportStoreTests: XCTestCase {
       }
     )
     
-    store.send(.setDate(newDate)) {
+    store.send(.set(\.$date, newDate)) {
       $0.date = newDate
     }
   }
@@ -519,7 +519,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     
-    store.send(.setShowEditContact(true)) {
+    store.send(.set(\.$showEditContact, true)) {
       $0.showEditContact = true
     }
   }
@@ -546,7 +546,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     
-    store.send(.setShowEditDescription(true)) {
+    store.send(.set(\.$showEditDescription, true)) {
       $0.showEditDescription = true
     }
   }
