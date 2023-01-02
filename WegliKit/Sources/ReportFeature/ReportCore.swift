@@ -725,18 +725,9 @@ public extension DescriptionDomain.State {
         guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
         return index
       } ?? 0,
-      selectedBrand: model.brand.flatMap { brand -> CarBrand in
-        let brands = DescriptionDomain.brands
-        guard let index = brands.firstIndex(where: { brand == $0.title }) else { return CarBrand("") }
-        return brands[index]
-      } ?? CarBrand(""),
+      selectedBrand: .init(model.brand),
       selectedDuration:  model.duration.flatMap { Int($0) } ?? 0,
-      selectedCharge: model.charge.flatMap { chargeIdentifier -> Charge? in
-        let charges = DescriptionDomain.charges
-        guard let index = charges.firstIndex(where: { chargeIdentifier == $0.value }) else { return nil }
-        let value = charges[index]
-        return Charge(id: UUID().uuidString, text: value.value, isFavorite: false, isSelected: false)
-      },
+      selectedCharge: model.charge.flatMap(Charge.init),
       blockedOthers: true,
       vehicleEmpty: model.vehicleEmpty,
       hazardLights: model.hazardLights,

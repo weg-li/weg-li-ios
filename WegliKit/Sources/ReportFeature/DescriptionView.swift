@@ -87,7 +87,7 @@ public struct DescriptionView: View {
         }
       )
       .accessibilitySortPriority(2)
-      .buttonStyle(.bordered)
+      .buttonStyle(.edit())
       .padding(.top)
       .accessibilityAction {
         viewStore.send(.set(\.$showEditDescription, true))

@@ -43,19 +43,19 @@ public struct CarBrandSelection: ReducerProtocol {
   }
 }
 
-struct CarBrandSelectorView: View {
-  typealias S = CarBrandSelection.State
-  typealias A = CarBrandSelection.Action
+public struct CarBrandSelectorView: View {
+  public typealias S = CarBrandSelection.State
+  public typealias A = CarBrandSelection.Action
   
   let store: Store<S, A>
   @ObservedObject private var viewStore: ViewStore<S, A>
   
-  init(store: Store<S, A>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
   
-  var body: some View {
+  public var body: some View {
     List {
       ForEach(viewStore.carBrandSearchResults, id: \.id) { brand in
         HStack {

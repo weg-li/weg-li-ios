@@ -8,6 +8,7 @@ import ReportFeature
 import SharedModels
 import Styleguide
 import SwiftUI
+import SwiftUINavigation
 
 public struct EditNoticeDomain: ReducerProtocol {
   public init() {}
@@ -17,55 +18,68 @@ public struct EditNoticeDomain: ReducerProtocol {
     
     @BindableState public var createdAt: Date
     
+    @BindableState public var selectedColor: Int
+    @BindableState public var licensePlateNumber: String
     @BindableState public var street: String
     @BindableState public var city: String
     @BindableState public var zip: String
     
+    @BindableState public var presentChargeSelection = false
+    @BindableState public var presentCarBrandSelection = false
+    
+    public var destination: Destination?
+    public enum Destination: Equatable {
+      case selectBrand(CarBrandSelection.State)
+    }
+        
     init(
       description: DescriptionDomain.State,
+      selectedColor: Int,
+      licensePlateNumber: String,
       createdAt: Date,
       street: String,
       city: String,
       zip: String
     ) {
       self.description = description
+      self.licensePlateNumber = licensePlateNumber
       self.createdAt = createdAt
       self.street = street
       self.city = city
       self.zip = zip
+      self.selectedColor = selectedColor
     }
-//    init(
-//      registration: String,
-//      brand: String,
-//      color: String,
-//      charge: String,
-//      note: String,
-//      createdAt: Date,
-//      street: String,
-//      city: String,
-//      zip: String
-//    ) {
-//      self.registration = registration
-//      self.brand = brand
-//      self.color = color
-//      self.charge = charge
-//      self.note = note
-//      self.createdAt = createdAt
-//      self.street = street
-//      self.city = city
-//      self.zip = zip
-//    }
   }
   
   public enum Action: Equatable, BindableAction {
     case binding(BindingAction<EditNoticeDomain.State>)
-    case updateCreatedAtDate(Date)
     case description(DescriptionDomain.Action)
+    case setDestination(State.Destination?)
   }
   
   public var body: some ReducerProtocol<State, Action> {
+    Scope(state: \.description, action: /Action.description) {
+      DescriptionDomain()
+    }
     
     BindingReducer()
+    
+    Reduce<State, Action> { state, action in
+      switch action {
+      case .binding:
+        return .none
+        
+      case .description(.chargeSelection(.setCharge)):
+        state.description.presentChargeSelection = false
+        return .none
+      case .description(.carBrandSelection(.setBrand)):
+        state.presentCarBrandSelection = false
+        return .none
+        
+      case .description, .setDestination:
+        return .none
+      }
+    }
   }
 }
 
@@ -89,31 +103,17 @@ struct EditNoticeView: View {
   ]
   
   var body: some View {
-    List {
-//      Section(header: Text("Fotos")) {
-//        LazyVGrid(columns: gridItemLayout, spacing: 12) {
-//          ForEach(viewStore.images.imageStates) { image in
-//            ImageView(
-//              store: .init(
-//                initialState: image,
-//                reducer: ImageDomain()
-//              )
-//            )
-//          }
-//        }
-//      }
+    Group {
+      Section {
+        ImageGrid {
+          ForEach(0..<4, id: \.self) { _ in
+            Color.red
+          }
+        }
+      } header: {
+        SectionHeader(text: L10n.Photos.widgetTitle)
+      }
       
-//      Section {
-//        EditDescriptionView(
-//          store: .init(
-//            initialState: viewStore.description,
-//            reducer: DescriptionDomain()
-//          )
-//        )
-//      } header: {
-//        sectionHeader("Bescreibung")
-//      }
-            
       Section {
         VStack(alignment: .leading) {
           TextField(
@@ -129,7 +129,6 @@ struct EditNoticeView: View {
             text: viewStore.binding(\.$zip)
           )
         }
-        .textFieldStyle(.roundedBorder)
       } header: {
         SectionHeader(text: "Adresse")
       }
@@ -143,7 +142,15 @@ struct EditNoticeView: View {
       } header: {
         SectionHeader(text: "Datum")
       }
+        
+      EditDescriptionView(
+        store: self.store.scope(
+          state: \.description,
+          action: A.description
+        )
+      )
     }
+    .textFieldStyle(.roundedBorder)
   }
 }
 
@@ -166,5 +173,11 @@ extension EditNoticeDomain.State {
     self.city = notice.city ?? ""
     self.zip = notice.zip ?? ""
     self.description = .init(model: notice)
+    self.licensePlateNumber = notice.registration ?? ""
+    self.selectedColor = notice.color.flatMap { color -> Int in
+      let colors = DescriptionDomain.colors
+      guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
+      return index
+    } ?? 0
   }
 }

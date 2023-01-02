@@ -197,3 +197,13 @@ public struct CarBrand: Identifiable, Equatable, Codable {
     self.title = brand
   }
 }
+
+extension CarBrand {
+  public init(_ noticeKey: String?) {
+    self = noticeKey.flatMap { brand -> CarBrand in
+      let brands = DescriptionDomain.brands
+      guard let index = brands.firstIndex(where: { brand == $0.title }) else { return CarBrand("") }
+      return brands[index]
+    } ?? CarBrand("")
+  }
+}

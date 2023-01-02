@@ -16,6 +16,17 @@ public struct Charge: Hashable, Codable, Identifiable {
   }
 }
 
+extension Charge {
+  public init(_ noticeKey: String) {
+    let charges = DescriptionDomain.charges
+    guard let index = charges.firstIndex(where: { noticeKey == $0.value }) else {
+      preconditionFailure("unknown key")
+    }
+    let value = charges[index]
+    self = Charge(id: UUID().uuidString, text: value.value, isFavorite: false, isSelected: false)
+  }
+}
+
 struct ChargeView: View {
   let text: String
   let isSelected: Bool

@@ -82,12 +82,14 @@ public struct ReportView: View {
               isPresented: viewStore.binding(\.$showEditDescription),
               content: {
                 NavigationStack {
-                  EditDescriptionView(
-                    store: store.scope(
-                      state: \.description,
-                      action: A.description
+                  List {
+                    EditDescriptionView(
+                      store: store.scope(
+                        state: \.description,
+                        action: A.description
+                      )
                     )
-                  )
+                  }
                   .accessibilityAddTraits([.isModal])
                   .navigationTitle(Text(L10n.Description.widgetTitle))
                   .navigationBarTitleDisplayMode(.inline)

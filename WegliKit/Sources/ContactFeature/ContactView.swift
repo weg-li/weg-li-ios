@@ -135,7 +135,8 @@ public struct ContactDetailsView: View {
     }
   }
   
-  func dataRow<V: View>(type: RowType, @ViewBuilder _ content: @escaping () -> V) -> some View {
+  @ViewBuilder
+  func dataRow(type: RowType, content: @escaping () -> some View) -> some View {
     VStack(alignment: .leading) {
       HStack {
         Text(type.label)

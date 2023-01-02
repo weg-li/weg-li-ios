@@ -21,9 +21,9 @@ public struct EditDescriptionView: View {
     self.store = store
     self.viewStore = ViewStore(store)
   }
-  
+    
   public var body: some View {
-    List {
+    Group {
       Section {
         licensePlateView
         
@@ -83,6 +83,9 @@ public struct EditDescriptionView: View {
             action: A.carBrandSelection
           )
         )
+        .accessibilityAddTraits([.isModal])
+        .navigationTitle(Text(L10n.Description.Row.carType))
+        .navigationBarTitleDisplayMode(.inline)
       },
       label: {
         HStack {
@@ -124,6 +127,9 @@ public struct EditDescriptionView: View {
             action: A.chargeSelection
           )
         )
+        .accessibilityAddTraits([.isModal])
+        .navigationTitle(Text(L10n.Description.Row.chargeType))
+        .navigationBarTitleDisplayMode(.inline)
       },
       label: {
         HStack {

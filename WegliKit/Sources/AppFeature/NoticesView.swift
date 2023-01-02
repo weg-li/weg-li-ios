@@ -41,12 +41,18 @@ public struct NoticesView: View {
               case: /S.Destination.edit
             ) { $model in
               NavigationStack {
-                EditNoticeView(
-                  store: .init(
-                    initialState: .init(notice: model),
-                    reducer: EditNoticeDomain()
+                List {
+                  EditNoticeView(
+                    store: .init(
+                      initialState: .init(notice: model),
+                      reducer: EditNoticeDomain()
+                    )
                   )
-                )
+                  .accessibilityAddTraits([.isModal])
+                  .navigationTitle(Text("Meldung bearbeiten"))
+                  .navigationBarTitleDisplayMode(.inline)
+                }
+//                .listStyle(.insetGrouped)
                 .toolbar {
                   ToolbarItem(placement: .cancellationAction) {
                     Button(L10n.Button.close) {
