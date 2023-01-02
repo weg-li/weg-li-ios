@@ -71,10 +71,10 @@ extension APIService: DependencyKey {
         return try data.decoded(decoder: .noticeDecoder)
       },
       patchNotice: { notice in
-        let input = NoticePatchInput(token: notice.id, notice: notice)
+        let input = NoticePatchInput(notice: notice)
         let body = try input.encoded(encoder: .noticeEncoder)
         
-        let data = try await apiClient.send(.patch(.notices, body: body))
+        let data = try await apiClient.send(.patch(.updateNotice(token: notice.id), body: body))
         
         return try data.decoded(decoder: .noticeDecoder)
       }
@@ -83,7 +83,6 @@ extension APIService: DependencyKey {
 }
 
 struct NoticePatchInput: Encodable, Equatable {
-  let token: String
   let notice: Notice
 }
 

@@ -56,7 +56,7 @@ public struct ContactWidget: View {
           }
         )
         .accessibilitySortPriority(3)
-        .buttonStyle(EditButtonStyle())
+        .buttonStyle(.edit())
         .padding(.top)
       }
       .fixedSize(horizontal: false, vertical: true)

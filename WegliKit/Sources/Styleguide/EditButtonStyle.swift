@@ -13,3 +13,9 @@ public struct EditButtonStyle: ButtonStyle {
       .clipShape(RoundedRectangle(cornerRadius: 10))
   }
 }
+
+public extension ButtonStyle where Self == EditButtonStyle {
+  static func edit() -> Self {
+    EditButtonStyle()
+  }
+}

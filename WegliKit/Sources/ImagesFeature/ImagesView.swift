@@ -23,10 +23,10 @@ public struct ImagesView: View {
       ImageGrid(store: store)
       
       takePhotoButton
-        .buttonStyle(EditButtonStyle())
+        .buttonStyle(.edit())
 
       importButton
-        .buttonStyle(EditButtonStyle())
+        .buttonStyle(.edit())
         .padding(.bottom, .grid(1))
 
       Divider()

@@ -12,6 +12,9 @@ public struct Endpoint {
 }
 
 public extension Endpoint {
+  static func updateNotice(token: String) -> Self {
+    Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/notices/\(token)")
+  }
   /// `/api/notices` endpoint
   static let notices = Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/notices")
   /// `/api/uploads` endpoint

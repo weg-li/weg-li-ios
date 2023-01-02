@@ -8,13 +8,16 @@ import Styleguide
 import SwiftUI
 
 public struct EditDescriptionView: View {
+  public typealias S = DescriptionDomain.State
+  public typealias A = DescriptionDomain.Action
+  
   @Environment(\.presentationMode) var presentationMode
   @Environment(\.isSearching) var isSearching
   
-  let store: Store<DescriptionDomain.State, DescriptionDomain.Action>
-  @ObservedObject private var viewStore: ViewStore<DescriptionDomain.State, DescriptionDomain.Action>
+  let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<S, A>
   
-  public init(store: Store<DescriptionDomain.State, DescriptionDomain.Action>) {
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }
@@ -29,7 +32,7 @@ public struct EditDescriptionView: View {
         carColorView
       }
       .padding(.top, .grid(1))
-      .textFieldStyle(PlainTextFieldStyle())
+      .textFieldStyle(.roundedBorder)
       
       Section(header: Text(L10n.Description.Section.Violation.copy)) {
         chargeTypeView
@@ -59,10 +62,7 @@ public struct EditDescriptionView: View {
   var licensePlateView: some View {
     TextField(
       L10n.Description.Row.licenseplateNumber,
-      text: viewStore.binding(
-        get: \.licensePlateNumber,
-        send: DescriptionDomain.Action.setLicensePlateNumber
-      )
+      text: viewStore.binding(\.$licensePlateNumber)
     )
     .disableAutocorrection(true)
     .textInputAutocapitalization(.characters)
@@ -72,42 +72,20 @@ public struct EditDescriptionView: View {
     NavigationLink(
       isActive: viewStore.binding(
         get: \.presentCarBrandSelection,
-        send: DescriptionDomain.Action.presentBrandSelectionView
+        send: A.presentBrandSelectionView
       ),
       destination: {
-        List {
-          ForEach(viewStore.state.carBrandSearchResults, id: \.id) { brand in
-            HStack {
-              Text(brand.title)
-                .foregroundColor(Color(.label))
-                .multilineTextAlignment(.leading)
-              Spacer()
-              if viewStore.state.selectedBrand == brand {
-                Image(systemName: "checkmark")
-                  .resizable()
-                  .frame(width: .grid(4), height: .grid(4))
-                  .foregroundColor(.blue)
-              }
-            }
-            .accessibilityValue(Text(viewStore.state.selectedBrand == brand ? "ausgewählt" : ""))
-            .padding(.grid(1))
-            .contentShape(Rectangle())
-            .onTapGesture {
-              viewStore.send(.setBrand(brand))
-            }
-          }
-        }.searchable(
-          text: viewStore.binding(
-            get: \.carBrandSearchText,
-            send: DescriptionDomain.Action.setCarBrandSearchText
-          ),
-          placement: .navigationBarDrawer(displayMode: .always)
+        CarBrandSelectorView(
+          store: self.store.scope(
+            state: \.carBrandSelection,
+            action: A.carBrandSelection
+          )
         )
       },
       label: {
         HStack {
           Text(L10n.Description.Row.carType)
-          if let brand = viewStore.state.selectedBrand {
+          if let brand = viewStore.carBrandSelection.selectedBrand {
             Spacer()
             Text(brand.title)
           }
@@ -123,13 +101,10 @@ public struct EditDescriptionView: View {
   var carColorView: some View {
     Picker(
       L10n.Description.Row.carColor,
-      selection: viewStore.binding(
-        get: \.selectedColor,
-        send: DescriptionDomain.Action.setColor
-      )
+      selection: viewStore.binding(\.$selectedColor)
     ) {
-      ForEach(1 ..< DescriptionDomain.State.colors.count, id: \.self) {
-        Text(DescriptionDomain.State.colors[$0].value)
+      ForEach(1 ..< DescriptionDomain.colors.count, id: \.self) {
+        Text(DescriptionDomain.colors[$0].value)
           .contentShape(Rectangle())
           .tag($0)
           .foregroundColor(Color(.label))
@@ -141,34 +116,20 @@ public struct EditDescriptionView: View {
     NavigationLink(
       isActive: viewStore.binding(
         get: \.presentChargeSelection,
-        send: DescriptionDomain.Action.presentChargeSelectionView
+        send: A.presentChargeSelectionView
       ),
       destination: {
-        List {
-          ForEach(viewStore.chargesSearchResults, id: \.id) { charge in
-            ChargeView(
-              text: charge.text,
-              isSelected: viewStore.selectedCharge?.id == charge.id,
-              isFavorite: charge.isFavorite,
-              onTap: { viewStore.send(.setCharge(charge)) },
-              onSwipe: { viewStore.send(.toggleChargeFavorite(charge)) }
-            )
-          }
-        }
-        .animation(.default, value: viewStore.chargesSearchResults)
-        .searchable(
-          text: viewStore.binding(
-            get: \.chargeTypeSearchText,
-            send: DescriptionDomain.Action.setChargeTypeSearchText
-          ),
-          placement: .navigationBarDrawer(displayMode: .always)
+        ChargeSelectionView(
+          store: self.store.scope(
+            state: \.chargeSelection,
+            action: A.chargeSelection
+          )
         )
-        .disableAutocorrection(true)
       },
       label: {
         HStack {
           Text(L10n.Description.Row.chargeType)
-          if let charge = viewStore.state.selectedCharge {
+          if let charge = viewStore.state.chargeSelection.selectedCharge {
             Spacer()
             Text(charge.text)
           }
@@ -184,10 +145,7 @@ public struct EditDescriptionView: View {
   var chargeDurationView: some View {
     Picker(
       L10n.Description.Row.length,
-      selection: viewStore.binding(
-        get: \.selectedDuration,
-        send: DescriptionDomain.Action.setDuration
-      )
+      selection: viewStore.binding(\.$selectedDuration)
     ) {
       ForEach(viewStore.times, id: \.self) { time in
         Text(Times.times[time] ?? "")

@@ -166,7 +166,7 @@ public struct ContactView: View {
         action: Action.contact
       )
     )
-    .textFieldStyle(PlainTextFieldStyle())
+    .textFieldStyle(.plain)
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
     .toolbar {

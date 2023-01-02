@@ -35,7 +35,7 @@ public struct NoticesView: View {
             .listRowSeparator(.hidden)
             .sheet(
               unwrapping: viewStore.binding(
-                get: { $0.destination },
+                get: \.destination,
                 send: { A.setNavigationDestination($0) }
               ),
               case: /S.Destination.edit
@@ -43,8 +43,8 @@ public struct NoticesView: View {
               NavigationStack {
                 EditNoticeView(
                   store: .init(
-                    initialState: .init(model),
-                    reducer: ReportDomain()
+                    initialState: .init(notice: model),
+                    reducer: EditNoticeDomain()
                   )
                 )
                 .toolbar {

@@ -101,7 +101,7 @@ class AppStoreConnectScreenshots: XCTestCase {
     )
     
     assertAppStoreSnapshots(
-      view: AnyView(NavigationView(content: { view }).navigationViewStyle(StackNavigationViewStyle())),
+      view: AnyView(NavigationView(content: { view }).navigationViewStyle(.stack)),
       description: { Text("Beschreibe die Meldung") },
       backgroundColor: .wegliBlue,
       colorScheme: .light

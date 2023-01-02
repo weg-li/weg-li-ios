@@ -135,7 +135,7 @@ public struct ReportDomain: ReducerProtocol {
     case mail(MailDomain.Action)
     case mapAddressToDistrict(Address)
     case mapDistrictFinished(TaskResult<District>)
-
+    
     case onResetButtonTapped
     case onSubmitButtonTapped
     case onResetConfirmButtonTapped
@@ -388,7 +388,7 @@ public struct ReportDomain: ReducerProtocol {
       case .composeNotice:
         var notice = NoticeInput(state)
         notice.photos = state.uploadedImagesIds
-                
+        
         return .task { [notice, alwaysSendNotice = state.alwaysSendNotice] in
           if alwaysSendNotice {
             return await .submitNoticeResponse(
@@ -437,7 +437,7 @@ public struct ReportDomain: ReducerProtocol {
         return .fireAndForget {
           _ = await uiApplicationClient.open(editURL, [:])
         }
-
+        
       case .submitNoticeResponse(.success):
         state.isSubmittingNotice = false
         state.uploadedImagesIds.removeAll()
@@ -618,9 +618,9 @@ public extension SharedModels.NoticeInput {
       latitude: reportState.location.pinCoordinate?.latitude ?? 0,
       longitude: reportState.location.pinCoordinate?.longitude ?? 0,
       registration: reportState.description.licensePlateNumber,
-      brand: reportState.description.selectedBrand?.title ?? "",
-      color: DescriptionDomain.State.colors[reportState.description.selectedColor].key,
-      charge: reportState.description.selectedCharge?.text ?? "",
+      brand: reportState.description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.chargeSelection.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
@@ -648,9 +648,9 @@ public extension SharedModels.Notice {
       latitude: reportState.location.pinCoordinate?.latitude ?? 0,
       longitude: reportState.location.pinCoordinate?.longitude ?? 0,
       registration: reportState.description.licensePlateNumber,
-      brand: reportState.description.selectedBrand?.title ?? "",
-      color: DescriptionDomain.State.colors[reportState.description.selectedColor].key,
-      charge: reportState.description.selectedCharge?.text ?? "",
+      brand: reportState.description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.chargeSelection.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
@@ -684,36 +684,16 @@ extension ReportDomain.State {
     self.contactState = .empty
     self.district = nil
     self.date = model.createdAt ?? Date()
-    self.description = .init(
-      licensePlateNumber: model.registration ?? "",
-      selectedColor: model.color.flatMap { color -> Int in
-        let colors = DescriptionDomain.State.colors
-        guard let index = colors.firstIndex(where: { color == $0.value }) else { return 0 }
-        return index
-      } ?? 0,
-      selectedBrand: model.brand.flatMap { brand -> CarBrand in
-        let brands = DescriptionDomain.State.brands
-        guard let index = brands.firstIndex(where: { brand == $0.title }) else { return CarBrand("") }
-        return brands[index]
-      } ?? CarBrand(""),
-      selectedDuration: model.duration.flatMap { Int($0) } ?? 0,
-      selectedCharge: model.charge.flatMap { chargeIdentifier -> Charge? in
-        let charges = DescriptionDomain.State.charges
-        guard let index = charges.firstIndex(where: { chargeIdentifier == $0.value }) else { return nil }
-        let value = charges[index]
-        return Charge(id: UUID().uuidString, text: value.value, isFavorite: false, isSelected: false)
-      },
-      blockedOthers: true,
-      vehicleEmpty: model.vehicleEmpty,
-      hazardLights: model.hazardLights,
-      expiredTuv: model.expiredTuv,
-      expiredEco: model.expiredEco
-    )
+    self.description = .init(model: model)
     self.location = .init(
       locationOption: .manual,
       isMapExpanded: false,
       isResolvingAddress: false,
-      resolvedAddress: .init(),
+      resolvedAddress: .init(
+        street: model.street ?? "",
+        postalCode: model.zip ?? "",
+        city: model.city ?? ""
+      ),
       pinCoordinate: nil,
       isRequestingCurrentLocation: false,
       region: nil
@@ -749,4 +729,34 @@ extension MailComposeClient {
 extension MailComposeClient: DependencyKey {
   public static let liveValue = Self { MFMailComposeViewController.canSendMail() }
   public static let testValue = Self(canSendMail: unimplemented())
+}
+
+public extension DescriptionDomain.State {
+  init(model: Notice) {
+    self = Self.init(
+      licensePlateNumber: model.registration ?? "",
+      selectedColor: model.color.flatMap { color -> Int in
+        let colors = DescriptionDomain.colors
+        guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
+        return index
+      } ?? 0,
+      selectedBrand: model.brand.flatMap { brand -> CarBrand in
+        let brands = DescriptionDomain.brands
+        guard let index = brands.firstIndex(where: { brand == $0.title }) else { return CarBrand("") }
+        return brands[index]
+      } ?? CarBrand(""),
+      selectedDuration:  model.duration.flatMap { Int($0) } ?? 0,
+      selectedCharge: model.charge.flatMap { chargeIdentifier -> Charge? in
+        let charges = DescriptionDomain.charges
+        guard let index = charges.firstIndex(where: { chargeIdentifier == $0.value }) else { return nil }
+        let value = charges[index]
+        return Charge(id: UUID().uuidString, text: value.value, isFavorite: false, isSelected: false)
+      },
+      blockedOthers: true,
+      vehicleEmpty: model.vehicleEmpty,
+      hazardLights: model.hazardLights,
+      expiredTuv: model.expiredTuv,
+      expiredEco: model.expiredEco
+    )
+  }
 }

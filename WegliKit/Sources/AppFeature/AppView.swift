@@ -62,19 +62,8 @@ public struct AppView: View {
       .tabItem { Label(L10n.Settings.title, systemImage: "gearshape") }
       .tag(Tabs.settings)
     }
-    .alert(
-      unwrapping: viewStore.binding(
-        get: \.destination,
-        send: A.setNavigationDestination
-      ),
-      case: /S.Destination.alert
-    ) { action in
-      switch action {
-      case .dismiss:
-        viewStore.send(.setNavigationDestination(nil))
-      }
-    }
-    .navigationViewStyle(StackNavigationViewStyle())
+    
+    .navigationViewStyle(.stack)
   }
 }
 
@@ -98,7 +87,7 @@ struct MainView_Previews: PreviewProvider {
 extension Notice {
   var displayColor: String? {
     guard let safeColor = color else { return nil }
-    return DescriptionDomain.State.colors.first { color in
+    return DescriptionDomain.colors.first { color in
       color.key.lowercased() == safeColor.lowercased()
     }?.value
   }

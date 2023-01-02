@@ -19,9 +19,9 @@ public struct DescriptionView: View {
     
     init(state: ReportDomain.State) {
       self.description = state.description
-      self.brand = state.description.selectedBrand?.title ?? ""
-      self.color = DescriptionDomain.State.colors[state.description.selectedColor].value
-      self.chargeType = state.description.selectedCharge?.text ?? ""
+      self.brand = state.description.carBrandSelection.selectedBrand?.title ?? ""
+      self.color = DescriptionDomain.colors[state.description.selectedColor].value
+      self.chargeType = state.description.chargeSelection.selectedCharge?.text ?? ""
       self.showEditScreen = state.showEditDescription
     }
   }
@@ -84,7 +84,7 @@ public struct DescriptionView: View {
         }
       )
       .accessibilitySortPriority(2)
-      .buttonStyle(EditButtonStyle())
+      .buttonStyle(.bordered)
       .padding(.top)
       .accessibilityAction {
         viewStore.send(.setShowEditDescription(true))

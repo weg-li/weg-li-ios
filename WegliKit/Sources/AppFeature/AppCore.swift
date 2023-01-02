@@ -65,6 +65,7 @@ public struct AppDomain: ReducerProtocol {
     
     public var isSendingEditedNotice = false
     public var destination: Destination?
+    public var alert: AlertState<Action>?
     
     public enum Destination: Equatable {
       case edit(Notice)
@@ -102,6 +103,7 @@ public struct AppDomain: ReducerProtocol {
     case setNavigationDestination(State.Destination?)
     case onSaveNoticeButtonTapped
     case editNoticeResponse(TaskResult<Notice>)
+    case dismissAlert
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -284,22 +286,36 @@ public struct AppDomain: ReducerProtocol {
         
       case .onSaveNoticeButtonTapped:
         state.isSendingEditedNotice = true
-        return .task { [notice = state.selectedNotice] in
-          await .editNoticeResponse(
-            TaskResult {
-              try await apiService.patchNotice(notice!)
-            }
-          )
-        }
         
-      case .editNoticeResponse(let response):
-        switch response {
-        case .success:
-          return .task { .fetchNotices(forceReload: true) }
-        case .failure(let error):
-          state.destination = .alert(.init(title: TextState(error.localizedDescription)))
+        guard let notice = state.selectedNotice else {
           return .none
         }
+        
+        return .none
+//        return .task {
+//          await .editNoticeResponse(
+//            TaskResult {
+//              try await apiService.patchNotice(notice)
+//            }
+//          )
+//        }
+        
+      case .editNoticeResponse(let response):
+        state.isSendingEditedNotice = false
+        
+        switch response {
+        case .success:
+          state.destination = nil
+          return .task { .fetchNotices(forceReload: true) }
+          
+        case .failure:
+          state.alert = .editNoticeFailure
+          return .none
+        }
+        
+      case .dismissAlert:
+        state.alert = nil
+        return .none
       }
     }
   }
@@ -342,6 +358,15 @@ extension Store where State == AppDomain.State, Action == AppDomain.Action {
 }
 
 public extension AlertState where Action == AppDomain.Action {
+  static let editNoticeFailure = Self(
+    title: .init("Fehler"),
+    message: .init("Die Meldung konnte nicht gespeichert werden"),
+    buttons: [
+      .default(.init("Ok")),
+      .default(.init("Wiederholen"), action: .send(.fetchNotices(forceReload: true)))
+    ]
+  )
+  
   static let noInternetConnection = Self(
     title: .init("Keine Internetverbindung"),
     message: .init("Verbinde dich mit dem Internet um deine Meldungen zu laden"),

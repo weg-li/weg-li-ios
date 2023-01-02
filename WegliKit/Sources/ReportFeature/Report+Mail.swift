@@ -15,14 +15,14 @@ public extension ReportDomain.State {
     
     Kennzeichen: \(description.licensePlateNumber)
     
-    Marke: \(description.selectedBrand?.title ?? "")
+    Marke: \(description.carBrandSelection.selectedBrand?.title ?? "")
     
-    Farbe: \(DescriptionDomain.State.colors[description.selectedColor].value)
+    Farbe: \(DescriptionDomain.colors[description.selectedColor].value)
     
     Adresse:
     \(location.resolvedAddress.humanReadableAddress())
     
-    Verstoß: \(description.selectedCharge?.text ?? "")\(description.blockedOthers ? ", mit Behinderung (z.B. Anhalten, Ausweichen, Absteigen)" : "")
+    Verstoß: \(description.chargeSelection.selectedCharge?.text ?? "")\(description.blockedOthers ? ", mit Behinderung (z.B. Anhalten, Ausweichen, Absteigen)" : "")
     
     Tatzeit: \(date.humandReadableTimeAndDate)
     
