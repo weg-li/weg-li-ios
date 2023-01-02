@@ -106,53 +106,7 @@ final class ReportStoreTests: XCTestCase {
       XCTAssertTrue(value)
     })
   }
-  
-  func test_updateCar_shouldUpdateState() {
-    let store = TestStore(
-      initialState: report,
-      reducer: ReportDomain(),
-      prepareDependencies: { values in
-        values.locationManager = .unimplemented()
-        values.placesServiceClient = .noop
-        values.regulatoryOfficeMapper = .noop
-        values.apiService = .noop
-      }
-    )
-    
-    let color = 1
-    let brand = CarBrand("Opel")
-    store.send(.description(.setColor(color))) {
-      $0.description.selectedColor = color
-    }
-    store.send(.description(.setBrand(brand))) {
-      $0.description.selectedBrand = brand
-    }
-  }
-  
-  func test_updateCharge_shouldUpdateState() {
-    let store = TestStore(
-      initialState: report,
-      reducer: ReportDomain(),
-      prepareDependencies: { values in
-        values.continuousClock = ImmediateClock()
-        values.locationManager = .unimplemented()
-        values.placesServiceClient = .noop
-        values.regulatoryOfficeMapper = .noop
-        values.fileClient = .noop
-        values.apiService = .noop
-      }
-    )
-    
-    let duration = 42
-    let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
-    store.send(.description(.setCharge(testCharge))) {
-      $0.description.selectedCharge = testCharge
-    }
-    store.send(.description(.setDuration(duration))) {
-      $0.description.selectedDuration = duration
-    }
-  }
-  
+      
   func test_updateImages_shouldTriggerAddressResolve() async {
     let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
     let setSubject = PassthroughSubject<Never, Never>()

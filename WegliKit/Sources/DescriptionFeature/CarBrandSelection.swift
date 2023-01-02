@@ -9,6 +9,11 @@ public struct CarBrandSelection: ReducerProtocol {
     public var selectedBrand: CarBrand?
     @BindableState public var carBrandSearchText = ""
     
+    public init(selectedBrand: CarBrand? = nil, carBrandSearchText: String = "") {
+      self.selectedBrand = selectedBrand
+      self.carBrandSearchText = carBrandSearchText
+    }
+    
     var carBrandSearchResults: IdentifiedArrayOf<CarBrand> {
       if carBrandSearchText.isEmpty {
         return DescriptionDomain.brands

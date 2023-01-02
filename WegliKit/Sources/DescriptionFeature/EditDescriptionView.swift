@@ -23,18 +23,20 @@ public struct EditDescriptionView: View {
   }
   
   public var body: some View {
-    VStack {
-      Section(header: Text(L10n.Description.Section.Vehicle.copy)) {
+    List {
+      Section {
         licensePlateView
         
         carBrandView
         
         carColorView
+      } header: {
+        SectionHeader(text: L10n.Description.Section.Vehicle.copy)
       }
       .padding(.top, .grid(1))
-      .textFieldStyle(.roundedBorder)
+      .textFieldStyle(.plain)
       
-      Section(header: Text(L10n.Description.Section.Violation.copy)) {
+      Section {
         chargeTypeView
         
         chargeDurationView
@@ -48,12 +50,16 @@ public struct EditDescriptionView: View {
         expiredTuvView
         
         expiredEcoView
+      } header: {
+        SectionHeader(text: L10n.Description.Section.Violation.copy)
       }
       
-      Section(header: Text("Hinweise")) {
+      Section {
         TextEditor(text: viewStore.binding(\.$note))
           .font(.body)
           .clipShape(RoundedRectangle(cornerRadius: 4))
+      } header: {
+        SectionHeader(text: "Hinweise")
       }
     }
     .onAppear { viewStore.send(.onAppear) }
@@ -70,10 +76,7 @@ public struct EditDescriptionView: View {
   
   var carBrandView: some View {
     NavigationLink(
-      isActive: viewStore.binding(
-        get: \.presentCarBrandSelection,
-        send: A.presentBrandSelectionView
-      ),
+      isActive: viewStore.binding(\.$presentCarBrandSelection),
       destination: {
         CarBrandSelectorView(
           store: self.store.scope(
@@ -92,7 +95,7 @@ public struct EditDescriptionView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-          viewStore.send(.presentBrandSelectionView(true))
+          viewStore.send(.set(\.$presentCarBrandSelection, true))
         }
       }
     )
@@ -114,10 +117,7 @@ public struct EditDescriptionView: View {
   
   var chargeTypeView: some View {
     NavigationLink(
-      isActive: viewStore.binding(
-        get: \.presentChargeSelection,
-        send: A.presentChargeSelectionView
-      ),
+      isActive: viewStore.binding(\.$presentChargeSelection),
       destination: {
         ChargeSelectionView(
           store: self.store.scope(
@@ -136,7 +136,7 @@ public struct EditDescriptionView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-          viewStore.send(.presentChargeSelectionView(true))
+          viewStore.send(.set(\.$presentChargeSelection, true))
         }
       }
     )

@@ -172,9 +172,7 @@ struct EditNoticeView: View {
   
   @ViewBuilder
   func sectionHeader(_ text: String) -> some View {
-    Text(text)
-      .font(.title3)
-      .fontWeight(.bold)
+    SectionHeader(text: text)
   }
 }
 

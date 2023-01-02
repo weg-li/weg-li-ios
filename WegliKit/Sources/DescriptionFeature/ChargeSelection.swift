@@ -13,6 +13,14 @@ public struct ChargeSelection: ReducerProtocol {
     public var selectedCharge: Charge?
     @BindableState public var chargeTypeSearchText = ""
     
+    public init(
+      selectedCharge: Charge? = nil,
+      chargeTypeSearchText: String = ""
+    ) {
+      self.selectedCharge = selectedCharge
+      self.chargeTypeSearchText = chargeTypeSearchText
+    }
+    
     public var charges: IdentifiedArrayOf<Charge> = []
     var chargesSearchResults: IdentifiedArrayOf<Charge> {
       if chargeTypeSearchText.isEmpty {

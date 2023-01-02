@@ -52,7 +52,7 @@ public struct DescriptionDomain: ReducerProtocol {
     @BindableState public var note = ""
         
     @BindableState public var presentChargeSelection = false
-    public var presentCarBrandSelection = false
+    @BindableState public var presentCarBrandSelection = false
     
     public var isValid: Bool {
       let arguments = [
@@ -73,8 +73,6 @@ public struct DescriptionDomain: ReducerProtocol {
     
     case onAppear
     case favoriteChargesLoaded(TaskResult<[String]>)
-    case presentChargeSelectionView(Bool)
-    case presentBrandSelectionView(Bool)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -115,15 +113,13 @@ public struct DescriptionDomain: ReducerProtocol {
         }
         state.chargeSelection.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
         return EffectTask(value: .chargeSelection(.sortFavoritedCharges))
-          
-      case let .presentChargeSelectionView(value):
+        
+      case .binding(\.$presentChargeSelection):
         state.chargeSelection.chargeTypeSearchText = ""
-        state.presentChargeSelection = value
         return .none
-          
-      case let .presentBrandSelectionView(value):
+        
+      case .binding(\.$presentCarBrandSelection):
         state.carBrandSelection.carBrandSearchText = ""
-        state.presentCarBrandSelection = value
         return .none
         
       case .carBrandSelection(let carbrandSelectionAction):
