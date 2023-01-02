@@ -5,6 +5,7 @@ import Combine
 import ComposableArchitecture
 import ComposableCoreLocation
 import Contacts
+import DescriptionFeature
 import FileClient
 import Foundation
 import Helper
@@ -52,7 +53,7 @@ public struct AppDomain: ReducerProtocol {
       date: Date.init
     )
     
-    public var isNetworkAvailable = true {
+    public var isNetworkAvailable = true { // TODO:
       didSet {
         reportDraft.isNetworkAvailable = isNetworkAvailable
       }
@@ -61,10 +62,20 @@ public struct AppDomain: ReducerProtocol {
     public var isFetchingNotices: Bool { notices == .loading }
     
     @BindableState public var selectedTab: Tabs = .notice
-    @BindableState public var editNotice: Notice?
+    
+    public var editNotice: EditNoticeDomain.State?
     
     public var isSendingEditedNotice = false
-    public var destination: Destination?
+    public var destination: Destination? {
+      didSet {
+        switch destination {
+        case .edit(let notice):
+          editNotice = .init(notice: notice)
+        default:
+          return
+        }
+      }
+    }
     public var alert: AlertState<Action>?
     
     public enum Destination: Equatable {
@@ -75,19 +86,10 @@ public struct AppDomain: ReducerProtocol {
       case errorMessage(String)
       case dismiss
     }
-    
-    var selectedNotice: Notice? {
-      switch destination {
-      case .edit(let notice):
-        return notice
-      default:
-        return nil
-      }
-    }
   }
   
   public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<AppDomain.State>)
+    case binding(BindingAction<State>)
     case appDelegate(AppDelegateDomain.Action)
     case contactSettingsLoaded(TaskResult<Contact>)
     case userSettingsLoaded(TaskResult<UserSettings>)
@@ -103,6 +105,7 @@ public struct AppDomain: ReducerProtocol {
     case setNavigationDestination(State.Destination?)
     case onSaveNoticeButtonTapped
     case editNoticeResponse(TaskResult<Notice>)
+    case editNotice(EditNoticeDomain.Action)
     case dismissAlert
   }
   
@@ -195,14 +198,18 @@ public struct AppDomain: ReducerProtocol {
         
         // After the emailResult reports the mail has been sent the report will be stored.
       case .report(.mail(.setMailResult(.sent))):
-        state.reportDraft.images.storedPhotos.forEach { image in
-          _ = try? image?.imageUrl.flatMap { safeUrl in
-            try FileManager.default.removeItem(at: safeUrl)
-          }
-        }
         state.reportDraft.images.storedPhotos.removeAll()
-        
-        return Effect(value: .reportSaved)
+        let safeImageUrls = state.reportDraft.images.storedPhotos
+          .compactMap {  $0 }
+          .compactMap(\.imageUrl)
+        return .merge(
+          .fireAndForget {
+            for url in safeImageUrls {
+              try await fileClient.removeItem(url)
+            }
+          },
+          EffectTask(value: .reportSaved)
+        )
         
       case .report(.onResetConfirmButtonTapped):
         state.reportDraft = ReportDomain.State(
@@ -223,7 +230,6 @@ public struct AppDomain: ReducerProtocol {
         
       case let .fetchNotices(forceReload):
         guard state.isNetworkAvailable else {
-//          state.destination = .alert(.noInternetConnection)
           state.notices = .empty(.emptyNotices())
           return .none
         }
@@ -287,18 +293,18 @@ public struct AppDomain: ReducerProtocol {
       case .onSaveNoticeButtonTapped:
         state.isSendingEditedNotice = true
         
-        guard let notice = state.selectedNotice else {
+        guard let notice = state.editNotice else {
           return .none
         }
+        let patch = Notice(notice)
         
-        return .none
-//        return .task {
-//          await .editNoticeResponse(
-//            TaskResult {
-//              try await apiService.patchNotice(notice)
-//            }
-//          )
-//        }
+        return .task {
+          await .editNoticeResponse(
+            TaskResult {
+              try await apiService.patchNotice(patch)
+            }
+          )
+        }
         
       case .editNoticeResponse(let response):
         state.isSendingEditedNotice = false
@@ -313,10 +319,16 @@ public struct AppDomain: ReducerProtocol {
           return .none
         }
         
+      case .editNotice:
+        return .none
+        
       case .dismissAlert:
         state.alert = nil
         return .none
       }
+    }
+    .ifLet(\.editNotice, action: /Action.editNotice) {
+      EditNoticeDomain()
     }
   }
 }
@@ -383,6 +395,36 @@ public extension EmptyState {
       text: "Keine Meldungen",
       message: .init(string: "Meldungen konnten nicht geladen werden"),
       action: .init(label: "Erneut laden", action: .fetchNotices(forceReload: false))
+    )
+  }
+}
+
+extension Notice {
+  init(_ editState: EditNoticeDomain.State) {
+    self.init(
+      token: editState.notice.id,
+      status: editState.notice.status ?? "",
+      street: editState.notice.street ?? "",
+      city: editState.notice.city ?? "",
+      zip: editState.notice.zip ?? "",
+      latitude: editState.notice.latitude ?? 0,
+      longitude: editState.notice.longitude ?? 0,
+      registration: editState.notice.registration ?? "",
+      brand: editState.description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[editState.description.selectedColor].key,
+      charge: editState.description.chargeSelection.selectedCharge?.text ?? "",
+      date: editState.notice.date ?? .now,
+      duration: 0,
+      severity: nil,
+      note: editState.description.note,
+      createdAt: editState.notice.createdAt ?? .now,
+      updatedAt: Date(),
+      sentAt: Date(),
+      vehicleEmpty: editState.description.vehicleEmpty,
+      hazardLights: editState.description.hazardLights,
+      expiredTuv: editState.description.expiredTuv,
+      expiredEco: editState.description.expiredEco,
+      photos: editState.notice.photos ?? []
     )
   }
 }

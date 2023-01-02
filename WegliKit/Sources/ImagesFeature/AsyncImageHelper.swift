@@ -8,7 +8,7 @@ import SwiftUI
 /// This view displays a thumbnail from a URL. It begins loading the thumbnail asynchronously when
 /// it first appears on screen. While loading, this view displays a placeholder image. If it encounters an error,
 /// it displays an error image. You must call the `load()` function to start asynchronous loading.
-struct AsyncThumbnailView: View {
+public struct AsyncThumbnailView: View {
   let url: URL
   let contentMode: ContentMode
   
@@ -16,13 +16,13 @@ struct AsyncThumbnailView: View {
   
   @State private var image: UIImage?
   
-  init(url: URL, contentMode: ContentMode = .fill) {
+  public init(url: URL, contentMode: ContentMode = .fill) {
     self.url = url
     self.contentMode = contentMode
     self.imageLoader = ImageActor.shared
   }
   
-  var body: some View {
+  public var body: some View {
     Group {
       if let image {
         Image(uiImage: image)

@@ -1,26 +1,27 @@
+import ComposableArchitecture
 import Foundation
 
 public struct Notice: Codable, Equatable, Identifiable {
   public var id: String { token ?? UUID().uuidString }
   
-  public let token: String?
-  public let status: String?
-  public let street: String?
-  public let city: String?
-  public let zip: String?
-  public let latitude: Double?
-  public let longitude: Double?
-  public let registration: String?
-  public let brand: String?
-  public let color: String?
-  public let charge: String?
-  public let date: Date?
-  public let duration: Int64?
-  public let severity: String?
+  public var token: String?
+  public var status: String?
+  public var street: String?
+  public var city: String?
+  public var zip: String?
+  public var latitude: Double?
+  public var longitude: Double?
+  public var registration: String?
+  public var brand: String?
+  public var color: String?
+  public var charge: String?
+  public var date: Date?
+  public var duration: Int64?
+  public var severity: String?
   public var note: String?
-  public let createdAt: Date?
-  public let updatedAt: Date?
-  public let sentAt: Date?
+  @BindableState public var createdAt: Date?
+  public var updatedAt: Date?
+  public var sentAt: Date?
   public var vehicleEmpty = false
   public var hazardLights = false
   public var expiredTuv = false

@@ -3,6 +3,7 @@ import Foundation
 import Helper
 import L10n
 import ReportFeature
+import SharedModels
 import Styleguide
 import SwiftUI
 import SwiftUINavigation
@@ -30,47 +31,7 @@ public struct NoticesView: View {
         
       case let .results(notices):
         List(notices) { notice in
-          NoticeView(notice: notice)
-            .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
-            .listRowSeparator(.hidden)
-            .sheet(
-              unwrapping: viewStore.binding(
-                get: \.destination,
-                send: { A.setNavigationDestination($0) }
-              ),
-              case: /S.Destination.edit
-            ) { $model in
-              NavigationStack {
-                List {
-                  EditNoticeView(
-                    store: .init(
-                      initialState: .init(notice: model),
-                      reducer: EditNoticeDomain()
-                    )
-                  )
-                  .accessibilityAddTraits([.isModal])
-                  .navigationTitle(Text("Meldung bearbeiten"))
-                  .navigationBarTitleDisplayMode(.inline)
-                }
-//                .listStyle(.insetGrouped)
-                .toolbar {
-                  ToolbarItem(placement: .cancellationAction) {
-                    Button(L10n.Button.close) {
-                      viewStore.send(.setNavigationDestination(nil))
-                    }
-                  }
-                  ToolbarItem(placement: .confirmationAction) {
-                    if viewStore.state.isSendingEditedNotice {
-                      ProgressView()
-                    } else {
-                      Button("Speichern") {
-                        viewStore.send(.onSaveNoticeButtonTapped)
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          noticeView(notice)
         }
         .listStyle(.plain)
         
@@ -106,6 +67,51 @@ public struct NoticesView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       }
     }
+  }
+  
+  func noticeView(_ notice: Notice) -> some View {
+    NoticeView(notice: notice)
+      .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
+      .listRowSeparator(.hidden)
+      .sheet(
+        unwrapping: viewStore.binding(
+          get: \.destination,
+          send: { A.setNavigationDestination($0) }
+        ),
+        case: /S.Destination.edit
+      ) { $model in
+        NavigationStack {
+          IfLetStore(
+            self.store.scope(
+              state: \.editNotice,
+              action: A.editNotice
+            ),
+            then: { store in
+              EditNoticeView(store: store)
+            },
+            else: { Text("🐞") }
+          )
+          .accessibilityAddTraits([.isModal])
+          .navigationTitle(Text("Meldung bearbeiten"))
+          .navigationBarTitleDisplayMode(.inline)
+          .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+              Button(L10n.Button.close) {
+                viewStore.send(.setNavigationDestination(nil))
+              }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+              if viewStore.state.isSendingEditedNotice {
+                ProgressView()
+              } else {
+                Button("Speichern") {
+                  viewStore.send(.onSaveNoticeButtonTapped)
+                }
+              }
+            }
+          }
+        }
+      }
   }
   
   @ViewBuilder

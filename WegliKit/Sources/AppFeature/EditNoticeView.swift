@@ -14,16 +14,18 @@ public struct EditNoticeDomain: ReducerProtocol {
   public init() {}
   
   public struct State: Equatable {
+    var notice: Notice
+    
     public var description: DescriptionDomain.State
     
     @BindableState public var createdAt: Date
-    
+
     @BindableState public var selectedColor: Int
     @BindableState public var licensePlateNumber: String
     @BindableState public var street: String
     @BindableState public var city: String
     @BindableState public var zip: String
-    
+
     @BindableState public var presentChargeSelection = false
     @BindableState public var presentCarBrandSelection = false
     
@@ -33,26 +35,25 @@ public struct EditNoticeDomain: ReducerProtocol {
     }
         
     init(
-      description: DescriptionDomain.State,
-      selectedColor: Int,
-      licensePlateNumber: String,
-      createdAt: Date,
-      street: String,
-      city: String,
-      zip: String
+      notice: Notice
     ) {
-      self.description = description
-      self.licensePlateNumber = licensePlateNumber
-      self.createdAt = createdAt
-      self.street = street
-      self.city = city
-      self.zip = zip
-      self.selectedColor = selectedColor
+      self.notice = notice
+      self.description = .init(model: notice)
+      self.licensePlateNumber = notice.registration ?? ""
+      self.createdAt = notice.createdAt ?? .now
+      self.street = notice.street ?? ""
+      self.city = notice.city ?? ""
+      self.zip = notice.zip ?? ""
+      self.selectedColor = notice.color.flatMap { color -> Int in
+        let colors = DescriptionDomain.colors
+        guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
+        return index
+      } ?? 0
     }
   }
   
   public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<EditNoticeDomain.State>)
+    case binding(BindingAction<State>)
     case description(DescriptionDomain.Action)
     case setDestination(State.Destination?)
   }
@@ -96,22 +97,28 @@ struct EditNoticeView: View {
     self.viewStore = ViewStore(store)
   }
   
-  let gridItemLayout = [
-    GridItem(.flexible(minimum: 50, maximum: .infinity)),
-    GridItem(.flexible(minimum: 50, maximum: .infinity)),
-    GridItem(.flexible(minimum: 50, maximum: .infinity))
-  ]
-  
   var body: some View {
-    Group {
-      Section {
-        ImageGrid {
-          ForEach(0..<4, id: \.self) { _ in
-            Color.red
+    List {
+      if let photos = viewStore.notice.photos {
+        Section {
+          ImageGrid {
+            ForEach(photos, id: \.self) { photo in
+              if let url = URL(string: photo.url) {
+                AsyncThumbnailView(url: url)
+                  .frame(
+                    minWidth: 50,
+                    maxWidth: .infinity,
+                    minHeight: 100,
+                    maxHeight: 100
+                  )
+                  .clipShape(RoundedRectangle(cornerRadius: 10))
+                  .padding(.grid(1))
+              }
+            }
           }
+        } header: {
+          SectionHeader(text: L10n.Photos.widgetTitle)
         }
-      } header: {
-        SectionHeader(text: L10n.Photos.widgetTitle)
       }
       
       Section {
@@ -150,6 +157,7 @@ struct EditNoticeView: View {
         )
       )
     }
+    .listStyle(.insetGrouped)
     .textFieldStyle(.roundedBorder)
   }
 }
@@ -162,22 +170,5 @@ struct SwiftUIView_Previews: PreviewProvider {
         reducer: EditNoticeDomain()
       )
     )
-  }
-}
-
-
-extension EditNoticeDomain.State {
-  init(notice: Notice) {
-    self.createdAt = notice.createdAt ?? .now
-    self.street = notice.street ?? ""
-    self.city = notice.city ?? ""
-    self.zip = notice.zip ?? ""
-    self.description = .init(model: notice)
-    self.licensePlateNumber = notice.registration ?? ""
-    self.selectedColor = notice.color.flatMap { color -> Int in
-      let colors = DescriptionDomain.colors
-      guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
-      return index
-    } ?? 0
   }
 }
