@@ -59,7 +59,7 @@ let package = Package(
         .helper,
         .keychainClient,
         .models,
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -81,7 +81,7 @@ let package = Package(
     .target(
       name: "CameraAccessClient",
       dependencies: [
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -112,7 +112,7 @@ let package = Package(
       dependencies: [
         .helper,
         .models,
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -139,7 +139,7 @@ let package = Package(
       dependencies: [
         .apiClient,
         .models,
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -147,7 +147,7 @@ let package = Package(
       name: "KeychainClient",
       dependencies: [
         .product(name: "KeychainSwift", package: "keychain-swift"),
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -178,14 +178,14 @@ let package = Package(
     .target(
       name: "PathMonitorClient",
       dependencies: [
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
     .target(
       name: "PhotoLibraryAccessClient",
       dependencies: [
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -193,7 +193,7 @@ let package = Package(
       name: "PlacesServiceClient",
       dependencies: [
         .models,
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     ),
@@ -201,7 +201,7 @@ let package = Package(
       name: "RegulatoryOfficeMapper",
       dependencies: [
         .models,
-        .dependencies,
+        .tca,
         .testOverlay
       ],
       resources: [.process("Resources")]
@@ -260,7 +260,7 @@ let package = Package(
     .target(
       name: "UIApplicationClient",
       dependencies: [
-        .dependencies,
+        .tca,
         .testOverlay
       ]
     )
@@ -383,7 +383,7 @@ extension Target.Dependency {
   
   static let tca = product(name: "ComposableArchitecture", package: "swift-composable-architecture")
   static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")
-  static let dependencies = product(name: "Dependencies", package: "swift-composable-architecture")
+//  static let dependencies = product(name: "Dependencies", package: "swift-composable-architecture")
   static let testOverlay = product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
   static let navigation = product(name: "SwiftUINavigation", package: "swiftui-navigation")
 }
