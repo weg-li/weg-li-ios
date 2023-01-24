@@ -68,7 +68,7 @@ public struct Widget<Content: View>: View {
 
 struct Widget_Previews: PreviewProvider {
   static var previews: some View {
-    NavigationView {
+    NavigationStack {
       VStack {
         Widget(title: Text("Fotos"), isCompleted: false) { Text("Foobar") }
         Widget(title: Text("Fotos"), isCompleted: false) { Text("Foobar") }

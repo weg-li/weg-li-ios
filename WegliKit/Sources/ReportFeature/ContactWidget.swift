@@ -49,44 +49,19 @@ public struct ContactWidget: View {
       .accessibilityElement(children: .combine)
       VStack(spacing: .grid(2)) {
         Button(
-          action: { viewStore.send(.setShowEditContact(true)) },
+          action: { viewStore.send(.set(\.$showEditContact, true)) },
           label: {
             Label(L10n.Contact.editButtonCopy, systemImage: "square.and.pencil")
               .frame(maxWidth: .infinity)
           }
         )
         .accessibilitySortPriority(3)
-        .buttonStyle(EditButtonStyle())
+        .buttonStyle(.edit())
         .padding(.top)
       }
       .fixedSize(horizontal: false, vertical: true)
     }
     .contentShape(Rectangle())
-    .onTapGesture {
-      viewStore.send(.setShowEditContact(true))
-    }
-    .sheet(
-      isPresented: viewStore.binding(
-        get: \.showEditScreen,
-        send: ReportDomain.Action.setShowEditContact
-      ), content: {
-        NavigationView {
-          ContactView(
-            store: store.scope(
-              state: \.contactState,
-              action: ReportDomain.Action.contact
-            )
-          )
-          .accessibilityAddTraits([.isModal])
-          .navigationBarItems(
-            leading: Button(
-              action: { viewStore.send(.setShowEditContact(false)) },
-              label: { Text(L10n.Button.close) }
-            )
-          )
-        }
-      }
-    )
   }
   
   private func row(callout: String, content: String) -> some View {

@@ -20,13 +20,13 @@ public struct ImagesView: View {
   
   public var body: some View {
     VStack(alignment: .center, spacing: 20.0) {
-      ImageGrid(store: store)
+      ImageGridView(store: store)
       
       takePhotoButton
-        .buttonStyle(EditButtonStyle())
+        .buttonStyle(.edit())
 
       importButton
-        .buttonStyle(EditButtonStyle())
+        .buttonStyle(.edit())
         .padding(.bottom, .grid(1))
 
       Divider()

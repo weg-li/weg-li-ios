@@ -135,7 +135,8 @@ public struct ContactDetailsView: View {
     }
   }
   
-  func dataRow<V: View>(type: RowType, @ViewBuilder _ content: @escaping () -> V) -> some View {
+  @ViewBuilder
+  func dataRow(type: RowType, content: @escaping () -> some View) -> some View {
     VStack(alignment: .leading) {
       HStack {
         Text(type.label)
@@ -166,7 +167,7 @@ public struct ContactView: View {
         action: Action.contact
       )
     )
-    .textFieldStyle(PlainTextFieldStyle())
+    .textFieldStyle(.plain)
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
     .toolbar {

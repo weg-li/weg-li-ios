@@ -55,7 +55,7 @@ public struct LocationView: View {
         ForEach(LocationOption.allCases, id: \.self) { selection in
           Text(selection.title).tag(selection)
         }
-      }.pickerStyle(SegmentedPickerStyle())
+      }.pickerStyle(.segmented)
         .accessibilityHint("Setzt die Adresse an der Anzeige")
       
       if LocationOption.manual == viewStore.locationOption {
@@ -90,7 +90,7 @@ public struct LocationView: View {
           .disableAutocorrection(true)
         }
         .multilineTextAlignment(.leading)
-        .textFieldStyle(RoundedBorderTextFieldStyle())
+        .textFieldStyle(.roundedBorder)
       } else {
         ZStack(alignment: .bottomTrailing) {
           MapView(
@@ -154,7 +154,7 @@ public struct LocationView: View {
         : "arrow.up.left.and.arrow.down.right"
       )
     })
-    .buttonStyle(OnWidgetInteractionButtonStyle())
+    .buttonStyle(.widgetInteraction())
   }
 }
 

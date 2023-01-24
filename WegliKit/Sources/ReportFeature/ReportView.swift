@@ -46,10 +46,7 @@ public struct ReportView: View {
           VStack(alignment: .leading) {
             DatePicker(
               L10n.date,
-              selection: viewStore.binding(
-                get: \.date,
-                send: A.setDate
-              )
+              selection: viewStore.binding(\.$date)
             )
             .labelsHidden()
             .padding(.bottom)
@@ -78,13 +75,65 @@ public struct ReportView: View {
         Widget(
           title: Text(L10n.Description.widgetTitle),
           isCompleted: viewStore.isDescriptionValid
-        ) { DescriptionView(store: store) }
+        ) {
+          DescriptionView(store: store)
+            .onTapGesture { viewStore.send(.set(\.$showEditDescription, true)) }
+            .sheet(
+              isPresented: viewStore.binding(\.$showEditDescription),
+              content: {
+                NavigationStack {
+                  List {
+                    EditDescriptionView(
+                      store: store.scope(
+                        state: \.description,
+                        action: A.description
+                      )
+                    )
+                  }
+                  .accessibilityAddTraits([.isModal])
+                  .navigationTitle(Text(L10n.Description.widgetTitle))
+                  .navigationBarTitleDisplayMode(.inline)
+                  .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                      Button(
+                        action: { viewStore.send(.set(\.$showEditDescription, false)) },
+                        label: { Text(L10n.Button.close) }
+                      )
+                    }
+                  }
+                }
+              }
+            )
+        }
         
         // Contact
         Widget(
           title: Text(L10n.Report.Contact.widgetTitle),
           isCompleted: viewStore.isContactValid
-        ) { ContactWidget(store: store.scope(state: { $0 })) }
+        ) {
+          ContactWidget(store: store.scope(state: { $0 }))
+            .onTapGesture { viewStore.send(.set(\.$showEditContact, true)) }
+            .sheet(
+              isPresented: viewStore.binding(\.$showEditContact),
+              content: {
+                NavigationStack {
+                  ContactView(
+                    store: store.scope(
+                      state: \.contactState,
+                      action: ReportDomain.Action.contact
+                    )
+                  )
+                  .accessibilityAddTraits([.isModal])
+                  .navigationBarItems(
+                    leading: Button(
+                      action: { viewStore.send(.set(\.$showEditContact, false)) },
+                      label: { Text(L10n.Button.close) }
+                    )
+                  )
+                }
+              }
+            )
+        }
         
         // Send notice buttons
         VStack {

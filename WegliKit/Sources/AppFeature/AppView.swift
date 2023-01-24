@@ -26,7 +26,7 @@ public struct AppView: View {
   public var body: some View {
     TabView(selection: viewStore.binding(\.$selectedTab)) {
       // Notices
-      NavigationView {
+      NavigationStack {
         NoticesView(store: viewStore.isFetchingNotices ? .placeholder : self.store)
           .redacted(reason: viewStore.isFetchingNotices ? .placeholder : [])
           .refreshable {
@@ -39,7 +39,7 @@ public struct AppView: View {
       .tag(Tabs.notices)
       
       // New Notice
-      NavigationView {
+      NavigationStack {
         ReportView(
           store: store.scope(
             state: \.reportDraft,
@@ -51,7 +51,7 @@ public struct AppView: View {
       .tag(Tabs.notice)
       
       // Settings
-      NavigationView {
+      NavigationStack {
         SettingsView(
           store: store.scope(
             state: \.settings,
@@ -62,8 +62,8 @@ public struct AppView: View {
       .tabItem { Label(L10n.Settings.title, systemImage: "gearshape") }
       .tag(Tabs.settings)
     }
-    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
-    .navigationViewStyle(StackNavigationViewStyle())
+    
+    .navigationViewStyle(.stack)
   }
 }
 
@@ -87,7 +87,7 @@ struct MainView_Previews: PreviewProvider {
 extension Notice {
   var displayColor: String? {
     guard let safeColor = color else { return nil }
-    return DescriptionDomain.State.colors.first { color in
+    return DescriptionDomain.colors.first { color in
       color.key.lowercased() == safeColor.lowercased()
     }?.value
   }

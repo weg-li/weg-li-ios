@@ -20,6 +20,10 @@ public struct OnWidgetInteractionButtonStyle: ButtonStyle {
   }
 }
 
+extension ButtonStyle where Self == OnWidgetInteractionButtonStyle {
+  public static func widgetInteraction() -> OnWidgetInteractionButtonStyle { OnWidgetInteractionButtonStyle() }
+}
+
 struct OnWidgetInteractionButtonStyle_Previews: PreviewProvider {
   static var previews: some View {
     Button(
@@ -28,6 +32,8 @@ struct OnWidgetInteractionButtonStyle_Previews: PreviewProvider {
         Image(systemName: "trash")
       }
     )
-    .buttonStyle(OnWidgetInteractionButtonStyle())
+    .buttonStyle(.widgetInteraction())
   }
 }
+
+

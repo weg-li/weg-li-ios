@@ -45,15 +45,15 @@ public struct ReportDomain: ReducerProtocol {
     public var contactState: ContactViewDomain.State
     public var district: District?
     
-    public var date: Date
+    @BindableState public var date: Date
     public var description: DescriptionDomain.State
     public var location: LocationDomain.State
     public var mail: MailDomain.State
     
     public var alert: AlertState<Action>?
     
-    public var showEditDescription = false
-    public var showEditContact = false
+    @BindableState public var showEditDescription = false
+    @BindableState public var showEditContact = false
     
     public var apiToken = ""
     public var alwaysSendNotice = true
@@ -135,15 +135,12 @@ public struct ReportDomain: ReducerProtocol {
     case mail(MailDomain.Action)
     case mapAddressToDistrict(Address)
     case mapDistrictFinished(TaskResult<District>)
-
+    
     case onResetButtonTapped
     case onSubmitButtonTapped
     case onResetConfirmButtonTapped
     
-    case setShowEditDescription(Bool)
-    case setShowEditContact(Bool)
     case dismissAlert
-    case setDate(Date)
     case uploadImages
     case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
     case composeNotice
@@ -334,20 +331,8 @@ public struct ReportDomain: ReducerProtocol {
         // Reset report will be handled in the homeReducer
         return Effect(value: .dismissAlert)
         
-      case let .setShowEditDescription(value):
-        state.showEditDescription = value
-        return .none
-        
-      case let .setShowEditContact(value):
-        state.showEditContact = value
-        return .none
-        
       case .dismissAlert:
         state.alert = nil
-        return .none
-        
-      case let .setDate(date):
-        state.date = date
         return .none
         
       case .onSubmitButtonTapped:
@@ -388,7 +373,7 @@ public struct ReportDomain: ReducerProtocol {
       case .composeNotice:
         var notice = NoticeInput(state)
         notice.photos = state.uploadedImagesIds
-                
+        
         return .task { [notice, alwaysSendNotice = state.alwaysSendNotice] in
           if alwaysSendNotice {
             return await .submitNoticeResponse(
@@ -437,7 +422,7 @@ public struct ReportDomain: ReducerProtocol {
         return .fireAndForget {
           _ = await uiApplicationClient.open(editURL, [:])
         }
-
+        
       case .submitNoticeResponse(.success):
         state.isSubmittingNotice = false
         state.uploadedImagesIds.removeAll()
@@ -502,7 +487,7 @@ public extension ReportDomain.State {
     uuid: UUID.init,
     images: .init(
       showImagePicker: false,
-      storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "trash")!)!] // swiftlint:disable:this force_unwrapping
+      storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "swift")!)!] // swiftlint:disable:this force_unwrapping
     ),
     contactState: .preview,
     district: District(
@@ -618,9 +603,9 @@ public extension SharedModels.NoticeInput {
       latitude: reportState.location.pinCoordinate?.latitude ?? 0,
       longitude: reportState.location.pinCoordinate?.longitude ?? 0,
       registration: reportState.description.licensePlateNumber,
-      brand: reportState.description.selectedBrand?.title ?? "",
-      color: DescriptionDomain.State.colors[reportState.description.selectedColor].key,
-      charge: reportState.description.selectedCharge?.text ?? "",
+      brand: reportState.description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.chargeSelection.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
@@ -648,9 +633,9 @@ public extension SharedModels.Notice {
       latitude: reportState.location.pinCoordinate?.latitude ?? 0,
       longitude: reportState.location.pinCoordinate?.longitude ?? 0,
       registration: reportState.description.licensePlateNumber,
-      brand: reportState.description.selectedBrand?.title ?? "",
-      color: DescriptionDomain.State.colors[reportState.description.selectedColor].key,
-      charge: reportState.description.selectedCharge?.text ?? "",
+      brand: reportState.description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[reportState.description.selectedColor].key,
+      charge: reportState.description.chargeSelection.selectedCharge?.text ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
@@ -665,6 +650,51 @@ public extension SharedModels.Notice {
   static let placeholder = Self(.preview)
 }
 
+extension ReportDomain.State {
+  public init(_ model: SharedModels.Notice) {
+    self.id = model.id
+    self.images = .init(
+      alert: nil,
+      showCamera: false,
+      showImagePicker: false,
+      storedPhotos: model.photos?.compactMap { noticePhoto in
+        PickerImageResult(
+          id: UUID().uuidString,
+          imageUrl: URL(string: noticePhoto.url)
+        )
+      } ?? [],
+      coordinateFromImagePicker: nil,
+      dateFromImagePicker: model.date
+    )
+    self.contactState = .empty
+    self.district = nil
+    self.date = model.createdAt ?? Date()
+    self.description = .init(model: model)
+    self.location = .init(
+      locationOption: .manual,
+      isMapExpanded: false,
+      isResolvingAddress: false,
+      resolvedAddress: .init(
+        street: model.street ?? "",
+        postalCode: model.zip ?? "",
+        city: model.city ?? ""
+      ),
+      pinCoordinate: nil,
+      isRequestingCurrentLocation: false,
+      region: nil
+    )
+    self.mail = .init()
+    self.alert = nil
+    self.showEditDescription = false
+    self.showEditContact = false
+    self.apiToken = ""
+    self.uploadedImagesIds = []
+    self.isNetworkAvailable = false
+  }
+}
+
+
+// MARK: - MailComposeClient Dependency
 
 extension DependencyValues {
   public var mailComposeClient: MailComposeClient {
@@ -684,4 +714,25 @@ extension MailComposeClient {
 extension MailComposeClient: DependencyKey {
   public static let liveValue = Self { MFMailComposeViewController.canSendMail() }
   public static let testValue = Self(canSendMail: unimplemented())
+}
+
+public extension DescriptionDomain.State {
+  init(model: Notice) {
+    self = Self.init(
+      licensePlateNumber: model.registration ?? "",
+      selectedColor: model.color.flatMap { color -> Int in
+        let colors = DescriptionDomain.colors
+        guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
+        return index
+      } ?? 0,
+      selectedBrand: .init(model.brand),
+      selectedDuration:  model.duration.flatMap { Int($0) } ?? 0,
+      selectedCharge: model.charge.flatMap(Charge.init),
+      blockedOthers: true,
+      vehicleEmpty: model.vehicleEmpty,
+      hazardLights: model.hazardLights,
+      expiredTuv: model.expiredTuv,
+      expiredEco: model.expiredEco
+    )
+  }
 }

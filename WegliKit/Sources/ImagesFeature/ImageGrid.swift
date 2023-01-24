@@ -4,7 +4,7 @@ import ComposableArchitecture
 import SharedModels
 import SwiftUI
 
-public struct ImageGrid: View {
+public struct ImageGridView: View {
   public typealias S = ImagesViewDomain.State
   public typealias A = ImagesViewDomain.Action
   
@@ -15,6 +15,23 @@ public struct ImageGrid: View {
     self.store = store
     self.viewStore = ViewStore(store)
   }
+
+  public var body: some View {
+    ImageGrid {
+      ForEachStore(
+        store.scope(state: \.imageStates, action: A.image),
+        content: ImageView.init
+      )
+    }
+  }
+}
+
+public struct ImageGrid<Content: View>: View {
+  let content: Content
+  
+  public init(@ViewBuilder _ content: () -> Content) {
+    self.content = content()
+  }
   
   let gridItemLayout = [
     GridItem(.flexible(minimum: 50, maximum: .infinity)),
@@ -24,10 +41,7 @@ public struct ImageGrid: View {
   
   public var body: some View {
     LazyVGrid(columns: gridItemLayout, spacing: 12) {
-      ForEachStore(
-        store.scope(state: \.imageStates, action: A.image),
-        content: ImageView.init
-      )
+      content
     }
     .transition(.opacity.combined(with: .move(edge: .bottom)))
   }
@@ -35,7 +49,7 @@ public struct ImageGrid: View {
 
 struct ImageGrid_Previews: PreviewProvider {
   static var previews: some View {
-    ImageGrid(
+    ImageGridView(
       store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>(
         initialState: .init(
           showImagePicker: false,

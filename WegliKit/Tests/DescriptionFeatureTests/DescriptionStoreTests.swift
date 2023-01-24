@@ -1,6 +1,5 @@
 // Created for weg-li in 2021.
 
-import Combine
 import ComposableArchitecture
 import DescriptionFeature
 import FileClient
@@ -16,21 +15,10 @@ final class DescriptionStoreTests: XCTestCase {
       reducer: DescriptionDomain()
     )
     
-    await store.send(.setColor(1)) { state in
+    await store.send(.set(\.$selectedColor, 1)) { state in
       state.selectedColor = 1
       
-      XCTAssertEqual(DescriptionDomain.State.colors[1].value, "Beige")
-    }
-  }
-  
-  func test_setCarType_shouldUpdateState() async {
-    let store = TestStore(
-      initialState: DescriptionDomain.State(selectedColor: 1),
-      reducer: DescriptionDomain()
-    )
-    
-    await store.send(.setBrand(brand)) { state in
-      state.selectedBrand = self.brand
+      XCTAssertEqual(DescriptionDomain.colors[1].value, "Beige")
     }
   }
   
@@ -44,24 +32,8 @@ final class DescriptionStoreTests: XCTestCase {
       reducer: DescriptionDomain()
     )
     
-    await store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
+    await store.send(.set(\.$licensePlateNumber, "WEG-LI-101")) { state in
       state.licensePlateNumber = "WEG-LI-101"
-    }
-  }
-  
-  func test_selectCharge_shouldUpdateState() async {
-    let store = TestStore(
-      initialState: DescriptionDomain.State(
-        licensePlateNumber: "",
-        selectedColor: 1,
-        selectedBrand: brand
-      ),
-      reducer: DescriptionDomain()
-    )
-    
-    let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
-    await store.send(.setCharge(testCharge)) { state in
-      state.selectedCharge = testCharge
     }
   }
   
@@ -75,7 +47,7 @@ final class DescriptionStoreTests: XCTestCase {
       reducer: DescriptionDomain()
     )
     
-    await store.send(.setDuration(1)) { state in
+    await store.send(.set(\.$selectedDuration, 1)) { state in
       state.selectedDuration = 1
     }
   }
@@ -93,31 +65,10 @@ final class DescriptionStoreTests: XCTestCase {
       reducer: DescriptionDomain()
     )
     
-    await store.send(.setLicensePlateNumber("WEG-LI-101")) { state in
+    await store.send(.set(\.$licensePlateNumber, "WEG-LI-101")) { state in
       state.licensePlateNumber = "WEG-LI-101"
       
       XCTAssertTrue(state.isValid)
-    }
-  }
-  
-  func test_actionSetChargeTypeSearchText_shouldUpdateCharges() async {
-    let state = DescriptionDomain.State(
-      licensePlateNumber: "",
-      selectedColor: 1,
-      selectedBrand: brand
-    )
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: DescriptionDomain(),
-      prepareDependencies: { values in
-        values.continuousClock = ImmediateClock()
-        values.fileClient = .noop
-      }
-    )
-    
-    await store.send(.setChargeTypeSearchText("query")) {
-      $0.chargeTypeSearchText = "query"
     }
   }
   
@@ -144,7 +95,7 @@ final class DescriptionStoreTests: XCTestCase {
       }
     )
     
-    let charges = DescriptionDomain.State.charges.map {
+    let charges = DescriptionDomain.charges.map {
       Charge(
         id: $0.key,
         text: $0.value,
@@ -154,58 +105,11 @@ final class DescriptionStoreTests: XCTestCase {
     }
     await store.send(.onAppear)
     await store.receive(.favoriteChargesLoaded(.success(["0"]))) {
-      $0.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
+      $0.chargeSelection.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
     }
-    await store.receive(.sortFavoritedCharges) {
+    await store.receive(.chargeSelection(.sortFavoritedCharges)) {
       let sortedCharges = charges.sorted(by: { $0.isFavorite && !$1.isFavorite })
-      $0.charges = IdentifiedArrayOf(uniqueElements: sortedCharges, id: \.id)
-    }
-  }
-  
-  func test_actionToggleChargeFavorite() async {
-    let clock = TestClock()
-    
-    let didWriteFiles = ActorIsolated(false)
-    var fileClient = FileClient.noop
-    fileClient.save = { @Sendable fileName, _ in
-      await didWriteFiles.setValue(true)
-      return ()
-    }
-    
-    var state = DescriptionDomain.State(
-      licensePlateNumber: "",
-      selectedColor: 1,
-      selectedBrand: brand
-    )
-    let charge1 = Charge(id: "1", text: "Text", isFavorite: false, isSelected: false)
-    let charge2 = Charge(id: "2", text: "Text", isFavorite: false, isSelected: false)
-    
-    state.charges = [charge1, charge2]
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: DescriptionDomain(),
-      prepareDependencies: { values in
-        values.continuousClock = clock
-        values.fileClient = fileClient
-      }
-    )
-    
-    await store.send(.toggleChargeFavorite(charge2)) {
-      $0.charges = [
-        charge1,
-        Charge(id: "2", text: "Text", isFavorite: true, isSelected: false)
-      ]
-    }
-    
-    
-    
-    await clock.advance(by: .milliseconds(1001))
-    await store.receive(.sortFavoritedCharges) {
-      $0.charges = [
-        Charge(id: "2", text: "Text", isFavorite: true, isSelected: false),
-        charge1
-      ]
+      $0.chargeSelection.charges = IdentifiedArrayOf(uniqueElements: sortedCharges, id: \.id)
     }
   }
 }

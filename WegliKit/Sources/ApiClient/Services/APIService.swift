@@ -19,17 +19,20 @@ public struct APIService {
   public var postNotice: @Sendable (NoticeInput) async throws -> Notice
   public var upload: @Sendable (PickerImageResult) async throws -> ImageUploadResponse
   public var submitNotice: @Sendable (NoticeInput) async throws -> Notice
+  public var patchNotice: @Sendable (Notice) async throws -> Notice
 
   public init(
     getNotices: @Sendable @escaping (Bool) async throws -> [Notice],
     postNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
     upload: @Sendable @escaping (PickerImageResult) async throws -> ImageUploadResponse,
-    submitNotice: @Sendable @escaping (NoticeInput) async throws -> Notice
+    submitNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
+    patchNotice: @Sendable @escaping (Notice) async throws -> Notice
   ) {
     self.getNotices = getNotices
     self.postNotice = postNotice
     self.upload = upload
     self.submitNotice = submitNotice
+    self.patchNotice = patchNotice
   }
 }
 
@@ -66,9 +69,21 @@ extension APIService: DependencyKey {
         let data = try await apiClient.send(.post(.submitNotices, body: body))
         
         return try data.decoded(decoder: .noticeDecoder)
+      },
+      patchNotice: { notice in
+        let input = NoticePatchInput(notice: notice)
+        let body = try input.encoded(encoder: .noticeEncoder)
+        
+        let data = try await apiClient.send(.patch(.updateNotice(token: notice.id), body: body))
+        
+        return try data.decoded(decoder: .noticeDecoder)
       }
     )
   }
+}
+
+struct NoticePatchInput: Encodable, Equatable {
+  let notice: Notice
 }
 
 extension APIService: TestDependencyKey {
@@ -95,7 +110,8 @@ extension APIService: TestDependencyKey {
         )
       )
     },
-    submitNotice: { _ in .mock }
+    submitNotice: { _ in .mock },
+    patchNotice: { _ in .mock }
   )
   
   public static let failing = Self(
@@ -108,13 +124,15 @@ extension APIService: TestDependencyKey {
     upload: { _ in
       throw NetworkRequestError.badRequest
     },
-    submitNotice: { _ in fatalError() }
+    submitNotice: { _ in throw ApiError(error: NetworkRequestError.decodingError) },
+    patchNotice: { _ in throw ApiError(error: NetworkRequestError.decodingError) }
   )
   
   public static var testValue: APIService = Self(
     getNotices: unimplemented("\(Self.self).getNotices"),
     postNotice: unimplemented("\(Self.self).postNotice"),
     upload: unimplemented("\(Self.self).upload"),
-    submitNotice: unimplemented("\(Self.self).submitNotice")
+    submitNotice: unimplemented("\(Self.self).submitNotice"),
+    patchNotice: unimplemented("\(Self.self).patchNotice")
   )
 }

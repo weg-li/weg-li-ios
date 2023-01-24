@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NoticePhoto: Equatable, Codable {
+public struct NoticePhoto: Hashable, Codable {
   public let filename: String
   public let url: String
   
