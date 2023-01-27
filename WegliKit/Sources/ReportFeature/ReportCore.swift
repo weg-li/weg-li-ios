@@ -45,15 +45,15 @@ public struct ReportDomain: ReducerProtocol {
     public var contactState: ContactViewDomain.State
     public var district: District?
     
-    @BindableState public var date: Date
+    @BindingState public var date: Date
     public var description: DescriptionDomain.State
     public var location: LocationDomain.State
     public var mail: MailDomain.State
     
     public var alert: AlertState<Action>?
     
-    @BindableState public var showEditDescription = false
-    @BindableState public var showEditContact = false
+    @BindingState public var showEditDescription = false
+    @BindingState public var showEditContact = false
     
     public var apiToken = ""
     public var alwaysSendNotice = true
@@ -217,12 +217,12 @@ public struct ReportDomain: ReducerProtocol {
             return .none
           }
           
-          return Effect(value: Action.location(.resolveLocation(coordinate)))
+          return EffectTask(value: Action.location(.resolveLocation(coordinate)))
           
         case .setPhotos:
           if state.images.pickerResultCoordinate == nil {
             if let coordinate = state.location.region?.center {
-              return Effect(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
+              return EffectTask(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
             }
           }
           
@@ -258,7 +258,7 @@ public struct ReportDomain: ReducerProtocol {
           guard let address = resolvedAddresses.first else {
             return .none
           }
-          return Effect(value: .mapAddressToDistrict(address))
+          return EffectTask(value: .mapAddressToDistrict(address))
           
         case let .resolveAddressFinished(.failure(error)):
           state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
@@ -269,21 +269,21 @@ public struct ReportDomain: ReducerProtocol {
           guard postalCode.count == postalCodeMinumimCharacters, postalCode.isNumeric else {
             return .none
           }
-          return Effect(value: .mapAddressToDistrict(state.location.resolvedAddress))
+          return EffectTask(value: .mapAddressToDistrict(state.location.resolvedAddress))
           
         case .updateGeoAddressCity:
-          return Effect(value: .mapAddressToDistrict(state.location.resolvedAddress))
+          return EffectTask(value: .mapAddressToDistrict(state.location.resolvedAddress))
           
         case let .setLocationOption(option) where option == .fromPhotos:
           if !state.images.storedPhotos.isEmpty, let coordinate = state.images.pickerResultCoordinate {
-            return Effect(value: .location(.resolveLocation(coordinate)))
+            return EffectTask(value: .location(.resolveLocation(coordinate)))
           } else {
             return .none
           }
           
         case let .setPinCoordinate(coordinate):
           guard let coordinate = coordinate, state.location.locationOption == .currentLocation else { return .none }
-          return Effect(value: .location(.resolveLocation(coordinate)))
+          return EffectTask(value: .location(.resolveLocation(coordinate)))
           
         default:
           return .none
@@ -304,7 +304,7 @@ public struct ReportDomain: ReducerProtocol {
         state.mail.mail.attachmentData = state.images.storedPhotos
           .compactMap { $0?.imageUrl }
           .compactMap { try? Data(contentsOf: $0) }
-        return Effect(value: .mail(.presentMailContentView(true)))
+        return EffectTask(value: .mail(.presentMailContentView(true)))
         
       case .mail:
         return .none
@@ -329,7 +329,7 @@ public struct ReportDomain: ReducerProtocol {
         
       case .onResetConfirmButtonTapped:
         // Reset report will be handled in the homeReducer
-        return Effect(value: .dismissAlert)
+        return EffectTask(value: .dismissAlert)
         
       case .dismissAlert:
         state.alert = nil
@@ -364,11 +364,11 @@ public struct ReportDomain: ReducerProtocol {
         
       case let .uploadImagesResponse(.success(imageInputFromUpload)):
         state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
-        return Effect(value: .composeNotice)
+        return EffectTask(value: .composeNotice)
         
       case let .uploadImagesResponse(.failure(error)):
         state.isSubmittingNotice = false
-        return Effect(value: .postNoticeResponse(.failure(ApiError(error: error))))
+        return EffectTask(value: .postNoticeResponse(.failure(ApiError(error: error))))
         
       case .composeNotice:
         var notice = NoticeInput(state)

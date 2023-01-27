@@ -15,10 +15,10 @@ public struct Address: Equatable, Codable {
     self.addition = addition
   }
   
-  @BindableState public var street: String
-  @BindableState public var postalCode: String
-  @BindableState public var city: String
-  @BindableState public var addition = ""
+  @BindingState public var street: String
+  @BindingState public var postalCode: String
+  @BindingState public var city: String
+  @BindingState public var addition = ""
 }
 
 public extension Address {

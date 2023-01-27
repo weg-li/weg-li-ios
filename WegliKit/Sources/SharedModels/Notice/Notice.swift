@@ -19,7 +19,7 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var duration: Int64?
   public var severity: String?
   public var note: String?
-  @BindableState public var createdAt: Date?
+  public var createdAt: Date?
   public var updatedAt: Date?
   public var sentAt: Date?
   public var vehicleEmpty = false

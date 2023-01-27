@@ -16,11 +16,11 @@ public struct Contact: Equatable, Codable {
     self.dateOfBirth = dateOfBirth
   }
   
-  @BindableState public var firstName: String
-  @BindableState public var name: String
-  @BindableState public var address: Address
-  @BindableState public var phone: String
-  @BindableState public var dateOfBirth: String
+  @BindingState public var firstName: String
+  @BindingState public var name: String
+  @BindingState public var address: Address
+  @BindingState public var phone: String
+  @BindingState public var dateOfBirth: String
   
   public var isValid: Bool {
     [

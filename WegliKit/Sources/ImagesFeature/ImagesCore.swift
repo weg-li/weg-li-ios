@@ -87,12 +87,12 @@ public struct ImagesViewDomain: ReducerProtocol {
     case .onAddPhotosButtonTapped:
       switch photoLibraryAccessClient.authorizationStatus() {
       case .notDetermined:
-        return Effect(value: .requestPhotoLibraryAccess)
+        return EffectTask(value: .requestPhotoLibraryAccess)
       case .restricted, .denied:
         state.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
         return .none
       case .authorized, .limited:
-        return Effect(value: .setShowImagePicker(true))
+        return EffectTask(value: .setShowImagePicker(true))
       @unknown default:
         return .none
       }
@@ -111,7 +111,7 @@ public struct ImagesViewDomain: ReducerProtocol {
     case let .requestPhotoLibraryAccessResult(status):
       switch status {
       case .authorized, .limited:
-        return Effect(value: .setShowImagePicker(true))
+        return EffectTask(value: .setShowImagePicker(true))
       case .notDetermined:
         // show alert
         return .none
@@ -125,12 +125,12 @@ public struct ImagesViewDomain: ReducerProtocol {
     case .onTakePhotosButtonTapped:
       switch cameraAccessClient.authorizationStatus() {
       case .authorized:
-        return Effect(value: .setShowCamera(true))
+        return EffectTask(value: .setShowCamera(true))
       case .denied:
         state.alert = .init(title: TextState(L10n.Camera.Alert.accessDenied))
         return .none
       case .notDetermined:
-        return Effect(value: .requestCameraAccess)
+        return EffectTask(value: .requestCameraAccess)
       case .restricted:
         return .none
       @unknown default:
@@ -153,7 +153,7 @@ public struct ImagesViewDomain: ReducerProtocol {
     case let .requestCameraAccessResult(result):
       let userDidGrantAccess = (try? result.value) ?? false
       if userDidGrantAccess {
-        return Effect(value: .setShowCamera(true))
+        return EffectTask(value: .setShowCamera(true))
       }
       return .none
 
@@ -170,8 +170,8 @@ public struct ImagesViewDomain: ReducerProtocol {
       state.isRecognizingTexts = true
       
       return .merge(
-        Effect(value: .setImageCoordinate(images.imageCoordinates.first)),
-        Effect(value: .setImageCreationDate(images.imageCreationDates.first)),
+        EffectTask(value: .setImageCoordinate(images.imageCoordinates.first)),
+        EffectTask(value: .setImageCreationDate(images.imageCreationDates.first)),
         .textRecognition(in: images, client: textRecognitionClient)
       )
       
@@ -236,13 +236,13 @@ public struct ImagesViewDomain: ReducerProtocol {
         .compactMap { $0 }
         .filter { $0.id != id }
       
-      var effects: [Effect<Action, Never>] = []
+      var effects: [EffectTask<Action>] = []
       
       if !photos.isEmpty {
         state.storedPhotos = photos
       } else {
         effects.append(
-          Effect.run(operation: { send in
+          EffectTask.run(operation: { send in
             try await clock.sleep(for: .milliseconds(800))
             await send(.justSetPhotos(photos), animation: .easeOut)
           })
@@ -261,13 +261,13 @@ public struct ImagesViewDomain: ReducerProtocol {
       let imageCoordinates = state.storedPhotos.compactMap { $0 }.imageCoordinates
       if !imageCoordinates.isEmpty, let firstCoordinate = imageCoordinates.first {
         effects.append(
-          Effect(value: .setImageCoordinate(firstCoordinate))
+          EffectTask(value: .setImageCoordinate(firstCoordinate))
         )
       }
       let imageCreationDates = state.storedPhotos.compactMap { $0 }.imageCreationDates
       if !imageCreationDates.isEmpty, let firstDate = imageCreationDates.first {
         effects.append(
-          Effect(value: .setImageCreationDate(firstDate))
+          EffectTask(value: .setImageCreationDate(firstDate))
         )
       }
       return .merge(effects)
@@ -283,7 +283,7 @@ public struct ImagesViewDomain: ReducerProtocol {
       
       state.isRecognizingTexts = true
       
-      return Effect.task {
+      return EffectTask.task {
         await Action.textRecognitionCompleted(
           TaskResult {
             try await clock.sleep(for: .milliseconds(200))
@@ -305,11 +305,11 @@ public struct ImagesViewDomain: ReducerProtocol {
 // MARK: Helper
 
 
-private extension Effect {
+private extension EffectTask {
   static func textRecognition(
     in images: [PickerImageResult],
     client: TextRecognitionClient
-  ) -> Effect<ImagesViewDomain.Action, Never> {
+  ) -> EffectTask<ImagesViewDomain.Action> {
     .task {
       await withThrowingTaskGroup(of: [TextItem].self) { group in
         for image in images {

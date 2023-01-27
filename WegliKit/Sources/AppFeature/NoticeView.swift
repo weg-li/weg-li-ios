@@ -20,7 +20,7 @@ public struct NoticeView: View {
     ZStack {
       HStack {
         VStack(alignment: .leading) {
-          if let creationDate = notice.createdAt {
+          if let creationDate = notice.date {
             Text(creationDate.humandReadableDate)
               .fontWeight(.bold)
               .font(.title)

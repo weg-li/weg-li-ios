@@ -61,7 +61,7 @@ public struct AppDomain: ReducerProtocol {
     
     public var isFetchingNotices: Bool { notices == .loading }
     
-    @BindableState public var selectedTab: Tabs = .notice
+    @BindingState public var selectedTab: Tabs = .notice
     
     public var editNotice: EditNoticeDomain.State?
     
@@ -160,7 +160,7 @@ public struct AppDomain: ReducerProtocol {
           state.notices = .error(.tokenUnavailable)
           return .none
         }
-        return Effect(value: .fetchNotices(forceReload: false))
+        return EffectTask(value: .fetchNotices(forceReload: false))
         
       case let .contactSettingsLoaded(result):
         let contact = (try? result.value) ?? .init()
@@ -250,14 +250,18 @@ public struct AppDomain: ReducerProtocol {
         }
         
       case let .fetchNoticesResponse(.success(notices)):
-        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
+        let sortedNotices = notices.sorted {
+          guard let aDate = $0.date, let bDate = $1.date else { return false }
+          return aDate > bDate
+        }
+        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(sortedNotices)
         
-        guard !notices.isEmpty else  {
+        guard !sortedNotices.isEmpty else  {
           return .none
         }
         
         return .fireAndForget {
-          try await fileClient.saveNotices(notices)
+          try await fileClient.saveNotices(sortedNotices)
         }
         
       case let .fetchNoticesResponse(.failure(error)):
@@ -413,8 +417,8 @@ extension Notice {
       brand: editState.description.carBrandSelection.selectedBrand?.title ?? "",
       color: DescriptionDomain.colors[editState.description.selectedColor].key,
       charge: editState.description.chargeSelection.selectedCharge?.text ?? "",
-      date: editState.createdAt,
-      duration: 0,
+      date: editState.date,
+      duration: Int64(editState.description.selectedDuration),
       severity: nil,
       note: editState.description.note,
       createdAt: editState.notice.createdAt ?? .now,

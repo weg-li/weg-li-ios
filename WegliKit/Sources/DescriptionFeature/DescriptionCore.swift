@@ -41,18 +41,18 @@ public struct DescriptionDomain: ReducerProtocol {
     public var carBrandSelection: CarBrandSelection.State
     public var chargeSelection: ChargeSelection.State
 
-    @BindableState public var licensePlateNumber: String
-    @BindableState public var selectedColor: Int
-    @BindableState public var selectedDuration: Int
-    @BindableState public var blockedOthers = false
-    @BindableState public var vehicleEmpty = false
-    @BindableState public var hazardLights = false
-    @BindableState public var expiredTuv = false
-    @BindableState public var expiredEco = false
-    @BindableState public var note = ""
+    @BindingState public var licensePlateNumber: String
+    @BindingState public var selectedColor: Int
+    @BindingState public var selectedDuration: Int
+    @BindingState public var blockedOthers = false
+    @BindingState public var vehicleEmpty = false
+    @BindingState public var hazardLights = false
+    @BindingState public var expiredTuv = false
+    @BindingState public var expiredEco = false
+    @BindingState public var note = ""
         
-    @BindableState public var presentChargeSelection = false
-    @BindableState public var presentCarBrandSelection = false
+    @BindingState public var presentChargeSelection = false
+    @BindingState public var presentCarBrandSelection = false
     
     public var isValid: Bool {
       let arguments = [

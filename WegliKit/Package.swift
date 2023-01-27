@@ -383,7 +383,7 @@ extension Target.Dependency {
   
   static let tca = product(name: "ComposableArchitecture", package: "swift-composable-architecture")
   static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")
-//  static let dependencies = product(name: "Dependencies", package: "swift-composable-architecture")
   static let testOverlay = product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
   static let navigation = product(name: "SwiftUINavigation", package: "swiftui-navigation")
+  static let customDump = product(name: "CustomDump", package: "swift-custom-dump")
 }

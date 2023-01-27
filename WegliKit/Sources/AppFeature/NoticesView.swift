@@ -89,7 +89,7 @@ public struct NoticesView: View {
             then: { store in
               EditNoticeView(store: store)
             },
-            else: { Text("🐞") }
+            else: { Text("Error creating EditNotice view") }
           )
           .accessibilityAddTraits([.isModal])
           .navigationTitle(Text("Meldung bearbeiten"))

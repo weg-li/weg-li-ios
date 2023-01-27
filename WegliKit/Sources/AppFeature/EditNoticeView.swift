@@ -8,7 +8,6 @@ import ReportFeature
 import SharedModels
 import Styleguide
 import SwiftUI
-import SwiftUINavigation
 
 public struct EditNoticeDomain: ReducerProtocol {
   public init() {}
@@ -18,16 +17,13 @@ public struct EditNoticeDomain: ReducerProtocol {
     
     public var description: DescriptionDomain.State
     
-    @BindableState public var createdAt: Date
-
-    @BindableState public var selectedColor: Int
-    @BindableState public var licensePlateNumber: String
-    @BindableState public var street: String
-    @BindableState public var city: String
-    @BindableState public var zip: String
-
-    @BindableState public var presentChargeSelection = false
-    @BindableState public var presentCarBrandSelection = false
+    @BindingState public var date: Date
+    @BindingState public var licensePlateNumber: String
+    @BindingState public var street: String
+    @BindingState public var city: String
+    @BindingState public var zip: String
+    @BindingState public var presentChargeSelection = false
+    @BindingState public var presentCarBrandSelection = false
     
     public var destination: Destination?
     public enum Destination: Equatable {
@@ -40,15 +36,10 @@ public struct EditNoticeDomain: ReducerProtocol {
       self.notice = notice
       self.description = .init(model: notice)
       self.licensePlateNumber = notice.registration ?? ""
-      self.createdAt = notice.createdAt ?? .now
+      self.date = notice.date ?? .now
       self.street = notice.street ?? ""
       self.city = notice.city ?? ""
       self.zip = notice.zip ?? ""
-      self.selectedColor = notice.color.flatMap { color -> Int in
-        let colors = DescriptionDomain.colors
-        guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
-        return index
-      } ?? 0
     }
   }
   
@@ -143,7 +134,7 @@ struct EditNoticeView: View {
       Section {
         DatePicker(
           L10n.date,
-          selection: viewStore.binding(\.$createdAt)
+          selection: viewStore.binding(\.$date)
         )
         .labelsHidden()
       } header: {

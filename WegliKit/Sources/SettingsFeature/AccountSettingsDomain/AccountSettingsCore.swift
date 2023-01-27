@@ -48,8 +48,7 @@ public struct AccountSettingsDomain: ReducerProtocol {
 }
 
 public struct AccountSettings: Equatable {
-  @BindableState
-  public var apiToken: String
+  @BindingState public var apiToken: String
   
   public init(apiToken: String) {
     self.apiToken = apiToken

@@ -23,8 +23,8 @@ public struct ContactViewDomain: ReducerProtocol {
       self.alert = alert
     }
     
-    @BindableState public var contact: Contact
-    @BindableState public var alert: AlertState<Action>?
+    @BindingState public var contact: Contact
+    @BindingState public var alert: AlertState<Action>?
   }
   
   public enum Action: Equatable {
@@ -57,7 +57,7 @@ public struct ContactViewDomain: ReducerProtocol {
         return .none
       case .onResetContactConfirmButtonTapped:
         state.contact = .empty
-        return Effect(value: .dismissAlert)
+        return EffectTask(value: .dismissAlert)
       case .dismissAlert:
         state.alert = nil
         return .none

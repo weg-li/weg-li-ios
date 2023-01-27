@@ -124,7 +124,7 @@ public struct LocationDomain: ReducerProtocol {
           return .none
         case .currentLocation:
           state.isResolvingAddress = true
-          return Effect(value: .locationRequested)
+          return EffectTask(value: .locationRequested)
         case .manual:
           state.isResolvingAddress = false
           return .none
@@ -138,7 +138,7 @@ public struct LocationDomain: ReducerProtocol {
         guard let region = state.region else {
           let region = CoordinateRegion(center: location.coordinate)
           state.region = region
-          return Effect(value: Action.resolveLocation(region.center.asCLLocationCoordinate2D))
+          return EffectTask(value: Action.resolveLocation(region.center.asCLLocationCoordinate2D))
         }
         
         guard
@@ -148,7 +148,7 @@ public struct LocationDomain: ReducerProtocol {
         }
         
         state.region = .init(center: location.coordinate)
-        return Effect(value: Action.resolveLocation(location.coordinate))
+        return EffectTask(value: Action.resolveLocation(location.coordinate))
         
       case .locationManager(let locationAciton):
         switch locationAciton {
@@ -254,7 +254,7 @@ enum CancelSearchId {}
 
 extension LocationManager {
   /// Configures the LocationManager
-  func setup() -> Effect<Never, Never> {
+  func setup() -> EffectTask<Never> {
     set(
       id: LocationManagerId(),
       activityType: .otherNavigation,
