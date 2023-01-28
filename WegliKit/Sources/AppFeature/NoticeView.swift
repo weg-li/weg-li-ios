@@ -28,71 +28,26 @@ public struct NoticeView: View {
               .padding(.bottom, .grid(1))
           }
           
-          if let creationDate = notice.createdAt {
-            Text("Erstellt am: \(creationDate.humandReadableDate)")
-              .font(.subheadline)
-              .padding(.bottom, .grid(1))
-          }
-          
-          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
-            Image(systemName: "waveform.path.ecg")
-              .font(.title2)
-              .accessibility(hidden: true)
-              .unredacted()
-            
-            VStack(alignment: .leading, spacing: .grid(1)) {
-              if let status = notice.status {
-                Text("Status: __\(status.displayTitle)__")
-              }
+          if let registration = notice.registration {
+            HStack(alignment: .center, spacing: 3) {
+              Text(verbatim: registration)
+                .font(.custom(FontName.nummernschild.rawValue, size: 23, relativeTo: .body))
+                .foregroundColor(.black)
+                .textCase(.uppercase)
+                .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 2))
+                .overlay(Color.blue.frame(width: 6), alignment: .leading)
             }
-            .font(.body)
+            .unredacted()
+            .background(.white)
+            .clipShape(
+              RoundedRectangle(cornerRadius: 4, style: .circular)
+            )
+            .overlay(
+              RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.black, lineWidth: 1)
+            )
+            .accessibility(value: Text(registration))
           }
-          .accessibility(label: Text("Status"))
-          .accessibilityElement()
-          .padding(.bottom, .grid(2))
-          
-          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
-            Image(systemName: "car")
-              .font(.title2)
-              .accessibility(hidden: true)
-              .unredacted()
-            
-            VStack(alignment: .leading, spacing: .grid(1)) {
-              if let registration = notice.registration {
-                HStack(alignment: .center, spacing: 3) {
-                  Text(verbatim: registration)
-                    .font(.custom(FontName.nummernschild.rawValue, size: 23, relativeTo: .body))
-                    .foregroundColor(.black)
-                    .textCase(.uppercase)
-                    .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 2))
-                    .overlay(Color.blue.frame(width: 6), alignment: .leading)
-                }
-                .unredacted()
-                .background(.white)
-                .clipShape(
-                  RoundedRectangle(cornerRadius: 4, style: .circular)
-                )
-                .overlay(
-                  RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.black, lineWidth: 1)
-                )
-                .accessibility(value: Text(registration))
-              }
-              
-              VStack(alignment: .leading) {
-                if let brand = notice.brand {
-                  Text("Marke: __\(brand)__")
-                }
-                if let color = notice.displayColor {
-                  Text("Farbe: __\(color)__")
-                }
-              }
-            }
-            .font(.body)
-          }
-          .accessibility(label: Text("Vehicle info"))
-          .accessibilityElement()
-          .padding(.bottom, .grid(2))
           
           if let photos = notice.photos {
             HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
@@ -113,6 +68,27 @@ public struct NoticeView: View {
               }
             }
             .accessibilityElement()
+          }
+          
+          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
+            Text("Status:")
+              .font(.subheadline)
+              .fontWeight(.semibold)
+            
+            VStack(alignment: .leading, spacing: .grid(1)) {
+              if let status = notice.status {
+                StatusView(status: status)
+              }
+            }
+            .font(.body)
+          }
+          .accessibilityElement(children: .combine)
+          .padding(.bottom, .grid(2))
+          
+          if let creationDate = notice.createdAt {
+            Text("Erstellt am: \(creationDate.humandReadableDate)")
+              .font(.subheadline)
+              .padding(.bottom, .grid(1))
           }
         }
         .padding()
