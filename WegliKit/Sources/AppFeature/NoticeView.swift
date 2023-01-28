@@ -2,6 +2,7 @@
 
 import DescriptionFeature
 import Helper
+import ImagesFeature
 import ReportFeature
 import SharedModels
 import Styleguide
@@ -20,10 +21,16 @@ public struct NoticeView: View {
     ZStack {
       HStack {
         VStack(alignment: .leading) {
-          if let creationDate = notice.date {
-            Text(creationDate.humandReadableDate)
+          if let noticeDate = notice.date {
+            Text("Tatzeit: \(noticeDate.humandReadableDate)")
               .fontWeight(.bold)
               .font(.title)
+              .padding(.bottom, .grid(1))
+          }
+          
+          if let creationDate = notice.createdAt {
+            Text("Erstellt am: \(creationDate.humandReadableDate)")
+              .font(.subheadline)
               .padding(.bottom, .grid(1))
           }
           
@@ -35,7 +42,7 @@ public struct NoticeView: View {
             
             VStack(alignment: .leading, spacing: .grid(1)) {
               if let status = notice.status {
-                Text("Status: __\(status)__")
+                Text("Status: __\(status.displayTitle)__")
               }
             }
             .font(.body)
@@ -87,30 +94,26 @@ public struct NoticeView: View {
           .accessibilityElement()
           .padding(.bottom, .grid(2))
           
-          HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
-            Image(systemName: "exclamationmark.triangle")
-              .font(.title2)
-              .accessibility(hidden: true)
-              .unredacted()
-            
-            VStack(alignment: .leading, spacing: .grid(1)) {
-              VStack(alignment: .leading) {
-                if let time = notice.time?.description {
-                  Text(time)
+          if let photos = notice.photos {
+            HVStack(useVStack: useVStackOverall, spacing: .grid(3)) {
+              ImageGrid {
+                ForEach(photos, id: \.self) { photo in
+                  if let url = URL(string: photo.url) {
+                    AsyncThumbnailView(url: url)
+                      .frame(
+                        minWidth: 50,
+                        maxWidth: .infinity,
+                        minHeight: 100,
+                        maxHeight: 100
+                      )
+                      .clipShape(RoundedRectangle(cornerRadius: 10))
+                      .padding(.grid(1))
+                  }
                 }
-                if let interval = notice.interval {
-                  Text(interval)
-                }
-              }
-              if let charge = notice.charge {
-                Text(charge)
-                  .multilineTextAlignment(.leading)
-                  .fixedSize(horizontal: false, vertical: true)
               }
             }
-            .font(.body)
+            .accessibilityElement()
           }
-          .accessibilityElement()
         }
         .padding()
         Spacer()

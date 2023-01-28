@@ -280,7 +280,6 @@ final class ImagesStoreTests: XCTestCase {
   }
   
   func test_addPhotosButtonTapped_shouldRequestAccess_andPresentAlert_whenAccessIsDenied() async {
-    let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.denied)
     let accessClient = PhotoLibraryAccessClient(
       requestAuthorization: { .denied },
       authorizationStatus: { .notDetermined }
@@ -331,7 +330,6 @@ final class ImagesStoreTests: XCTestCase {
   }
   
   func test_addPhotosButtonTapped_() async {
-    let subject = CurrentValueSubject<PhotoLibraryAuthorizationStatus, Never>(.denied)
     let accessClient = PhotoLibraryAccessClient(
       requestAuthorization: { .denied },
       authorizationStatus: { .notDetermined }

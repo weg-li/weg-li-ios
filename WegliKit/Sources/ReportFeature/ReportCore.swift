@@ -626,7 +626,7 @@ public extension SharedModels.Notice {
   init(_ reportState: ReportDomain.State) {
     self.init(
       token: reportState.id,
-      status: "open",
+      status: .open,
       street: reportState.location.resolvedAddress.street,
       city: reportState.location.resolvedAddress.city,
       zip: reportState.location.resolvedAddress.postalCode,

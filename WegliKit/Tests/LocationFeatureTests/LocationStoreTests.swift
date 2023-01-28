@@ -38,7 +38,7 @@ final class LocationStoreTests: XCTestCase {
           requestWhenInUseAuthorization: { _ in
             .fireAndForget { didRequestInUseAuthorization = true }
           },
-          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+          set: { _, _ -> EffectTask<Never> in setSubject.eraseToEffect() }
         )
         values.placesServiceClient = PlacesServiceClient(placemarks: { _ in [expectedAddress] })
         values.applicationClient = .previewValue
@@ -127,7 +127,7 @@ final class LocationStoreTests: XCTestCase {
           requestWhenInUseAuthorization: { _ in
             .fireAndForget { didRequestInUseAuthorization = true }
           },
-          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+          set: { _, _ -> EffectTask<Never> in setSubject.eraseToEffect() }
         )
         values.placesServiceClient = PlacesServiceClient(placemarks: { _ in [expectedAddress] })
         values.applicationClient = .previewValue
@@ -213,7 +213,7 @@ final class LocationStoreTests: XCTestCase {
           authorizationStatus: { .denied },
           create: { _ in locationManagerSubject.eraseToEffect() },
           locationServicesEnabled: { false },
-          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+          set: { _, _ -> EffectTask<Never> in setSubject.eraseToEffect() }
         )
         values.placesServiceClient = .noop
         values.applicationClient = .previewValue
@@ -252,7 +252,7 @@ final class LocationStoreTests: XCTestCase {
           requestWhenInUseAuthorization: { _ in
             .fireAndForget { didRequestInUseAuthorization = true }
           },
-          set: { _, _ -> Effect<Never, Never> in setSubject.eraseToEffect() }
+          set: { _, _ -> EffectTask<Never> in setSubject.eraseToEffect() }
         )
         values.placesServiceClient = .noop
         values.applicationClient = .previewValue

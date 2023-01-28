@@ -276,6 +276,60 @@ final class AppStoreTests: XCTestCase {
       $0.notices = .results([.mock])
     }
   }
+  
+  func test_Action_setNoticesSortOrder() async {
+    var state = AppDomain.State(reportDraft: report)
+    state.notices = .results([.xxxx123, .xxxy123, .abcd123])
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: AppDomain()
+    )
+    
+    var order: AppDomain.State.NoticeSortOrder = .registration
+    await store.send(.setSortOrder(order)) {
+      $0.noticesSortOrder = order
+      $0.orderSortType[order] = true
+      $0.notices = .results([.abcd123, .xxxx123, .xxxy123])
+    }
+    await store.send(.setSortOrder(order)) {
+      $0.orderSortType[order] = false
+      $0.notices = .results([.xxxy123, .xxxx123, .abcd123])
+    }
+    
+    order = .createdAtDate
+    await store.send(.setSortOrder(order)) {
+      $0.noticesSortOrder = order
+      $0.orderSortType[order] = true
+      $0.notices = .results([.xxxy123, .xxxx123, .abcd123])
+    }
+    await store.send(.setSortOrder(order)) {
+      $0.orderSortType[order] = false
+      $0.notices = .results([.abcd123, .xxxx123, .xxxy123])
+    }
+    
+    order = .noticeDate
+    await store.send(.setSortOrder(order)) {
+      $0.noticesSortOrder = order
+      $0.orderSortType[order] = false
+      $0.notices = .results([.abcd123, .xxxy123, .xxxx123])
+    }
+    await store.send(.setSortOrder(order)) {
+      $0.orderSortType[order] = true
+      $0.notices = .results([.xxxx123, .xxxy123, .abcd123])
+    }
+    
+    order = .status
+    await store.send(.setSortOrder(order)) {
+      $0.noticesSortOrder = order
+      $0.orderSortType[order] = true
+      $0.notices = .results([.xxxy123, .abcd123, .xxxx123])
+    }
+    await store.send(.setSortOrder(order)) {
+      $0.orderSortType[order] = false
+      $0.notices = .results([.xxxx123, .xxxy123, .abcd123])
+    }
+  }
 }
 
 extension AppDomain.State {
@@ -283,4 +337,72 @@ extension AppDomain.State {
     self.init()
     self.reportDraft = reportDraft
   }
+}
+
+extension SharedModels.Notice {
+  static let xxxy123 = Self(
+    token: "xxxy123",
+    status: .open,
+    street: "xxxy123+Street",
+    city: "xxxy123+City",
+    zip: "xxxy123+Zip",
+    latitude: 0,
+    longitude: 0,
+    registration: "xxxy123",
+    brand: "Audi",
+    color: "blue",
+    charge: "CHARGE",
+    date: Date(timeIntervalSince1970: 1_380_624_207),
+    duration: 1,
+    severity: nil,
+    note: "NOTE",
+    createdAt: Date(timeIntervalSince1970: 1_580_624_207),
+    updatedAt: Date(timeIntervalSince1970: 1_580_624_207),
+    sentAt: Date(timeIntervalSince1970: 1_580_624_207),
+    photos: []
+  )
+  
+  static let xxxx123 = Self(
+    token: "xxxx123",
+    status: .disabled,
+    street: "xxxx123+Street",
+    city: "xxxx123+City",
+    zip: "xxxx123+Zip",
+    latitude: 0,
+    longitude: 0,
+    registration: "xxxx123",
+    brand: "Opel",
+    color: "orange",
+    charge: "CHARGE",
+    date: Date(timeIntervalSince1970: 1_299_624_207),
+    duration: 1,
+    severity: nil,
+    note: "NOTE",
+    createdAt: Date(timeIntervalSince1970: 1_599_624_207),
+    updatedAt: Date(timeIntervalSince1970: 1_599_624_207),
+    sentAt: Date(timeIntervalSince1970: 1_599_624_207),
+    photos: []
+  )
+  
+  static let abcd123 = Self(
+    token: "abcd123",
+    status: .open,
+    street: "abcd123+Street",
+    city: "abcd123+City",
+    zip: "abcd123+Zip",
+    latitude: 0,
+    longitude: 0,
+    registration: "abcd123",
+    brand: "VW",
+    color: "black",
+    charge: "CHARGE",
+    date: Date(timeIntervalSince1970: 1_499_624_207),
+    duration: 1,
+    severity: nil,
+    note: "NOTE",
+    createdAt: Date(timeIntervalSince1970: 1_899_624_207),
+    updatedAt: Date(timeIntervalSince1970: 1_899_624_207),
+    sentAt: Date(timeIntervalSince1970: 1_899_624_207),
+    photos: []
+  )
 }

@@ -62,9 +62,18 @@ public struct AppDomain: ReducerProtocol {
     public var isFetchingNotices: Bool { notices == .loading }
     
     @BindingState public var selectedTab: Tabs = .notice
+    public var noticesSortOrder: NoticeSortOrder = .noticeDate
+    public var orderSortType: [NoticeSortOrder: Bool] = [
+      .noticeDate: true,
+      .createdAtDate: false,
+      .registration: false,
+      .status: false
+    ]
     
     public var editNotice: EditNoticeDomain.State?
-    
+    public func isAscending(for type: NoticeSortOrder) -> Bool {
+      orderSortType[type, default: true]
+    }
     public var isSendingEditedNotice = false
     public var destination: Destination? {
       didSet {
@@ -86,6 +95,12 @@ public struct AppDomain: ReducerProtocol {
       case errorMessage(String)
       case dismiss
     }
+    public enum NoticeSortOrder: Hashable {
+      case createdAtDate
+      case noticeDate
+      case registration
+      case status
+    }
   }
   
   public enum Action: Equatable, BindableAction {
@@ -101,6 +116,7 @@ public struct AppDomain: ReducerProtocol {
     case reportSaved
     case onAppear
     case observeConnection
+    case setSortOrder(State.NoticeSortOrder)
     case observeConnectionResponse(NetworkPath)
     case setNavigationDestination(State.Destination?)
     case onSaveNoticeButtonTapped
@@ -123,6 +139,56 @@ public struct AppDomain: ReducerProtocol {
     Reduce<State, Action> { state, action in
       switch action {
       case .binding:
+        return .none
+        
+      case .setSortOrder(let order):
+        guard let notices = state.notices.elements else {
+          return .none
+        }
+        
+        state.noticesSortOrder = order
+                        
+        switch order {
+        case .noticeDate:
+          let orderAscending = state.orderSortType[order, default: true]
+          let sortedNotices = notices.sorted {
+            guard let aDate = $0.date, let bDate = $1.date else { return false }
+            let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
+            return sortOperator(aDate, bDate)
+          }
+          state.orderSortType[order] = !orderAscending
+          state.notices = .results(sortedNotices)
+        
+        case .createdAtDate:
+          let orderAscending = state.orderSortType[order, default: true]
+          let sortedNotices = notices.sorted {
+            guard let aCreatedAtDate = $0.createdAt, let bCreateAtDate = $1.createdAt else { return false }
+            let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
+            return sortOperator(aCreatedAtDate, bCreateAtDate)
+          }
+          state.orderSortType[order] = !orderAscending
+          state.notices = .results(sortedNotices)
+          
+        case .registration:
+          let orderAscending = state.orderSortType[order, default: true]
+          let sortedNotices = notices.sorted {
+            guard let aRegistration = $0.registration, let bRegistration = $1.registration else { return false }
+            let sortOperator: (String, String) -> Bool = orderAscending ? (>) : (<)
+            return sortOperator(aRegistration, bRegistration)
+          }
+          state.orderSortType[order] = !orderAscending
+          state.notices = .results(sortedNotices)
+          
+        case .status:
+          let orderAscending = state.orderSortType[order, default: true]
+          let sortedNotices = notices.sorted {
+            guard let aStatus = $0.status, let bStatus = $1.status else { return false }
+            let sortOperator: (Notice.Status, Notice.Status) -> Bool = orderAscending ? (>) : (<)
+            return sortOperator(aStatus, bStatus)
+          }
+          state.orderSortType[order] = !orderAscending
+          state.notices = .results(sortedNotices)
+        }
         return .none
         
       case .appDelegate:
@@ -407,7 +473,7 @@ extension Notice {
   init(_ editState: EditNoticeDomain.State) {
     self.init(
       token: editState.notice.id,
-      status: editState.notice.status ?? "",
+      status: editState.notice.status ?? .open,
       street: editState.street,
       city: editState.city,
       zip: editState.zip,

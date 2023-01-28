@@ -67,6 +67,69 @@ public struct NoticesView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       }
     }
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Menu(
+          content: {
+            Button(
+              action: { viewStore.send(.setSortOrder(.noticeDate)) },
+              label: {
+                if viewStore.noticesSortOrder == .noticeDate {
+                  let isAscending = viewStore.orderSortType[.noticeDate, default: true]
+                  Label("Tatzeit", systemImage: isAscending ? "arrowtriangle.down.fill" : "arrowtriangle.up.fill")
+                } else {
+                  Text("Tatzeit")
+                }
+              }
+            )
+            
+            Button(
+              action: { viewStore.send(.setSortOrder(.registration)) },
+              label: {
+                if viewStore.noticesSortOrder == .registration {
+                  let isAscending = viewStore.orderSortType[.registration, default: true]
+                  Label("Kennzeichen", systemImage: isAscending ? "arrowtriangle.down.fill" : "arrowtriangle.up.fill")
+                } else {
+                  Text("Kennzeichen")
+                }
+              }
+            )
+            
+            Button(
+              action: { viewStore.send(.setSortOrder(.createdAtDate)) },
+              label: {
+                if viewStore.noticesSortOrder == .createdAtDate {
+                  let isAscending = viewStore.orderSortType[.createdAtDate, default: true]
+                  Label("Erstellt", systemImage: isAscending ? "arrowtriangle.down.fill" : "arrowtriangle.up.fill")
+                } else {
+                  Text("Erstellt")
+                }
+              }
+            )
+            
+            Button(
+              action: { viewStore.send(.setSortOrder(.status)) },
+              label: {
+                if viewStore.noticesSortOrder == .status {
+                  let isAscending = viewStore.orderSortType[.status, default: true]
+                  Label("Status", systemImage: isAscending ? "arrowtriangle.down.fill" : "arrowtriangle.up.fill")
+                } else {
+                  Text("Status")
+                }
+              }
+            )
+          },
+          label: {
+            Image(systemName: "arrow.up.arrow.down")
+              .unredacted()
+              .foregroundColor(Color(uiColor: .label))
+              .font(.body)
+              .frame(width: .grid(8), height: .grid(8))
+          }
+        )
+        .disabled(viewStore.isFetchingNotices)
+      }
+    }
   }
   
   func noticeView(_ notice: Notice) -> some View {

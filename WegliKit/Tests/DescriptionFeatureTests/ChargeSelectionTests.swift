@@ -72,5 +72,7 @@ final class ChargeSelectionTests: XCTestCase {
         charge1
       ]
     }
+    
+    await store.finish()
   }
 }

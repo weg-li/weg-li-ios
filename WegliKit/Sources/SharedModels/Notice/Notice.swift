@@ -5,7 +5,7 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var id: String { token ?? UUID().uuidString }
   
   public var token: String?
-  public var status: String?
+  public var status: Status?
   public var street: String?
   public var city: String?
   public var zip: String?
@@ -46,7 +46,7 @@ public struct Notice: Codable, Equatable, Identifiable {
   
   public init(
     token: String,
-    status: String,
+    status: Status,
     street: String,
     city: String,
     zip: String,
@@ -93,12 +93,49 @@ public struct Notice: Codable, Equatable, Identifiable {
     self.expiredEco = expiredEco
     self.photos = photos
   }
+  
+  public enum Status: String, Codable, Comparable {
+    case open
+    case disabled
+    case analyzing
+    case shared
+    
+    public var displayTitle: String {
+      switch self {
+      case .open:
+        return "offen"
+      case .disabled:
+        return "deaktiviert"
+      case .analyzing:
+        return "analysieren"
+      case .shared:
+        return "gemeldet"
+      }
+    }
+    
+    var sortOrderValue: Int {
+      switch self {
+      case .open:
+        return 0
+      case .disabled:
+        return 3
+      case .analyzing:
+        return 2
+      case .shared:
+        return 1
+      }
+    }
+    
+    public static func < (lhs: Notice.Status, rhs: Notice.Status) -> Bool {
+      lhs.sortOrderValue < rhs.sortOrderValue
+    }
+  }
 }
 
 public extension Notice {
   static let mock = Self(
     token: "123",
-    status: "",
+    status: .open,
     street: "",
     city: "",
     zip: "",
