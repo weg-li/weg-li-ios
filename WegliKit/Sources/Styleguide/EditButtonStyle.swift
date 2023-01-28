@@ -19,3 +19,15 @@ public extension ButtonStyle where Self == EditButtonStyle {
     EditButtonStyle()
   }
 }
+
+struct SwiftUIView_Previews: PreviewProvider {
+  static var previews: some View {
+    VStack {
+      Button("This is a test") { }
+        .buttonStyle(.edit())
+      
+      Button("This is a test") { }
+        .buttonStyle(DeleteButtonStyle())
+    }
+  }
+}

@@ -48,4 +48,8 @@ public extension Request {
   static func patch(_ endpoint: Endpoint, body: Data?) -> Request {
     Request(endpoint: endpoint, httpMethod: .patch, body: body)
   }
+  
+  static func delete(_ endpoint: Endpoint) -> Request {
+    Request(endpoint: endpoint, httpMethod: .delete)
+  }
 }

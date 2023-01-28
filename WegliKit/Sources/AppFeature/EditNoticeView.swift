@@ -12,6 +12,8 @@ import SwiftUI
 public struct EditNoticeDomain: ReducerProtocol {
   public init() {}
   
+  @Dependency(\.apiService) public var apiService
+  
   public struct State: Equatable {
     var notice: Notice
     
@@ -29,6 +31,8 @@ public struct EditNoticeDomain: ReducerProtocol {
     public enum Destination: Equatable {
       case selectBrand(CarBrandSelection.State)
     }
+    public var isDeletingNotice = false
+    public var alert: AlertState<Action>?
         
     init(
       notice: Notice
@@ -47,6 +51,11 @@ public struct EditNoticeDomain: ReducerProtocol {
     case binding(BindingAction<State>)
     case description(DescriptionDomain.Action)
     case setDestination(State.Destination?)
+    
+    case onDeleteNoticeButtonTapped
+    case deleteConfirmButtonTapped
+    case deleteNoticeResponse(TaskResult<Bool>)
+    case dismissAlert
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -70,6 +79,39 @@ public struct EditNoticeDomain: ReducerProtocol {
         
       case .description, .setDestination:
         return .none
+        
+      case .onDeleteNoticeButtonTapped:
+        state.alert = .confirmDeleteNotice
+        return .none
+      
+      case .deleteConfirmButtonTapped:
+        guard let token = state.notice.token else {
+          return .none
+        }
+        state.isDeletingNotice = true
+        
+        return .task {
+          await .deleteNoticeResponse(
+            TaskResult { try await apiService.deleteNotice(token) }
+          )
+        }
+        
+      case .deleteNoticeResponse(let response):
+        state.isDeletingNotice = false
+        
+        switch response {
+        case .success:
+          return .none
+        case .failure(let error):
+          debugPrint(error.localizedDescription)
+          state.alert = .editNoticeFailure
+          return .none
+        }
+        
+      case .dismissAlert:
+        state.alert = nil
+        return .none
+        
       }
     }
   }
@@ -147,7 +189,26 @@ struct EditNoticeView: View {
           action: A.description
         )
       )
+      
+      
+      Button(
+        action: { viewStore.send(.onDeleteNoticeButtonTapped) },
+        label: {
+          Group {
+            if viewStore.isDeletingNotice {
+              ProgressView()
+                .tint(.red)
+            } else {
+              Label("Meldung löschen", systemImage: "trash")
+                .font(.body)
+                .fontWeight(.semibold)
+            }
+          }
+        }
+      )
+      .buttonStyle(.delete)
     }
+    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .listStyle(.insetGrouped)
     .textFieldStyle(.roundedBorder)
   }
@@ -162,4 +223,22 @@ struct SwiftUIView_Previews: PreviewProvider {
       )
     )
   }
+}
+
+public extension AlertState where Action == EditNoticeDomain.Action {
+  static let editNoticeFailure = Self(
+    title: .init("Fehler"),
+    message: .init("Die Meldung konnte nicht gelöscht werden"),
+    buttons: [
+      .default(.init("Ok")),
+      .default(.init("Wiederholen"), action: .send(.deleteConfirmButtonTapped))
+    ]
+  )
+  
+  static let confirmDeleteNotice = Self(
+    title: .init("Löschen bestätigen"),
+    buttons: [
+      .destructive(.init("Löschen"), action: .send(.deleteConfirmButtonTapped)),
+    ]
+  )
 }

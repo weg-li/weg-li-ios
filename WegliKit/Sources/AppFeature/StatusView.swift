@@ -12,8 +12,8 @@ struct StatusView: View {
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(Color(uiColor: .label))
-        .padding(.horizontal, 4)
-        .padding(.vertical, 2)
+        .padding(.horizontal)
+        .padding(.vertical, 4)
         .overlay(
           RoundedRectangle(cornerRadius: 10)
             .stroke(Color(uiColor: .label), lineWidth: 1)
@@ -23,8 +23,8 @@ struct StatusView: View {
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(.white)
-        .padding(.horizontal, 4)
-        .padding(.vertical, 2)
+        .padding(.horizontal)
+        .padding(.vertical, 4)
         .background(Color.red)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay(
@@ -36,8 +36,8 @@ struct StatusView: View {
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(.white)
-        .padding(.horizontal, 4)
-        .padding(.vertical, 2)
+        .padding(.horizontal)
+        .padding(.vertical, 4)
         .background(Color.init(red: 0.1, green: 0.6, blue: 0.8))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay(
@@ -49,8 +49,8 @@ struct StatusView: View {
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(.white)
-        .padding(.horizontal, 4)
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
+        .padding(.horizontal)
         .background(Color.green)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay(

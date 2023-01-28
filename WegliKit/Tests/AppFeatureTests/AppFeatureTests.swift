@@ -70,7 +70,7 @@ final class AppStoreTests: XCTestCase {
       $0.contact.firstName = newContact.firstName
     }
   }
-    
+  
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
     let store = TestStore(
       initialState: AppDomain.State(reportDraft: report),
@@ -165,7 +165,7 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() async {
-   let didSaveNotices = ActorIsolated(false)
+    let didSaveNotices = ActorIsolated(false)
     
     var fileClient = FileClient.noop
     fileClient.save = { @Sendable _, _ in
@@ -182,6 +182,9 @@ final class AppStoreTests: XCTestCase {
     
     await store.send(.fetchNoticesResponse(.success(.placeholder))) {
       $0.notices = .results(.placeholder)
+    }
+    await store.receive(.setSortOrder(.noticeDate)) {
+      $0.orderSortType[.noticeDate] = false
     }
     await didSaveNotices.withValue { value in
       XCTAssertTrue(value)
@@ -225,6 +228,9 @@ final class AppStoreTests: XCTestCase {
     await store.receive(.fetchNotices(forceReload: false))
     await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.notices = .results([.mock])
+    }
+    await store.receive(.setSortOrder(.noticeDate)) {
+      $0.orderSortType[.noticeDate] = false
     }
   }
   
@@ -275,9 +281,14 @@ final class AppStoreTests: XCTestCase {
     await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.notices = .results([.mock])
     }
+    await store.receive(.setSortOrder(.noticeDate)) {
+      $0.orderSortType[.noticeDate] = false
+    }
   }
   
   func test_Action_setNoticesSortOrder() async {
+    let didSaveNotices = ActorIsolated(false)
+    
     var state = AppDomain.State(reportDraft: report)
     state.notices = .results([.xxxx123, .xxxy123, .abcd123])
     
@@ -285,6 +296,10 @@ final class AppStoreTests: XCTestCase {
       initialState: state,
       reducer: AppDomain()
     )
+    store.dependencies.fileClient.save = { @Sendable _, _ in
+      await didSaveNotices.setValue(true)
+      return ()
+    }
     
     var order: AppDomain.State.NoticeSortOrder = .registration
     await store.send(.setSortOrder(order)) {
@@ -292,11 +307,14 @@ final class AppStoreTests: XCTestCase {
       $0.orderSortType[order] = true
       $0.notices = .results([.abcd123, .xxxx123, .xxxy123])
     }
+    await didSaveNotices.withValue { value in
+      XCTAssertTrue(value)
+    }
     await store.send(.setSortOrder(order)) {
       $0.orderSortType[order] = false
       $0.notices = .results([.xxxy123, .xxxx123, .abcd123])
     }
-    
+
     order = .createdAtDate
     await store.send(.setSortOrder(order)) {
       $0.noticesSortOrder = order
@@ -307,7 +325,7 @@ final class AppStoreTests: XCTestCase {
       $0.orderSortType[order] = false
       $0.notices = .results([.abcd123, .xxxx123, .xxxy123])
     }
-    
+
     order = .noticeDate
     await store.send(.setSortOrder(order)) {
       $0.noticesSortOrder = order
@@ -318,7 +336,7 @@ final class AppStoreTests: XCTestCase {
       $0.orderSortType[order] = true
       $0.notices = .results([.xxxx123, .xxxy123, .abcd123])
     }
-    
+
     order = .status
     await store.send(.setSortOrder(order)) {
       $0.noticesSortOrder = order

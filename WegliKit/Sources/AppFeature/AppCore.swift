@@ -120,8 +120,8 @@ public struct AppDomain: ReducerProtocol {
     case observeConnectionResponse(NetworkPath)
     case setNavigationDestination(State.Destination?)
     case onSaveNoticeButtonTapped
-    case editNoticeResponse(TaskResult<Notice>)
     case editNotice(EditNoticeDomain.Action)
+    case editNoticeResponse(TaskResult<Notice>)
     case dismissAlert
   }
   
@@ -150,7 +150,7 @@ public struct AppDomain: ReducerProtocol {
                         
         switch order {
         case .noticeDate:
-          let orderAscending = state.orderSortType[order, default: true]
+          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
             guard let aDate = $0.date, let bDate = $1.date else { return false }
             let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
@@ -160,7 +160,7 @@ public struct AppDomain: ReducerProtocol {
           state.notices = .results(sortedNotices)
         
         case .createdAtDate:
-          let orderAscending = state.orderSortType[order, default: true]
+          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
             guard let aCreatedAtDate = $0.createdAt, let bCreateAtDate = $1.createdAt else { return false }
             let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
@@ -170,7 +170,7 @@ public struct AppDomain: ReducerProtocol {
           state.notices = .results(sortedNotices)
           
         case .registration:
-          let orderAscending = state.orderSortType[order, default: true]
+          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
             guard let aRegistration = $0.registration, let bRegistration = $1.registration else { return false }
             let sortOperator: (String, String) -> Bool = orderAscending ? (>) : (<)
@@ -180,7 +180,7 @@ public struct AppDomain: ReducerProtocol {
           state.notices = .results(sortedNotices)
           
         case .status:
-          let orderAscending = state.orderSortType[order, default: true]
+          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
             guard let aStatus = $0.status, let bStatus = $1.status else { return false }
             let sortOperator: (Notice.Status, Notice.Status) -> Bool = orderAscending ? (>) : (<)
@@ -189,7 +189,10 @@ public struct AppDomain: ReducerProtocol {
           state.orderSortType[order] = !orderAscending
           state.notices = .results(sortedNotices)
         }
-        return .none
+        
+        return .fireAndForget {
+          try await fileClient.saveNotices(notices)
+        }
         
       case .appDelegate:
         return .run { send in
@@ -309,26 +312,18 @@ public struct AppDomain: ReducerProtocol {
         
         return .task {
           await .fetchNoticesResponse(
-            TaskResult {
-              try await apiService.getNotices(forceReload)
-            }
+            TaskResult { try await apiService.getNotices(forceReload) }
           )
         }
         
       case let .fetchNoticesResponse(.success(notices)):
-        let sortedNotices = notices.sorted {
-          guard let aDate = $0.date, let bDate = $1.date else { return false }
-          return aDate > bDate
-        }
-        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(sortedNotices)
+        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
         
-        guard !sortedNotices.isEmpty else  {
+        guard !notices.isEmpty else  {
           return .none
         }
         
-        return .fireAndForget {
-          try await fileClient.saveNotices(sortedNotices)
-        }
+        return EffectTask(value: .setSortOrder(state.noticesSortOrder))
         
       case let .fetchNoticesResponse(.failure(error)):
         state.notices = .error(.loadingError(error: .init(error: error)))
@@ -370,9 +365,7 @@ public struct AppDomain: ReducerProtocol {
         
         return .task {
           await .editNoticeResponse(
-            TaskResult {
-              try await apiService.patchNotice(patch)
-            }
+            TaskResult { try await apiService.patchNotice(patch) }
           )
         }
         
@@ -386,6 +379,15 @@ public struct AppDomain: ReducerProtocol {
           
         case .failure:
           state.alert = .editNoticeFailure
+          return .none
+        }
+        
+      case .editNotice(.deleteNoticeResponse(let result)):
+        switch result {
+        case .success:
+          state.destination = nil
+          return .task { .fetchNotices(forceReload: true) }
+        case .failure:
           return .none
         }
         
@@ -446,6 +448,14 @@ public extension AlertState where Action == AppDomain.Action {
     buttons: [
       .default(.init("Ok")),
       .default(.init("Wiederholen"), action: .send(.fetchNotices(forceReload: true)))
+    ]
+  )
+  
+  static let confirmDeleteNotice = Self(
+    title: .init("Löschen bestätigen"),
+    buttons: [
+      .destructive(.init("Löschen")),
+      .default(.init("Abbrechen"), action: .send(.dismissAlert))
     ]
   )
   

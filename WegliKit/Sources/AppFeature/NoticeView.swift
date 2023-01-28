@@ -75,12 +75,9 @@ public struct NoticeView: View {
               .font(.subheadline)
               .fontWeight(.semibold)
             
-            VStack(alignment: .leading, spacing: .grid(1)) {
-              if let status = notice.status {
-                StatusView(status: status)
-              }
+            if let status = notice.status {
+              StatusView(status: status)
             }
-            .font(.body)
           }
           .accessibilityElement(children: .combine)
           .padding(.bottom, .grid(2))
