@@ -40,7 +40,7 @@ public struct ImageGrid<Content: View>: View {
   ]
   
   public var body: some View {
-    LazyVGrid(columns: gridItemLayout, spacing: 12) {
+    LazyVGrid(columns: gridItemLayout, spacing: .grid(2)) {
       content
     }
     .transition(.opacity.combined(with: .move(edge: .bottom)))

@@ -50,7 +50,8 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
     .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
     .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0"),
-    .package(url: "https://github.com/pointfreeco/swiftui-navigation.git", from: "0.4.0")
+    .package(url: "https://github.com/pointfreeco/swiftui-navigation.git", from: "0.4.0"),
+    .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.5.0"),
   ],
   targets: [
     .target(
@@ -131,7 +132,8 @@ let package = Package(
         "PhotoLibraryAccessClient",
         .models,
         .styleguide,
-        .tca
+        .tca,
+        .product(name: "Kingfisher", package: "Kingfisher")
       ]
     ),
     .target(

@@ -38,8 +38,8 @@ public struct ImagesViewDomain: ReducerProtocol {
     }
     
     public var alert: AlertState<Action>?
-    public var showImagePicker: Bool
-    public var showCamera: Bool
+    @BindingState public var showImagePicker: Bool
+    @BindingState public var showCamera: Bool
     public var storedPhotos: [PickerImageResult?]
     public var pickerResultCoordinate: CLLocationCoordinate2D?
     public var pickerResultDate: Date?
@@ -63,7 +63,8 @@ public struct ImagesViewDomain: ReducerProtocol {
     }
   }
   
-  public enum Action: Equatable {
+  public enum Action: Equatable, BindableAction {
+    case binding(BindingAction<State>)
     case onAddPhotosButtonTapped
     case onTakePhotosButtonTapped
     case setPhotos([PickerImageResult?])
@@ -82,222 +83,229 @@ public struct ImagesViewDomain: ReducerProtocol {
     case image(id: String, action: ImageDomain.Action)
   }
   
-  public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-    switch action {
-    case .onAddPhotosButtonTapped:
-      switch photoLibraryAccessClient.authorizationStatus() {
-      case .notDetermined:
-        return EffectTask(value: .requestPhotoLibraryAccess)
-      case .restricted, .denied:
-        state.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
-        return .none
-      case .authorized, .limited:
-        return EffectTask(value: .setShowImagePicker(true))
-      @unknown default:
-        return .none
-      }
-      
-    case let .setShowImagePicker(value):
-      state.showImagePicker = value
-      return .none
-      
-    case .requestPhotoLibraryAccess:
-      return .task {
-        .requestPhotoLibraryAccessResult(
-          await photoLibraryAccessClient.requestAuthorization()
-        )
-      }
-          
-    case let .requestPhotoLibraryAccessResult(status):
-      switch status {
-      case .authorized, .limited:
-        return EffectTask(value: .setShowImagePicker(true))
-      case .notDetermined:
-        // show alert
-        return .none
-      case .denied:
-        state.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
-        return .none
-      default:
-        return .none
-      }
-
-    case .onTakePhotosButtonTapped:
-      switch cameraAccessClient.authorizationStatus() {
-      case .authorized:
-        return EffectTask(value: .setShowCamera(true))
-      case .denied:
-        state.alert = .init(title: TextState(L10n.Camera.Alert.accessDenied))
-        return .none
-      case .notDetermined:
-        return EffectTask(value: .requestCameraAccess)
-      case .restricted:
-        return .none
-      @unknown default:
-        return .none
-      }
-
-    case let .setShowCamera(value):
-      state.showCamera = value
-      return .none
-
-    case .requestCameraAccess:
-      return .task {
-        await .requestCameraAccessResult(
-          TaskResult {
-            await cameraAccessClient.requestAuthorization()
-          }
-        )
-      }
-
-    case let .requestCameraAccessResult(result):
-      let userDidGrantAccess = (try? result.value) ?? false
-      if userDidGrantAccess {
-        return EffectTask(value: .setShowCamera(true))
-      }
-      return .none
-
-    case let .setPhotos(photos):
-      state.storedPhotos.append(contentsOf: photos)
+  public var body: some ReducerProtocol<State, Action> {
+    BindingReducer()
     
-      guard !photos.isEmpty else {
-        state.licensePlates.removeAll()
-        state.recognizedTextItems.removeAll()
+    Reduce<State, Action> { state, action in
+      switch action {
+      case .binding:
         return .none
-      }
-      
-      let images = photos.compactMap { $0 }
-      state.isRecognizingTexts = true
-      
-      return .merge(
-        EffectTask(value: .setImageCoordinate(images.imageCoordinates.first)),
-        EffectTask(value: .setImageCreationDate(images.imageCreationDates.first)),
-        .textRecognition(in: images, client: textRecognitionClient)
-      )
-      
-    case let .textRecognitionCompleted(.success(items)):
-      state.isRecognizingTexts = false
-              
-      if state.showsAllTextRecognitionResults {
-        state.licensePlates.append(contentsOf: items)
-      } else {
-        var licensePlates = items
-        for index in licensePlates.indices {
-          let cleanText = licensePlates[index].text
-            .filter { !$0.isLowercase }
-            .withReplacedCharacters("-.,:; ", by: " ")
-          licensePlates[index].text = cleanText
+        
+      case .onAddPhotosButtonTapped:
+        switch photoLibraryAccessClient.authorizationStatus() {
+        case .notDetermined:
+          return EffectTask(value: .requestPhotoLibraryAccess)
+        case .restricted, .denied:
+          state.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
+          return .none
+        case .authorized, .limited:
+          return EffectTask(value: .setShowImagePicker(true))
+        @unknown default:
+          return .none
         }
         
-        let filteredLicensePlates = licensePlates.filter { textItem in
-          isMatches(germanLicensePlateRegex, textItem.text)
+      case let .setShowImagePicker(value):
+        state.showImagePicker = value
+        return .none
+        
+      case .requestPhotoLibraryAccess:
+        return .task {
+          .requestPhotoLibraryAccessResult(
+            await photoLibraryAccessClient.requestAuthorization()
+          )
         }
-        state.licensePlates.append(contentsOf: filteredLicensePlates)
-      }
-      
-      return .none
-      
-    case let .textRecognitionCompleted(.failure(error)):
-      state.isRecognizingTexts = false
-      
-      debugPrint(error.localizedDescription)
-      return .none
-      
-    case let .selectedTextItem(licensePlate):
-      debugPrint(licensePlate)
-      return .none
-      
-    // set photo coordinate from selected photos first element.
-    case let .setImageCoordinate(coordinate):
-      guard let coordinate = coordinate, let resolvedCoordinate = state.pickerResultCoordinate else {
-        return .none
-      }
-      let resolved = CLLocation(from: resolvedCoordinate)
-      let location = CLLocation(from: coordinate)
-      
-      if resolved.distance(from: location) < distanceFilter {
-        return .none
-      }
-      
-      state.pickerResultCoordinate = coordinate
-      return .none
-      
-    case let .setImageCreationDate(date):
-      state.pickerResultDate = date
-      return .none
-      
-    case let .justSetPhotos(photos):
-      state.storedPhotos = photos
-      return .none
-      
-    case let .image(id, .onRemovePhotoButtonTapped):
-      // filter storedPhotos by image ID which removes the selected one.
-      let photos = state.storedPhotos
-        .compactMap { $0 }
-        .filter { $0.id != id }
-      
-      var effects: [EffectTask<Action>] = []
-      
-      if !photos.isEmpty {
-        state.storedPhotos = photos
-      } else {
-        effects.append(
-          EffectTask.run(operation: { send in
-            try await clock.sleep(for: .milliseconds(800))
-            await send(.justSetPhotos(photos), animation: .easeOut)
-          })
-        )
-      }
-      
-      let filterTextItems = state.recognizedTextItems
-        .compactMap { $0 }
-        .filter { $0.id != id }
-      state.recognizedTextItems = filterTextItems
+            
+      case let .requestPhotoLibraryAccessResult(status):
+        switch status {
+        case .authorized, .limited:
+          return EffectTask(value: .setShowImagePicker(true))
+        case .notDetermined:
+          // show alert
+          return .none
+        case .denied:
+          state.alert = .init(title: TextState(L10n.Photos.Alert.accessDenied))
+          return .none
+        default:
+          return .none
+        }
 
-      state.licensePlates.removeAll(where: { $0.id == id })
+      case .onTakePhotosButtonTapped:
+        switch cameraAccessClient.authorizationStatus() {
+        case .authorized:
+          return EffectTask(value: .setShowCamera(true))
+        case .denied:
+          state.alert = .init(title: TextState(L10n.Camera.Alert.accessDenied))
+          return .none
+        case .notDetermined:
+          return EffectTask(value: .requestCameraAccess)
+        case .restricted:
+          return .none
+        @unknown default:
+          return .none
+        }
+
+      case let .setShowCamera(value):
+        state.showCamera = value
+        return .none
+
+      case .requestCameraAccess:
+        return .task {
+          await .requestCameraAccessResult(
+            TaskResult {
+              await cameraAccessClient.requestAuthorization()
+            }
+          )
+        }
+
+      case let .requestCameraAccessResult(result):
+        let userDidGrantAccess = (try? result.value) ?? false
+        if userDidGrantAccess {
+          return EffectTask(value: .setShowCamera(true))
+        }
+        return .none
+
+      case let .setPhotos(photos):
+        state.storedPhotos.append(contentsOf: photos)
       
-      
-      
-      let imageCoordinates = state.storedPhotos.compactMap { $0 }.imageCoordinates
-      if !imageCoordinates.isEmpty, let firstCoordinate = imageCoordinates.first {
-        effects.append(
-          EffectTask(value: .setImageCoordinate(firstCoordinate))
+        guard !photos.isEmpty else {
+          state.licensePlates.removeAll()
+          state.recognizedTextItems.removeAll()
+          return .none
+        }
+        
+        let images = photos.compactMap { $0 }
+        state.isRecognizingTexts = true
+        
+        return .merge(
+          EffectTask(value: .setImageCoordinate(images.imageCoordinates.first)),
+          EffectTask(value: .setImageCreationDate(images.imageCreationDates.first)),
+          .textRecognition(in: images, client: textRecognitionClient)
         )
-      }
-      let imageCreationDates = state.storedPhotos.compactMap { $0 }.imageCreationDates
-      if !imageCreationDates.isEmpty, let firstDate = imageCreationDates.first {
-        effects.append(
-          EffectTask(value: .setImageCreationDate(firstDate))
-        )
-      }
-      return .merge(effects)
-      
-    case let .image(id, .onRecognizeTextButtonTapped):
-      let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
-      guard
-        let image = unwrappedPhotos.first(where: { $0.id == id })
-      else {
-        debugPrint("image can not be found")
+        
+      case let .textRecognitionCompleted(.success(items)):
+        state.isRecognizingTexts = false
+                
+        if state.showsAllTextRecognitionResults {
+          state.licensePlates.append(contentsOf: items)
+        } else {
+          var licensePlates = items
+          for index in licensePlates.indices {
+            let cleanText = licensePlates[index].text
+              .filter { !$0.isLowercase }
+              .withReplacedCharacters("-.,:; ", by: " ")
+            licensePlates[index].text = cleanText
+          }
+          
+          let filteredLicensePlates = licensePlates.filter { textItem in
+            isMatches(germanLicensePlateRegex, textItem.text)
+          }
+          state.licensePlates.append(contentsOf: filteredLicensePlates)
+        }
+        
+        return .none
+        
+      case let .textRecognitionCompleted(.failure(error)):
+        state.isRecognizingTexts = false
+        
+        debugPrint(error.localizedDescription)
+        return .none
+        
+      case let .selectedTextItem(licensePlate):
+        debugPrint(licensePlate)
+        return .none
+        
+      // set photo coordinate from selected photos first element.
+      case let .setImageCoordinate(coordinate):
+        guard let coordinate = coordinate, let resolvedCoordinate = state.pickerResultCoordinate else {
+          return .none
+        }
+        let resolved = CLLocation(from: resolvedCoordinate)
+        let location = CLLocation(from: coordinate)
+        
+        if resolved.distance(from: location) < distanceFilter {
+          return .none
+        }
+        
+        state.pickerResultCoordinate = coordinate
+        return .none
+        
+      case let .setImageCreationDate(date):
+        state.pickerResultDate = date
+        return .none
+        
+      case let .justSetPhotos(photos):
+        state.storedPhotos = photos
+        return .none
+        
+      case let .image(id, .onRemovePhotoButtonTapped):
+        // filter storedPhotos by image ID which removes the selected one.
+        let photos = state.storedPhotos
+          .compactMap { $0 }
+          .filter { $0.id != id }
+        
+        var effects: [EffectTask<Action>] = []
+        
+        if !photos.isEmpty {
+          state.storedPhotos = photos
+        } else {
+          effects.append(
+            EffectTask.run(operation: { send in
+              try await clock.sleep(for: .milliseconds(800))
+              await send(.justSetPhotos(photos), animation: .easeOut)
+            })
+          )
+        }
+        
+        let filterTextItems = state.recognizedTextItems
+          .compactMap { $0 }
+          .filter { $0.id != id }
+        state.recognizedTextItems = filterTextItems
+
+        state.licensePlates.removeAll(where: { $0.id == id })
+        
+        
+        
+        let imageCoordinates = state.storedPhotos.compactMap { $0 }.imageCoordinates
+        if !imageCoordinates.isEmpty, let firstCoordinate = imageCoordinates.first {
+          effects.append(
+            EffectTask(value: .setImageCoordinate(firstCoordinate))
+          )
+        }
+        let imageCreationDates = state.storedPhotos.compactMap { $0 }.imageCreationDates
+        if !imageCreationDates.isEmpty, let firstDate = imageCreationDates.first {
+          effects.append(
+            EffectTask(value: .setImageCreationDate(firstDate))
+          )
+        }
+        return .merge(effects)
+        
+      case let .image(id, .onRecognizeTextButtonTapped):
+        let unwrappedPhotos = state.storedPhotos.compactMap { $0 }
+        guard
+          let image = unwrappedPhotos.first(where: { $0.id == id })
+        else {
+          debugPrint("image can not be found")
+          return .none
+        }
+        
+        state.isRecognizingTexts = true
+        
+        return EffectTask.task {
+          await Action.textRecognitionCompleted(
+            TaskResult {
+              try await clock.sleep(for: .milliseconds(200))
+              return try await textRecognitionClient.recognizeText(image)
+            }
+          )
+        }
+        
+      case .image:
+        return .none
+        
+      case .dismissAlert:
+        state.alert = nil
         return .none
       }
-      
-      state.isRecognizingTexts = true
-      
-      return EffectTask.task {
-        await Action.textRecognitionCompleted(
-          TaskResult {
-            try await clock.sleep(for: .milliseconds(200))
-            return try await textRecognitionClient.recognizeText(image)
-          }
-        )
-      }
-      
-    case .image:
-      return .none
-      
-    case .dismissAlert:
-      state.alert = nil
-      return .none
     }
   }
 }

@@ -75,4 +75,41 @@ final class ChargeSelectionTests: XCTestCase {
     
     await store.finish()
   }
+  
+  func test_onAppear_shouldUpdateCharges() async {
+    var fileClient = FileClient.noop
+    fileClient.load = { @Sendable _ in
+      .init(
+        try! JSONEncoder().encode(["0"])
+      )
+    }
+    
+    let state = ChargeSelection.State()
+    
+    let store = TestStore(
+      initialState: state,
+      reducer: ChargeSelection(),
+      prepareDependencies: { values in
+        values.continuousClock = ImmediateClock()
+        values.fileClient = fileClient
+      }
+    )
+    
+    let charges = DescriptionDomain.charges.map {
+      Charge(
+        id: $0.key,
+        text: $0.value,
+        isFavorite: ["0"].contains($0.key),
+        isSelected: false
+      )
+    }
+    await store.send(.onAppear)
+    await store.receive(.favoriteChargesLoaded(.success(["0"]))) {
+      $0.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
+    }
+    await store.receive(.sortFavoritedCharges) {
+      let sortedCharges = charges.sorted(by: { $0.isFavorite && !$1.isFavorite })
+      $0.charges = IdentifiedArrayOf(uniqueElements: sortedCharges, id: \.id)
+    }
+  }
 }

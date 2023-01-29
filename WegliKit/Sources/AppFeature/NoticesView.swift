@@ -31,7 +31,9 @@ public struct NoticesView: View {
         
       case let .results(notices):
         List(notices) { notice in
-          noticeView(notice)
+          NoticeView(notice: notice)
+            .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
+            .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         
@@ -65,6 +67,46 @@ public struct NoticesView: View {
         }
         .padding(.horizontal, .grid(3))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      }
+    }
+    .sheet(
+      unwrapping: viewStore.binding(
+        get: \.destination,
+        send: { A.setNavigationDestination($0) }
+      ),
+      case: /S.Destination.edit,
+      onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
+    ) { $model in
+      NavigationStack {
+        IfLetStore(
+          self.store.scope(
+            state: \.editNotice,
+            action: A.editNotice
+          ),
+          then: { store in
+            EditNoticeView(store: store)
+          },
+          else: { Text("Error creating EditNotice view") }
+        )
+        .accessibilityAddTraits([.isModal])
+        .navigationTitle(Text("Bearbeiten"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItem(placement: .cancellationAction) {
+            Button(L10n.Button.close) {
+              viewStore.send(.setNavigationDestination(nil))
+            }
+          }
+          ToolbarItem(placement: .confirmationAction) {
+            if viewStore.state.isSendingEditedNotice {
+              ProgressView()
+            } else {
+              Button("Speichern") {
+                viewStore.send(.onSaveNoticeButtonTapped)
+              }
+            }
+          }
+        }
       }
     }
     .toolbar {
@@ -130,51 +172,6 @@ public struct NoticesView: View {
         .disabled(viewStore.isFetchingNotices)
       }
     }
-  }
-  
-  func noticeView(_ notice: Notice) -> some View {
-    NoticeView(notice: notice)
-      .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
-      .listRowSeparator(.hidden)
-      .sheet(
-        unwrapping: viewStore.binding(
-          get: \.destination,
-          send: { A.setNavigationDestination($0) }
-        ),
-        case: /S.Destination.edit
-      ) { $model in
-        NavigationStack {
-          IfLetStore(
-            self.store.scope(
-              state: \.editNotice,
-              action: A.editNotice
-            ),
-            then: { store in
-              EditNoticeView(store: store)
-            },
-            else: { Text("Error creating EditNotice view") }
-          )
-          .accessibilityAddTraits([.isModal])
-          .navigationTitle(Text("Meldung bearbeiten"))
-          .navigationBarTitleDisplayMode(.inline)
-          .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-              Button(L10n.Button.close) {
-                viewStore.send(.setNavigationDestination(nil))
-              }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-              if viewStore.state.isSendingEditedNotice {
-                ProgressView()
-              } else {
-                Button("Speichern") {
-                  viewStore.send(.onSaveNoticeButtonTapped)
-                }
-              }
-            }
-          }
-        }
-      }
   }
   
   @ViewBuilder

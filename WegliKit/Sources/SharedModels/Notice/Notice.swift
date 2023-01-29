@@ -22,10 +22,10 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var createdAt: Date?
   public var updatedAt: Date?
   public var sentAt: Date?
-  public var vehicleEmpty = false
-  public var hazardLights = false
-  public var expiredTuv = false
-  public var expiredEco = false
+  public var vehicleEmpty: Bool?
+  public var hazardLights: Bool?
+  public var expiredTuv: Bool?
+  public var expiredEco: Bool?
   public var photos: [NoticePhoto]?
   
   public var time: String? {

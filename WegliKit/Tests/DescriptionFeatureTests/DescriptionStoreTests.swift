@@ -71,45 +71,4 @@ final class DescriptionStoreTests: XCTestCase {
       XCTAssertTrue(state.isValid)
     }
   }
-  
-  func test_onAppear_shouldUpdateCharges() async {
-    var fileClient = FileClient.noop
-    fileClient.load = { @Sendable _ in
-      .init(
-        try! JSONEncoder().encode(["0"])
-      )
-    }
-    
-    let state = DescriptionDomain.State(
-      licensePlateNumber: "",
-      selectedColor: 1,
-      selectedBrand: brand
-    )
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: DescriptionDomain(),
-      prepareDependencies: { values in
-        values.continuousClock = ImmediateClock()
-        values.fileClient = fileClient
-      }
-    )
-    
-    let charges = DescriptionDomain.charges.map {
-      Charge(
-        id: $0.key,
-        text: $0.value,
-        isFavorite: ["0"].contains($0.key),
-        isSelected: false
-      )
-    }
-    await store.send(.onAppear)
-    await store.receive(.favoriteChargesLoaded(.success(["0"]))) {
-      $0.chargeSelection.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
-    }
-    await store.receive(.chargeSelection(.sortFavoritedCharges)) {
-      let sortedCharges = charges.sorted(by: { $0.isFavorite && !$1.isFavorite })
-      $0.chargeSelection.charges = IdentifiedArrayOf(uniqueElements: sortedCharges, id: \.id)
-    }
-  }
 }

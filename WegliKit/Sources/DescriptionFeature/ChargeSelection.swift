@@ -37,6 +37,8 @@ public struct ChargeSelection: ReducerProtocol {
     case setChargeTypeSearchText(String)
     case toggleChargeFavorite(Charge)
     case sortFavoritedCharges
+    case onAppear
+    case favoriteChargesLoaded(TaskResult<[String]>)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -46,6 +48,29 @@ public struct ChargeSelection: ReducerProtocol {
       switch action {
       case .binding:
         return .none
+        
+      case .onAppear:
+        return .task {
+          await .favoriteChargesLoaded(
+            TaskResult {
+              try await fileClient.loadFavoriteCharges()
+            }
+          )
+        }
+        
+      case let .favoriteChargesLoaded(result):
+        let chargeIds = (try? result.value) ?? []
+          
+        let charges = DescriptionDomain.charges.map {
+          Charge(
+            id: $0.key,
+            text: $0.value,
+            isFavorite: chargeIds.contains($0.key),
+            isSelected: false
+          )
+        }
+        state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
+        return EffectTask(value: .sortFavoritedCharges)
         
       case let .setCharge(value):
         state.selectedCharge = value
@@ -110,6 +135,7 @@ public struct ChargeSelectionView: View {
         )
       }
     }
+    .onAppear { viewStore.send(.onAppear) }
     .animation(.default, value: viewStore.chargesSearchResults)
     .searchable(
       text: viewStore.binding(\.$chargeTypeSearchText),

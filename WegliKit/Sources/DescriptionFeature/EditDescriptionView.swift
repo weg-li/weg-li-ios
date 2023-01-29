@@ -61,7 +61,6 @@ public struct EditDescriptionView: View {
         SectionHeader(text: "Hinweise")
       }
     }
-    .onAppear { viewStore.send(.onAppear) }
   }
   
   var licensePlateView: some View {
@@ -69,6 +68,7 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.licenseplateNumber,
       text: viewStore.binding(\.$licensePlateNumber)
     )
+    .textFieldStyle(.roundedBorder)
     .disableAutocorrection(true)
     .textInputAutocapitalization(.characters)
   }
@@ -83,7 +83,6 @@ public struct EditDescriptionView: View {
             action: A.carBrandSelection
           )
         )
-        .accessibilityAddTraits([.isModal])
         .navigationTitle(Text(L10n.Description.Row.carType))
         .navigationBarTitleDisplayMode(.inline)
       },
@@ -147,12 +146,19 @@ public struct EditDescriptionView: View {
     )
   }
   
+  var times: [Int] {
+    Array(
+      Times.times.sorted(by: { $0.0 < $1.0 })
+        .map(\.key)
+        .dropFirst()
+    )
+  }
   var chargeDurationView: some View {
     Picker(
       L10n.Description.Row.length,
       selection: viewStore.binding(\.$selectedDuration)
     ) {
-      ForEach(viewStore.times, id: \.self) { time in
+      ForEach(times, id: \.self) { time in
         Text(Times.times[time] ?? "")
           .contentShape(Rectangle())
           .foregroundColor(Color(.label))

@@ -16,7 +16,7 @@ public struct ImagesView: View {
     self.viewStore = ViewStore(store)
   }
   
-  let rows = [GridItem(.flexible(minimum: 30, maximum: 60))]
+  let licenseRowLayout = [GridItem(.flexible(minimum: 30, maximum: 60))]
   
   public var body: some View {
     VStack(alignment: .center, spacing: 20.0) {
@@ -49,7 +49,7 @@ public struct ImagesView: View {
           VStack {
             ScrollView(.horizontal) {
               Spacer(minLength: .grid(1))
-              LazyHGrid(rows: rows, alignment: .center) {
+              LazyHGrid(rows: licenseRowLayout, alignment: .center) {
                 ForEach(viewStore.state.licensePlates, id: \.self) { item in
                   licensePlateView(item: item)
                     .accessibilityElement()
@@ -71,16 +71,10 @@ public struct ImagesView: View {
     }
     .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .sheet(
-      isPresented: viewStore.binding(
-        get: \.showImagePicker,
-        send: ImagesViewDomain.Action.setShowImagePicker
-      ),
+      isPresented: viewStore.binding(\.$showImagePicker),
       content: {
         ImagePicker(
-          isPresented: viewStore.binding(
-            get: \.showImagePicker,
-            send: ImagesViewDomain.Action.setShowImagePicker
-          ),
+          isPresented: viewStore.binding(\.$showImagePicker),
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
             send: ImagesViewDomain.Action.setPhotos
@@ -89,16 +83,10 @@ public struct ImagesView: View {
       }
     )
     .fullScreenCover(
-      isPresented: viewStore.binding(
-        get: \.showCamera,
-        send: ImagesViewDomain.Action.setShowCamera
-      ),
+      isPresented: viewStore.binding(\.$showCamera),
       content: {
         CameraView(
-          isPresented: viewStore.binding(
-            get: \.showCamera,
-            send: ImagesViewDomain.Action.setShowCamera
-          ),
+          isPresented: viewStore.binding(\.$showCamera),
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
             send: ImagesViewDomain.Action.setPhotos

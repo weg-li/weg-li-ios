@@ -729,10 +729,10 @@ public extension DescriptionDomain.State {
       selectedDuration:  model.duration.flatMap { Int($0) } ?? 0,
       selectedCharge: model.charge.flatMap(Charge.init),
       blockedOthers: true,
-      vehicleEmpty: model.vehicleEmpty,
-      hazardLights: model.hazardLights,
-      expiredTuv: model.expiredTuv,
-      expiredEco: model.expiredEco
+      vehicleEmpty: model.vehicleEmpty ?? true,
+      hazardLights: model.hazardLights ?? false,
+      expiredTuv: model.expiredTuv ?? false,
+      expiredEco: model.expiredEco ?? false
     )
   }
 }

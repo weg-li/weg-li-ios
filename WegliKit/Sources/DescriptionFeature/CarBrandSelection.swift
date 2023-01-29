@@ -77,7 +77,8 @@ public struct CarBrandSelectorView: View {
           viewStore.send(.setBrand(brand))
         }
       }
-    }.searchable(
+    }
+    .searchable(
       text: viewStore.binding(\.$carBrandSearchText),
       placement: .navigationBarDrawer(displayMode: .always)
     )

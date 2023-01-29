@@ -204,7 +204,6 @@ public struct AppDomain: ReducerProtocol {
                 )
               )
             }
-            
             group.addTask {
               await send(
                 .userSettingsLoaded(
@@ -212,7 +211,6 @@ public struct AppDomain: ReducerProtocol {
                 )
               )
             }
-            
             group.addTask {
               await send(
                 .storedApiTokenLoaded(
@@ -489,7 +487,7 @@ extension Notice {
       zip: editState.zip,
       latitude: editState.notice.latitude ?? 0,
       longitude: editState.notice.longitude ?? 0,
-      registration: editState.notice.registration ?? "",
+      registration: editState.description.licensePlateNumber,
       brand: editState.description.carBrandSelection.selectedBrand?.title ?? "",
       color: DescriptionDomain.colors[editState.description.selectedColor].key,
       charge: editState.description.chargeSelection.selectedCharge?.text ?? "",

@@ -8,14 +8,18 @@ public struct Widget<Content: View>: View {
   
   public init(
     title: Text,
-    isCompleted: Bool,
+    isCompleted: Bool = false,
+    shouldIndicateCompletion: Bool = true,
     content: @escaping () -> Content
+    
   ) {
     self.title = title
     self.isCompleted = isCompleted
+    self.shouldIndicateCompletion = shouldIndicateCompletion
     self.content = content
   }
   
+  public var shouldIndicateCompletion: Bool
   public let title: Text
   public var isCompleted: Bool
   public let content: () -> Content
@@ -24,8 +28,10 @@ public struct Widget<Content: View>: View {
   public var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        CompletionIndicator(isValid: isCompleted)
-          .accessibilityHidden(true)
+        if shouldIndicateCompletion {
+          CompletionIndicator(isValid: isCompleted)
+            .accessibilityHidden(true)
+        }
         title.fontWeight(.bold)
           .accessibilitySortPriority(3)
           .accessibilityValue(
@@ -33,20 +39,25 @@ public struct Widget<Content: View>: View {
               ? L10n.Widget.A11y.CompletionIndicatorLabel.isValid
               : L10n.Widget.A11y.CompletionIndicatorLabel.isNotValid
           )
-        Spacer()
-        Button(action: {
-          withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
-            self.showContent.toggle()
-          }
-        }) {
-          Image(systemName: "chevron.right.circle")
-            .rotationEffect(.degrees(showContent ? 90 : 0))
-            .scaleEffect(showContent ? 1.1 : 1)
+        if shouldIndicateCompletion {
+          Spacer()
+          Button(
+            action: {
+              withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
+                self.showContent.toggle()
+              }
+            },
+            label: {
+              Image(systemName: "chevron.right.circle")
+                .rotationEffect(.degrees(showContent ? 90 : 0))
+                .scaleEffect(showContent ? 1.1 : 1)
+            }
+          )
+          .contentShape(Rectangle())
+          .accessibility(label: Text(L10n.Widget.A11y.toggleCollapseButtonLabel))
+          .accessibilityHidden(true)
+          .foregroundColor(.secondary)
         }
-        .contentShape(Rectangle())
-        .accessibility(label: Text(L10n.Widget.A11y.toggleCollapseButtonLabel))
-        .accessibilityHidden(true)
-        .foregroundColor(.secondary)
       }
       .accessibilityAction(named: Text(L10n.Widget.A11y.toggleCollapseButtonLabel)) {
         self.showContent.toggle()
@@ -59,10 +70,19 @@ public struct Widget<Content: View>: View {
       }
     }
     .accessibilityElement(children: .contain)
+    .modifier(WidgetBubbleModifier())
     .padding()
-    .background(Color(.secondarySystemFill))
-    .clipShape(RoundedRectangle(cornerRadius: 10))
-    .padding()
+  }
+}
+
+public struct WidgetBubbleModifier: ViewModifier {
+  public init() {}
+  
+  public func body(content: Content) -> some View {
+    content
+      .padding()
+      .background(Color(.secondarySystemFill))
+      .clipShape(RoundedRectangle(cornerRadius: 10))
   }
 }
 

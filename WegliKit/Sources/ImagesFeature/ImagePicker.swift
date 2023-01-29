@@ -8,6 +8,11 @@ import SharedModels
 import SwiftUI
 
 public struct ImagePicker: UIViewControllerRepresentable {
+  public init(isPresented: Binding<Bool>, pickerResult: Binding<[PickerImageResult?]>) {
+    self._isPresented = isPresented
+    self._pickerResult = pickerResult
+  }
+  
   @Binding var isPresented: Bool
   @Binding var pickerResult: [PickerImageResult?]
   

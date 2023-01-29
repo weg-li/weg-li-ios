@@ -87,9 +87,6 @@ public struct DescriptionDomain: ReducerProtocol {
     case binding(BindingAction<State>)
     case carBrandSelection(CarBrandSelection.Action)
     case chargeSelection(ChargeSelection.Action)
-    
-    case onAppear
-    case favoriteChargesLoaded(TaskResult<[String]>)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -107,29 +104,6 @@ public struct DescriptionDomain: ReducerProtocol {
       switch action {
       case .binding:
         return .none
-          
-      case .onAppear:
-        return .task {
-          await .favoriteChargesLoaded(
-            TaskResult {
-              try await fileClient.loadFavoriteCharges()
-            }
-          )
-        }
-        
-      case let .favoriteChargesLoaded(result):
-        let chargeIds = (try? result.value) ?? []
-          
-        let charges = Self.charges.map {
-          Charge(
-            id: $0.key,
-            text: $0.value,
-            isFavorite: chargeIds.contains($0.key),
-            isSelected: false
-          )
-        }
-        state.chargeSelection.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
-        return EffectTask(value: .chargeSelection(.sortFavoritedCharges))
         
       case .binding(\.$presentChargeSelection):
         state.chargeSelection.chargeTypeSearchText = ""

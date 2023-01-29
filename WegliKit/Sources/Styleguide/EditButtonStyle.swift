@@ -25,9 +25,6 @@ struct SwiftUIView_Previews: PreviewProvider {
     VStack {
       Button("This is a test") { }
         .buttonStyle(.edit())
-      
-      Button("This is a test") { }
-        .buttonStyle(DeleteButtonStyle())
     }
   }
 }
