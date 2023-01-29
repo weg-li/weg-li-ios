@@ -8,7 +8,10 @@ struct StatusView: View {
   var body: some View {
     switch status {
     case .open:
-      Label(status.displayTitle, systemImage: "pencil")
+      HStack(spacing: 3) {
+        Image(systemName: "pencil")
+        Text(status.displayTitle)
+      }
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(Color(uiColor: .label))
@@ -19,7 +22,10 @@ struct StatusView: View {
             .stroke(Color(uiColor: .label), lineWidth: 1)
         )
     case .disabled:
-      Label(status.displayTitle, systemImage: "circle.slash")
+      HStack(spacing: 3) {
+        Image(systemName: "circle.slash")
+        Text(status.displayTitle)
+      }
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(.white)
@@ -32,7 +38,10 @@ struct StatusView: View {
             .stroke(Color(uiColor: .label), lineWidth: 0)
         )
     case .analyzing:
-      Label(status.displayTitle, systemImage: "hourglass")
+      HStack(spacing: 3) {
+        Image(systemName: "hourglass")
+        Text(status.displayTitle)
+      }
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(.white)
@@ -45,7 +54,10 @@ struct StatusView: View {
             .stroke(Color(uiColor: .label), lineWidth: 0)
         )
     case .shared:
-      Label(status.displayTitle, systemImage: "checkmark.circle")
+      HStack(spacing: 3) {
+        Image(systemName: "checkmark.circle")
+        Text(status.displayTitle)
+      }
         .fontWeight(.semibold)
         .font(.body)
         .foregroundColor(.white)

@@ -87,6 +87,27 @@ public struct AppDomain: ReducerProtocol {
     }
     public var alert: AlertState<Action>?
     
+    var showNoticeDateSortOption: Bool {
+      guard let elements = notices.elements else { return false }
+      let filtered = elements.compactMap(\.date)
+      return filtered.count == elements.count
+    }
+    var showCreatedAtDateSortOption: Bool {
+      guard let elements = notices.elements else { return false }
+      let filtered = elements.compactMap(\.createdAt)
+      return filtered.count == elements.count
+    }
+    var showStatusSortOption: Bool {
+      guard let elements = notices.elements else { return false }
+      let filtered = elements.compactMap(\.status)
+      return filtered.count == elements.count
+    }
+    var showRegistrationSortOption: Bool {
+      guard let elements = notices.elements else { return false }
+      let filtered = elements.compactMap(\.registration)
+      return filtered.count == elements.count
+    }
+    
     public enum Destination: Equatable {
       case edit(Notice)
       case alert(AlertState<AlertAction>)
@@ -156,8 +177,8 @@ public struct AppDomain: ReducerProtocol {
             let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
             return sortOperator(aDate, bDate)
           }
-          state.orderSortType[order] = !orderAscending
           state.notices = .results(sortedNotices)
+          state.orderSortType[order] = !orderAscending
         
         case .createdAtDate:
           guard let orderAscending = state.orderSortType[order] else { return .none }
@@ -166,8 +187,8 @@ public struct AppDomain: ReducerProtocol {
             let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
             return sortOperator(aCreatedAtDate, bCreateAtDate)
           }
-          state.orderSortType[order] = !orderAscending
           state.notices = .results(sortedNotices)
+          state.orderSortType[order] = !orderAscending
           
         case .registration:
           guard let orderAscending = state.orderSortType[order] else { return .none }
@@ -176,8 +197,8 @@ public struct AppDomain: ReducerProtocol {
             let sortOperator: (String, String) -> Bool = orderAscending ? (>) : (<)
             return sortOperator(aRegistration, bRegistration)
           }
-          state.orderSortType[order] = !orderAscending
           state.notices = .results(sortedNotices)
+          state.orderSortType[order] = !orderAscending
           
         case .status:
           guard let orderAscending = state.orderSortType[order] else { return .none }
@@ -186,8 +207,8 @@ public struct AppDomain: ReducerProtocol {
             let sortOperator: (Notice.Status, Notice.Status) -> Bool = orderAscending ? (>) : (<)
             return sortOperator(aStatus, bStatus)
           }
-          state.orderSortType[order] = !orderAscending
           state.notices = .results(sortedNotices)
+          state.orderSortType[order] = !orderAscending
         }
         
         return .fireAndForget {
