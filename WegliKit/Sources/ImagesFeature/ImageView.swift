@@ -25,6 +25,7 @@ public struct ImageView: View {
       AsyncThumbnailView(url: url)
         .gridModifier
         .padding(.grid(1))
+        .contentShape(Rectangle())
         .contextMenu {
           Button {
             showImageView.toggle()
