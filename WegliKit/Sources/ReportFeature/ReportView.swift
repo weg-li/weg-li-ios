@@ -9,6 +9,7 @@ import L10n
 import LocationFeature
 import Styleguide
 import SwiftUI
+import SwiftUINavigation
 
 public struct ReportView: View {
   public typealias S = ReportDomain.State
@@ -77,10 +78,12 @@ public struct ReportView: View {
           isCompleted: viewStore.isDescriptionValid
         ) {
           DescriptionView(store: store)
-            .onTapGesture { viewStore.send(.set(\.$showEditDescription, true)) }
+            .onTapGesture { viewStore.send(.setDestination(.description)) }
             .sheet(
-              isPresented: viewStore.binding(\.$showEditDescription),
-              content: {
+              unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
+              case: /S.Destination.description,
+              onDismiss: { viewStore.send(.setDestination(nil)) },
+              content: { _ in
                 NavigationStack {
                   List {
                     EditDescriptionView(
@@ -96,7 +99,7 @@ public struct ReportView: View {
                   .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                       Button(
-                        action: { viewStore.send(.set(\.$showEditDescription, false)) },
+                        action: { viewStore.send(.setDestination(nil)) },
                         label: { Text(L10n.Button.close) }
                       )
                     }
@@ -107,32 +110,38 @@ public struct ReportView: View {
         }
         
         // Contact
-        Widget(
-          title: Text(L10n.Report.Contact.widgetTitle),
-          isCompleted: viewStore.isContactValid
-        ) {
-          ContactWidget(store: store.scope(state: { $0 }))
-            .onTapGesture { viewStore.send(.set(\.$showEditContact, true)) }
-            .sheet(
-              isPresented: viewStore.binding(\.$showEditContact),
-              content: {
-                NavigationStack {
-                  ContactView(
-                    store: store.scope(
-                      state: \.contactState,
-                      action: ReportDomain.Action.contact
+        if viewStore.apiToken.isEmpty {
+          Widget(
+            title: Text(L10n.Report.Contact.widgetTitle),
+            isCompleted: viewStore.isContactValid
+          ) {
+            ContactWidget(store: store.scope(state: { $0 }))
+              .onTapGesture { viewStore.send(.setDestination(.contact)) }
+              .sheet(
+                unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
+                case: /S.Destination.contact,
+                onDismiss: { viewStore.send(.setDestination(nil)) },
+                content: { _ in
+                  NavigationStack {
+                    ContactView(
+                      store: store.scope(
+                        state: \.contactState,
+                        action: ReportDomain.Action.contact
+                      )
                     )
-                  )
-                  .accessibilityAddTraits([.isModal])
-                  .navigationBarItems(
-                    leading: Button(
-                      action: { viewStore.send(.set(\.$showEditContact, false)) },
-                      label: { Text(L10n.Button.close) }
-                    )
-                  )
+                    .accessibilityAddTraits([.isModal])
+                    .toolbar {
+                      ToolbarItem(placement: .cancellationAction) {
+                        Button(
+                          action: { viewStore.send(.setDestination(nil)) },
+                          label: { Text(L10n.Button.close) }
+                        )
+                      }
+                    }
+                  }
                 }
-              }
-            )
+              )
+          }
         }
         
         // Send notice buttons
@@ -195,8 +204,10 @@ public struct ReportView: View {
                   if !viewStore.state.description.isValid {
                     Text(L10n.Report.Error.description.asBulletPoint)
                   }
-                  if !viewStore.state.contactState.contact.isValid {
-                    Text(L10n.Report.Error.contact.asBulletPoint)
+                  if viewStore.apiToken.isEmpty {
+                    if !viewStore.state.contactState.contact.isValid {
+                      Text(L10n.Report.Error.contact.asBulletPoint)
+                    }
                   }
                 }
               }

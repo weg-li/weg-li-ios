@@ -8,10 +8,13 @@ import Styleguide
 import SwiftUI
 
 public struct ImagesView: View {
-  let store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>
-  @ObservedObject private var viewStore: ViewStore<ImagesViewDomain.State, ImagesViewDomain.Action>
+  public typealias S = ImagesViewDomain.State
+  public typealias A = ImagesViewDomain.Action
   
-  public init(store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>) {
+  let store: Store<S, A>
+  @ObservedObject private var viewStore: ViewStore<S, A>
+  
+  public init(store: Store<S, A>) {
     self.store = store
     self.viewStore = ViewStore(store)
   }

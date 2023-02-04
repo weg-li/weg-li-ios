@@ -116,6 +116,7 @@ public struct AppDomain: ReducerProtocol {
       case errorMessage(String)
       case dismiss
     }
+    
     public enum NoticeSortOrder: Hashable {
       case createdAtDate
       case noticeDate
@@ -144,6 +145,7 @@ public struct AppDomain: ReducerProtocol {
     case editNotice(EditNoticeDomain.Action)
     case editNoticeResponse(TaskResult<Notice>)
     case dismissAlert
+    case onNavigateToAccontSettingsButtonTapped
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -286,18 +288,7 @@ public struct AppDomain: ReducerProtocol {
         
         // After the emailResult reports the mail has been sent the report will be stored.
       case .report(.mail(.setMailResult(.sent))):
-        state.reportDraft.images.storedPhotos.removeAll()
-        let safeImageUrls = state.reportDraft.images.storedPhotos
-          .compactMap {  $0 }
-          .compactMap(\.imageUrl)
-        return .merge(
-          .fireAndForget {
-            for url in safeImageUrls {
-              try await fileClient.removeItem(url)
-            }
-          },
-          EffectTask(value: .reportSaved)
-        )
+        return .none
         
       case .report(.onResetConfirmButtonTapped):
         state.reportDraft = ReportDomain.State(
@@ -416,6 +407,12 @@ public struct AppDomain: ReducerProtocol {
       case .dismissAlert:
         state.alert = nil
         return .none
+        
+      case .onNavigateToAccontSettingsButtonTapped:
+        return .concatenate(
+          EffectTask(value: .binding(.set(\.$selectedTab, .settings))),
+          EffectTask(value: .settings(.setDestination(.accountSettings)))
+        )
       }
     }
     .ifLet(\.editNotice, action: /Action.editNotice) {

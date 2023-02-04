@@ -79,7 +79,7 @@ public struct DescriptionView: View {
       .accessibilityElement(children: .combine)
       
       Button(
-        action: { viewStore.send(.set(\.$showEditDescription, true)) },
+        action: { viewStore.send(.setDestination(.description)) },
         label: {
           Label(L10n.Description.EditButton.copy, systemImage: "square.and.pencil")
             .contentShape(Rectangle())

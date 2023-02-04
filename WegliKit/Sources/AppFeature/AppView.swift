@@ -62,7 +62,6 @@ public struct AppView: View {
       .tabItem { Label(L10n.Settings.title, systemImage: "gearshape") }
       .tag(Tabs.settings)
     }
-    
     .navigationViewStyle(.stack)
   }
 }

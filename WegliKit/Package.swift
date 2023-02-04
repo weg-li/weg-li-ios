@@ -133,6 +133,7 @@ let package = Package(
         .models,
         .styleguide,
         .tca,
+        .navigation,
         .product(name: "Kingfisher", package: "Kingfisher")
       ]
     ),
@@ -241,7 +242,8 @@ let package = Package(
         .models,
         .styleguide,
         .applicationClient,
-        .tca
+        .tca,
+        .navigation
       ]
     ),
     .target(

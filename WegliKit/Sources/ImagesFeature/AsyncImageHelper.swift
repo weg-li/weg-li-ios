@@ -12,7 +12,6 @@ import SwiftUI
 public struct AsyncThumbnailView: View {
   let url: URL
   private let processor = DownsamplingImageProcessor(size: .init(width: 600, height: 600))
-  |> RoundCornerImageProcessor(cornerRadius: 10)
   
   @State private var image: UIImage?
   
@@ -25,6 +24,8 @@ public struct AsyncThumbnailView: View {
       .placeholder { placeholder }
       .setProcessor(processor)
       .fade(duration: 0.25)
+      .resizable()
+      .aspectRatio(contentMode: .fill)
   }
   
   var placeholder: some View {
@@ -49,6 +50,8 @@ struct AsyncImageView: View {
     KFImage.url(url)
       .placeholder { placeholder }
       .fade(duration: 0.25)
+      .resizable()
+      .aspectRatio(contentMode: .fit)
   }
   
   var placeholder: some View {

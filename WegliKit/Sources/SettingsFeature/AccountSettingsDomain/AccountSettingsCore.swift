@@ -14,7 +14,6 @@ public struct AccountSettingsDomain: ReducerProtocol {
     public var accountSettings: AccountSettings
     
     public var isNetworkRequestInProgress = false
-    public var apiTestRequestResult: Bool?
     
     public init(accountSettings: AccountSettings) {
       self.accountSettings = accountSettings

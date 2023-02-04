@@ -1,5 +1,5 @@
-// Created for weg-li in 2021.
 
+// Created for weg-li in 2021.
 import ApiClient
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -77,6 +77,8 @@ public struct ReportDomain: ReducerProtocol {
     
     public var uploadedNoticeID: String?
     
+    public var destination: Destination?
+    
     public func isModified() -> Bool {
       district != nil
       || isPhotosValid
@@ -86,10 +88,16 @@ public struct ReportDomain: ReducerProtocol {
     }
     
     public var isReportValid: Bool {
-      images.isValid
-      && contactState.contact.isValid
-      && description.isValid
-      && location.resolvedAddress.isValid
+      var values = [
+        images.isValid,
+        location.resolvedAddress.isValid,
+        description.isValid
+      ]
+      if apiToken.isEmpty {
+        values.append(contactState.contact.isValid)
+      }
+      let isValid = values.allSatisfy { $0 == true }
+      return isValid
     }
     
     init(
@@ -123,6 +131,11 @@ public struct ReportDomain: ReducerProtocol {
       self.uploadedImagesIds = uploadedImagesIds
       self.isNetworkAvailable = isNetworkAvailable
     }
+    
+    public enum Destination: Equatable {
+      case description
+      case contact
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -147,6 +160,7 @@ public struct ReportDomain: ReducerProtocol {
     case postNoticeResponse(TaskResult<Notice>)
     case submitNoticeResponse(TaskResult<Notice>)
     case editNoticeInBrowser
+    case setDestination(State.Destination?)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -446,14 +460,22 @@ public struct ReportDomain: ReducerProtocol {
         
         state.alert = .sendNoticeFailed(error: error as! ApiError)
         return .none
+      
+      case .setDestination(let value):
+        switch value {
+        case .none:
+          state.description.presentChargeSelection = false
+          state.description.presentCarBrandSelection = false
+        case .some:
+          break
+        }
+        state.destination = value
+        return .none
         
       }
     }
   }
 }
-
-
-
 
 public extension ReportDomain.State {
   init(

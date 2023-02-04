@@ -49,7 +49,7 @@ public struct ContactWidget: View {
       .accessibilityElement(children: .combine)
       VStack(spacing: .grid(2)) {
         Button(
-          action: { viewStore.send(.set(\.$showEditContact, true)) },
+          action: { viewStore.send(.setDestination(.contact)) },
           label: {
             Label(L10n.Contact.editButtonCopy, systemImage: "square.and.pencil")
               .frame(maxWidth: .infinity)

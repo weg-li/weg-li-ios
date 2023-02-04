@@ -59,11 +59,17 @@ public struct NoticesView: View {
               .multilineTextAlignment(.center)
           }
           
-          if let errorMessage = errorState.error?.errorDump {
-            Text(errorMessage)
-              .font(.body.italic())
-              .multilineTextAlignment(.center)
+          if errorState == ErrorState.tokenUnavailable {
+            goToAccountSettings()
+              .padding(.vertical)
           }
+
+//          if let errorMessage = errorState.error?.errorDump {
+//            Text(errorMessage)
+//              .font(.body.italic())
+//              .multilineTextAlignment(.center)
+//          }
+          
         }
         .padding(.horizontal, .grid(3))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -72,7 +78,7 @@ public struct NoticesView: View {
     .sheet(
       unwrapping: viewStore.binding(
         get: \.destination,
-        send: { A.setNavigationDestination($0) }
+        send: A.setNavigationDestination
       ),
       case: /S.Destination.edit,
       onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
@@ -183,6 +189,15 @@ public struct NoticesView: View {
   }
   
   @ViewBuilder
+  func goToAccountSettings() -> some View {
+    Button(
+      action: { viewStore.send(.onNavigateToAccontSettingsButtonTapped) },
+      label: { Text("Zu den Einstellungen") }
+    )
+    .buttonStyle(CTAButtonStyle())
+  }
+  
+  @ViewBuilder
   private func emptyStateView(_ emptyState: EmptyState<AppDomain.Action>) -> some View {
     VStack(alignment: .center, spacing: .grid(3)) {
       Image(systemName: "doc.richtext")
@@ -191,11 +206,13 @@ public struct NoticesView: View {
       Text(emptyState.text)
         .font(.system(.title))
         .multilineTextAlignment(.center)
+      
       if let message = emptyState.message {
         Text(AttributedString(message))
           .font(.body)
           .multilineTextAlignment(.center)
       }
+      
       if let action = emptyState.action {
         Button(
           action: { viewStore.send(action.action) },

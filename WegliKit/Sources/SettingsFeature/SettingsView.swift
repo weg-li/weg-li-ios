@@ -6,6 +6,7 @@ import Helper
 import L10n
 import Styleguide
 import SwiftUI
+import SwiftUINavigation
 
 public struct SettingsView: View {
   public typealias S = SettingsDomain.State
@@ -24,18 +25,14 @@ public struct SettingsView: View {
   public var body: some View {
     Form {
       Section {
-        NavigationLink(
-          destination: AccountSettingsView(
-            store: store.scope(
-              state: \.accountSettingsState,
-              action: A.accountSettings
-            )
-          ),
+        Button(
+          action: { viewStore.send(.setDestination(.accountSettings)) },
           label: {
             HStack {
               Label("Account", systemImage: "person.circle")
                 .labelStyle(.titleOnly)
               Spacer()
+              Image(systemName: "chevron.right")
             }
           }
         )
@@ -86,6 +83,7 @@ public struct SettingsView: View {
               Spacer()
               linkIcon
             }
+            .padding(.vertical, 4)
           }
         )
         .accessibilityAddTraits([.isLink])
@@ -98,6 +96,7 @@ public struct SettingsView: View {
               Spacer()
               linkIcon
             }
+            .padding(.vertical, 4)
           }
         )
         .accessibilityAddTraits([.isLink])
@@ -110,6 +109,7 @@ public struct SettingsView: View {
               Spacer()
               linkIcon
             }
+            .padding(.vertical, 4)
           }
         )
       }
@@ -123,6 +123,18 @@ public struct SettingsView: View {
       }
       versionNumberView
     }
+    .navigationDestination(
+      unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
+      case: /S.Destination.accountSettings,
+      destination: { _ in
+        AccountSettingsView(
+          store: store.scope(
+            state: \.accountSettingsState,
+            action: A.accountSettings
+          )
+        )
+      }
+    )
     .foregroundColor(Color(.label))
     .navigationTitle(L10n.Settings.title)
   }

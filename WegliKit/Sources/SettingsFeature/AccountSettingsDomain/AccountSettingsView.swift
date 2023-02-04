@@ -32,6 +32,12 @@ public struct AccountSettingsView: View {
                 send: A.setApiToken
               )
             )
+            .clearButton(
+              text: viewStore.binding(
+                get: \.accountSettings.apiToken,
+                send: A.setApiToken
+              )
+            )
             .placeholder(when: viewStore.state.accountSettings.apiToken.isEmpty, placeholder: {
               Text("API-Token")
                 .italic()
@@ -86,7 +92,7 @@ public struct AccountSettingsView: View {
       }
       .headerProminence(.increased)
     }
-    .navigationBarTitle("Account", displayMode: .inline)
+    .navigationBarTitle("Account", displayMode: .automatic)
   }
 }
 
@@ -100,6 +106,31 @@ private extension View {
       placeholder().opacity(shouldShow ? 1 : 0)
       self
     }
+  }
+}
+
+struct ClearButton: ViewModifier {
+  @Binding var text: String
+  
+  func body(content: Content) -> some View {
+    ZStack(alignment: .trailing) {
+      content
+      
+      if !text.isEmpty {
+        Button {
+          text = ""
+        } label: {
+          Image(systemName: "multiply.circle.fill")
+            .foregroundStyle(.gray)
+        }
+        .padding(.trailing, 8)
+      }
+    }
+  }
+}
+extension View {
+  func clearButton(text: Binding<String>) -> some View {
+    modifier(ClearButton(text: text))
   }
 }
 

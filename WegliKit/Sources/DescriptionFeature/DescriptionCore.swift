@@ -102,9 +102,6 @@ public struct DescriptionDomain: ReducerProtocol {
     
     Reduce<State, Action> { state, action in
       switch action {
-      case .binding:
-        return .none
-        
       case .binding(\.$presentChargeSelection):
         state.chargeSelection.chargeTypeSearchText = ""
         return .none
@@ -112,24 +109,12 @@ public struct DescriptionDomain: ReducerProtocol {
       case .binding(\.$presentCarBrandSelection):
         state.carBrandSelection.carBrandSearchText = ""
         return .none
+
+      case .carBrandSelection, .chargeSelection:
+        return .none
         
-      case .carBrandSelection(let carbrandSelectionAction):
-        switch carbrandSelectionAction {
-        case .setBrand:
-          state.presentCarBrandSelection = false
-          return .none
-        case .binding:
-          return .none
-        }
-        
-      case .chargeSelection(let chargeSelectionAction):
-        switch chargeSelectionAction {
-        case .setCharge:
-          state.presentChargeSelection = false
-          return .none
-        default:
-          return .none
-        }
+      case .binding:
+        return .none
       }
     }
   }

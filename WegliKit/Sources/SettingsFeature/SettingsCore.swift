@@ -35,6 +35,11 @@ public struct SettingsDomain: ReducerProtocol {
     
     public var accountSettingsState: AccountSettingsDomain.State
     public var userSettings: UserSettings
+    public var destination: Destination?
+    
+    public enum Destination: Equatable {
+      case accountSettings
+    }
   }
   
   public enum Action: Equatable {
@@ -44,6 +49,7 @@ public struct SettingsDomain: ReducerProtocol {
     case openImprintTapped
     case donateTapped
     case openGitHubProjectTapped
+    case setDestination(State.Destination?)
   }
   
   public var body: some ReducerProtocol<State, Action> {
@@ -89,6 +95,10 @@ public struct SettingsDomain: ReducerProtocol {
             try await fileClient.saveUserSettings(userSettings)
           }
         }
+        
+      case .setDestination(let value):
+        state.destination = value
+        return .none
       }
     }
   }
