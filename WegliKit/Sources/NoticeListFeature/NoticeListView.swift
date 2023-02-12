@@ -31,15 +31,7 @@ public struct NoticeListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         
       case let .results(notices):
-        List(notices) { notice in
-          NoticeView(notice: notice)
-            .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
-            .listRowSeparator(.hidden)
-        }
-        .refreshable {
-          await viewStore.send(.fetchNotices(forceReload: true), while: \.isFetchingNotices)
-        }
-        .listStyle(.plain)
+        noticeList(notices: notices)
         
       case let .empty(emptyState):
         emptyStateView(emptyState)
@@ -202,6 +194,19 @@ public struct NoticeListView: View {
         .disabled(viewStore.isFetchingNotices)
       }
     }
+  }
+  
+  @ViewBuilder
+  func noticeList(notices: [Notice]) -> some View {
+    List(notices) { notice in
+      NoticeView(notice: notice)
+        .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
+        .listRowSeparator(.hidden)
+    }
+    .refreshable {
+      await viewStore.send(.fetchNotices(forceReload: true), while: \.isFetchingNotices)
+    }
+    .listStyle(.plain)
   }
   
   @ViewBuilder

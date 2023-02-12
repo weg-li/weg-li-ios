@@ -21,17 +21,18 @@ public struct NoticeListDomain: ReducerProtocol {
   public struct State: Equatable {
     public var notices: ContentState<[Notice], Action>
     public var editNotice: EditNoticeDomain.State?
-    public var isFetchingNotices = false
-    public var isNetworkAvailable = true
     public var alert: AlertState<Action>?
     public var noticesSortOrder: NoticeSortOrder = .noticeDate
     public var orderSortType: [NoticeSortOrder: Bool]
-    public var isSendingEditedNotice = false
+    @BindingState public var isFetchingNotices = false
+    @BindingState public var isNetworkAvailable = true
+    @BindingState public var isSendingEditedNotice = false
     
-    public var errorBarMessage: BarMessageType?
+    public var errorBarMessage: MessageBarType?
     
-    public enum BarMessageType: Equatable {
-      case loadingError
+    public enum MessageBarType: Equatable {
+      case error
+      case success
     }
     
     public init(
@@ -115,7 +116,8 @@ public struct NoticeListDomain: ReducerProtocol {
     }
   }
   
-  public enum Action: Equatable {
+  public enum Action: Equatable, BindableAction {
+    case binding(BindingAction<State>)
     case setSortOrder(State.NoticeSortOrder)
     case setNavigationDestination(State.Destination?)
     case onNavigateToAccontSettingsButtonTapped
@@ -130,12 +132,14 @@ public struct NoticeListDomain: ReducerProtocol {
     case onAppear
     case observeConnection
     case dismissAlert
-    case displayErrorBar(State.BarMessageType?)
+    case displayMessageBar(State.MessageBarType?)
     
     case observeConnectionResponse(NetworkPath)
   }
   
   public var body: some ReducerProtocol<State, Action> {
+    BindingReducer()
+    
     Reduce<State, Action> { state, action in
       switch action {
       case .onAppear:
@@ -194,8 +198,6 @@ public struct NoticeListDomain: ReducerProtocol {
           try await fileClient.saveNotices(notices)
         }
         
-        
-        
       case let .fetchNotices(forceReload):
         guard state.isNetworkAvailable else {
           state.notices = .empty(.emptyNotices())
@@ -207,16 +209,22 @@ public struct NoticeListDomain: ReducerProtocol {
           return .none
         }
         
-        state.isFetchingNotices = true
-        state.notices = .loading // TODO: show after 0.1 seconds
+        state.notices = .loading
         
-        return .task {
-          await .fetchNoticesResponse(
-            TaskResult { try await apiService.getNotices(forceReload) }
-          )
-        }
+        return .merge(
+          .run { send in
+            try await clock.sleep(for: .seconds(0.15))
+            await send.send(.binding(.set(\.$isFetchingNotices, true)))
+          }.cancellable(id: LoadingState.self),
+          .task {
+            await .fetchNoticesResponse(
+              TaskResult { try await apiService.getNotices(forceReload) }
+            )
+          }
+        )
         
       case let .fetchNoticesResponse(.success(notices)):
+        Task.cancel(id: LoadingState.self)
         state.isFetchingNotices = false
         state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
         
@@ -227,6 +235,7 @@ public struct NoticeListDomain: ReducerProtocol {
         return EffectTask(value: .setSortOrder(state.noticesSortOrder))
         
       case let .fetchNoticesResponse(.failure(error)):
+        Task.cancel(id: LoadingState.self)
         state.isFetchingNotices = false
         
         if let apiError = error as? ApiError, apiError == .tokenUnavailable {
@@ -241,13 +250,13 @@ public struct NoticeListDomain: ReducerProtocol {
             )
           },
           .run { send in
-            await send.send(.displayErrorBar(.loadingError))
+            await send.send(.displayMessageBar(.error))
             try await Task.sleep(for: .seconds(4))
-            await send.send(.displayErrorBar(nil))
+            await send.send(.displayMessageBar(nil))
           }
         )
         
-      case .displayErrorBar(let value):
+      case .displayMessageBar(let value):
         state.errorBarMessage = value
         return .none
         
@@ -313,6 +322,8 @@ public struct NoticeListDomain: ReducerProtocol {
         state.alert = nil
         return .none
         
+      case .binding:
+        return .none
       }
     }
     .ifLet(\.editNotice, action: /Action.editNotice) {
@@ -323,6 +334,8 @@ public struct NoticeListDomain: ReducerProtocol {
 
 
 // MARK: - Helper
+
+enum LoadingState {}
 enum ObserveConnectionIdentifier {}
 
 public extension AlertState where Action == NoticeListDomain.Action {
