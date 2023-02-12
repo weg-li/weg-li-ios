@@ -35,6 +35,10 @@ let package = Package(
       targets: ["MailFeature"]
     ),
     .library(
+      name: "NoticeListFeature",
+      targets: ["NoticeListFeature"]
+    ),
+    .library(
       name: "ReportFeature",
       targets: ["ReportFeature"]
     ),
@@ -73,6 +77,7 @@ let package = Package(
         .l10n,
         "ReportFeature",
         "SettingsFeature",
+        "NoticeListFeature",
         .models,
         .styleguide,
         .tca,
@@ -179,6 +184,17 @@ let package = Package(
       ]
     ),
     .target(
+      name: "NoticeListFeature",
+      dependencies: [
+        .l10n,
+        .models,
+        .tca,
+        .navigation,
+        "DescriptionFeature",
+        "ImagesFeature"
+      ]
+    ),
+    .target(
       name: "PathMonitorClient",
       dependencies: [
         .tca,
@@ -244,7 +260,8 @@ let package = Package(
         .applicationClient,
         .tca,
         .navigation
-      ]
+      ],
+      resources: [.process("Resources")]
     ),
     .target(
       name: "SharedModels",
@@ -332,6 +349,19 @@ package.targets.append(
       name: "MailFeatureTests",
       dependencies: [
         "MailFeature",
+        .models,
+        .tca,
+        .product(name: "CustomDump", package: "swift-custom-dump")
+      ]
+    ),
+    .testTarget(
+      name: "NoticeListFeatureTests",
+      dependencies: [
+        "NoticeListFeature",
+        "ContactFeature",
+        "DescriptionFeature",
+        "ImagesFeature",
+        "ReportFeature",
         .models,
         .tca,
         .product(name: "CustomDump", package: "swift-custom-dump")

@@ -24,7 +24,6 @@ final class AppStoreTests: XCTestCase {
   let fixedUUID = { UUID.reportId }
   let fixedDate = { Date(timeIntervalSinceReferenceDate: 0) }
   let scheduler = DispatchQueue.immediate.eraseToAnyScheduler()
-  var userDefaults: UserDefaults!
   
   var report: ReportDomain.State!
   
@@ -45,8 +44,6 @@ final class AppStoreTests: XCTestCase {
       location: .init(),
       mail: .init()
     )
-    userDefaults = UserDefaults(suiteName: #file)
-    userDefaults.removePersistentDomain(forName: #file)
   }
   
   func test_updateContact_ShouldUpdateState() async {
@@ -138,59 +135,6 @@ final class AppStoreTests: XCTestCase {
     await store.finish()
   }
   
-  func test_ActionFetchNoticeResponse_shouldNotStoreNoticeToFileClientWhenResponseIsEmpty() async {
-    let didSaveNotices = ActorIsolated(false)
-    
-    var fileClient = FileClient.noop
-    fileClient.save = { @Sendable _, _ in
-      await didSaveNotices.setValue(true)
-      return ()
-    }
-    
-    let store = TestStore(
-      initialState: .init(reportDraft: report),
-      reducer: AppDomain(),
-      prepareDependencies: { dependencies in
-        dependencies.continuousClock = ImmediateClock()
-        dependencies.fileClient = fileClient
-      }
-    )
-    
-    await store.send(.fetchNoticesResponse(.success([]))) {
-      $0.notices = .empty(.emptyNotices())
-    }
-    await didSaveNotices.withValue { value in
-      XCTAssertFalse(value)
-    }
-  }
-  
-  func test_ActionFetchNoticeResponse_shouldStoreNoticeToFileClient() async {
-    let didSaveNotices = ActorIsolated(false)
-    
-    var fileClient = FileClient.noop
-    fileClient.save = { @Sendable _, _ in
-      await didSaveNotices.setValue(true)
-      return ()
-    }
-    
-    let store = TestStore(
-      initialState: .init(reportDraft: report),
-      reducer: AppDomain()
-    )
-    store.dependencies.fileClient = fileClient
-    store.dependencies.apiService.getNotices = { _ in .placeholder }
-    
-    await store.send(.fetchNoticesResponse(.success(.placeholder))) {
-      $0.notices = .results(.placeholder)
-    }
-    await store.receive(.setSortOrder(.noticeDate)) {
-      $0.orderSortType[.noticeDate] = false
-    }
-    await didSaveNotices.withValue { value in
-      XCTAssertTrue(value)
-    }
-  }
-  
   func test_ActionOnAccountSettings_shouldPersistAccountsSettings() async {
     let store = TestStore(
       initialState: .init(reportDraft: report),
@@ -205,147 +149,18 @@ final class AppStoreTests: XCTestCase {
     }
   }
   
-  func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() async {
-    var state = AppDomain.State(reportDraft: report)
-    state.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: AppDomain()
-    )
-    store.dependencies.keychainClient = .noop
-    store.dependencies.continuousClock = ImmediateClock()
-    store.dependencies.apiService.getNotices = { _ in [.mock] }
-    store.dependencies.fileClient.save = { @Sendable _ ,_ in () }
-    store.dependencies.fileClient.load = { @Sendable key in
-      if key == "contact-settings" {
-        return try! Contact.preview.encoded()
-      }
-      fatalError()
-    }
-    
-    await store.send(.onAppear)
-    await store.receive(.fetchNotices(forceReload: false))
-    await store.receive(.fetchNoticesResponse(.success([.mock]))) {
-      $0.notices = .results([.mock])
-    }
-    await store.receive(.setSortOrder(.noticeDate)) {
-      $0.orderSortType[.noticeDate] = false
-    }
-  }
-  
-  func test_Action_onAppear_shouldPresentNoTokenErrorState() {
+  func test_onNavigateToAccountSettingsButtonTapped() async {
     let store = TestStore(
       initialState: .init(reportDraft: report),
       reducer: AppDomain()
     )
     
-    store.send(.onAppear) {
-      $0.notices = .error(
-        .init(
-          systemImageName: "key",
-          title: "Kein API Token",
-          body: "Füge deinen API Token in den Account Einstellungen hinzu um die App mit deinem weg.li Account zu verbinden"
-        )
-      )
+    await store.send(.noticeList(.onNavigateToAccontSettingsButtonTapped))
+    await store.receive(.binding(.set(\.$selectedTab, .settings))) {
+      $0.selectedTab = .settings
     }
-  }
-  
-  func test_Action_fetchNotices_shouldNotReload_whenElementsHaveBeenLoaded_andNoForceReload() {
-    var state = AppDomain.State(reportDraft: report)
-    state.notices = .results([.mock])
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: AppDomain()
-    )
-    
-    store.send(.fetchNotices(forceReload: false))
-    // does not fetch notices again
-  }
-  
-  func test_Action_fetchNotices_shouldReload_whenElementsHaveBeenLoaded_andForceReload() async {
-    var state = AppDomain.State(reportDraft: report)
-    state.notices = .results([.placeholder])
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: AppDomain()
-    )
-    store.dependencies.apiService.getNotices = { _ in [.mock] }
-    store.dependencies.fileClient.save = { @Sendable _, _ in () }
-    
-    await store.send(.fetchNotices(forceReload: true)) {
-      $0.notices = .loading
-    }
-    await store.receive(.fetchNoticesResponse(.success([.mock]))) {
-      $0.notices = .results([.mock])
-    }
-    await store.receive(.setSortOrder(.noticeDate)) {
-      $0.orderSortType[.noticeDate] = false
-    }
-  }
-  
-  func test_Action_setNoticesSortOrder() async {
-    let didSaveNotices = ActorIsolated(false)
-    
-    var state = AppDomain.State(reportDraft: report)
-    state.notices = .results([.xxxx123, .xxxy123, .abcd123])
-    
-    let store = TestStore(
-      initialState: state,
-      reducer: AppDomain()
-    )
-    store.dependencies.fileClient.save = { @Sendable _, _ in
-      await didSaveNotices.setValue(true)
-      return ()
-    }
-    
-    var order: AppDomain.State.NoticeSortOrder = .registration
-    await store.send(.setSortOrder(order)) {
-      $0.noticesSortOrder = order
-      $0.orderSortType[order] = true
-      $0.notices = .results([.abcd123, .xxxx123, .xxxy123])
-    }
-    await didSaveNotices.withValue { value in
-      XCTAssertTrue(value)
-    }
-    await store.send(.setSortOrder(order)) {
-      $0.orderSortType[order] = false
-      $0.notices = .results([.xxxy123, .xxxx123, .abcd123])
-    }
-
-    order = .createdAtDate
-    await store.send(.setSortOrder(order)) {
-      $0.noticesSortOrder = order
-      $0.orderSortType[order] = true
-      $0.notices = .results([.xxxy123, .xxxx123, .abcd123])
-    }
-    await store.send(.setSortOrder(order)) {
-      $0.orderSortType[order] = false
-      $0.notices = .results([.abcd123, .xxxx123, .xxxy123])
-    }
-
-    order = .noticeDate
-    await store.send(.setSortOrder(order)) {
-      $0.noticesSortOrder = order
-      $0.orderSortType[order] = false
-      $0.notices = .results([.abcd123, .xxxy123, .xxxx123])
-    }
-    await store.send(.setSortOrder(order)) {
-      $0.orderSortType[order] = true
-      $0.notices = .results([.xxxx123, .xxxy123, .abcd123])
-    }
-
-    order = .status
-    await store.send(.setSortOrder(order)) {
-      $0.noticesSortOrder = order
-      $0.orderSortType[order] = true
-      $0.notices = .results([.xxxy123, .abcd123, .xxxx123])
-    }
-    await store.send(.setSortOrder(order)) {
-      $0.orderSortType[order] = false
-      $0.notices = .results([.xxxx123, .xxxy123, .abcd123])
+    await store.receive(.settings(.setDestination(.accountSettings))) {
+      $0.settings.destination = .accountSettings
     }
   }
 }
@@ -355,72 +170,4 @@ extension AppDomain.State {
     self.init()
     self.reportDraft = reportDraft
   }
-}
-
-extension SharedModels.Notice {
-  static let xxxy123 = Self(
-    token: "xxxy123",
-    status: .open,
-    street: "xxxy123+Street",
-    city: "xxxy123+City",
-    zip: "xxxy123+Zip",
-    latitude: 0,
-    longitude: 0,
-    registration: "xxxy123",
-    brand: "Audi",
-    color: "blue",
-    charge: "CHARGE",
-    date: Date(timeIntervalSince1970: 1_380_624_207),
-    duration: 1,
-    severity: nil,
-    note: "NOTE",
-    createdAt: Date(timeIntervalSince1970: 1_580_624_207),
-    updatedAt: Date(timeIntervalSince1970: 1_580_624_207),
-    sentAt: Date(timeIntervalSince1970: 1_580_624_207),
-    photos: []
-  )
-  
-  static let xxxx123 = Self(
-    token: "xxxx123",
-    status: .disabled,
-    street: "xxxx123+Street",
-    city: "xxxx123+City",
-    zip: "xxxx123+Zip",
-    latitude: 0,
-    longitude: 0,
-    registration: "xxxx123",
-    brand: "Opel",
-    color: "orange",
-    charge: "CHARGE",
-    date: Date(timeIntervalSince1970: 1_299_624_207),
-    duration: 1,
-    severity: nil,
-    note: "NOTE",
-    createdAt: Date(timeIntervalSince1970: 1_599_624_207),
-    updatedAt: Date(timeIntervalSince1970: 1_599_624_207),
-    sentAt: Date(timeIntervalSince1970: 1_599_624_207),
-    photos: []
-  )
-  
-  static let abcd123 = Self(
-    token: "abcd123",
-    status: .open,
-    street: "abcd123+Street",
-    city: "abcd123+City",
-    zip: "abcd123+Zip",
-    latitude: 0,
-    longitude: 0,
-    registration: "abcd123",
-    brand: "VW",
-    color: "black",
-    charge: "CHARGE",
-    date: Date(timeIntervalSince1970: 1_499_624_207),
-    duration: 1,
-    severity: nil,
-    note: "NOTE",
-    createdAt: Date(timeIntervalSince1970: 1_899_624_207),
-    updatedAt: Date(timeIntervalSince1970: 1_899_624_207),
-    sentAt: Date(timeIntervalSince1970: 1_899_624_207),
-    photos: []
-  )
 }

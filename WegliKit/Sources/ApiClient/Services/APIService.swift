@@ -149,3 +149,7 @@ extension APIService: TestDependencyKey {
     deleteNotice: unimplemented("\(Self.self).deleteNotice")
   )
 }
+
+extension ApiError {
+  public static let tokenUnavailable = Self(message: "API Token unavailable")
+}

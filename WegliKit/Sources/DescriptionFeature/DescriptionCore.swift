@@ -166,3 +166,24 @@ extension CarBrand {
     } ?? CarBrand("")
   }
 }
+
+public extension DescriptionDomain.State {
+  init(model: Notice) {
+    self = Self.init(
+      licensePlateNumber: model.registration ?? "",
+      selectedColor: model.color.flatMap { color -> Int in
+        let colors = DescriptionDomain.colors
+        guard let index = colors.firstIndex(where: { color == $0.key }) else { return 0 }
+        return index
+      } ?? 0,
+      selectedBrand: .init(model.brand),
+      selectedDuration:  model.duration.flatMap { Int($0) } ?? 0,
+      selectedCharge: model.charge.flatMap(Charge.init),
+      blockedOthers: true,
+      vehicleEmpty: model.vehicleEmpty ?? true,
+      hazardLights: model.hazardLights ?? false,
+      expiredTuv: model.expiredTuv ?? false,
+      expiredEco: model.expiredEco ?? false
+    )
+  }
+}

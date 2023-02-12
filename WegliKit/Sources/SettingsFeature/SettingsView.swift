@@ -157,7 +157,7 @@ public struct SettingsView: View {
         }
         Spacer()
         // swiftlint:disable:next force_unwrapping
-        Image(uiImage: UIImage(named: "GitHub")!)
+        Image(uiImage: UIImage(named: "GitHub", in: .module, with: nil)!)
           .resizable()
           .frame(maxWidth: 32, maxHeight: 32)
           .colorInvert()

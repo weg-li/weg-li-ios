@@ -14,6 +14,7 @@ import KeychainClient
 import L10n
 import MapKit
 import Network
+import NoticeListFeature
 import OrderedCollections
 import PathMonitorClient
 import PlacesServiceClient
@@ -40,12 +41,10 @@ public struct AppDomain: ReducerProtocol {
   @Dependency(\.pathMonitorClient) public var pathMonitorClient
   
   public struct State: Equatable {
-    /// Settings
     public var settings: SettingsDomain.State
     public var contact: Contact = .empty
-    public var notices: ContentState<[Notice], Action>
+    public var noticeList: NoticeListDomain.State
     
-    /// Holds a report that has not been stored or sent via mail
     public var reportDraft: ReportDomain.State = .init(
       uuid: UUID.init,
       images: .init(),
@@ -53,76 +52,9 @@ public struct AppDomain: ReducerProtocol {
       date: Date.init
     )
     
-    public var isNetworkAvailable = true { // TODO:
-      didSet {
-        reportDraft.isNetworkAvailable = isNetworkAvailable
-      }
-    }
-    
-    public var isFetchingNotices: Bool { notices == .loading }
-    
     @BindingState public var selectedTab: Tabs = .notice
-    public var noticesSortOrder: NoticeSortOrder = .noticeDate
-    public var orderSortType: [NoticeSortOrder: Bool] = [
-      .noticeDate: true,
-      .createdAtDate: false,
-      .registration: false,
-      .status: false
-    ]
     
-    public var editNotice: EditNoticeDomain.State?
-    public func isAscending(for type: NoticeSortOrder) -> Bool {
-      orderSortType[type, default: true]
-    }
-    public var isSendingEditedNotice = false
-    public var destination: Destination? {
-      didSet {
-        switch destination {
-        case .edit(let notice):
-          editNotice = .init(notice: notice)
-        default:
-          return
-        }
-      }
-    }
-    public var alert: AlertState<Action>?
-    
-    var showNoticeDateSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.date)
-      return filtered.count == elements.count
-    }
-    var showCreatedAtDateSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.createdAt)
-      return filtered.count == elements.count
-    }
-    var showStatusSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.status)
-      return filtered.count == elements.count
-    }
-    var showRegistrationSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.registration)
-      return filtered.count == elements.count
-    }
-    
-    public enum Destination: Equatable {
-      case edit(Notice)
-      case alert(AlertState<AlertAction>)
-    }
-    public enum AlertAction: Equatable {
-      case errorMessage(String)
-      case dismiss
-    }
-    
-    public enum NoticeSortOrder: Hashable {
-      case createdAtDate
-      case noticeDate
-      case registration
-      case status
-    }
+    public var isFetchingNotices = false
   }
   
   public enum Action: Equatable, BindableAction {
@@ -133,22 +65,15 @@ public struct AppDomain: ReducerProtocol {
     case storedApiTokenLoaded(TaskResult<String?>)
     case settings(SettingsDomain.Action)
     case report(ReportDomain.Action)
-    case fetchNotices(forceReload: Bool)
-    case fetchNoticesResponse(TaskResult<[Notice]>)
+    case noticeList(NoticeListDomain.Action)
     case reportSaved
-    case onAppear
-    case observeConnection
-    case setSortOrder(State.NoticeSortOrder)
-    case observeConnectionResponse(NetworkPath)
-    case setNavigationDestination(State.Destination?)
-    case onSaveNoticeButtonTapped
-    case editNotice(EditNoticeDomain.Action)
-    case editNoticeResponse(TaskResult<Notice>)
-    case dismissAlert
-    case onNavigateToAccontSettingsButtonTapped
   }
   
   public var body: some ReducerProtocol<State, Action> {
+    Scope(state: \.noticeList, action: /Action.noticeList) {
+      NoticeListDomain()
+    }
+    
     Scope(state: \.reportDraft, action: /Action.report) {
       ReportDomain()
     }
@@ -163,59 +88,6 @@ public struct AppDomain: ReducerProtocol {
       switch action {
       case .binding:
         return .none
-        
-      case .setSortOrder(let order):
-        guard let notices = state.notices.elements else {
-          return .none
-        }
-        
-        state.noticesSortOrder = order
-                        
-        switch order {
-        case .noticeDate:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
-          let sortedNotices = notices.sorted {
-            guard let aDate = $0.date, let bDate = $1.date else { return false }
-            let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
-            return sortOperator(aDate, bDate)
-          }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
-        
-        case .createdAtDate:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
-          let sortedNotices = notices.sorted {
-            guard let aCreatedAtDate = $0.createdAt, let bCreateAtDate = $1.createdAt else { return false }
-            let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
-            return sortOperator(aCreatedAtDate, bCreateAtDate)
-          }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
-          
-        case .registration:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
-          let sortedNotices = notices.sorted {
-            guard let aRegistration = $0.registration, let bRegistration = $1.registration else { return false }
-            let sortOperator: (String, String) -> Bool = orderAscending ? (>) : (<)
-            return sortOperator(aRegistration, bRegistration)
-          }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
-          
-        case .status:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
-          let sortedNotices = notices.sorted {
-            guard let aStatus = $0.status, let bStatus = $1.status else { return false }
-            let sortOperator: (Notice.Status, Notice.Status) -> Bool = orderAscending ? (>) : (<)
-            return sortOperator(aStatus, bStatus)
-          }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
-        }
-        
-        return .fireAndForget {
-          try await fileClient.saveNotices(notices)
-        }
         
       case .appDelegate:
         return .run { send in
@@ -243,14 +115,6 @@ public struct AppDomain: ReducerProtocol {
             }
           }
         }
-        
-      case .onAppear:
-        let isTokenAvailable = !state.settings.accountSettingsState.accountSettings.apiToken.isEmpty
-        guard isTokenAvailable else {
-          state.notices = .error(.tokenUnavailable)
-          return .none
-        }
-        return EffectTask(value: .fetchNotices(forceReload: false))
         
       case let .contactSettingsLoaded(result):
         let contact = (try? result.value) ?? .init()
@@ -303,42 +167,7 @@ public struct AppDomain: ReducerProtocol {
       case .report(.contact):
         state.contact = state.reportDraft.contactState.contact
         return .none
-        
-      case .report:
-        return .none
-        
-      case let .fetchNotices(forceReload):
-        guard state.isNetworkAvailable else {
-          state.notices = .empty(.emptyNotices())
-          return .none
-        }
-        
-        // dont reload every time
-        if let elements = state.notices.elements, !elements.isEmpty, !forceReload {
-          return .none
-        }
-        
-        state.notices = .loading
-        
-        return .task {
-          await .fetchNoticesResponse(
-            TaskResult { try await apiService.getNotices(forceReload) }
-          )
-        }
-        
-      case let .fetchNoticesResponse(.success(notices)):
-        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
-        
-        guard !notices.isEmpty else  {
-          return .none
-        }
-        
-        return EffectTask(value: .setSortOrder(state.noticesSortOrder))
-        
-      case let .fetchNoticesResponse(.failure(error)):
-        state.notices = .error(.loadingError(error: .init(error: error)))
-        return .none
-        
+              
       case .reportSaved:
         // Reset report draft after it was saved
         state.reportDraft = ReportDomain.State(
@@ -349,74 +178,15 @@ public struct AppDomain: ReducerProtocol {
         )
         return .none
         
-      case .observeConnection:
-        return .run { send in
-          for await path in await pathMonitorClient.networkPathPublisher() {
-            await send(.observeConnectionResponse(path))
-          }
-        }
-        .cancellable(id: ObserveConnectionIdentifier.self)
-        
-      case let .observeConnectionResponse(networkPath):
-        state.isNetworkAvailable = networkPath.status == .satisfied
-        return .none
-
-      case .setNavigationDestination(let value):
-        state.destination = value
-        return .none
-        
-      case .onSaveNoticeButtonTapped:
-        state.isSendingEditedNotice = true
-        
-        guard let notice = state.editNotice else {
-          return .none
-        }
-        let patch = Notice(notice)
-        
-        return .task {
-          await .editNoticeResponse(
-            TaskResult { try await apiService.patchNotice(patch) }
-          )
-        }
-        
-      case .editNoticeResponse(let response):
-        state.isSendingEditedNotice = false
-        
-        switch response {
-        case .success:
-          state.destination = nil
-          return .task { .fetchNotices(forceReload: true) }
-          
-        case .failure:
-          state.alert = .editNoticeFailure
-          return .none
-        }
-        
-      case .editNotice(.deleteNoticeResponse(let result)):
-        switch result {
-        case .success:
-          state.destination = nil
-          return .task { .fetchNotices(forceReload: true) }
-        case .failure:
-          return .none
-        }
-        
-      case .editNotice:
-        return .none
-        
-      case .dismissAlert:
-        state.alert = nil
-        return .none
-        
-      case .onNavigateToAccontSettingsButtonTapped:
+      case .noticeList(.onNavigateToAccontSettingsButtonTapped):
         return .concatenate(
           EffectTask(value: .binding(.set(\.$selectedTab, .settings))),
           EffectTask(value: .settings(.setDestination(.accountSettings)))
         )
+        
+      case .noticeList, .report:
+        return .none
       }
-    }
-    .ifLet(\.editNotice, action: /Action.editNotice) {
-      EditNoticeDomain()
     }
   }
 }
@@ -428,99 +198,10 @@ public extension AppDomain.State {
       accountSettingsState: .init(accountSettings: .init(apiToken: "")),
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    notices: ContentState<[Notice], AppDomain.Action> = .loading
+    noticeList: NoticeListDomain.State = .init(notices: .loading)
   ) {
     self.settings = settings
-    self.notices = notices
+    self.noticeList = noticeList
   }
 }
 
-// MARK: Helper
-
-enum ObserveConnectionIdentifier {}
-
-public extension Array where Element == Notice {
-  static let placeholder: [Element] = Array(repeating: Notice(ReportDomain.State.preview), count: 6)
-}
-
-extension Store where State == AppDomain.State, Action == AppDomain.Action {
-  static let placeholder = Store(
-    initialState: .init(
-      settings: .init(
-        accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        userSettings: .init()
-      ),
-      notices: .results(.placeholder)
-    ),
-    reducer: .empty,
-    environment: ()
-  )
-}
-
-public extension AlertState where Action == AppDomain.Action {
-  static let editNoticeFailure = Self(
-    title: .init("Fehler"),
-    message: .init("Die Meldung konnte nicht gespeichert werden"),
-    buttons: [
-      .default(.init("Ok")),
-      .default(.init("Wiederholen"), action: .send(.fetchNotices(forceReload: true)))
-    ]
-  )
-  
-  static let confirmDeleteNotice = Self(
-    title: .init("Löschen bestätigen"),
-    buttons: [
-      .destructive(.init("Löschen")),
-      .default(.init("Abbrechen"), action: .send(.dismissAlert))
-    ]
-  )
-  
-  static let noInternetConnection = Self(
-    title: .init("Keine Internetverbindung"),
-    message: .init("Verbinde dich mit dem Internet um deine Meldungen zu laden"),
-    buttons: [
-      .cancel(.init(L10n.cancel)),
-      .default(.init("Wiederholen"), action: .send(.fetchNotices(forceReload: true)))
-    ]
-  )
-}
-
-public extension EmptyState {
-  static func emptyNotices() -> EmptyState<AppDomain.Action> {
-    .init(
-      text: "Keine Meldungen",
-      message: .init(string: "Meldungen konnten nicht geladen werden"),
-      action: .init(label: "Erneut laden", action: .fetchNotices(forceReload: false))
-    )
-  }
-}
-
-extension Notice {
-  init(_ editState: EditNoticeDomain.State) {
-    self.init(
-      token: editState.notice.id,
-      status: editState.notice.status ?? .open,
-      street: editState.street,
-      city: editState.city,
-      zip: editState.zip,
-      latitude: editState.notice.latitude ?? 0,
-      longitude: editState.notice.longitude ?? 0,
-      registration: editState.description.licensePlateNumber,
-      brand: editState.description.carBrandSelection.selectedBrand?.title ?? "",
-      color: DescriptionDomain.colors[editState.description.selectedColor].key,
-      charge: editState.description.chargeSelection.selectedCharge?.text ?? "",
-      date: editState.date,
-      duration: Int64(editState.description.selectedDuration),
-      severity: nil,
-      note: editState.description.note,
-      createdAt: editState.notice.createdAt ?? .now,
-      updatedAt: Date(),
-      sentAt: Date(),
-      vehicleEmpty: editState.description.vehicleEmpty,
-      hazardLights: editState.description.hazardLights,
-      expiredTuv: editState.description.expiredTuv,
-      expiredEco: editState.description.expiredEco,
-      photos: editState.notice.photos ?? []
-    )
-  }
-}

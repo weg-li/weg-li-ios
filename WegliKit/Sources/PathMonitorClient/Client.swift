@@ -8,14 +8,12 @@ extension DependencyValues {
   }
 }
 
-
-// MARK: Client interface
-
-
 /// A client to monitor the apps connectivity
 public struct PathMonitorClient {
   public var networkPathPublisher: @Sendable () async -> AsyncStream<NetworkPath>
 
+  public var isNetworkAvailable = true
+  
   public init(networkPathPublisher: @escaping @Sendable () async -> AsyncStream<NetworkPath>) {
     self.networkPathPublisher = networkPathPublisher
   }

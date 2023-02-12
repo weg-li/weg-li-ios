@@ -2,15 +2,16 @@ import ComposableArchitecture
 import Foundation
 import Helper
 import L10n
-import ReportFeature
 import SharedModels
 import Styleguide
 import SwiftUI
 import SwiftUINavigation
 
-public struct NoticesView: View {
-  public typealias S = AppDomain.State
-  public typealias A = AppDomain.Action
+public struct NoticeListView: View {
+  public typealias S = NoticeListDomain.State
+  public typealias A = NoticeListDomain.Action
+  
+  @State private var showErrorBar = false
   
   let store: Store<S, A>
   @ObservedObject var viewStore: ViewStore<S, A>
@@ -34,6 +35,9 @@ public struct NoticesView: View {
           NoticeView(notice: notice)
             .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
             .listRowSeparator(.hidden)
+        }
+        .refreshable {
+          await viewStore.send(.fetchNotices(forceReload: true), while: \.isFetchingNotices)
         }
         .listStyle(.plain)
         
@@ -63,18 +67,30 @@ public struct NoticesView: View {
             goToAccountSettings()
               .padding(.vertical)
           }
-
-//          if let errorMessage = errorState.error?.errorDump {
-//            Text(errorMessage)
-//              .font(.body.italic())
-//              .multilineTextAlignment(.center)
-//          }
           
+          //          if let errorMessage = errorState.error?.errorDump {
+          //            Text(errorMessage)
+          //              .font(.body.italic())
+          //              .multilineTextAlignment(.center)
+          //          }
         }
         .padding(.horizontal, .grid(3))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
       }
     }
+    .onChange(of: viewStore.state.errorBarMessage, perform: { newValue in
+      withAnimation {
+        showErrorBar = newValue != nil
+      }
+    })
+    .overlay(alignment: .bottom, content: {
+      if showErrorBar {
+        errorBarMessageView()
+          .transition(.opacity)
+          .animation(.easeOut, value: showErrorBar)
+      }
+    })
+    .onAppear { viewStore.send(.onAppear) }
     .sheet(
       unwrapping: viewStore.binding(
         get: \.destination,
@@ -189,6 +205,23 @@ public struct NoticesView: View {
   }
   
   @ViewBuilder
+  func errorBarMessageView() -> some View {
+    ZStack {
+      Color.red
+      
+      HStack {
+        Image(systemName: "exclamationmark.octagon")
+        Text("Error loading notices")
+      }
+      .foregroundColor(.white)
+      .padding()
+    }
+    .frame(maxWidth: .infinity, maxHeight: 60)
+    .cornerRadius(12)
+    .padding()
+  }
+  
+  @ViewBuilder
   func goToAccountSettings() -> some View {
     Button(
       action: { viewStore.send(.onNavigateToAccontSettingsButtonTapped) },
@@ -198,7 +231,7 @@ public struct NoticesView: View {
   }
   
   @ViewBuilder
-  private func emptyStateView(_ emptyState: EmptyState<AppDomain.Action>) -> some View {
+  private func emptyStateView(_ emptyState: EmptyState<NoticeListDomain.Action>) -> some View {
     VStack(alignment: .center, spacing: .grid(3)) {
       Image(systemName: "doc.richtext")
         .font(Font.system(.largeTitle))
@@ -224,5 +257,16 @@ public struct NoticesView: View {
     }
     .padding()
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+}
+
+struct NoticeListView_Previews: PreviewProvider {
+  static var previews: some View {
+    NoticeListView(
+      store: .init(
+        initialState: NoticeListDomain.State(notices: .results([.mock, .mock])),
+        reducer: EmptyReducer()
+      )
+    )
   }
 }

@@ -4,6 +4,7 @@ import ComposableArchitecture
 import DescriptionFeature
 import Helper
 import L10n
+import NoticeListFeature
 import ReportFeature
 import SettingsFeature
 import SharedModels
@@ -27,13 +28,9 @@ public struct AppView: View {
     TabView(selection: viewStore.binding(\.$selectedTab)) {
       // Notices
       NavigationStack {
-        NoticesView(store: viewStore.isFetchingNotices ? .placeholder : self.store)
-          .redacted(reason: viewStore.isFetchingNotices ? .placeholder : [])
-          .refreshable {
-            await viewStore.send(.fetchNotices(forceReload: true), while: \.isFetchingNotices)
-          }
+        NoticeListView(store: viewStore.noticeList.isFetchingNotices ? .placeholder : self.store.scope(state: \.noticeList, action: A.noticeList))
+          .redacted(reason: viewStore.noticeList.isFetchingNotices ? .placeholder : [])
           .navigationBarTitle(L10n.Home.navigationBarTitle)
-          .onAppear { viewStore.send(.onAppear) }
       }
       .tabItem { Label(L10n.notices, systemImage: "list.dash") }
       .tag(Tabs.notices)
@@ -69,7 +66,7 @@ public struct AppView: View {
 struct MainView_Previews: PreviewProvider {
   static var previews: some View {
     var appState = AppDomain.State()
-    appState.notices = .results(.placeholder)
+    appState.noticeList.notices = .results(.placeholder)
     
     return Preview {
       AppView(
@@ -81,6 +78,22 @@ struct MainView_Previews: PreviewProvider {
       )
     }
   }
+}
+
+// MARK: - Helper
+
+public extension Array where Element == Notice {
+  static let placeholder: [Element] = Array(repeating: .preview, count: 6)
+}
+
+extension Store where State == NoticeListDomain.State, Action == NoticeListDomain.Action {
+  static let placeholder = Store(
+    initialState: .init(
+      notices: .results(.placeholder)
+    ),
+    reducer: .empty,
+    environment: ()
+  )
 }
 
 extension Notice {
