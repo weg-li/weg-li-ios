@@ -99,7 +99,8 @@ public struct NoticeView: View {
       VStack {
         HStack {
           Spacer()
-          Image(systemName: "exclamationmark.octagon")
+//          Image(systemName: "exclamationmark.octagon")
+          Text("✊")
             .font(.system(size: 140))
             .offset(x: 70)
             .clipped()

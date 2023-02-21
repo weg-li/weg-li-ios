@@ -8,12 +8,12 @@ public struct ImageGridView: View {
   public typealias S = ImagesViewDomain.State
   public typealias A = ImagesViewDomain.Action
   
-  let store: Store<S, A>
-  @ObservedObject var viewStore: ViewStore<S, A>
+  let store: StoreOf<ImagesViewDomain>
+  @ObservedObject var viewStore: ViewStoreOf<ImagesViewDomain>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<ImagesViewDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
 
   public var body: some View {
@@ -50,7 +50,7 @@ public struct ImageGrid<Content: View>: View {
 struct ImageGrid_Previews: PreviewProvider {
   static var previews: some View {
     ImageGridView(
-      store: Store<ImagesViewDomain.State, ImagesViewDomain.Action>(
+      store: Store(
         initialState: .init(
           showImagePicker: false,
           storedPhotos: [

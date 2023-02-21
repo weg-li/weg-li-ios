@@ -22,12 +22,12 @@ public struct ContactWidget: View {
     }
   }
   
-  public let store: Store<ReportDomain.State, ReportDomain.Action>
+  public let store: StoreOf<ReportDomain>
   @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
   
-  public init(store: Store<ReportDomain.State, ReportDomain.Action>) {
+  public init(store: StoreOf<ReportDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store.scope(state: ViewState.init))
+    self.viewStore = ViewStore(store.scope(state: ViewState.init), observe: { $0 })
   }
   
   public var body: some View {
@@ -83,10 +83,9 @@ public struct ContactWidget: View {
 struct PersonalDataWidget_Previews: PreviewProvider {
   static var previews: some View {
     ContactWidget(
-      store: .init(
+      store: Store(
         initialState: .preview,
-        reducer: .empty,
-        environment: ()
+        reducer: ReportDomain()
       )
     )
   }

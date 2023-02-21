@@ -45,11 +45,11 @@ let package = Package(
     .library(
       name: "SettingsFeature",
       targets: ["SettingsFeature"]
-    )
+    ),
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .upToNextMajor(from: "0.34.0")),
-    .package(url: "https://github.com/pointfreeco/composable-core-location", exact: "0.1.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "prerelease/1.0"),
+    .package(url: "https://github.com/mltbnz/composable-core-location", branch: "main"),
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
     .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
@@ -104,6 +104,7 @@ let package = Package(
     .target(
       name: "DescriptionFeature",
       dependencies: [
+        .feedbackClient,
         .fileClient,
         .helper,
         .l10n,
@@ -112,6 +113,13 @@ let package = Package(
         .tca
       ],
       resources: [.process("Resources")]
+    ),
+    .target(
+      name: "FeedbackGeneratorClient",
+      dependencies: [
+        .testOverlay,
+        .tca
+      ]
     ),
     .target(
       name: "FileClient",
@@ -191,7 +199,8 @@ let package = Package(
         .tca,
         .navigation,
         "DescriptionFeature",
-        "ImagesFeature"
+        "ImagesFeature",
+        .feedbackClient
       ]
     ),
     .target(
@@ -231,6 +240,7 @@ let package = Package(
         .apiClient,
         "ContactFeature",
         "DescriptionFeature",
+        .feedbackClient,
         .fileClient,
         .helper,
         "ImagesUploadClient",
@@ -244,7 +254,7 @@ let package = Package(
         .models,
         .locationClient,
         .tca,
-        .testOverlay
+        .testOverlay,
       ]
     ),
     .target(
@@ -414,6 +424,7 @@ extension Target.Dependency {
   static let applicationClient = byName(name: "UIApplicationClient")
   static let styleguide = byName(name: "Styleguide")
   static let placesServiceClient = byName(name: "PlacesServiceClient")
+  static let feedbackClient = byName(name: "FeedbackGeneratorClient")
   
   static let tca = product(name: "ComposableArchitecture", package: "swift-composable-architecture")
   static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")

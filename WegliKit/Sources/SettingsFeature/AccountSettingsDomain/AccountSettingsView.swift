@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import SafariServices
 import SharedModels
 import Styleguide
 import SwiftUI
@@ -10,17 +11,22 @@ public struct AccountSettingsView: View {
   public typealias S = AccountSettingsDomain.State
   public typealias A = AccountSettingsDomain.Action
   
-  let store: Store<S, A>
-  @ObservedObject var viewStore: ViewStore<S, A>
+  let store: StoreOf<AccountSettingsDomain>
+  @ObservedObject var viewStore: ViewStoreOf<AccountSettingsDomain>
   
-  public init(store: Store<S, A>) {
+  let userLink = URL(string: "https://www.weg.li/user")!
+  
+  public init(store: StoreOf<AccountSettingsDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   let description: AttributedString? = try? AttributedString(markdown: "Füge Deinen API-Token hinzu um die App mit deinem bestehenden Account zu verknüpfen und Anzeigen über [weg.li](https://www.weg.li) zu versenden. Du findest den API-Token in deinem Profil")
   
   public var body: some View {
+    WithViewStore(store, observe: \.accountSettings) { viewStore in
+      
+    }
     Form {
       Section(header: Label("API-Token", systemImage: "key.fill")) {
         VStack(alignment: .leading) {
@@ -73,7 +79,7 @@ public struct AccountSettingsView: View {
                 .padding(.vertical, .grid(1))
               
               Button(
-                action: { viewStore.send(.openUserSettings) },
+                action: { viewStore.send(.openUserSettings(true)) },
                 label: {
                   Label("Profil öffnen", systemImage: "arrow.up.right")
                     .frame(maxWidth: .infinity, minHeight: 40)
@@ -92,6 +98,10 @@ public struct AccountSettingsView: View {
       }
       .headerProminence(.increased)
     }
+    .sheet(
+      isPresented: viewStore.binding(get: \.presentWebView, send: A.openUserSettings), content: {
+        SafariView(url: userLink)
+      })
     .navigationBarTitle("Account", displayMode: .automatic)
   }
 }
@@ -144,5 +154,17 @@ struct AccountSettingsView_Previews: PreviewProvider {
         reducer: AccountSettingsDomain()
       )
     )
+  }
+}
+
+struct SafariView: UIViewControllerRepresentable {
+  let url: URL
+  
+  func makeUIViewController(context: UIViewControllerRepresentableContext<SafariView>) -> SFSafariViewController {
+    return SFSafariViewController(url: url)
+  }
+  
+  func updateUIViewController(_ uiViewController: SFSafariViewController, context: UIViewControllerRepresentableContext<SafariView>) {
+    
   }
 }

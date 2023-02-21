@@ -5,6 +5,7 @@ import ComposableArchitecture
 import ComposableCoreLocation
 import ContactFeature
 import DescriptionFeature
+import FeedbackGeneratorClient
 import FileClient
 import Helper
 import ImagesFeature
@@ -21,7 +22,7 @@ import SwiftUI
 import UIApplicationClient
 import XCTestDynamicOverlay
 
-public struct ReportDomain: ReducerProtocol {
+public struct ReportDomain: Reducer {
   public init() {}
   
   @Dependency(\.continuousClock) public var clock
@@ -35,8 +36,8 @@ public struct ReportDomain: ReducerProtocol {
   @Dependency(\.applicationClient) public var uiApplicationClient
   @Dependency(\.date) public var date
   @Dependency(\.mailComposeClient) public var mailComposeClient
+  @Dependency(\.feedbackGenerator) public var feedbackGenerator
   
-  let debounce = 0.5
   let postalCodeMinumimCharacters = 5
   
   public struct State: Equatable {
@@ -163,7 +164,7 @@ public struct ReportDomain: ReducerProtocol {
     case setDestination(State.Destination?)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Scope(state: \.images, action: /Action.images) {
       ImagesViewDomain()
     }
@@ -444,22 +445,30 @@ public struct ReportDomain: ReducerProtocol {
         state.alert = .reportSent
         
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
-        return .fireAndForget {
-          await withTaskGroup(of: Void.self, body: { group in
-            imageURLs.forEach { url in
-              group.addTask(priority: .background) {
-                try? await fileClient.removeItem(url)
+        
+        return .merge(
+          .fireAndForget {
+            await withTaskGroup(of: Void.self, body: { group in
+              imageURLs.forEach { url in
+                group.addTask(priority: .background) {
+                  try? await fileClient.removeItem(url)
+                }
               }
-            }
-            debugPrint("removed items")
-          })
-        }
+              debugPrint("removed items")
+            })
+          },
+          .fireAndForget {
+            await feedbackGenerator.notify(.success)
+          }
+        )
         
       case let .submitNoticeResponse(.failure(error)):
         state.isSubmittingNotice = false
         
         state.alert = .sendNoticeFailed(error: error as! ApiError)
-        return .none
+        return .fireAndForget {
+          await feedbackGenerator.notify(.error)
+        }
       
       case .setDestination(let value):
         switch value {
@@ -607,12 +616,6 @@ public extension AlertState where Action == ReportDomain.Action {
     title: TextState(L10n.Location.Alert.noCoordinate)
   )
 }
-
-public let mapperQueue = DispatchQueue(
-  label: "li.weg.iosclient.RegulatoryOfficeMapper",
-  qos: .userInitiated,
-  attributes: .concurrent
-)
 
 public extension SharedModels.NoticeInput {
   init(_ reportState: ReportDomain.State) {

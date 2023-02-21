@@ -1,13 +1,15 @@
 import ComposableArchitecture
 import Dependencies
+import FeedbackGeneratorClient
 import Foundation
 import SwiftUI
 
-public struct ChargeSelection: ReducerProtocol {
+public struct ChargeSelection: Reducer {
   public init() {}
   
   @Dependency(\.continuousClock) public var clock
   @Dependency(\.fileClient) public var fileClient
+  @Dependency(\.feedbackGenerator) public var feedbackGenerator
   
   public struct State: Equatable {
     public var selectedCharge: Charge?
@@ -41,7 +43,7 @@ public struct ChargeSelection: ReducerProtocol {
     case favoriteChargesLoaded(TaskResult<[String]>)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     BindingReducer()
     
     Reduce<State, Action> { state, action in
@@ -95,8 +97,11 @@ public struct ChargeSelection: ReducerProtocol {
         
         return .concatenate(
           .task {
-            try await clock.sleep(for: .seconds(0.5))
+            try await clock.sleep(for: .seconds(0.4))
             return .sortFavoritedCharges
+          },
+          .fireAndForget {
+            await feedbackGenerator.selectionChanged()
           },
           .fireAndForget(priority: .userInitiated) {
             try await fileClient.saveFavoriteCharges(ids)
@@ -115,12 +120,12 @@ public struct ChargeSelectionView: View {
   public typealias S = ChargeSelection.State
   public typealias A = ChargeSelection.Action
   
-  let store: Store<S, A>
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  private let store: StoreOf<ChargeSelection>
+  @ObservedObject private var viewStore: ViewStoreOf<ChargeSelection>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<ChargeSelection>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {
@@ -130,8 +135,8 @@ public struct ChargeSelectionView: View {
           text: charge.text,
           isSelected: viewStore.selectedCharge?.id == charge.id,
           isFavorite: charge.isFavorite,
-          onTap: { viewStore.send(.setCharge(charge)) },
-          onSwipe: { viewStore.send(.toggleChargeFavorite(charge)) }
+          onTap: { viewStore.send(.setCharge(charge), animation: .default) },
+          onSwipe: { viewStore.send(.toggleChargeFavorite(charge), animation: .default) }
         )
       }
     }

@@ -30,10 +30,10 @@ public struct LocationView: View {
     }
   }
   
-  let store: Store<LocationDomain.State, LocationDomain.Action>
+  private let store: StoreOf<LocationDomain>
   @ObservedObject private var viewStore: ViewStore<ViewState, LocationDomain.Action>
   
-  public init(store: Store<LocationDomain.State, LocationDomain.Action>) {
+  public init(store: StoreOf<LocationDomain>) {
     self.store = store
     self.viewStore = ViewStore(
       store.scope(
@@ -162,15 +162,14 @@ struct Location_Previews: PreviewProvider {
   static var previews: some View {
     Preview {
       LocationView(
-        store: .init(
-          initialState: .init(
+        store: Store(
+          initialState: LocationDomain.State(
             locationOption: .currentLocation,
             isMapExpanded: false,
             isRequestingCurrentLocation: true,
             region: nil
           ),
-          reducer: .empty,
-          environment: ()
+          reducer: LocationDomain()
         )
       )
     }

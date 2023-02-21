@@ -7,7 +7,7 @@ import Helper
 import SharedModels
 import SwiftUI
 
-public struct DescriptionDomain: ReducerProtocol {
+public struct DescriptionDomain: Reducer {
   public init() {}
   
   @Dependency(\.continuousClock) public var clock
@@ -89,7 +89,7 @@ public struct DescriptionDomain: ReducerProtocol {
     case chargeSelection(ChargeSelection.Action)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     BindingReducer()
     
     Scope(state: \.carBrandSelection, action: /Action.carBrandSelection) {
@@ -177,7 +177,7 @@ public extension DescriptionDomain.State {
         return index
       } ?? 0,
       selectedBrand: .init(model.brand),
-      selectedDuration:  model.duration.flatMap { Int($0) } ?? 0,
+      selectedDuration:  model.duration.flatMap(Int.init) ?? 0,
       selectedCharge: model.charge.flatMap(Charge.init),
       blockedOthers: true,
       vehicleEmpty: model.vehicleEmpty ?? true,

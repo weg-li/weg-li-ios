@@ -11,7 +11,7 @@ import PhotoLibraryAccessClient
 import SharedModels
 import UIKit
 
-public struct ImagesViewDomain: ReducerProtocol {
+public struct ImagesViewDomain: Reducer {
   public init() {}
   
   @Dependency(\.continuousClock) public var clock
@@ -83,7 +83,7 @@ public struct ImagesViewDomain: ReducerProtocol {
     case image(id: String, action: ImageDomain.Action)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     BindingReducer()
     
     Reduce<State, Action> { state, action in

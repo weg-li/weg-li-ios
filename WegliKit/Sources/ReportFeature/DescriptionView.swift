@@ -29,17 +29,17 @@ public struct DescriptionView: View {
     }
   }
   
-  let store: Store<S, A>
+  let store: StoreOf<ReportDomain>
   @ObservedObject private var viewStore: ViewStore<ViewState, A>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<ReportDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store.scope(state: ViewState.init))
+    self.viewStore = ViewStore(store.scope(state: ViewState.init), observe: { $0 })
   }
   
   public var body: some View {
     VStack(alignment: .leading) {
-      VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: .grid(3)) {
         row(title: L10n.Description.Row.licenseplateNumber, content: viewStore.description.licensePlateNumber)
         
         row(title: L10n.Description.Row.carType, content: viewStore.brand)

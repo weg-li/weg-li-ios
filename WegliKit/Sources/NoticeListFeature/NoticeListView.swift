@@ -13,22 +13,21 @@ public struct NoticeListView: View {
   
   @State private var showErrorBar = false
   
-  let store: Store<S, A>
-  @ObservedObject var viewStore: ViewStore<S, A>
+  let store: StoreOf<NoticeListDomain>
+  @ObservedObject var viewStore: ViewStoreOf<NoticeListDomain>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<NoticeListDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {
     Group {
       switch viewStore.notices {
       case .loading:
-        ProgressView {
-          Text("Loading ...")
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        noticeList(notices: .placeholder)
+          .redacted(reason: viewStore.isFetchingNotices ? .placeholder : [])
+          .disabled(viewStore.isFetchingNotices)
         
       case let .results(notices):
         noticeList(notices: notices)
@@ -274,4 +273,11 @@ struct NoticeListView_Previews: PreviewProvider {
       )
     )
   }
+}
+
+
+// MARK: Helper
+
+extension Array where Element == Notice {
+  static let placeholder: [Element] = Array(repeating: .preview, count: 6)
 }

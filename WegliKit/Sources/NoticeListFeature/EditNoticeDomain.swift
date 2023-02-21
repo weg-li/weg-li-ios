@@ -4,7 +4,7 @@ import DescriptionFeature
 import ImagesFeature
 import SharedModels
 
-public struct EditNoticeDomain: ReducerProtocol {
+public struct EditNoticeDomain: Reducer {
   public init() {}
   
   @Dependency(\.apiService) public var apiService
@@ -58,7 +58,7 @@ public struct EditNoticeDomain: ReducerProtocol {
     case dismissAlert
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Scope(state: \.description, action: /Action.description) {
       DescriptionDomain()
     }

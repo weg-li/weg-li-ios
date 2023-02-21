@@ -99,7 +99,7 @@ struct NoticePatchInput: Encodable, Equatable {
 extension APIService: TestDependencyKey {
   public static let noop = Self(
     getNotices: { _ in
-      [Notice.mock]
+      [.mock, .mock]
     },
     postNotice: { _ in
       .mock

@@ -9,10 +9,10 @@ public struct MailView: UIViewControllerRepresentable {
   public typealias S = MailDomain.State
   public typealias A = MailDomain.Action
   
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  @ObservedObject private var viewStore: ViewStoreOf<MailDomain>
   
-  public init(store: Store<S, A>) {
-    self.viewStore = ViewStore(store)
+  public init(store: StoreOf<MailDomain>) {
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public class Coordinator: NSObject, MFMailComposeViewControllerDelegate {

@@ -14,12 +14,12 @@ public struct EditDescriptionView: View {
   @Environment(\.presentationMode) var presentationMode
   @Environment(\.isSearching) var isSearching
   
-  let store: Store<S, A>
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  private let store: StoreOf<DescriptionDomain>
+  @ObservedObject private var viewStore: ViewStoreOf<DescriptionDomain>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<DescriptionDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
     
   public var body: some View {
@@ -206,10 +206,9 @@ struct Description_Previews: PreviewProvider {
   static var previews: some View {
     Preview {
       EditDescriptionView(
-        store: .init(
-          initialState: .init(),
-          reducer: .empty,
-          environment: ()
+        store: Store(
+          initialState: DescriptionDomain.State(),
+          reducer: DescriptionDomain()
         )
       )
     }

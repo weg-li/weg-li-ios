@@ -132,10 +132,9 @@ final class SettingsStoreTests: XCTestCase {
       return .init(true)
     }
     
-    await store.send(.accountSettings(.openUserSettings))
-    await openedUrl.withValue({ url in
-      XCTAssertEqual(url, URL(string: "https://www.weg.li/user")!)
-    })
+    await store.send(.accountSettings(.openUserSettings(true))) {
+      $0.accountSettingsState.presentWebView = true
+    }
   }
   
   func test_updateUserSettings_ShouldWriteToFileClient() async {

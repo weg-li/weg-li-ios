@@ -71,12 +71,15 @@ public struct LocationDomain: ReducerProtocol {
       switch action {
       case .onAppear:
         return .merge(
-          locationManager
-            .create(id: LocationManagerId())
-            .map(Action.locationManager),
-          locationManager
-            .setup()
-            .fireAndForget()
+          .run { sender in
+            for await event in locationManager.delegate() {
+              await sender.send(.locationManager(event))
+            }
+          }
+          .cancellable(id: LocationManagerId()),
+          .fireAndForget {
+            await locationManager.setup()
+          }
         )
         
       case .locationRequested:
@@ -87,9 +90,9 @@ public struct LocationDomain: ReducerProtocol {
         switch locationManager.authorizationStatus() {
         case .notDetermined:
           state.isRequestingCurrentLocation = true
-          return locationManager
-            .requestWhenInUseAuthorization(id: LocationManagerId())
-            .fireAndForget()
+          return .fireAndForget {
+            await locationManager.requestWhenInUseAuthorization()
+          }
           
         case .restricted:
           state.alert = .goToSettingsAlert
@@ -100,9 +103,9 @@ public struct LocationDomain: ReducerProtocol {
           return .none
           
         case .authorizedAlways, .authorizedWhenInUse:
-          return locationManager
-            .startUpdatingLocation(id: LocationManagerId())
-            .fireAndForget()
+          return .fireAndForget {
+            await locationManager.startUpdatingLocation()
+          }
           
         @unknown default:
           return .none
@@ -155,10 +158,11 @@ public struct LocationDomain: ReducerProtocol {
         case .didChangeAuthorization(.authorizedAlways),
             .didChangeAuthorization(.authorizedWhenInUse):
           if state.isRequestingCurrentLocation {
-            return locationManager
-              .requestLocation(id: LocationManagerId())
-              .fireAndForget()
+            return .fireAndForget {
+              await locationManager.requestLocation()
+            }
           }
+          
           return .none
           
         case .didChangeAuthorization(.denied):
@@ -254,9 +258,8 @@ enum CancelSearchId {}
 
 extension LocationManager {
   /// Configures the LocationManager
-  func setup() -> EffectTask<Never> {
-    set(
-      id: LocationManagerId(),
+  func setup() async {
+    await set(
       activityType: .otherNavigation,
       allowsBackgroundLocationUpdates: false,
       desiredAccuracy: kCLLocationAccuracyNearestTenMeters,

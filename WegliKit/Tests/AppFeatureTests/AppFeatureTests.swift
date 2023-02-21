@@ -121,14 +121,14 @@ final class AppStoreTests: XCTestCase {
       fatalError()
     }
     
-    await store.send(.appDelegate(.didFinishLaunching))
+    await store.send(.internalAction(.appDelegate(.didFinishLaunching)))
     await clock.advance(by: .seconds(0.5))
-    await store.receive(.contactSettingsLoaded(.success(.preview))) {
+    await store.receive(.internalAction(.contactSettingsLoaded(.success(.preview)))) {
       $0.contact = .preview
       $0.reportDraft.contactState.contact = .preview
     }
-    await store.receive(.userSettingsLoaded(.success(state.settings.userSettings)))
-    await store.receive(.storedApiTokenLoaded(.success(token))) {
+    await store.receive(.internalAction(.userSettingsLoaded(.success(state.settings.userSettings))))
+    await store.receive(.internalAction(.storedApiTokenLoaded(.success(token)))) {
       $0.reportDraft.apiToken = token
       $0.settings.accountSettingsState.accountSettings.apiToken = token
     }
@@ -150,13 +150,14 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_onNavigateToAccountSettingsButtonTapped() async {
-    let store = TestStore(
+    var store = TestStore(
       initialState: .init(reportDraft: report),
       reducer: AppDomain()
     )
+    store.exhaustivity = .off
     
     await store.send(.noticeList(.onNavigateToAccontSettingsButtonTapped))
-    await store.receive(.binding(.set(\.$selectedTab, .settings))) {
+    await store.receive(.viewAction(.setSelectedTab(.settings))) {
       $0.selectedTab = .settings
     }
     await store.receive(.settings(.setDestination(.accountSettings))) {

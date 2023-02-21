@@ -4,7 +4,7 @@ import ComposableArchitecture
 import Foundation
 import SharedModels
 
-public struct ImageDomain: ReducerProtocol {
+public struct ImageDomain: Reducer {
   public init() {}
   
   public struct State: Hashable, Identifiable {

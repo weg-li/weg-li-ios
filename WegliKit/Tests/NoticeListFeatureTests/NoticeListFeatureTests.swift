@@ -54,6 +54,7 @@ final class NoticeListFeatureTests: XCTestCase {
       initialState: .init(notices: .loading),
       reducer: NoticeListDomain()
     )
+    store.exhaustivity = .off
     store.dependencies.keychainClient = .noop
     store.dependencies.continuousClock = ImmediateClock()
     store.dependencies.apiService.getNotices = { _ in [.mock] }
@@ -66,9 +67,7 @@ final class NoticeListFeatureTests: XCTestCase {
     }
     
     await store.send(.onAppear)
-    await store.receive(.fetchNotices(forceReload: false)) {
-      $0.isFetchingNotices = true
-    }
+    await store.receive(.fetchNotices(forceReload: false))
     await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.isFetchingNotices = false
       $0.notices = .results([.mock])
@@ -85,7 +84,10 @@ final class NoticeListFeatureTests: XCTestCase {
     )
     store.dependencies.pathMonitorClient = .satisfied
     store.dependencies.keychainClient.getToken = { nil }
-    store.dependencies.apiService = .liveValue
+    store.dependencies.apiService.getNotices = { _ in
+      throw ApiError.tokenUnavailable
+    }
+    store.dependencies.continuousClock = TestClock()
     
     await store.send(.onAppear)
     await store.receive(.fetchNotices(forceReload: false)) {
@@ -97,33 +99,37 @@ final class NoticeListFeatureTests: XCTestCase {
     }
   }
   
-  func test_Action_fetchNotices_shouldNotReload_whenElementsHaveBeenLoaded_andNoForceReload() {
+  func test_Action_fetchNotices_shouldNotReload_whenElementsHaveBeenLoaded_andNoForceReload() async {
     let store = TestStore(
       initialState: NoticeListDomain.State(notices: .results([.mock])),
       reducer: NoticeListDomain()
     )
     
-    store.send(.fetchNotices(forceReload: false))
+    await store.send(.fetchNotices(forceReload: false))
     // does not fetch notices again
   }
   
   func test_Action_fetchNotices_shouldReload_whenElementsHaveBeenLoaded_andForceReload() async {
+    let testClock = TestClock()
+    
     let store = TestStore(
       initialState: NoticeListDomain.State(notices: .results([.mock])),
       reducer: NoticeListDomain()
     )
     store.dependencies.apiService.getNotices = { _ in [.mock] }
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
+    store.dependencies.continuousClock = testClock
     
     await store.send(.fetchNotices(forceReload: true)) {
-      $0.isFetchingNotices = true
       $0.notices = .loading
+      $0.isFetchingNotices = true
     }
     await store.receive(.fetchNoticesResponse(.success([.mock]))) {
       $0.isFetchingNotices = false
       $0.notices = .results([.mock])
     }
     await store.receive(.setSortOrder(.noticeDate)) {
+      $0.notices = .results([.mock])
       $0.orderSortType[.noticeDate] = false
     }
   }

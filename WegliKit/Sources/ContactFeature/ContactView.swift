@@ -149,22 +149,22 @@ public struct ContactDetailsView: View {
 }
 
 public struct ContactView: View {
-  public typealias Action = ContactViewDomain.Action
-  public typealias State = ContactViewDomain.State
+  public typealias A = ContactViewDomain.Action
+  public typealias S = ContactViewDomain.State
   
-  let store: Store<State, Action>
-  @ObservedObject private var viewStore: ViewStore<State, Action>
+  let store: StoreOf<ContactViewDomain>
+  @ObservedObject private var viewStore: ViewStoreOf<ContactViewDomain>
   
-  public init(store: Store<State, Action>) {
+  public init(store: StoreOf<ContactViewDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {
     ContactDetailsView(
       store: store.scope(
         state: \.contact,
-        action: Action.contact
+        action: A.contact
       )
     )
     .textFieldStyle(.plain)
@@ -197,10 +197,9 @@ public struct ContactView: View {
 struct PersonalData_Previews: PreviewProvider {
   static var previews: some View {
     ContactView(
-      store: .init(
-        initialState: .preview,
-        reducer: .empty,
-        environment: ()
+      store: Store(
+        initialState: ContactViewDomain.State(),
+        reducer: ContactViewDomain()
       )
     )
   }

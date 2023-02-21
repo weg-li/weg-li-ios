@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Foundation
 import SwiftUI
 
-public struct CarBrandSelection: ReducerProtocol {
+public struct CarBrandSelection: Reducer {
   public init() {}
   
   public struct State: Equatable {
@@ -28,7 +28,7 @@ public struct CarBrandSelection: ReducerProtocol {
     case binding(BindingAction<State>)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Reduce<State, Action> { state, action in
       switch action {
       case .setBrand(let brand):
@@ -47,12 +47,12 @@ public struct CarBrandSelectorView: View {
   public typealias S = CarBrandSelection.State
   public typealias A = CarBrandSelection.Action
   
-  let store: Store<S, A>
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  private let store: StoreOf<CarBrandSelection>
+  @ObservedObject private var viewStore: ViewStoreOf<CarBrandSelection>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<CarBrandSelection>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {

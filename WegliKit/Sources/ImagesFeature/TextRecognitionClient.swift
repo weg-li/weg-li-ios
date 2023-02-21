@@ -11,9 +11,7 @@ extension DependencyValues {
   }
 }
 
-
 // MARK: Client interface
-
 
 public struct TextRecognitionClient {
   public var recognizeText: (PickerImageResult) async throws -> [TextItem]

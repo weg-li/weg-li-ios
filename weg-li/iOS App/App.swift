@@ -41,7 +41,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     // swiftlint:disable:next discouraged_optional_collection
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    viewStore.send(.appDelegate(.didFinishLaunching))
+    viewStore.send(.internalAction(.appDelegate(.didFinishLaunching)))
     return true
   }
 }

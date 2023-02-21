@@ -12,12 +12,12 @@ struct EditNoticeView: View {
   public typealias S = EditNoticeDomain.State
   public typealias A = EditNoticeDomain.Action
   
-  private let store: Store<S, A>
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  private let store: StoreOf<EditNoticeDomain>
+  @ObservedObject private var viewStore: ViewStoreOf<EditNoticeDomain>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<EditNoticeDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   var body: some View {
@@ -248,9 +248,10 @@ struct EditNoticeView: View {
   
   var times: [Int] {
     Array(
-      Times.times.sorted(by: { $0.0 < $1.0 })
+      Times.times
         .map(\.key)
         .dropFirst()
+        .sorted()
     )
   }
   var chargeDurationView: some View {

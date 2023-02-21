@@ -1,14 +1,15 @@
 import ApiClient
 import ComposableArchitecture
-import UIKit
 import DescriptionFeature
+import FeedbackGeneratorClient
 import Foundation
 import Helper
 import L10n
 import PathMonitorClient
 import SharedModels
+import UIKit
 
-public struct NoticeListDomain: ReducerProtocol {
+public struct NoticeListDomain: Reducer {
   public init() {}
   
   @Dependency(\.fileClient) public var fileClient
@@ -17,6 +18,7 @@ public struct NoticeListDomain: ReducerProtocol {
   @Dependency(\.date) public var date
   @Dependency(\.pathMonitorClient) public var pathMonitorClient
   @Dependency(\.continuousClock) public var clock
+  @Dependency(\.feedbackGenerator) public var feedbackGenerator
   
   public struct State: Equatable {
     public var notices: ContentState<[Notice], Action>
@@ -137,7 +139,7 @@ public struct NoticeListDomain: ReducerProtocol {
     case observeConnectionResponse(NetworkPath)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     BindingReducer()
     
     Reduce<State, Action> { state, action in
@@ -210,10 +212,11 @@ public struct NoticeListDomain: ReducerProtocol {
         }
         
         state.notices = .loading
+        state.isFetchingNotices = true
         
         return .merge(
           .run { send in
-            try await clock.sleep(for: .seconds(0.15))
+            try await clock.sleep(for: .seconds(0.1))
             await send.send(.binding(.set(\.$isFetchingNotices, true)))
           }.cancellable(id: LoadingState.self),
           .task {
@@ -299,20 +302,34 @@ public struct NoticeListDomain: ReducerProtocol {
         switch response {
         case .success:
           state.destination = nil
-          return .task { .fetchNotices(forceReload: true) }
+          return .merge(
+            .task { .fetchNotices(forceReload: true) },
+            .fireAndForget {
+              await feedbackGenerator.notify(.success)
+            }
+          )
           
         case .failure:
           state.alert = .editNoticeFailure
-          return .none
+          return .fireAndForget {
+            await feedbackGenerator.notify(.error)
+          }
         }
         
       case .editNotice(.deleteNoticeResponse(let result)):
         switch result {
         case .success:
           state.destination = nil
-          return .task { .fetchNotices(forceReload: true) }
+          return .merge(
+            .task { .fetchNotices(forceReload: true) },
+            .fireAndForget {
+              await feedbackGenerator.notify(.success)
+            }
+          )
         case .failure:
-          return .none
+          return .fireAndForget {
+            await feedbackGenerator.notify(.error)
+          }
         }
         
       case .editNotice:

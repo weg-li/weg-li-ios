@@ -29,7 +29,7 @@ public enum Tabs: Hashable {
   case settings
 }
 
-public struct AppDomain: ReducerProtocol {
+public struct AppDomain: Reducer {
   public init() {}
   
   @Dependency(\.continuousClock) public var clock
@@ -52,24 +52,39 @@ public struct AppDomain: ReducerProtocol {
       date: Date.init
     )
     
-    @BindingState public var selectedTab: Tabs = .notice
+    public var selectedTab: Tabs = .notice
     
     public var isFetchingNotices = false
+    
+    enum NavigationDestination: Equatable {
+      case noticeList(NoticeListDomain.State.Destination?)
+      case report(ReportDomain.State.Destination?)
+      case settings(SettingsDomain.State.Destination?)
+    }
   }
   
-  public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<State>)
-    case appDelegate(AppDelegateDomain.Action)
-    case contactSettingsLoaded(TaskResult<Contact>)
-    case userSettingsLoaded(TaskResult<UserSettings>)
-    case storedApiTokenLoaded(TaskResult<String?>)
+  public enum Action: Equatable {
+    case internalAction(InternalAction)
+    case viewAction(ViewAction)
+
     case settings(SettingsDomain.Action)
     case report(ReportDomain.Action)
     case noticeList(NoticeListDomain.Action)
+
     case reportSaved
+    
+    public enum ViewAction: Equatable {
+      case setSelectedTab(Tabs)
+    }
+    public enum InternalAction: Equatable {
+      case appDelegate(AppDelegateDomain.Action)
+      case contactSettingsLoaded(TaskResult<Contact>)
+      case userSettingsLoaded(TaskResult<UserSettings>)
+      case storedApiTokenLoaded(TaskResult<String?>)
+    }
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Scope(state: \.noticeList, action: /Action.noticeList) {
       NoticeListDomain()
     }
@@ -82,57 +97,69 @@ public struct AppDomain: ReducerProtocol {
       SettingsDomain()
     }
     
-    BindingReducer()
-    
     Reduce<State, Action> { state, action in
       switch action {
-      case .binding:
-        return .none
-        
-      case .appDelegate:
-        return .run { send in
-          await withThrowingTaskGroup(of: Void.self) { group in
-            group.addTask {
-              await send(
-                .contactSettingsLoaded(
-                  TaskResult { try await fileClient.loadContactSettings() }
+      case .internalAction(let internalAction):
+        switch internalAction {
+        case .appDelegate:
+          return .run { send in
+            await withThrowingTaskGroup(of: Void.self) { group in
+              group.addTask {
+                await send(
+                  .internalAction(
+                    .contactSettingsLoaded(
+                      TaskResult { try await fileClient.loadContactSettings() }
+                    )
+                  )
                 )
-              )
-            }
-            group.addTask {
-              await send(
-                .userSettingsLoaded(
-                  TaskResult { try await fileClient.loadUserSettings() }
+              }
+              group.addTask {
+                await send(
+                  .internalAction(
+                    .userSettingsLoaded(
+                      TaskResult { try await fileClient.loadUserSettings() }
+                    )
+                  )
                 )
-              )
-            }
-            group.addTask {
-              await send(
-                .storedApiTokenLoaded(
-                  TaskResult { await keychainClient.getApiToken() }
+              }
+              group.addTask {
+                await send(
+                  .internalAction(
+                    .storedApiTokenLoaded(
+                      TaskResult { await keychainClient.getApiToken() }
+                    )
+                  )
                 )
-              )
+              }
             }
           }
+          
+        case let .contactSettingsLoaded(result):
+          let contact = (try? result.value) ?? .init()
+          state.contact = contact
+          state.reportDraft.contactState.contact = contact
+          return .none
+          
+        case let .storedApiTokenLoaded(result):
+          let apiToken = (try? result.value) ?? ""
+          state.settings.accountSettingsState.accountSettings.apiToken = apiToken
+          state.reportDraft.apiToken = apiToken
+          return .none
+          
+        case let .userSettingsLoaded(result):
+          let userSettings = (try? result.value) ?? UserSettings(showsAllTextRecognitionSettings: false)
+          state.settings.userSettings = userSettings
+          state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
+          return .none
         }
         
-      case let .contactSettingsLoaded(result):
-        let contact = (try? result.value) ?? .init()
-        state.contact = contact
-        state.reportDraft.contactState.contact = contact
-        return .none
+      case .viewAction(let viewAction):
+        switch viewAction {
+        case .setSelectedTab(let tab):
+          state.selectedTab = tab
+          return .none
+        }
         
-      case let .storedApiTokenLoaded(result):
-        let apiToken = (try? result.value) ?? ""
-        state.settings.accountSettingsState.accountSettings.apiToken = apiToken
-        state.reportDraft.apiToken = apiToken
-        return .none
-        
-      case let .userSettingsLoaded(result):
-        let userSettings = (try? result.value) ?? UserSettings(showsAllTextRecognitionSettings: false)
-        state.settings.userSettings = userSettings
-        state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
-        return .none
         
       case .settings(let settingsAction):
         switch settingsAction {
@@ -180,7 +207,7 @@ public struct AppDomain: ReducerProtocol {
         
       case .noticeList(.onNavigateToAccontSettingsButtonTapped):
         return .concatenate(
-          EffectTask(value: .binding(.set(\.$selectedTab, .settings))),
+          EffectTask(value: .viewAction(.setSelectedTab(.settings))),
           EffectTask(value: .settings(.setDestination(.accountSettings)))
         )
         

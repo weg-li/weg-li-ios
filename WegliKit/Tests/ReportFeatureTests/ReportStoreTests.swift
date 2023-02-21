@@ -42,7 +42,7 @@ final class ReportStoreTests: XCTestCase {
     )
   }
   
-  func test_updateDate_shouldUpdateState() {
+  func test_updateDate_shouldUpdateState() async {
     let newDate = Date(timeIntervalSinceReferenceDate: 0)
     
     let store = TestStore(
@@ -50,7 +50,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain(),
       prepareDependencies: { values in
         values.continuousClock = ImmediateClock()
-        values.locationManager = .unimplemented()
+        values.locationManager = .unimplemented
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop
         values.fileClient = .noop
@@ -58,7 +58,7 @@ final class ReportStoreTests: XCTestCase {
       }
     )
     
-    store.send(.set(\.$date, newDate)) {
+    await store.send(.set(\.$date, newDate)) {
       $0.date = newDate
     }
   }
@@ -79,7 +79,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain(),
       prepareDependencies: { values in
         values.continuousClock = ImmediateClock()
-        values.locationManager = .unimplemented()
+        values.locationManager = .unimplemented
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop
         values.fileClient = fileClient
@@ -108,8 +108,7 @@ final class ReportStoreTests: XCTestCase {
   }
       
   func test_updateImages_shouldTriggerAddressResolve() async {
-    let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
-    let setSubject = PassthroughSubject<Never, Never>()
+    let locationObserver = AsyncStream<LocationManager.Action>.streamWithContinuation()
   
     let coordinate: CLLocationCoordinate2D = .init(latitude: 43.32, longitude: 32.43)
     let expectedAddress = Address(
@@ -132,12 +131,10 @@ final class ReportStoreTests: XCTestCase {
     )
     let clock = TestClock()
     store.dependencies.continuousClock = clock
-    store.dependencies.locationManager = .unimplemented(
-        authorizationStatus: { .authorizedAlways },
-        create: { _ in locationManagerSubject.eraseToEffect() },
-        locationServicesEnabled: { true },
-        set: { _,_ in setSubject.eraseToEffect() }
-      )
+    store.dependencies.locationManager = .unimplemented
+    store.dependencies.locationManager.authorizationStatus = { .authorizedAlways }
+    store.dependencies.locationManager.delegate = { locationObserver.stream }
+    store.dependencies.locationManager.locationServicesEnabled = { true }
     store.dependencies.placesServiceClient.placemarks = { _ in [expectedAddress] }
     store.dependencies.regulatoryOfficeMapper = .live()
     store.dependencies.fileClient = .noop
@@ -190,12 +187,9 @@ final class ReportStoreTests: XCTestCase {
     await store.receive(.mapDistrictFinished(.success(expectedDistrict))) {
       $0.district = expectedDistrict
     }
-    
-    setSubject.send(completion: .finished)
-    locationManagerSubject.send(completion: .finished)
   }
   
-  func test_submitButtonTap_createsMail_andPresentsMailView() {
+  func test_submitButtonTap_createsMail_andPresentsMailView() async {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
       initialState: ReportDomain.State(
@@ -224,16 +218,16 @@ final class ReportStoreTests: XCTestCase {
     )
     store.dependencies.mailComposeClient.canSendMail = { true }
     
-    store.send(.mail(.submitButtonTapped)) {
+    await store.send(.mail(.submitButtonTapped)) {
       $0.mail.mail.address = "Anzeige@bowi.berlin.de"
       $0.mail.mail.body = $0.createMailBody()
     }
-    store.receive(.mail(.presentMailContentView(true))) {
+    await store.receive(.mail(.presentMailContentView(true))) {
       $0.mail.isPresentingMailContent = true
     }
   }
   
-  func test_submitButtonTap_createsMail_butShowsError() {
+  func test_submitButtonTap_createsMail_butShowsError() async {
     let image = UIImage(systemName: "pencil")!
     let store = TestStore(
       initialState: ReportDomain.State(
@@ -262,7 +256,7 @@ final class ReportStoreTests: XCTestCase {
     )
     store.dependencies.mailComposeClient.canSendMail = { false }
     
-    store.send(.mail(.submitButtonTapped)) {
+    await store.send(.mail(.submitButtonTapped)) {
       $0.alert = .noMailAccount
     }
   }
@@ -289,7 +283,7 @@ final class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_locationOptionCurrentLocation_shouldPresentOfflineError_whenClientHasNoInternetConnection() {
+  func test_locationOptionCurrentLocation_shouldPresentOfflineError_whenClientHasNoInternetConnection() async {
     let coordinate = CLLocationCoordinate2D(latitude: 31.31, longitude: 12.12)
     
     var state: ReportDomain.State = report
@@ -302,7 +296,7 @@ final class ReportStoreTests: XCTestCase {
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
         
-    store.send(.images(.setImageCoordinate(coordinate))) {
+    await store.send(.images(.setImageCoordinate(coordinate))) {
       $0.images.pickerResultCoordinate = coordinate
       $0.location.pinCoordinate = coordinate
       $0.location.region = .init(center: .init(coordinate), span: .init(latitudeDelta: 0.005, longitudeDelta: 0.005))
@@ -470,7 +464,7 @@ final class ReportStoreTests: XCTestCase {
     }
   }
   
-  func test_resetDataButtonTap_shouldPresentAnAlert() {
+  func test_resetDataButtonTap_shouldPresentAnAlert() async {
     let store = TestStore(
       initialState: ReportDomain.State(
         uuid: fixedUUID,
@@ -492,12 +486,12 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     
-    store.send(.onResetButtonTapped) {
+    await store.send(.onResetButtonTapped) {
       $0.alert = .resetReportAlert
     }
   }
   
-  func test_setShowContact_shouldPresentAnAlert() {
+  func test_setShowContact_shouldPresentAnAlert() async {
     let store = TestStore(
       initialState: ReportDomain.State(
         uuid: fixedUUID,
@@ -519,12 +513,12 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     
-    store.send(.set(\.$showEditContact, true)) {
+    await store.send(.set(\.$showEditContact, true)) {
       $0.showEditContact = true
     }
   }
   
-  func test_setShowDescription_shouldPresentAnAlert() {
+  func test_setShowDescription_shouldPresentAnAlert() async {
     let store = TestStore(
       initialState: ReportDomain.State(
         uuid: fixedUUID,
@@ -546,12 +540,12 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain()
     )
     
-    store.send(.set(\.$showEditDescription, true)) {
+    await store.send(.set(\.$showEditDescription, true)) {
       $0.showEditDescription = true
     }
   }
   
-  func test_selectedLicensePlate_shouldSetDescriptionDomainState() {
+  func test_selectedLicensePlate_shouldSetDescriptionDomainState() async {
     let store = TestStore(
       initialState: ReportDomain.State(
         uuid: fixedUUID,
@@ -574,7 +568,7 @@ final class ReportStoreTests: XCTestCase {
     )
     
     let item = TextItem(id: "123", text: "B-MB 3000")
-    store.send(.images(.selectedTextItem(item))) {
+    await store.send(.images(.selectedTextItem(item))) {
       $0.description.licensePlateNumber = item.text
     }
   }
@@ -649,7 +643,7 @@ final class ReportStoreTests: XCTestCase {
       reducer: ReportDomain(),
       prepareDependencies: { values in
         values.continuousClock = ImmediateClock()
-        values.locationManager = .unimplemented()
+        values.locationManager = .unimplemented
         values.placesServiceClient = .noop
         values.regulatoryOfficeMapper = .noop
         values.fileClient = fileClient
@@ -658,6 +652,7 @@ final class ReportStoreTests: XCTestCase {
       }
     )
     store.dependencies.apiService.submitNotice = { _ in .mock }
+    store.dependencies.feedbackGenerator.notify = { _ in }
     
     await store.send(.onSubmitButtonTapped) {
       $0.isSubmittingNotice = true

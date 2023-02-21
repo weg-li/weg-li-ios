@@ -11,12 +11,12 @@ public struct ImagesView: View {
   public typealias S = ImagesViewDomain.State
   public typealias A = ImagesViewDomain.Action
   
-  let store: Store<S, A>
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  let store: StoreOf<ImagesViewDomain>
+  @ObservedObject private var viewStore: ViewStoreOf<ImagesViewDomain>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<ImagesViewDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   let licenseRowLayout = [GridItem(.flexible(minimum: 30, maximum: 60))]
@@ -153,10 +153,9 @@ public struct ImagesView: View {
 struct Images_Previews: PreviewProvider {
   static var previews: some View {
     ImagesView(
-      store: .init(
-        initialState: .init(),
-        reducer: .empty,
-        environment: ()
+      store: Store(
+        initialState: ImagesViewDomain.State(),
+        reducer: ImagesViewDomain()
       )
     )
   }

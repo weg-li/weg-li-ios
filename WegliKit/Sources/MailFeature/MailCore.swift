@@ -4,9 +4,8 @@ import ComposableArchitecture
 import MessageUI
 import SharedModels
 
-public struct MailDomain: ReducerProtocol {
+public struct MailDomain: Reducer {
   public init() {}
-  
   
   public struct State: Equatable {
     public init(

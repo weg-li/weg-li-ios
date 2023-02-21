@@ -10,7 +10,7 @@ import SharedModels
 import UIApplicationClient
 import UIKit
 
-public struct SettingsDomain: ReducerProtocol {
+public struct SettingsDomain: Reducer {
   public init() {}
   
   @Dependency(\.applicationClient) var applicationClient
@@ -52,7 +52,7 @@ public struct SettingsDomain: ReducerProtocol {
     case setDestination(State.Destination?)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Scope(state: \.accountSettingsState, action: /Action.accountSettings) {
       AccountSettingsDomain()
     }

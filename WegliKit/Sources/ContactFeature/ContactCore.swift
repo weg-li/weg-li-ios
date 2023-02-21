@@ -8,7 +8,7 @@ import Helper
 import L10n
 import SharedModels
 
-public struct ContactViewDomain: ReducerProtocol {
+public struct ContactViewDomain: Reducer {
   public init() {}
   
   @Dependency(\.continuousClock) var clock
@@ -35,7 +35,7 @@ public struct ContactViewDomain: ReducerProtocol {
     case onDisappear
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Scope(state: \.contact, action: /Action.contact) {
       ContactDomain()
     }
@@ -78,7 +78,7 @@ public struct ContactDomain: ReducerProtocol {
     case binding(BindingAction<State>)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     BindingReducer()
   }
 }

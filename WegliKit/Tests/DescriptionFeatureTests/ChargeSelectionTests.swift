@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DescriptionFeature
+import FeedbackGeneratorClient
 import FileClient
 import XCTest
 
@@ -55,6 +56,7 @@ final class ChargeSelectionTests: XCTestCase {
       prepareDependencies: { values in
         values.continuousClock = clock
         values.fileClient = fileClient
+        values.feedbackGenerator = .noop
       }
     )
     

@@ -32,11 +32,11 @@ struct MailContentView: View {
   }
   
   @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
-  let store: Store<ReportDomain.State, ReportDomain.Action>
+  private let store: StoreOf<ReportDomain>
   
-  init(store: Store<ReportDomain.State, ReportDomain.Action>) {
+  init(store: StoreOf<ReportDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store.scope(state: ViewState.init))
+    self.viewStore = ViewStore(store.scope(state: ViewState.init), observe: { $0 })
   }
   
   var body: some View {
@@ -44,13 +44,12 @@ struct MailContentView: View {
       SubmitButton(
         state: .readyToSubmit(district: viewStore.districtName),
         disabled: viewStore.isSubmitButtonDisabled
-      ) {
-        viewStore.send(.mail(.submitButtonTapped))
-      }
-      .accessibilityValue(viewStore.isSubmitButtonDisabled ? "deaktviert" : "aktiviert")
-      .accessibilityHint(viewStore.isSubmitButtonDisabled ? L10n.Mail.readyToSubmitErrorCopy : "")
-      .padding(.bottom, .grid(2))
-      .disabled(viewStore.isSubmitButtonDisabled)
+      ) { viewStore.send(.mail(.submitButtonTapped)) }
+        .accessibilityValue(viewStore.isSubmitButtonDisabled ? "deaktviert" : "aktiviert")
+        .accessibilityHint(viewStore.isSubmitButtonDisabled ? L10n.Mail.readyToSubmitErrorCopy : "")
+        .padding(.bottom, .grid(2))
+        .disabled(viewStore.isSubmitButtonDisabled)
+      
       VStack(spacing: .grid(2)) {
         if !MFMailComposeViewController.canSendMail() {
           Text(L10n.Mail.deviceErrorCopy)

@@ -14,12 +14,12 @@ public struct SettingsView: View {
   
   @Environment(\.colorScheme) private var colorScheme
   
-  let store: Store<S, A>
-  @ObservedObject private var viewStore: ViewStore<S, A>
+  let store: StoreOf<SettingsDomain>
+  @ObservedObject private var viewStore: ViewStoreOf<SettingsDomain>
   
-  public init(store: Store<S, A>) {
+  public init(store: StoreOf<SettingsDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {
@@ -38,14 +38,14 @@ public struct SettingsView: View {
         )
       }
       
-      Section(header: Label("Allgemein", systemImage: "hammer.fill")) {
+      Section(header: Label("Meldung", systemImage: "gearshape.2.fill")) {
         Toggle(
           isOn: viewStore.binding(
             get: \.userSettings.showsAllTextRecognitionSettings,
             send: { A.userSettings(.setShowsAllTextRecognitionResults($0)) }
           ),
           label: {
-            Label("Alle Ergebnisse der Nummernschild Erkennung anzeigen", systemImage: "text.magnifyingglass")
+            Label("Alle Ergebnisse der Kennzeichenerkennung anzeigen", systemImage: "text.magnifyingglass")
               .labelStyle(.titleOnly)
           }
         )
@@ -73,7 +73,7 @@ public struct SettingsView: View {
       .headerProminence(.increased)
       
       Section(
-        header: Label(L10n.Settings.Section.projectTitle, systemImage: "chevron.left.forwardslash.chevron.right")
+        header: Label(L10n.Settings.Section.projectTitle, systemImage: "terminal.fill")
       ) {
         Button(
           action: { viewStore.send(.openImprintTapped) },
@@ -83,7 +83,7 @@ public struct SettingsView: View {
               Spacer()
               linkIcon
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, .grid(1))
           }
         )
         .accessibilityAddTraits([.isLink])
@@ -96,7 +96,7 @@ public struct SettingsView: View {
               Spacer()
               linkIcon
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, .grid(1))
           }
         )
         .accessibilityAddTraits([.isLink])
@@ -109,7 +109,7 @@ public struct SettingsView: View {
               Spacer()
               linkIcon
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, .grid(1))
           }
         )
       }
