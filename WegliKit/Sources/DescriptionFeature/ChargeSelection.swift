@@ -65,9 +65,9 @@ public struct ChargeSelection: Reducer {
           
         let charges = DescriptionDomain.charges.map {
           Charge(
-            id: $0.key,
-            text: $0.value,
-            isFavorite: chargeIds.contains($0.key),
+            id: $0.id,
+            text: $0.text,
+            isFavorite: chargeIds.contains($0.id),
             isSelected: false
           )
         }

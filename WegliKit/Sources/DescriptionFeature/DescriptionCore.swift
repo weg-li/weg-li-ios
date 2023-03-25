@@ -122,10 +122,15 @@ public struct DescriptionDomain: Reducer {
 public extension DescriptionDomain {
   static let bundle = Bundle.module
   
-  static let charges: [(key: String, value: String)] = {
+  struct _Charge: Codable, Identifiable {
+    public let id: String
+    public let text: String
+  }
+  
+  static let charges: [_Charge] = {
     var all = bundle.decode([String: String].self, from: "charges.json")
-      .compactMap { $0 }
-      .sorted { $0.value < $1.value }
+      .compactMap { _Charge(id: $0.key, text: $0.value) }
+      .sorted { $0.id < $1.id }
     return all
   }()
   
@@ -145,6 +150,19 @@ public extension DescriptionDomain {
     let carBrands = all.map(CarBrand.init)
     return IdentifiedArray(uniqueElements: carBrands, id: \.id)
   }()
+  
+  static let tbnrs: [NoticeCharge] = {
+    let all = bundle.decode([NoticeCharge].self, from: "tbnrs.json")
+    return all
+  }()
+  
+  static func noticeCharge(with tbnr: String) -> NoticeCharge? {
+    tbnrs.first { $0.tbnr == tbnr }
+  }
+  
+  static func charge(for id: String) -> _Charge? {
+    charges.first { $0.id == id }
+  }
 }
  
 public struct CarBrand: Identifiable, Equatable, Codable {

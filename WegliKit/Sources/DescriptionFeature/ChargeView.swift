@@ -20,11 +20,16 @@ public struct Charge: Hashable, Codable, Identifiable {
 extension Charge {
   public init(_ noticeKey: String) {
     let charges = DescriptionDomain.charges
-    guard let index = charges.firstIndex(where: { noticeKey == $0.value }) else {
+    guard let index = charges.firstIndex(where: { noticeKey == $0.text }) else {
       preconditionFailure("unknown key")
     }
     let value = charges[index]
-    self = Charge(id: UUID().uuidString, text: value.value, isFavorite: false, isSelected: false)
+    self = Charge(id: value.id, text: value.text, isFavorite: false, isSelected: false)
+  }
+  
+  init(_ noticeCharge: NoticeCharge) {
+    let text = DescriptionDomain.charge(for: noticeCharge.tbnr)?.text ?? ""
+    self = Charge(id: noticeCharge.tbnr, text: text, isFavorite: false, isSelected: false)
   }
 }
 

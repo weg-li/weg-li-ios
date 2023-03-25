@@ -214,20 +214,13 @@ public struct NoticeListDomain: Reducer {
         state.notices = .loading
         state.isFetchingNotices = true
         
-        return .merge(
-          .run { send in
-            try await clock.sleep(for: .seconds(0.1))
-            await send.send(.binding(.set(\.$isFetchingNotices, true)))
-          }.cancellable(id: LoadingState.self),
-          .task {
-            await .fetchNoticesResponse(
-              TaskResult { try await apiService.getNotices(forceReload) }
-            )
-          }
-        )
+        return .task {
+          await .fetchNoticesResponse(
+            TaskResult { try await apiService.getNotices(forceReload) }
+          )
+        }
         
       case let .fetchNoticesResponse(.success(notices)):
-        Task.cancel(id: LoadingState.self)
         state.isFetchingNotices = false
         state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
         
@@ -245,18 +238,11 @@ public struct NoticeListDomain: Reducer {
           return .none
         }
         
-        return .concatenate(
-          .task {
-            await .fetchNoticesResponse(
-              TaskResult { try await fileClient.loadNotices() }
-            )
-          },
-          .run { send in
-            await send.send(.displayMessageBar(.error))
-            try await Task.sleep(for: .seconds(4))
-            await send.send(.displayMessageBar(nil))
-          }
-        )
+        return .run { send in
+          await send.send(.displayMessageBar(.error))
+          try await Task.sleep(for: .seconds(4))
+          await send.send(.displayMessageBar(nil))
+        }
         
       case .displayMessageBar(let value):
         state.errorBarMessage = value
@@ -406,7 +392,7 @@ extension Notice {
       registration: editState.description.licensePlateNumber,
       brand: editState.description.carBrandSelection.selectedBrand?.title ?? "",
       color: DescriptionDomain.colors[editState.description.selectedColor].key,
-      charge: editState.description.chargeSelection.selectedCharge?.text ?? "",
+      charge: editState.description.chargeSelection.selectedCharge.flatMap { DescriptionDomain.noticeCharge(with: $0.id) },
       date: editState.date,
       duration: Int64(editState.description.selectedDuration),
       severity: nil,
@@ -433,7 +419,7 @@ extension Notice {
     registration: "XX-XX-123",
     brand: "",
     color: "",
-    charge: "",
+    charge: .init(tbnr: ""),
     date: .now,
     duration: 2,
     severity: nil,
@@ -445,7 +431,35 @@ extension Notice {
     hazardLights: false,
     expiredTuv: false,
     expiredEco: false,
-    photos: [.loadingPreview, .loadingPreview]
+    photos: [.loadingPreview1, .loadingPreview2]
   )
+  
+  public static func placeholder(id: String = UUID().uuidString) -> Self {
+    Self(
+      token: id,
+      status: .analyzing,
+      street: "",
+      city: "",
+      zip: "",
+      latitude: 0,
+      longitude: 0,
+      registration: "XX-XX-123",
+      brand: "",
+      color: "",
+      charge: .init(tbnr: ""),
+      date: .now,
+      duration: 2,
+      severity: nil,
+      note: "",
+      createdAt: .now,
+      updatedAt: .now,
+      sentAt: .now,
+      vehicleEmpty: false,
+      hazardLights: false,
+      expiredTuv: false,
+      expiredEco: false,
+      photos: [.loadingPreview1, .loadingPreview2]
+    )
+  }
 }
 

@@ -14,10 +14,11 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var registration: String?
   public var brand: String?
   public var color: String?
-  public var charge: String?
+  public var tbnr: String?
+  public var charge: NoticeCharge?
   public var date: Date?
   public var duration: Int64?
-  public var severity: String?
+  public var severity: Int?
   public var note: String?
   public var createdAt: Date?
   public var updatedAt: Date?
@@ -26,6 +27,7 @@ public struct Notice: Codable, Equatable, Identifiable {
   public var hazardLights: Bool?
   public var expiredTuv: Bool?
   public var expiredEco: Bool?
+  public var over28Tons: Bool?
   public var photos: [NoticePhoto]?
   
   public var time: String? {
@@ -55,10 +57,11 @@ public struct Notice: Codable, Equatable, Identifiable {
     registration: String,
     brand: String,
     color: String,
-    charge: String,
+    tbnr: String? = nil,
+    charge: NoticeCharge?,
     date: Date,
     duration: Int64,
-    severity: String?,
+    severity: Int?,
     note: String,
     createdAt: Date,
     updatedAt: Date,
@@ -67,6 +70,7 @@ public struct Notice: Codable, Equatable, Identifiable {
     hazardLights: Bool = false,
     expiredTuv: Bool = false,
     expiredEco: Bool = false,
+    over28Tons: Bool = false,
     photos: [NoticePhoto]
   ) {
     self.token = token
@@ -79,6 +83,7 @@ public struct Notice: Codable, Equatable, Identifiable {
     self.registration = registration
     self.brand = brand
     self.color = color
+    self.tbnr = tbnr
     self.charge = charge
     self.date = date
     self.duration = duration
@@ -144,10 +149,10 @@ public extension Notice {
     registration: "",
     brand: "",
     color: "",
-    charge: "",
+    charge: .init(tbnr: ""),
     date: .distantFuture,
     duration: 0,
-    severity: "",
+    severity: 1,
     note: "",
     createdAt: .distantFuture,
     updatedAt: .distantFuture,

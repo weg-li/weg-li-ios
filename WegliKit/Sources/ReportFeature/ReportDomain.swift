@@ -660,7 +660,9 @@ public extension SharedModels.Notice {
       registration: reportState.description.licensePlateNumber,
       brand: reportState.description.carBrandSelection.selectedBrand?.title ?? "",
       color: DescriptionDomain.colors[reportState.description.selectedColor].key,
-      charge: reportState.description.chargeSelection.selectedCharge?.text ?? "",
+      charge: reportState.description.chargeSelection.selectedCharge.flatMap {
+        DescriptionDomain.noticeCharge(with: $0.id) } ?? .init(tbnr: "")
+      ,
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,

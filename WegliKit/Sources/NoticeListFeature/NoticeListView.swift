@@ -58,12 +58,6 @@ public struct NoticeListView: View {
             goToAccountSettings()
               .padding(.vertical)
           }
-          
-          //          if let errorMessage = errorState.error?.errorDump {
-          //            Text(errorMessage)
-          //              .font(.body.italic())
-          //              .multilineTextAlignment(.center)
-          //          }
         }
         .padding(.horizontal, .grid(3))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
