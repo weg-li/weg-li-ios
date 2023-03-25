@@ -23,5 +23,6 @@ public struct NoticePhoto: Hashable, Codable {
 }
 
 public extension NoticePhoto {
-  static let loadingPreview = Self(uiImage: .init(systemName: "photo.fill")!)
+  static let loadingPreview1 = Self(uiImage: .init(systemName: "photo.fill")!)
+  static let loadingPreview2 = Self(uiImage: .init(systemName: "swift")!)
 }

@@ -20,7 +20,7 @@ public struct ReportView: View {
     
   public init(store: Store<S, A>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {
@@ -35,39 +35,6 @@ public struct ReportView: View {
             store: store.scope(
               state: \.images,
               action: A.images
-            )
-          )
-        }
-
-        // Date
-        Widget(
-          title: Text(L10n.date),
-          isCompleted: true
-        ) {
-          VStack(alignment: .leading) {
-            DatePicker(
-              L10n.date,
-              selection: viewStore.binding(\.$date)
-            )
-            .labelsHidden()
-            .padding(.bottom)
-
-            Text(L10n.Report.Notice.Photos.dateHint)
-              .multilineTextAlignment(.leading)
-              .foregroundColor(Color(.secondaryLabel))
-              .font(.footnote)
-          }
-        }
-
-        // Location
-        Widget(
-          title: Text(L10n.Location.widgetTitle),
-          isCompleted: viewStore.isLocationValid
-        ) {
-          LocationView(
-            store: store.scope(
-              state: \.location,
-              action: A.location
             )
           )
         }
@@ -109,6 +76,19 @@ public struct ReportView: View {
             )
         }
         
+        // Location
+        Widget(
+          title: Text(L10n.Location.widgetTitle),
+          isCompleted: viewStore.isLocationValid
+        ) {
+          LocationView(
+            store: store.scope(
+              state: \.location,
+              action: A.location
+            )
+          )
+        }
+        
         // Contact
         if viewStore.apiToken.isEmpty {
           Widget(
@@ -141,6 +121,26 @@ public struct ReportView: View {
                   }
                 }
               )
+          }
+        }
+        
+        // Date
+        Widget(
+          title: Text(L10n.date),
+          isCompleted: true
+        ) {
+          VStack(alignment: .leading) {
+            DatePicker(
+              L10n.date,
+              selection: viewStore.binding(\.$date)
+            )
+            .labelsHidden()
+            .padding(.bottom)
+
+            Text(L10n.Report.Notice.Photos.dateHint)
+              .multilineTextAlignment(.leading)
+              .foregroundColor(Color(.secondaryLabel))
+              .font(.footnote)
           }
         }
         

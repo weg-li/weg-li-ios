@@ -79,29 +79,43 @@ public struct AccountSettingsView: View {
                 .padding(.vertical, .grid(1))
               
               Button(
-                action: { viewStore.send(.openUserSettings(true)) },
+                action: { viewStore.send(.onGoToProfileButtonTapped) },
                 label: {
                   Label("Profil öffnen", systemImage: "arrow.up.right")
-                    .frame(maxWidth: .infinity, minHeight: 40)
+                    .padding(.grid(1))
+                    .frame(maxWidth: .infinity)
                 }
               )
-              .buttonStyle(.bordered)
+              .buttonStyle(CTAButtonStyle())
+              .accessibilityAddTraits([.isLink])
+              
+              Text("Oder erstelle ein Profil")
+                .multilineTextAlignment(.leading)
+                .foregroundColor(Color(.secondaryLabel))
+                .font(.subheadline)
+                .padding(.vertical, .grid(1))
+              
+              Button(
+                action: { viewStore.send(.onCreateProfileButtonTapped) },
+                label: {
+                  Label("Profil erstellen", systemImage: "arrow.up.right")
+                    .padding(.grid(1))
+                    .frame(maxWidth: .infinity)
+                }
+              )
+              .frame(maxWidth: .infinity)
+              .buttonStyle(CTAButtonStyle())
               .accessibilityAddTraits([.isLink])
             }
             .padding(.grid(2))
-            .overlay(
-              RoundedRectangle(cornerRadius: 4)
-                .stroke(Color(.lightGray), lineWidth: 1)
-            )
           }
         }
       }
       .headerProminence(.increased)
     }
-    .sheet(
-      isPresented: viewStore.binding(get: \.presentWebView, send: A.openUserSettings), content: {
-        SafariView(url: userLink)
-      })
+    .sheet(unwrapping: viewStore.binding(get: \.link, send: A.dismissSheet), content: { url in
+      SafariView(url: url.wrappedValue.url)
+    })
     .navigationBarTitle("Account", displayMode: .automatic)
   }
 }

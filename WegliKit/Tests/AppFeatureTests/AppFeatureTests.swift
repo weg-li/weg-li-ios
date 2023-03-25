@@ -68,7 +68,7 @@ final class AppStoreTests: XCTestCase {
     }
   }
   
-  func test_resetReportConfirmButtonTap_shouldResetDraftReport() {
+  func test_resetReportConfirmButtonTap_shouldResetDraftReport() async {
     let store = TestStore(
       initialState: AppDomain.State(reportDraft: report),
       reducer: AppDomain()
@@ -76,7 +76,7 @@ final class AppStoreTests: XCTestCase {
     store.dependencies.uuid = .constant(.reportId)
     store.dependencies.date = .constant(fixedDate())
     
-    store.send(.report(.onResetConfirmButtonTapped)) {
+    await store.send(.report(.onResetConfirmButtonTapped)) {
       $0.reportDraft = ReportDomain.State(
         uuid: self.fixedUUID,
         images: .init(),
@@ -87,7 +87,7 @@ final class AppStoreTests: XCTestCase {
         date: self.fixedDate
       )
     }
-    store.receive(.report(.dismissAlert))
+    await store.receive(.report(.dismissAlert))
   }
   
   func test_ActionStoredApiTokenLoaded() async {
@@ -150,7 +150,7 @@ final class AppStoreTests: XCTestCase {
   }
   
   func test_onNavigateToAccountSettingsButtonTapped() async {
-    var store = TestStore(
+    let store = TestStore(
       initialState: .init(reportDraft: report),
       reducer: AppDomain()
     )

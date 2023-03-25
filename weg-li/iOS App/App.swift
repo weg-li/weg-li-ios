@@ -31,10 +31,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     initialState: .init(),
     reducer: AppDomain()
   )
-  lazy var viewStore = ViewStore(
-    self.store.scope(state: { _ in () }),
-    removeDuplicates: ==
-  )
+  lazy var viewStore = ViewStore(self.store.scope(state: { _ in () }))
   
   func application(
     _ application: UIApplication,

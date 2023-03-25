@@ -35,12 +35,7 @@ public struct LocationView: View {
   
   public init(store: StoreOf<LocationDomain>) {
     self.store = store
-    self.viewStore = ViewStore(
-      store.scope(
-        state: ViewState.init,
-        action: { $0 }
-      )
-    )
+    self.viewStore = ViewStore(store, observe: ViewState.init)
   }
   
   public var body: some View {

@@ -132,8 +132,8 @@ final class SettingsStoreTests: XCTestCase {
       return .init(true)
     }
     
-    await store.send(.accountSettings(.openUserSettings(true))) {
-      $0.accountSettingsState.presentWebView = true
+    await store.send(.accountSettings(.onGoToProfileButtonTapped)) {
+      $0.accountSettingsState.link = AccountSettingsDomain.State.Link(url: URL(string: "https://www.weg.li/user")!)
     }
   }
   

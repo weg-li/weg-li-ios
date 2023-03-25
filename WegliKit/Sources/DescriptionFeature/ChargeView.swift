@@ -1,6 +1,7 @@
 import Foundation
 import Styleguide
 import SwiftUI
+import SharedModels
 
 public struct Charge: Hashable, Codable, Identifiable {
   public let id: String

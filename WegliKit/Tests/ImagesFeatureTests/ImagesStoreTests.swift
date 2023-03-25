@@ -98,7 +98,7 @@ final class ImagesStoreTests: XCTestCase {
     await store.receive(.setImageCreationDate(creationDate))
   }
   
-  func test_removePhoto_shouldUpdateState() {
+  func test_removePhoto_shouldUpdateState() async {
     let image1 = UIImage(systemName: "pencil")!
     let id1 = UUID().uuidString
     let storableImage1 = PickerImageResult(id: id1, uiImage: image1)
@@ -122,7 +122,7 @@ final class ImagesStoreTests: XCTestCase {
       }
     )
     
-    store.send(.image(id: id1, action: .onRemovePhotoButtonTapped)) {
+    await store.send(.image(id: id1, action: .onRemovePhotoButtonTapped)) {
       $0.storedPhotos = [storableImage2]
     }
   }
@@ -307,7 +307,7 @@ final class ImagesStoreTests: XCTestCase {
     }
   }
   
-  func test_dismissAlert_shouldUpdateState() {
+  func test_dismissAlert_shouldUpdateState() async {
     let store = TestStore(
       initialState: ImagesViewDomain.State(
         alert: AlertState(title: TextState(L10n.Photos.Alert.accessDenied)),
@@ -324,7 +324,7 @@ final class ImagesStoreTests: XCTestCase {
       }
     )
     
-    store.send(.dismissAlert) {
+    await store.send(.dismissAlert) {
       $0.alert = nil
     }
   }

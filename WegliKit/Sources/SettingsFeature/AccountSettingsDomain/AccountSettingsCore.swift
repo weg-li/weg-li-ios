@@ -10,16 +10,29 @@ public struct AccountSettingsDomain: ReducerProtocol {
   
   public struct State: Equatable {
     public var accountSettings: AccountSettings
-    public var presentWebView = false
+    
+    public var link: Link?
     
     public init(accountSettings: AccountSettings) {
       self.accountSettings = accountSettings
+    }
+    
+    public struct Link: Identifiable, Equatable {
+      public let id: String
+      public let url: URL
+
+      public init(url: URL) {
+        self.url = url
+        self.id = url.absoluteString
+      }
     }
   }
   
   public enum Action: Equatable {
     case setApiToken(String)
-    case openUserSettings(Bool)
+    case onGoToProfileButtonTapped
+    case onCreateProfileButtonTapped
+    case dismissSheet
   }
   
   public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -35,12 +48,17 @@ public struct AccountSettingsDomain: ReducerProtocol {
         }
       }
 
-    case .openUserSettings(let value):
-      state.presentWebView = value
+    case .onGoToProfileButtonTapped:
+      state.link = .init(url: URL(string: "https://www.weg.li/user")!)
       return .none
-//      return .fireAndForget(priority: .userInitiated) {
-//        _ = await applicationClient.open(userLink, [:])
-//      }
+      
+    case .onCreateProfileButtonTapped:
+      state.link = .init(url: URL(string: "https://www.weg.li")!)
+      return .none
+      
+    case .dismissSheet:
+      state.link = nil
+      return .none
     }
   }
 }

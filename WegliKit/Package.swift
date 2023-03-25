@@ -53,8 +53,8 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
     .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.2.0"),
-    .package(url: "https://github.com/pointfreeco/swiftui-navigation.git", from: "0.4.0"),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.8.4"),
+    .package(url: "https://github.com/pointfreeco/swiftui-navigation.git", from: "0.7.1"),
     .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.5.0"),
   ],
   targets: [
@@ -361,7 +361,7 @@ package.targets.append(
         "MailFeature",
         .models,
         .tca,
-        .product(name: "CustomDump", package: "swift-custom-dump")
+        .customDump
       ]
     ),
     .testTarget(
@@ -374,7 +374,7 @@ package.targets.append(
         "ReportFeature",
         .models,
         .tca,
-        .product(name: "CustomDump", package: "swift-custom-dump")
+        .customDump
       ]
     ),
     .testTarget(
@@ -386,7 +386,7 @@ package.targets.append(
         "ReportFeature",
         .models,
         .tca,
-        .product(name: "CustomDump", package: "swift-custom-dump")
+        .customDump
       ]
     ),
     .testTarget(

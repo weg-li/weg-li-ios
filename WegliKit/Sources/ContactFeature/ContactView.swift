@@ -15,7 +15,7 @@ public struct ContactDetailsView: View {
   
   public init(store: Store<ContactDomain.State, ContactDomain.Action>) {
     self.store = store
-    self.viewStore = ViewStore(store)
+    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {

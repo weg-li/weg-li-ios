@@ -145,7 +145,7 @@ public struct NoticeListDomain: Reducer {
     Reduce<State, Action> { state, action in
       switch action {
       case .onAppear:
-        return EffectTask(value: .fetchNotices(forceReload: false))
+        return .send(.fetchNotices(forceReload: false))
   
       case .setSortOrder(let order):
         guard let notices = state.notices.elements else {
@@ -235,10 +235,9 @@ public struct NoticeListDomain: Reducer {
           return .none
         }
 
-        return EffectTask(value: .setSortOrder(state.noticesSortOrder))
+        return .send(.setSortOrder(state.noticesSortOrder))
         
       case let .fetchNoticesResponse(.failure(error)):
-        Task.cancel(id: LoadingState.self)
         state.isFetchingNotices = false
         
         if let apiError = error as? ApiError, apiError == .tokenUnavailable {

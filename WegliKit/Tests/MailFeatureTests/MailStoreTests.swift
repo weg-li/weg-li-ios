@@ -7,7 +7,7 @@ import XCTest
 
 @MainActor
 final class MailStoreTests: XCTestCase {
-  func test_presentMailViewAction_shouldUpdateState() {
+  func test_presentMailViewAction_shouldUpdateState() async {
     let store = TestStore(
       initialState: MailDomain.State(
         mailComposeResult: nil,
@@ -17,12 +17,12 @@ final class MailStoreTests: XCTestCase {
       reducer: MailDomain()
     )
     
-    store.send(.presentMailContentView(true)) {
+    await store.send(.presentMailContentView(true)) {
       $0.isPresentingMailContent = true
     }
   }
   
-  func test_setMailResult_shouldUpdateState() {
+  func test_setMailResult_shouldUpdateState() async {
     let store = TestStore(
       initialState: MailDomain.State(
         mailComposeResult: nil,
@@ -33,7 +33,7 @@ final class MailStoreTests: XCTestCase {
     )
     
     let result = MFMailComposeResult(rawValue: 2)!
-    store.send(.setMailResult(result)) {
+    await store.send(.setMailResult(result)) {
       $0.mailComposeResult = result
     }
   }

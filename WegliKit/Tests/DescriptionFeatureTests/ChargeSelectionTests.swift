@@ -99,9 +99,9 @@ final class ChargeSelectionTests: XCTestCase {
     
     let charges = DescriptionDomain.charges.map {
       Charge(
-        id: $0.key,
-        text: $0.value,
-        isFavorite: ["0"].contains($0.key),
+        id: $0.id,
+        text: $0.text,
+        isFavorite: ["0"].contains($0.id),
         isSelected: false
       )
     }
@@ -109,9 +109,6 @@ final class ChargeSelectionTests: XCTestCase {
     await store.receive(.favoriteChargesLoaded(.success(["0"]))) {
       $0.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
     }
-    await store.receive(.sortFavoritedCharges) {
-      let sortedCharges = charges.sorted(by: { $0.isFavorite && !$1.isFavorite })
-      $0.charges = IdentifiedArrayOf(uniqueElements: sortedCharges, id: \.id)
-    }
+    await store.receive(.sortFavoritedCharges)
   }
 }

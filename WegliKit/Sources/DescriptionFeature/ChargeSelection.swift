@@ -72,7 +72,7 @@ public struct ChargeSelection: Reducer {
           )
         }
         state.charges = IdentifiedArrayOf(uniqueElements: charges, id: \.id)
-        return EffectTask(value: .sortFavoritedCharges)
+        return .send(.sortFavoritedCharges)
         
       case let .setCharge(value):
         state.selectedCharge = value

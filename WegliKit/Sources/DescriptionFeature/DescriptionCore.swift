@@ -28,9 +28,9 @@ public struct DescriptionDomain: Reducer {
     ) {
       self.licensePlateNumber = licensePlateNumber
       self.selectedColor = selectedColor
-      self.carBrandSelection = .init(selectedBrand: selectedBrand)
+      self.carBrandSelection = CarBrandSelection.State(selectedBrand: selectedBrand)
       self.selectedDuration = selectedDuration
-      self.chargeSelection = .init(selectedCharge: selectedCharge)
+      self.chargeSelection = ChargeSelection.State(selectedCharge: selectedCharge)
       self.blockedOthers = blockedOthers
       self.vehicleEmpty = vehicleEmpty
       self.hazardLights = hazardLights
@@ -59,7 +59,6 @@ public struct DescriptionDomain: Reducer {
         !licensePlateNumber.isEmpty,
         selectedColor != 0,
         carBrandSelection.selectedBrand != nil,
-        selectedDuration != 0,
         chargeSelection.selectedCharge != nil
       ]
       return arguments.allSatisfy { $0 == true }

@@ -34,7 +34,7 @@ public struct DescriptionView: View {
   
   public init(store: StoreOf<ReportDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store.scope(state: ViewState.init), observe: { $0 })
+    self.viewStore = ViewStore(store, observe: ViewState.init)
   }
   
   public var body: some View {
