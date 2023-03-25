@@ -269,5 +269,12 @@ struct NoticeListView_Previews: PreviewProvider {
 // MARK: Helper
 
 extension Array where Element == Notice {
-  static let placeholder: [Element] = Array(repeating: .preview, count: 6)
+  static let placeholder: [Element] = [
+    .placeholder(),
+    .placeholder(),
+    .placeholder(),
+    .placeholder(),
+    .placeholder(),
+    .placeholder()
+  ]
 }
