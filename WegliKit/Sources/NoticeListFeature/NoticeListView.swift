@@ -120,61 +120,57 @@ public struct NoticeListView: View {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu(
           content: {
-            if viewStore.showNoticeDateSortOption {
-              Button(
-                action: { viewStore.send(.setSortOrder(.noticeDate)) },
-                label: {
-                  if viewStore.noticesSortOrder == .noticeDate {
-                    let isAscending = viewStore.orderSortType[.noticeDate, default: true]
-                    Label("Tatzeit", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
-                  } else {
-                    Text("Tatzeit")
-                  }
+            Button(
+              action: { viewStore.send(.setSortOrder(.noticeDate)) },
+              label: {
+                if viewStore.noticesSortOrder == .noticeDate {
+                  let isAscending = viewStore.orderSortType[.noticeDate, default: true]
+                  Label("Tatzeit", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
+                } else {
+                  Text("Tatzeit")
                 }
-              )
-            }
+              }
+            )
+            .disabled(!viewStore.showNoticeDateSortOption)
             
-            if viewStore.showRegistrationSortOption {
-              Button(
-                action: { viewStore.send(.setSortOrder(.registration)) },
-                label: {
-                  if viewStore.noticesSortOrder == .registration {
-                    let isAscending = viewStore.orderSortType[.registration, default: true]
-                    Label("Kennzeichen", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
-                  } else {
-                    Text("Kennzeichen")
-                  }
+            Button(
+              action: { viewStore.send(.setSortOrder(.registration)) },
+              label: {
+                if viewStore.noticesSortOrder == .registration {
+                  let isAscending = viewStore.orderSortType[.registration, default: true]
+                  Label("Kennzeichen", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
+                } else {
+                  Text("Kennzeichen")
                 }
-              )
-            }
+              }
+            )
+            .disabled(!viewStore.showRegistrationSortOption)
             
-            if viewStore.showCreatedAtDateSortOption {
-              Button(
-                action: { viewStore.send(.setSortOrder(.createdAtDate)) },
-                label: {
-                  if viewStore.noticesSortOrder == .createdAtDate {
-                    let isAscending = viewStore.orderSortType[.createdAtDate, default: true]
-                    Label("Erstellt", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
-                  } else {
-                    Text("Erstellt")
-                  }
+            Button(
+              action: { viewStore.send(.setSortOrder(.createdAtDate)) },
+              label: {
+                if viewStore.noticesSortOrder == .createdAtDate {
+                  let isAscending = viewStore.orderSortType[.createdAtDate, default: true]
+                  Label("Erstellt", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
+                } else {
+                  Text("Erstellt")
                 }
-              )
-            }
+              }
+            )
+            .disabled(!viewStore.showCreatedAtDateSortOption)
             
-            if viewStore.showStatusSortOption {
-              Button(
-                action: { viewStore.send(.setSortOrder(.status)) },
-                label: {
-                  if viewStore.noticesSortOrder == .status {
-                    let isAscending = viewStore.orderSortType[.status, default: true]
-                    Label("Status", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
-                  } else {
-                    Text("Status")
-                  }
+            Button(
+              action: { viewStore.send(.setSortOrder(.status)) },
+              label: {
+                if viewStore.noticesSortOrder == .status {
+                  let isAscending = viewStore.orderSortType[.status, default: true]
+                  Label("Status", systemImage: isAscending ? "arrowtriangle.down" : "arrowtriangle.up")
+                } else {
+                  Text("Status")
                 }
-              )
-            }
+              }
+            )
+            .disabled(!viewStore.showStatusSortOption)
           },
           label: {
             Image(systemName: "arrow.up.arrow.down")

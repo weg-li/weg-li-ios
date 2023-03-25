@@ -81,22 +81,22 @@ public struct NoticeListDomain: Reducer {
     var showNoticeDateSortOption: Bool {
       guard let elements = notices.elements else { return false }
       let filtered = elements.compactMap(\.date)
-      return filtered.count == elements.count
+      return (filtered.count == elements.count) && filtered.count > 1
     }
     var showCreatedAtDateSortOption: Bool {
       guard let elements = notices.elements else { return false }
       let filtered = elements.compactMap(\.createdAt)
-      return filtered.count == elements.count
+      return (filtered.count == elements.count) && filtered.count > 1
     }
     var showStatusSortOption: Bool {
       guard let elements = notices.elements else { return false }
       let filtered = elements.compactMap(\.status)
-      return filtered.count == elements.count
+      return (filtered.count == elements.count) && filtered.count > 1
     }
     var showRegistrationSortOption: Bool {
       guard let elements = notices.elements else { return false }
       let filtered = elements.compactMap(\.registration)
-      return filtered.count == elements.count
+      return (filtered.count == elements.count) && filtered.count > 1
     }
     
     
