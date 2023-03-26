@@ -207,8 +207,8 @@ public struct AppDomain: Reducer {
         
       case .noticeList(.onNavigateToAccontSettingsButtonTapped):
         return .concatenate(
-          EffectTask(value: .viewAction(.setSelectedTab(.settings))),
-          EffectTask(value: .settings(.setDestination(.accountSettings)))
+          .send(.viewAction(.setSelectedTab(.settings))),
+          .send(.settings(.setDestination(.accountSettings)))
         )
         
       case .noticeList, .report:

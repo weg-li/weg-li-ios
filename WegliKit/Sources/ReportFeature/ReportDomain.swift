@@ -232,12 +232,12 @@ public struct ReportDomain: Reducer {
             return .none
           }
           
-          return EffectTask(value: Action.location(.resolveLocation(coordinate)))
+          return .send(Action.location(.resolveLocation(coordinate)))
           
         case .setPhotos:
           if state.images.pickerResultCoordinate == nil {
             if let coordinate = state.location.region?.center {
-              return EffectTask(value: .images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
+              return .send(.images(.setImageCoordinate(coordinate.asCLLocationCoordinate2D)))
             }
           }
           
@@ -273,7 +273,7 @@ public struct ReportDomain: Reducer {
           guard let address = resolvedAddresses.first else {
             return .none
           }
-          return EffectTask(value: .mapAddressToDistrict(address))
+          return .send(.mapAddressToDistrict(address))
           
         case let .resolveAddressFinished(.failure(error)):
           state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
@@ -284,21 +284,21 @@ public struct ReportDomain: Reducer {
           guard postalCode.count == postalCodeMinumimCharacters, postalCode.isNumeric else {
             return .none
           }
-          return EffectTask(value: .mapAddressToDistrict(state.location.resolvedAddress))
+          return .send(.mapAddressToDistrict(state.location.resolvedAddress))
           
         case .updateGeoAddressCity:
-          return EffectTask(value: .mapAddressToDistrict(state.location.resolvedAddress))
+          return .send(.mapAddressToDistrict(state.location.resolvedAddress))
           
         case let .setLocationOption(option) where option == .fromPhotos:
           if !state.images.storedPhotos.isEmpty, let coordinate = state.images.pickerResultCoordinate {
-            return EffectTask(value: .location(.resolveLocation(coordinate)))
+            return .send(.location(.resolveLocation(coordinate)))
           } else {
             return .none
           }
           
         case let .setPinCoordinate(coordinate):
           guard let coordinate = coordinate, state.location.locationOption == .currentLocation else { return .none }
-          return EffectTask(value: .location(.resolveLocation(coordinate)))
+          return .send(.location(.resolveLocation(coordinate)))
           
         default:
           return .none
@@ -319,7 +319,7 @@ public struct ReportDomain: Reducer {
         state.mail.mail.attachmentData = state.images.storedPhotos
           .compactMap { $0?.imageUrl }
           .compactMap { try? Data(contentsOf: $0) }
-        return EffectTask(value: .mail(.presentMailContentView(true)))
+        return .send(.mail(.presentMailContentView(true)))
         
       case .mail:
         return .none
@@ -344,7 +344,7 @@ public struct ReportDomain: Reducer {
         
       case .onResetConfirmButtonTapped:
         // Reset report will be handled in the homeReducer
-        return EffectTask(value: .dismissAlert)
+        return .send(.dismissAlert)
         
       case .dismissAlert:
         state.alert = nil
@@ -364,7 +364,7 @@ public struct ReportDomain: Reducer {
         }
         
         state.isSubmittingNotice = true
-        return EffectTask(value: .uploadImages)
+        return .send(.uploadImages)
         
       case .uploadImages:
         let results = state.images.imageStates.map { $0.image }
@@ -379,11 +379,11 @@ public struct ReportDomain: Reducer {
         
       case let .uploadImagesResponse(.success(imageInputFromUpload)):
         state.uploadedImagesIds = imageInputFromUpload.map(\.signedId)
-        return EffectTask(value: .composeNotice)
+        return .send(.composeNotice)
         
       case let .uploadImagesResponse(.failure(error)):
         state.isSubmittingNotice = false
-        return EffectTask(value: .postNoticeResponse(.failure(ApiError(error: error))))
+        return .send(.postNoticeResponse(.failure(ApiError(error: error))))
         
       case .composeNotice:
         var notice = NoticeInput(state)

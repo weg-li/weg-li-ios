@@ -57,7 +57,7 @@ public struct ContactViewDomain: Reducer {
         return .none
       case .onResetContactConfirmButtonTapped:
         state.contact = .empty
-        return EffectTask(value: .dismissAlert)
+        return .send(.dismissAlert)
       case .dismissAlert:
         state.alert = nil
         return .none
