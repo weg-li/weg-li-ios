@@ -31,20 +31,18 @@ class AppStoreConnectScreenshots: XCTestCase {
   }
   
   func test_noticesTab() {
-    var appState = AppState(
+    var appState = AppDomain.State(
       settings: .init(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init()
       ),
-      notices: .results([.init(.preview), .report2])
+      noticeList: .init(notices: .results([.preview, .report2]))
     )
     appState.selectedTab = .notices
     let view = AppView(
       store: .init(
         initialState: appState,
-        reducer: .empty,
-        environment: ()
+        reducer: AppDomain()
       )
     )
     
@@ -57,13 +55,12 @@ class AppStoreConnectScreenshots: XCTestCase {
   }
   
   func test_newNotice() {
-    var appState = AppState(
+    var appState = AppDomain.State(
       settings: .init(
         accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-        contact: .preview,
         userSettings: .init()
       ),
-      notices: .results([.init(.preview), .report2])
+      noticeList: .init(notices: .results([.preview, .report2]))
     )
     appState.selectedTab = .notice
     appState.reportDraft = .preview
@@ -78,8 +75,7 @@ class AppStoreConnectScreenshots: XCTestCase {
     let view = AppView(
       store: .init(
         initialState: appState,
-        reducer: .empty,
-        environment: ()
+        reducer: AppDomain()
       )
     )
     
@@ -95,8 +91,7 @@ class AppStoreConnectScreenshots: XCTestCase {
     let view = EditDescriptionView(
       store: .init(
         initialState: ReportDomain.State.preview.description,
-        reducer: .empty,
-        environment: ()
+        reducer: DescriptionDomain()
       )
     )
     
