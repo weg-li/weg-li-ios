@@ -163,7 +163,7 @@ public struct ReportView: View {
                   .frame(maxWidth: .infinity, alignment: .center)
                 }
               )
-              .disabled(viewStore.canSubmitNotice || viewStore.isSubmittingNotice)
+              .disabled(!viewStore.canSubmitNotice || viewStore.isSubmittingNotice)
               .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.canSubmitNotice))
               .padding([.horizontal])
               .padding(.vertical, .grid(1))
