@@ -121,7 +121,6 @@ final class NoticeListFeatureTests: XCTestCase {
     store.dependencies.continuousClock = testClock
     
     await store.send(.fetchNotices(forceReload: true)) {
-      $0.notices = .loading
       $0.isFetchingNotices = true
     }
     await store.receive(.fetchNoticesResponse(.success([.mock]))) {
