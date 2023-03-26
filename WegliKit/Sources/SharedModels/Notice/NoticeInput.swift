@@ -25,6 +25,7 @@ public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
   public var hazardLights = false
   public var expiredTuv = false
   public var expiredEco = false
+  public var over28Tons = false
   public var photos: [String]
     
   public init(
@@ -50,6 +51,7 @@ public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
     hazardLights: Bool = false,
     expiredTuv: Bool = false,
     expiredEco: Bool = false,
+    over28Tons: Bool = false,
     photos: [String]
   ) {
     self.token = token
@@ -74,6 +76,7 @@ public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
     self.hazardLights = hazardLights
     self.expiredTuv = expiredTuv
     self.expiredEco = expiredEco
+    self.over28Tons = over28Tons
     self.photos = photos
   }
 }

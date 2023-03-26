@@ -24,7 +24,8 @@ public struct DescriptionDomain: Reducer {
       vehicleEmpty: Bool = false,
       hazardLights: Bool = false,
       expiredTuv: Bool = false,
-      expiredEco: Bool = false
+      expiredEco: Bool = false,
+      over28Tons: Bool = false
     ) {
       self.licensePlateNumber = licensePlateNumber
       self.selectedColor = selectedColor
@@ -36,6 +37,7 @@ public struct DescriptionDomain: Reducer {
       self.hazardLights = hazardLights
       self.expiredTuv = expiredTuv
       self.expiredEco = expiredEco
+      self.over28Tons = over28Tons
     }
     
     public var carBrandSelection: CarBrandSelection.State
@@ -49,6 +51,7 @@ public struct DescriptionDomain: Reducer {
     @BindingState public var hazardLights = false
     @BindingState public var expiredTuv = false
     @BindingState public var expiredEco = false
+    @BindingState public var over28Tons = false
     @BindingState public var note = ""
         
     @BindingState public var presentChargeSelection = false
@@ -200,7 +203,8 @@ public extension DescriptionDomain.State {
       vehicleEmpty: model.vehicleEmpty ?? true,
       hazardLights: model.hazardLights ?? false,
       expiredTuv: model.expiredTuv ?? false,
-      expiredEco: model.expiredEco ?? false
+      expiredEco: model.expiredEco ?? false,
+      over28Tons: model.over28Tons ?? false
     )
   }
 }

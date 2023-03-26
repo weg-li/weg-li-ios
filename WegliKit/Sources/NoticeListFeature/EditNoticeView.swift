@@ -91,19 +91,32 @@ struct EditNoticeView: View {
           VStack(spacing: .grid(2)) {
             licensePlateView
               .padding(.bottom)
+            
             carBrandView
               .padding(.bottom)
+            
             carColorView
               .padding(.bottom)
+            
             chargeTypeView
               .padding(.bottom)
+            
             chargeDurationView
               .padding(.bottom)
-            blockedOthersView
-            vehicleEmptyView
-            hazardLightsView
-            expiredTuvView
-            expiredEcoView
+            
+            VStack {
+              blockedOthersView
+              
+              vehicleEmptyView
+              
+              hazardLightsView
+              
+              expiredTuvView
+              
+              expiredEcoView
+              
+              overTwentyEightTonsView
+            }
           }
           .foregroundColor(Color(uiColor: .label))
         }
@@ -303,6 +316,13 @@ struct EditNoticeView: View {
     ToggleButton(
       label: "Die Umwelt-Plakette fehlte oder war ungültig",
       isOn: viewStore.binding(\.description.$expiredEco)
+    )
+  }
+  
+  var overTwentyEightTonsView: some View {
+    ToggleButton(
+      label: "Fahrzeug über 2,8 t zulässige Gesamtmasse",
+      isOn: viewStore.binding(\.description.$over28Tons)
     )
   }
 }

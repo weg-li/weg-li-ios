@@ -401,6 +401,7 @@ extension Notice {
       hazardLights: editState.description.hazardLights,
       expiredTuv: editState.description.expiredTuv,
       expiredEco: editState.description.expiredEco,
+      over28Tons: editState.description.over28Tons,
       photos: editState.notice.photos ?? []
     )
   }

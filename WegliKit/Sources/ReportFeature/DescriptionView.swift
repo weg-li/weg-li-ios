@@ -50,30 +50,37 @@ public struct DescriptionView: View {
         
         row(title: L10n.Description.Row.length, content: viewStore.description.time)
         
-        toggleRow(
-          label: L10n.Description.Row.didBlockOthers,
-          value: viewStore.description.blockedOthers
-        )
-        
-        toggleRow(
-          label: "Das Fahrzeug war verlassen",
-          value: viewStore.description.vehicleEmpty
-        )
-        
-        toggleRow(
-          label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
-          value: viewStore.description.hazardLights
-        )
-        
-        toggleRow(
-          label: "Die TÜV-Plakette war abgelaufen",
-          value: viewStore.description.expiredTuv
-        )
-        
-        toggleRow(
-          label: "Die Umwelt-Plakette fehlte oder war ungültig",
-          value: viewStore.description.expiredEco
-        )
+        VStack(alignment: .leading, spacing: .grid(3)) {
+          toggleRow(
+            label: L10n.Description.Row.didBlockOthers,
+            value: viewStore.description.blockedOthers
+          )
+          
+          toggleRow(
+            label: "Das Fahrzeug war verlassen",
+            value: viewStore.description.vehicleEmpty
+          )
+          
+          toggleRow(
+            label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
+            value: viewStore.description.hazardLights
+          )
+          
+          toggleRow(
+            label: "Die TÜV-Plakette war abgelaufen",
+            value: viewStore.description.expiredTuv
+          )
+          
+          toggleRow(
+            label: "Die Umwelt-Plakette fehlte oder war ungültig",
+            value: viewStore.description.expiredEco
+          )
+          
+          toggleRow(
+            label: "Fahrzeug über 2,8 t zulässige Gesamtmasse",
+            value: viewStore.description.over28Tons
+          )
+        }
       }
       .accessibilitySortPriority(1)
       .accessibilityElement(children: .combine)

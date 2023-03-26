@@ -49,6 +49,8 @@ public struct EditDescriptionView: View {
         expiredTuvView
         
         expiredEcoView
+        
+        overTwentyEightTonsView
       } header: {
         SectionHeader(text: L10n.Description.Section.Violation.copy)
       }
@@ -68,7 +70,7 @@ public struct EditDescriptionView: View {
       L10n.Description.Row.licenseplateNumber,
       text: viewStore.binding(\.$licensePlateNumber)
     )
-    .textFieldStyle(.roundedBorder)
+    .textFieldStyle(.plain)
     .disableAutocorrection(true)
     .textInputAutocapitalization(.characters)
   }
@@ -198,6 +200,13 @@ public struct EditDescriptionView: View {
     ToggleButton(
       label: "Die Umwelt-Plakette fehlte oder war ungültig",
       isOn: viewStore.binding(\.$expiredEco)
+    )
+  }
+  
+  var overTwentyEightTonsView: some View {
+    ToggleButton(
+      label: "Fahrzeug über 2,8 t zulässige Gesamtmasse",
+      isOn: viewStore.binding(\.$over28Tons)
     )
   }
 }

@@ -642,6 +642,7 @@ public extension SharedModels.NoticeInput {
       hazardLights: reportState.description.hazardLights,
       expiredTuv: reportState.description.expiredTuv,
       expiredEco: reportState.description.expiredEco,
+      over28Tons: reportState.description.over28Tons,
       photos: []
     )
   }
