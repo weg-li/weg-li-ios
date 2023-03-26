@@ -78,27 +78,22 @@ public struct NoticeListDomain: Reducer {
     public func isAscending(for type: NoticeSortOrder) -> Bool {
       orderSortType[type, default: true]
     }
-    var showNoticeDateSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.date)
-      return (filtered.count == elements.count) && filtered.count > 1
-    }
-    var showCreatedAtDateSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.createdAt)
-      return (filtered.count == elements.count) && filtered.count > 1
-    }
-    var showStatusSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.status)
-      return (filtered.count == elements.count) && filtered.count > 1
-    }
-    var showRegistrationSortOption: Bool {
-      guard let elements = notices.elements else { return false }
-      let filtered = elements.compactMap(\.registration)
-      return (filtered.count == elements.count) && filtered.count > 1
-    }
     
+    func isSortActionDisabled(_ sortAction: SortAction) -> Bool {
+      guard let elements = notices.elements else { return true }
+      let filteredCount: Int
+      switch sortAction {
+      case .noticeDate:
+        filteredCount = elements.compactMap(\.date).count
+      case .status:
+        filteredCount = elements.compactMap(\.status).count
+      case .registration:
+        filteredCount = elements.compactMap(\.registration).count
+      case .createdAtDate:
+        filteredCount = elements.compactMap(\.createdAt).count
+      }
+      return filteredCount != elements.count || elements.count == 1
+    }
     
     public enum Destination: Equatable {
       case edit(Notice)
@@ -146,14 +141,14 @@ public struct NoticeListDomain: Reducer {
       switch action {
       case .onAppear:
         return .send(.fetchNotices(forceReload: false))
-  
+        
       case .setSortOrder(let order):
         guard let notices = state.notices.elements else {
           return .none
         }
         
         state.noticesSortOrder = order
-                        
+        
         switch order {
         case .noticeDate:
           guard let orderAscending = state.orderSortType[order] else { return .none }
@@ -164,7 +159,7 @@ public struct NoticeListDomain: Reducer {
           }
           state.notices = .results(sortedNotices)
           state.orderSortType[order] = !orderAscending
-        
+          
         case .createdAtDate:
           guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
@@ -211,7 +206,9 @@ public struct NoticeListDomain: Reducer {
           return .none
         }
         
-        state.notices = .loading
+        if !forceReload {
+          state.notices = .loading
+        }
         state.isFetchingNotices = true
         
         return .task {
@@ -227,7 +224,7 @@ public struct NoticeListDomain: Reducer {
         guard !notices.isEmpty else  {
           return .none
         }
-
+        
         return .send(.setSortOrder(state.noticesSortOrder))
         
       case let .fetchNoticesResponse(.failure(error)):
@@ -250,7 +247,7 @@ public struct NoticeListDomain: Reducer {
         
       case .onNavigateToAccontSettingsButtonTapped:
         return .none
-      
+        
       case .setNavigationDestination(let value):
         state.destination = value
         return .none
@@ -319,7 +316,7 @@ public struct NoticeListDomain: Reducer {
         
       case .editNotice:
         return .none
-      
+        
       case .dismissAlert:
         state.alert = nil
         return .none
@@ -407,7 +404,7 @@ extension Notice {
       photos: editState.notice.photos ?? []
     )
   }
-
+  
   public static let preview = Self(
     token: UUID().uuidString,
     status: .analyzing,
@@ -463,3 +460,35 @@ extension Notice {
   }
 }
 
+enum SortAction: CaseIterable {
+  case noticeDate
+  case status
+  case registration
+  case createdAtDate
+    
+  var text: String {
+    switch self {
+    case .noticeDate:
+      return "Tatzeit"
+    case .status:
+      return "Status"
+    case .registration:
+      return "Kennzeichen"
+    case .createdAtDate:
+      return "Erstellt"
+    }
+  }
+  
+  var sortOrder: NoticeListDomain.State.NoticeSortOrder {
+    switch self {
+    case .noticeDate:
+      return .noticeDate
+    case .status:
+      return .status
+    case .registration:
+      return .registration
+    case .createdAtDate:
+      return .createdAtDate
+    }
+  }
+}

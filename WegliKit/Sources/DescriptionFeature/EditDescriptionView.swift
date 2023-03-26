@@ -111,9 +111,9 @@ public struct EditDescriptionView: View {
         Text(DescriptionDomain.colors[$0].value)
           .contentShape(Rectangle())
           .tag($0)
-          .foregroundColor(Color(.label))
       }
     }
+    .pickerStyle(.menu)
   }
   
   var chargeTypeView: some View {
@@ -161,9 +161,9 @@ public struct EditDescriptionView: View {
       ForEach(times, id: \.self) { time in
         Text(Times.times[time] ?? "")
           .contentShape(Rectangle())
-          .foregroundColor(Color(.label))
       }
     }
+    .pickerStyle(.menu)
   }
   
   var blockedOthersView: some View {
