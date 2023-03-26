@@ -56,37 +56,6 @@ struct EditNoticeView: View {
         }
         .padding(.vertical, .grid(2))
         
-        Widget(title: Text( L10n.Location.widgetTitle), shouldIndicateCompletion: false) {
-          VStack(alignment: .leading) {
-            TextField(
-              L10n.Location.Placeholder.street,
-              text: viewStore.binding(\.$street)
-            )
-            TextField(
-              L10n.Location.Placeholder.city,
-              text: viewStore.binding(\.$city)
-            )
-            TextField(
-              L10n.Location.Placeholder.postalCode,
-              text: viewStore.binding(\.$zip)
-            )
-          }
-        }
-        .padding(.vertical, .grid(1))
-        
-        Widget(title: Text( L10n.date), shouldIndicateCompletion: false) {
-          HStack {
-            DatePicker(
-              L10n.date,
-              selection: viewStore.binding(\.$date)
-            )
-            .labelsHidden()
-            Spacer()
-          }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, .grid(2))
-        
         Widget(title: Text(L10n.Description.widgetTitle), shouldIndicateCompletion: false) {
           VStack(spacing: .grid(2)) {
             licensePlateView
@@ -120,6 +89,38 @@ struct EditNoticeView: View {
           }
           .foregroundColor(Color(uiColor: .label))
         }
+        
+        Widget(title: Text( L10n.Location.widgetTitle), shouldIndicateCompletion: false) {
+          VStack(alignment: .leading) {
+            TextField(
+              L10n.Location.Placeholder.street,
+              text: viewStore.binding(\.$street)
+            )
+            TextField(
+              L10n.Location.Placeholder.city,
+              text: viewStore.binding(\.$city)
+            )
+            TextField(
+              L10n.Location.Placeholder.postalCode,
+              text: viewStore.binding(\.$zip)
+            )
+          }
+        }
+        .padding(.vertical, .grid(1))
+        
+        Widget(title: Text( L10n.date), shouldIndicateCompletion: false) {
+          HStack {
+            DatePicker(
+              L10n.date,
+              selection: viewStore.binding(\.$date)
+            )
+            .labelsHidden()
+            Spacer()
+          }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, .grid(2))
+
         
         VStack(alignment: .leading) {
           if let createdAtDate = viewStore.notice.createdAt {

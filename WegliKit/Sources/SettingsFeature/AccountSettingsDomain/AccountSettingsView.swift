@@ -141,13 +141,15 @@ struct ClearButton: ViewModifier {
       content
       
       if !text.isEmpty {
-        Button {
-          text = ""
-        } label: {
-          Image(systemName: "multiply.circle.fill")
-            .foregroundStyle(.gray)
-        }
-        .padding(.trailing, 8)
+        Button(
+          action: { text = "" },
+          label: {
+            Image(systemName: "multiply.circle.fill")
+              .imageScale(.large)
+              .foregroundStyle(.white)
+              .padding(.trailing, 2)
+          }
+        )
       }
     }
   }
