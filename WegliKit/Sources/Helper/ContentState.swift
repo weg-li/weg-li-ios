@@ -88,7 +88,7 @@ public extension ErrorState {
     Self(
       systemImageName: "bolt.slash",
       title: "Fehler beim laden",
-      body: "Der hinzugefügte API Token ist ungültig",
+      body: error.message,
       error: .init(error: error)
     )
   }

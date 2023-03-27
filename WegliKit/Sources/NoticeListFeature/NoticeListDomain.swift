@@ -33,7 +33,7 @@ public struct NoticeListDomain: Reducer {
     public var errorBarMessage: MessageBarType?
     
     public enum MessageBarType: Equatable {
-      case error
+      case error(message: String)
       case success
     }
     
@@ -230,16 +230,15 @@ public struct NoticeListDomain: Reducer {
       case let .fetchNoticesResponse(.failure(error)):
         state.isFetchingNotices = false
         
-        if let apiError = error as? ApiError, apiError == .tokenUnavailable {
-          state.notices = .error(.tokenUnavailable)
-          return .none
+        if let apiError = error as? ApiError {
+          if apiError == .tokenUnavailable {
+            state.notices = .error(.tokenUnavailable)
+            return .none
+          } else {
+            state.notices = .error(.loadingError(error: .init(error: apiError)))
+          }
         }
-        
-        return .run { send in
-          await send.send(.displayMessageBar(.error))
-          try await Task.sleep(for: .seconds(4))
-          await send.send(.displayMessageBar(nil))
-        }
+        return .none
         
       case .displayMessageBar(let value):
         state.errorBarMessage = value

@@ -11,7 +11,7 @@ public struct NoticeListView: View {
   public typealias S = NoticeListDomain.State
   public typealias A = NoticeListDomain.Action
   
-  @State private var showErrorBar = false
+  @State private var errorMessage: S.MessageBarType?
   
   let store: StoreOf<NoticeListDomain>
   @ObservedObject var viewStore: ViewStoreOf<NoticeListDomain>
@@ -33,47 +33,61 @@ public struct NoticeListView: View {
         noticeList(notices: notices)
         
       case let .empty(emptyState):
-        emptyStateView(emptyState)
-          .padding(.horizontal)
+        ScrollView {
+          Spacer(minLength: 150)
+          emptyStateView(emptyState)
+            .padding(.horizontal)
+        }
         
       case let .error(errorState):
-        VStack(alignment: .center, spacing: .grid(2)) {
-          if let systemImageName = errorState.systemImageName {
-            Image(systemName: systemImageName)
-              .font(.title)
-              .padding(.bottom, .grid(3))
-          }
-          
-          Text(errorState.title)
-            .font(.title2.weight(.semibold))
-            .padding(.bottom, .grid(2))
-          
-          if let body = errorState.body {
-            Text(body)
-              .font(.body)
-              .multilineTextAlignment(.center)
-          }
-          
-          if errorState == ErrorState.tokenUnavailable {
-            goToAccountSettings()
+        ScrollView {
+          Spacer(minLength: 150)
+          VStack(alignment: .center, spacing: .grid(2)) {
+            if let systemImageName = errorState.systemImageName {
+              Image(systemName: systemImageName)
+                .font(.title)
+                .padding(.bottom, .grid(3))
+            }
+            
+            Text(errorState.title)
+              .font(.title2.weight(.semibold))
+              .padding(.bottom, .grid(2))
+            
+            if let body = errorState.body {
+              Text(body)
+                .font(.system(.body).monospaced())
+                .multilineTextAlignment(.center)
+                .lineLimit(10)
+            }
+            
+            if errorState == ErrorState.tokenUnavailable {
+              goToAccountSettings()
+                .padding(.vertical)
+            } else {
+              Button(
+                action: { viewStore.send(.fetchNotices(forceReload: true)) },
+                label: {
+                  Text("Neu laden")
+                    .padding(.horizontal)
+                }
+              )
+              .buttonStyle(CTAButtonStyle())
               .padding(.vertical)
+            }
           }
+          .padding(.horizontal, .grid(3))
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
-        .padding(.horizontal, .grid(3))
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-      }
+        }
+        
     }
     .onChange(of: viewStore.state.errorBarMessage, perform: { newValue in
       withAnimation {
-        showErrorBar = newValue != nil
+        errorMessage = newValue
       }
     })
     .overlay(alignment: .bottom, content: {
-      if showErrorBar {
-        errorBarMessageView()
-          .transition(.opacity)
-          .animation(.easeOut, value: showErrorBar)
-      }
+      messageBarView()
     })
     .onAppear { viewStore.send(.onAppear) }
     .sheet(
@@ -84,57 +98,12 @@ public struct NoticeListView: View {
       case: /S.Destination.edit,
       onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
     ) { $model in
-      NavigationStack {
-        IfLetStore(
-          self.store.scope(
-            state: \.editNotice,
-            action: A.editNotice
-          ),
-          then: { store in
-            EditNoticeView(store: store)
-          },
-          else: { Text("Error creating EditNotice view") }
-        )
-        .accessibilityAddTraits([.isModal])
-        .navigationTitle(Text("Bearbeiten"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .cancellationAction) {
-            Button(L10n.Button.close) {
-              viewStore.send(.setNavigationDestination(nil))
-            }
-          }
-          ToolbarItem(placement: .confirmationAction) {
-            if viewStore.state.isSendingEditedNotice {
-              ProgressView()
-            } else {
-              Button("Speichern") {
-                viewStore.send(.onSaveNoticeButtonTapped)
-              }
-            }
-          }
-        }
-      }
+      editNoticeSheet(notice: $model)
     }
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu(
-          content: {
-            ForEach(SortAction.allCases, id: \.self) { sortAction in
-              Button(
-                action: { viewStore.send(.setSortOrder(sortAction.sortOrder)) },
-                label: {
-                  if viewStore.noticesSortOrder == sortAction.sortOrder {
-                    let isAscending = viewStore.orderSortType[sortAction.sortOrder, default: true]
-                    Label(sortAction.text, systemImage: isAscending ? "arrow.down" : "arrow.up")
-                  } else {
-                    Text(sortAction.text)
-                  }
-                }
-              )
-              .disabled(viewStore.state.isSortActionDisabled(sortAction))
-            }
-          },
+          content: { menuContent() },
           label: {
             Image(systemName: "arrow.up.arrow.down")
               .unredacted()
@@ -145,6 +114,57 @@ public struct NoticeListView: View {
         )
         .disabled(viewStore.isFetchingNotices)
       }
+    }
+  }
+  
+  func editNoticeSheet(notice: Binding<Notice>) -> some View {
+    NavigationStack {
+      IfLetStore(
+        self.store.scope(
+          state: \.editNotice,
+          action: A.editNotice
+        ),
+        then: { store in
+          EditNoticeView(store: store)
+        },
+        else: { Text("Error creating EditNotice view") }
+      )
+      .accessibilityAddTraits([.isModal])
+      .navigationTitle(Text("Bearbeiten"))
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button(L10n.Button.close) {
+            viewStore.send(.setNavigationDestination(nil))
+          }
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          if viewStore.state.isSendingEditedNotice {
+            ProgressView()
+          } else {
+            Button("Speichern") {
+              viewStore.send(.onSaveNoticeButtonTapped)
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  func menuContent() -> some View {
+    ForEach(SortAction.allCases, id: \.self) { sortAction in
+      Button(
+        action: { viewStore.send(.setSortOrder(sortAction.sortOrder)) },
+        label: {
+          if viewStore.noticesSortOrder == sortAction.sortOrder {
+            let isAscending = viewStore.orderSortType[sortAction.sortOrder, default: true]
+            Label(sortAction.text, systemImage: isAscending ? "arrow.down" : "arrow.up")
+          } else {
+            Text(sortAction.text)
+          }
+        }
+      )
+      .disabled(viewStore.state.isSortActionDisabled(sortAction))
     }
   }
   
@@ -162,13 +182,36 @@ public struct NoticeListView: View {
   }
   
   @ViewBuilder
-  func errorBarMessageView() -> some View {
+  func messageBarView() -> some View {
+    switch errorMessage {
+    case .none:
+      EmptyView()
+    case .some(let wrapped):
+      if case let .error(message) = wrapped {
+        errorBarMessageView(text: message)
+          .transition(.opacity)
+          .animation(.easeOut, value: errorMessage != nil)
+      } else {
+        EmptyView()
+      }
+    }
+  }
+  
+  @ViewBuilder
+  func errorBarMessageView(text: String) -> some View {
     ZStack {
       Color.red
       
       HStack {
         Image(systemName: "exclamationmark.octagon")
-        Text("Error loading notices")
+        VStack {
+          Text("Error loading notices")
+            .bold()
+          Text(text)
+            .lineLimit(1)
+            .font(.system(.body).monospaced())
+        }
+        .frame(maxWidth: .infinity)
       }
       .foregroundColor(.white)
       .padding()
@@ -182,7 +225,7 @@ public struct NoticeListView: View {
   func goToAccountSettings() -> some View {
     Button(
       action: { viewStore.send(.onNavigateToAccontSettingsButtonTapped) },
-      label: { Text("Zu den Einstellungen") }
+      label: { Text("Zu den Einstellungen").padding(.horizontal) }
     )
     .buttonStyle(CTAButtonStyle())
   }
