@@ -13,7 +13,7 @@ public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
   public let registration: String
   public let brand: String
   public let color: String
-  public let charge: String
+  public let tbnr: String
   public let date: Date
   public let duration: Int64
   public let severity: String?
@@ -39,7 +39,7 @@ public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
     registration: String,
     brand: String,
     color: String,
-    charge: String,
+    tbnr: String,
     date: Date,
     duration: Int64,
     severity: String?,
@@ -64,7 +64,7 @@ public struct NoticeInput: Codable, Equatable, Identifiable, Sendable {
     self.registration = registration
     self.brand = brand
     self.color = color
-    self.charge = charge
+    self.tbnr = tbnr
     self.date = date
     self.duration = duration
     self.severity = severity

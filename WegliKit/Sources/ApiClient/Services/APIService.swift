@@ -53,7 +53,7 @@ extension APIService: DependencyKey {
         let noticePutRequestBody = NoticePutRequestBody(notice: input)
         let body = try noticePutRequestBody.encoded(encoder: .noticeEncoder)
         
-        let data = try await apiClient.send(.createNotice(body: body))
+        let data = try await apiClient.send(.post(.notices, body: body))
         
         return try data.decoded(decoder: .noticeDecoder)
       },
@@ -66,10 +66,8 @@ extension APIService: DependencyKey {
         return try responseData.decoded(decoder: .noticeDecoder)
       },
       submitNotice: { notice in
-        let noticePutRequestBody = NoticePutRequestBody(notice: notice)
-        let body = try noticePutRequestBody.encoded(encoder: .noticeEncoder)
-        
-        let data = try await apiClient.send(.post(.submitNotices, body: body))
+        let body = try notice.encoded(encoder: .noticeEncoder)
+        let data = try await apiClient.send(.patch(.submitNotices, body: body))
         
         return try data.decoded(decoder: .noticeDecoder)
       },

@@ -630,7 +630,7 @@ public extension SharedModels.NoticeInput {
       registration: reportState.description.licensePlateNumber,
       brand: reportState.description.carBrandSelection.selectedBrand?.title ?? "",
       color: DescriptionDomain.colors[reportState.description.selectedColor].key,
-      charge: reportState.description.chargeSelection.selectedCharge?.text ?? "",
+      tbnr: reportState.description.chargeSelection.selectedCharge?.id ?? "",
       date: reportState.date,
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
