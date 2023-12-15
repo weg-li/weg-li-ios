@@ -12,11 +12,16 @@ public struct PickerImageResult: Hashable, Identifiable, Codable {
   public var jpegData: Data? {
     guard
       let imageUrl = imageUrl,
-      let image = UIImage(contentsOfFile: imageUrl.path)
+      let imageData = try? Data(contentsOf: imageUrl)
     else {
       return nil
     }
-    return image.jpegData(compressionQuality: 0.4)
+    
+    if imageData.isJPEG {
+      return imageData
+    } else {
+      return UIImage(data: imageData)?.jpegData(compressionQuality: 0.9)
+    }
   }
 
   public init(
@@ -66,5 +71,16 @@ private func resizedImage(at url: URL, for targetSize: CGSize = CGSize(width: 10
   let renderer = UIGraphicsImageRenderer(size: scaledImageSize)
   return renderer.image { _ in
     image.draw(in: CGRect(origin: .zero, size: scaledImageSize))
+  }
+}
+
+extension Data {
+  var isJPEG: Bool {
+      guard count >= 2 else {
+          return false
+      }
+
+      // Check for the JPEG file signature
+      return self[0] == 0xFF && self[1] == 0xD8
   }
 }
