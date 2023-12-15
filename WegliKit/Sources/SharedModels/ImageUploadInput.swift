@@ -39,7 +39,13 @@ public extension ImageUploadInput {
 
 extension Data {
   func md5DigestBase64() -> String {
-    let digest = Insecure.MD5.hash(data: self)
-    return Data(digest).base64EncodedString()
+    // Calculate MD5 hash
+    let md5Hash = Insecure.MD5.hash(data: self)
+    // Convert hash to Data
+    let md5Data = Data(md5Hash)
+    // Base64 encode the MD5 hash
+    let base64Encoded = md5Data.base64EncodedString()
+    
+    return base64Encoded
   }
 }
