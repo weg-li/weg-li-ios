@@ -10,9 +10,7 @@ extension DependencyValues {
   }
 }
 
-
 // MARK: Client interface
-
 
 public struct ImagesUploadClient {
   public var uploadImages: ([PickerImageResult]) async throws -> [ImageUploadResponse]

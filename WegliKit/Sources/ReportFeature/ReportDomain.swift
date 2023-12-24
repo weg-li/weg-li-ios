@@ -343,7 +343,7 @@ public struct ReportDomain: Reducer {
         return .none
         
       case .onResetConfirmButtonTapped:
-        // Reset report will be handled in the homeReducer
+        // Reset report will be handled in the AppDomain reducer
         return .send(.dismissAlert)
         
       case .dismissAlert:
@@ -351,18 +351,6 @@ public struct ReportDomain: Reducer {
         return .none
         
       case .onSubmitButtonTapped:
-        guard state.isNetworkAvailable else {
-          state.alert = .init(
-            title: .init("Keine Internetverbindung"),
-            message: .init("Verbinde dich mit dem Internet um die Meldung zu versenden"),
-            buttons: [
-              .cancel(.init(L10n.cancel)),
-              .default(.init("Wiederholen"), action: .send(.onSubmitButtonTapped))
-            ]
-          )
-          return .none
-        }
-        
         state.isSubmittingNotice = true
         return .send(.uploadImages)
         
@@ -390,19 +378,25 @@ public struct ReportDomain: Reducer {
         notice.photos = state.uploadedImagesIds
         
         return .task { [notice, alwaysSendNotice = state.alwaysSendNotice] in
-          if alwaysSendNotice {
-            return await .submitNoticeResponse(
-              TaskResult {
-                try await wegliService.submitNotice(notice)
-              }
-            )
-          } else {
-            return await .postNoticeResponse(
-              TaskResult {
-                try await wegliService.postNotice(notice)
-              }
-            )
-          }
+          await .postNoticeResponse(
+            TaskResult {
+              try await wegliService.postNotice(notice)
+            }
+          )
+//          
+//          if alwaysSendNotice {
+//            await .submitNoticeResponse(
+//              TaskResult {
+//                try await wegliService.submitNotice(notice)
+//              }
+//            )
+//          } else {
+//            await .postNoticeResponse(
+//              TaskResult {
+//                try await wegliService.postNotice(notice)
+//              }
+//            )
+//          }
         }
         
       case let .postNoticeResponse(.success(response)):

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Foundation
 import SharedModels
 
-public struct UserSettingsDomain: ReducerProtocol {
+public struct UserSettingsDomain: Reducer {
   public init() {}
   
   public typealias State = UserSettings
@@ -12,7 +12,7 @@ public struct UserSettingsDomain: ReducerProtocol {
     case onAlwaysSendNotice(Bool)
   }
   
-  public func reduce(into state: inout UserSettings, action: Action) -> EffectTask<Action> {
+  public func reduce(into state: inout UserSettings, action: Action) -> Effect<Action> {
     switch action {
     case .setShowsAllTextRecognitionResults(let value):
       state.showsAllTextRecognitionSettings = value

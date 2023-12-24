@@ -6,7 +6,6 @@ import Helper
 import L10n
 import Styleguide
 import SwiftUI
-import SwiftUINavigation
 
 public struct SettingsView: View {
   public typealias S = SettingsDomain.State
@@ -14,131 +13,126 @@ public struct SettingsView: View {
   
   @Environment(\.colorScheme) private var colorScheme
   
+  struct ViewState: Equatable {
+    public let alwaysSendNotice: Bool
+    public let showsAllTextRecognitionSettings: Bool
+    
+    init(store: SettingsDomain.State) {
+      self.alwaysSendNotice = store.userSettings.alwaysSendNotice
+      self.showsAllTextRecognitionSettings = store.userSettings.showsAllTextRecognitionSettings
+    }
+  }
+  
   let store: StoreOf<SettingsDomain>
-  @ObservedObject private var viewStore: ViewStoreOf<SettingsDomain>
   
   public init(store: StoreOf<SettingsDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store, observe: { $0 })
   }
   
   public var body: some View {
-    Form {
-      Section {
-        Button(
-          action: { viewStore.send(.setDestination(.accountSettings)) },
-          label: {
-            HStack {
-              Label("Account", systemImage: "person.circle")
-                .labelStyle(.titleOnly)
-              Spacer()
-              Image(systemName: "chevron.right")
+    WithViewStore(self.store, observe: ViewState.init) { viewStore in
+      Form {
+        Section {
+          Button(
+            action: { viewStore.send(.accountSettingsButtonTapped) },
+            label: {
+              HStack {
+                Label("Account", systemImage: "person.circle")
+                  .labelStyle(.titleOnly)
+                Spacer()
+                Image(systemName: "chevron.right")
+              }
             }
-          }
-        )
-      }
-      
-      Section(header: Label("Meldung", systemImage: "gearshape.2.fill")) {
-        Toggle(
-          isOn: viewStore.binding(
-            get: \.userSettings.showsAllTextRecognitionSettings,
-            send: { A.userSettings(.setShowsAllTextRecognitionResults($0)) }
-          ),
-          label: {
-            Label("Alle Ergebnisse der Kennzeichenerkennung anzeigen", systemImage: "text.magnifyingglass")
-              .labelStyle(.titleOnly)
-          }
-        )
-        
-        Toggle(
-          isOn: viewStore.binding(
-            get: \.userSettings.alwaysSendNotice,
-            send: { A.userSettings(.onAlwaysSendNotice($0)) }
-          ),
-          label: {
-            VStack(alignment: .leading) {
-              Text("Meldung immer direkt senden")
-                .font(.body)
-                .padding(.bottom)
-              Text(
-                viewStore.state.userSettings.alwaysSendNotice
-                ? "Die Meldung wird direkt an die Behörde gesendet."
-                : "Die Meldung wird hochgeladen und du kannst sie noch einmal auf der Webseite prüfen bevor du sie versendest."
-              )
-              .font(.subheadline)
-            }
-          }
-        )
-      }
-      .headerProminence(.increased)
-      
-      Section(
-        header: Label(L10n.Settings.Section.projectTitle, systemImage: "terminal.fill")
-      ) {
-        Button(
-          action: { viewStore.send(.openImprintTapped) },
-          label: {
-            HStack {
-              Text(L10n.Settings.Row.imprint)
-              Spacer()
-              linkIcon
-            }
-            .padding(.vertical, .grid(1))
-          }
-        )
-        .accessibilityAddTraits([.isLink])
-        
-        Button(
-          action: { viewStore.send(.donateTapped) },
-          label: {
-            HStack {
-              Text(L10n.Settings.Row.donate)
-              Spacer()
-              linkIcon
-            }
-            .padding(.vertical, .grid(1))
-          }
-        )
-        .accessibilityAddTraits([.isLink])
-        
-        Button(
-          action: { viewStore.send(.openLicensesRowTapped) },
-          label: {
-            HStack {
-              Text(L10n.Settings.Row.licenses)
-              Spacer()
-              linkIcon
-            }
-            .padding(.vertical, .grid(1))
-          }
-        )
-      }
-      .headerProminence(.increased)
-      
-      Section {
-        Button(
-          action: { viewStore.send(.openGitHubProjectTapped) },
-          label: { githubView }
-        )
-      }
-      versionNumberView
-    }
-    .navigationDestination(
-      unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
-      case: /S.Destination.accountSettings,
-      destination: { _ in
-        AccountSettingsView(
-          store: store.scope(
-            state: \.accountSettingsState,
-            action: A.accountSettings
           )
-        )
+        }
+        
+        Section(header: Label("Meldung", systemImage: "gearshape.2.fill")) {
+          Toggle(
+            isOn: viewStore.binding(
+              get: \.alwaysSendNotice,
+              send: { .userSettings(.onAlwaysSendNotice($0)) }
+            ),
+            label: {
+              VStack(alignment: .leading) {
+                Text("Meldung immer direkt senden")
+                  .font(.body)
+                  .padding(.bottom)
+                Text(
+                  viewStore.state.alwaysSendNotice
+                  ? "Die Meldung wird direkt an die Behörde gesendet."
+                  : "Die Meldung wird hochgeladen und du kannst sie noch einmal auf der Webseite prüfen bevor du sie versendest."
+                )
+                .font(.subheadline)
+              }
+            }
+          )
+        }
+        .headerProminence(.increased)
+        
+        Section(
+          header: Label(L10n.Settings.Section.projectTitle, systemImage: "terminal.fill")
+        ) {
+          Button(
+            action: { viewStore.send(.openImprintTapped) },
+            label: {
+              HStack {
+                Text(L10n.Settings.Row.imprint)
+                Spacer()
+                linkIcon
+              }
+              .padding(.vertical, .grid(1))
+            }
+          )
+          .accessibilityAddTraits([.isLink])
+          
+          Button(
+            action: { viewStore.send(.donateTapped) },
+            label: {
+              HStack {
+                Text(L10n.Settings.Row.donate)
+                Spacer()
+                linkIcon
+              }
+              .padding(.vertical, .grid(1))
+            }
+          )
+          .accessibilityAddTraits([.isLink])
+          
+          Button(
+            action: { viewStore.send(.openLicensesRowTapped) },
+            label: {
+              HStack {
+                Text(L10n.Settings.Row.licenses)
+                Spacer()
+                linkIcon
+              }
+              .padding(.vertical, .grid(1))
+            }
+          )
+        }
+        .headerProminence(.increased)
+        
+        Section {
+          Button(
+            action: { viewStore.send(.openGitHubProjectTapped) },
+            label: { githubView }
+          )
+        }
+        versionNumberView
       }
-    )
-    .foregroundColor(Color(.label))
-    .navigationTitle(L10n.Settings.title)
+      .navigationDestination(
+        store: self.store.scope(
+          state: \.$destination.accountSettings,
+          action: \.destination.accountSettings
+        ),
+        destination: AccountSettingsView.init
+      )
+      .foregroundColor(Color(.label))
+      .navigationTitle(L10n.Settings.title)
+    }
   }
   
+  @ViewBuilder
   var githubView: some View {
     VStack {
       HStack(alignment: .top) {
@@ -204,7 +198,7 @@ struct SettingsView_Previews: PreviewProvider {
               accountSettingsState: .init(accountSettings: .init(apiToken: "")),
               userSettings: .init(showsAllTextRecognitionSettings: false)
             ),
-            reducer: SettingsDomain()
+            reducer: { SettingsDomain() }
           )
         )
       }

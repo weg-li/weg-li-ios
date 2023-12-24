@@ -25,87 +25,87 @@ public struct AccountSettingsView: View {
   
   public var body: some View {
     WithViewStore(store, observe: \.accountSettings) { viewStore in
-      
-    }
-    List {
-      Section(header: Label("API-Token", systemImage: "key.fill")) {
-        VStack(alignment: .leading) {
-          VStack(alignment: .leading, spacing: .grid(3)) {
-            TextField(
-              "",
-              text: viewStore.binding(
-                get: \.accountSettings.apiToken,
-                send: A.setApiToken
+      List {
+        Section(header: Label("API-Token", systemImage: "key.fill")) {
+          VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: .grid(3)) {
+              TextField(
+                "",
+                text: viewStore.binding(
+                  get: \.apiToken,
+                  send: A.setApiToken
+                )
               )
-            )
-            .placeholder(
-              when: viewStore.state.accountSettings.apiToken.isEmpty,
-              placeholder: {
-                Text("API-Token")
-                  .italic()
-                  .foregroundColor(Color(.lightGray))
+              .placeholder(
+                when: viewStore.state.apiToken.isEmpty,
+                placeholder: {
+                  Text("API-Token")
+                    .italic()
+                    .foregroundColor(Color(.lightGray))
+                }
+              )
+              .onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
+              .lineLimit(1)
+              .font(.body.monospaced())
+              .keyboardType(.default)
+              .padding(.grid(3))
+              .clipShape(RoundedRectangle(cornerRadius: .grid(2), style: .circular))
+              .overlay(
+                RoundedRectangle(cornerRadius: .grid(2))
+                  .stroke(Color(.label), lineWidth: 2)
+              )
+              .disableAutocorrection(true)
+              .submitLabel(.done)
+              .padding(.vertical, .grid(4))
+              
+              VStack(alignment: .leading) {
+                Text(description)
+                  .multilineTextAlignment(.leading)
+                  .foregroundColor(Color(.secondaryLabel))
+                  .font(.subheadline)
+                  .padding(.vertical, .grid(1))
+                
+                Button(
+                  action: { viewStore.send(.onGoToProfileButtonTapped) },
+                  label: {
+                    Label("Profil öffnen", systemImage: "arrow.up.right")
+                      .padding(.grid(1))
+                      .frame(maxWidth: .infinity)
+                  }
+                )
+                .buttonStyle(CTAButtonStyle())
+                .accessibilityAddTraits([.isLink])
+                
+                Text("Oder erstelle ein Profil")
+                  .multilineTextAlignment(.leading)
+                  .foregroundColor(Color(.secondaryLabel))
+                  .font(.subheadline)
+                  .padding(.vertical, .grid(1))
+                
+                Button(
+                  action: { viewStore.send(.onCreateProfileButtonTapped) },
+                  label: {
+                    Label("Profil erstellen", systemImage: "arrow.up.right")
+                      .padding(.grid(1))
+                      .frame(maxWidth: .infinity)
+                  }
+                )
+                .frame(maxWidth: .infinity)
+                .buttonStyle(CTAButtonStyle())
+                .accessibilityAddTraits([.isLink])
               }
-            )
-            .onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
-            .lineLimit(1)
-            .font(.body.monospaced())
-            .keyboardType(.default)
-            .padding(.grid(3))
-            .clipShape(RoundedRectangle(cornerRadius: .grid(2), style: .circular))
-            .overlay(
-              RoundedRectangle(cornerRadius: .grid(2))
-                .stroke(Color(.label), lineWidth: 2)
-            )
-            .disableAutocorrection(true)
-            .submitLabel(.done)
-            .padding(.vertical, .grid(4))
-            
-            VStack(alignment: .leading) {
-              Text(description)
-                .multilineTextAlignment(.leading)
-                .foregroundColor(Color(.secondaryLabel))
-                .font(.subheadline)
-                .padding(.vertical, .grid(1))
-              
-              Button(
-                action: { viewStore.send(.onGoToProfileButtonTapped) },
-                label: {
-                  Label("Profil öffnen", systemImage: "arrow.up.right")
-                    .padding(.grid(1))
-                    .frame(maxWidth: .infinity)
-                }
-              )
-              .buttonStyle(CTAButtonStyle())
-              .accessibilityAddTraits([.isLink])
-              
-              Text("Oder erstelle ein Profil")
-                .multilineTextAlignment(.leading)
-                .foregroundColor(Color(.secondaryLabel))
-                .font(.subheadline)
-                .padding(.vertical, .grid(1))
-              
-              Button(
-                action: { viewStore.send(.onCreateProfileButtonTapped) },
-                label: {
-                  Label("Profil erstellen", systemImage: "arrow.up.right")
-                    .padding(.grid(1))
-                    .frame(maxWidth: .infinity)
-                }
-              )
-              .frame(maxWidth: .infinity)
-              .buttonStyle(CTAButtonStyle())
-              .accessibilityAddTraits([.isLink])
+              .padding(.grid(2))
             }
-            .padding(.grid(2))
           }
         }
+        .headerProminence(.increased)
       }
-      .headerProminence(.increased)
+      .onAppear { viewStore.send(.onAppear) }
+      .sheet(store: self.store.scope(state: \.$link, action: \.link)) { store in
+        LinkView(store: store)
+      }
+      .navigationBarTitle("Account", displayMode: .automatic)
     }
-    .sheet(unwrapping: viewStore.binding(get: \.link, send: A.dismissSheet), content: { url in
-      SafariView(url: url.wrappedValue.url)
-    })
-    .navigationBarTitle("Account", displayMode: .automatic)
   }
 }
 
@@ -129,11 +129,23 @@ struct AccountSettingsView_Previews: PreviewProvider {
     AccountSettingsView(
       store: .init(
         initialState: .init(accountSettings: .init(apiToken: "")),
-        reducer: AccountSettingsDomain()
+        reducer: { AccountSettingsDomain() }
       )
     )
   }
 }
+     
+           
+struct LinkView: View {
+  let store: StoreOf<Link>
+  
+  var body: some View {
+    WithViewStore(self.store, observe: { $0 }) { viewStore in
+      SafariView(url: viewStore.url)
+    }
+  }
+}
+           
 
 struct SafariView: UIViewControllerRepresentable {
   let url: URL

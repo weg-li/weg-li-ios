@@ -109,9 +109,11 @@ public struct ImagesViewDomain: Reducer {
         return .none
         
       case .requestPhotoLibraryAccess:
-        return .task {
-          .requestPhotoLibraryAccessResult(
-            await photoLibraryAccessClient.requestAuthorization()
+        return .run { send in
+          await send(
+            .requestPhotoLibraryAccessResult(
+              await photoLibraryAccessClient.requestAuthorization()
+            )
           )
         }
             
@@ -149,11 +151,13 @@ public struct ImagesViewDomain: Reducer {
         return .none
 
       case .requestCameraAccess:
-        return .task {
-          await .requestCameraAccessResult(
-            TaskResult {
-              await cameraAccessClient.requestAuthorization()
-            }
+        return .run { send in
+          await send(
+            .requestCameraAccessResult(
+              TaskResult {
+                await cameraAccessClient.requestAuthorization()
+              }
+            )
           )
         }
 
@@ -243,13 +247,13 @@ public struct ImagesViewDomain: Reducer {
           .compactMap { $0 }
           .filter { $0.id != id }
         
-        var effects: [EffectTask<Action>] = []
+        var effects: [Effect<Action>] = []
         
         if !photos.isEmpty {
           state.storedPhotos = photos
         } else {
           effects.append(
-            EffectTask.run(operation: { send in
+            Effect.run(operation: { send in
               try await clock.sleep(for: .milliseconds(800))
               await send(.justSetPhotos(photos), animation: .easeOut)
             })
@@ -290,12 +294,14 @@ public struct ImagesViewDomain: Reducer {
         
         state.isRecognizingTexts = true
         
-        return .task {
-          await Action.textRecognitionCompleted(
-            TaskResult {
-              try await clock.sleep(for: .milliseconds(200))
-              return try await textRecognitionClient.recognizeText(image)
-            }
+        return .run { send in
+          await send(
+            Action.textRecognitionCompleted(
+              TaskResult {
+                try await clock.sleep(for: .milliseconds(200))
+                return try await textRecognitionClient.recognizeText(image)
+              }
+            )
           )
         }
         
@@ -313,13 +319,13 @@ public struct ImagesViewDomain: Reducer {
 // MARK: Helper
 
 
-private extension EffectTask {
+private extension Effect {
   static func textRecognition(
     in images: [PickerImageResult],
     client: TextRecognitionClient
-  ) -> EffectTask<ImagesViewDomain.Action> {
-    .task {
-      await withThrowingTaskGroup(of: [TextItem].self) { group in
+  ) -> Effect<ImagesViewDomain.Action> {
+    .run { send in
+      await send(withThrowingTaskGroup(of: [TextItem].self) { group in
         for image in images {
           group.addTask {
             try await client.recognizeText(image)
@@ -338,7 +344,7 @@ private extension EffectTask {
         } catch {
           return ImagesViewDomain.Action.textRecognitionCompleted(.failure(error))
         }
-      }
+      })
     }
   }
 }

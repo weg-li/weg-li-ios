@@ -26,16 +26,13 @@ extension TextRecognitionClient: DependencyKey {
   
   static let live = Self(
     recognizeText: { image in
-      guard let cgImage = image.asUIImage?.cgImage else {
+      guard let imageUrl = image.imageUrl else {
         throw VisionError.missingCGImage
       }
-      
-      // Create a new image-request handler.
-      let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-      
+            
       let task = Task(priority: .userInitiated) {
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<[TextItem], Error>) in
-          performRequest(with: cgImage, imageId: image.id) { request, error in
+          performRequest(imageUrl: imageUrl, imageId: image.id) { request, error in
             if let error = error {
               cont.resume(throwing: error)
             } else {
@@ -60,11 +57,11 @@ extension TextRecognitionClient: DependencyKey {
 }
 
 private func performRequest(
-  with image: CGImage,
+  imageUrl: URL,
   imageId: String,
   completion: @escaping VNRequestCompletionHandler
 ) {
-  let newHandler = VNImageRequestHandler(cgImage: image)
+  let newHandler = VNImageRequestHandler(url: imageUrl)
   
   let newRequest = VNRecognizeTextRequest(completionHandler: completion)
   newRequest.recognitionLevel = .accurate

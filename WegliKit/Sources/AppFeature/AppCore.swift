@@ -189,6 +189,7 @@ public struct AppDomain: Reducer {
           date: date.callAsFunction,
           location: .init()
         )
+        state.reportDraft.apiToken = keychainClient.getToken() ?? ""
         return .none
         
       case .report(.contact):

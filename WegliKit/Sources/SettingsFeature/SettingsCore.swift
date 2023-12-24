@@ -35,39 +35,53 @@ public struct SettingsDomain: Reducer {
     
     public var accountSettingsState: AccountSettingsDomain.State
     public var userSettings: UserSettings
-    public var destination: Destination?
     
-    public enum Destination: Equatable {
-      case accountSettings
-    }
+    @PresentationState var destination: Destination.State?
   }
   
+  @CasePathable
   public enum Action: Equatable {
-    case accountSettings(AccountSettingsDomain.Action)
     case userSettings(UserSettingsDomain.Action)
     case openLicensesRowTapped
     case openImprintTapped
     case donateTapped
     case openGitHubProjectTapped
-    case setDestination(State.Destination?)
+    case accountSettingsButtonTapped
+    case destination(PresentationAction<Destination.Action>)
   }
   
-  public var body: some ReducerOf<Self> {
-    Scope(state: \.accountSettingsState, action: /Action.accountSettings) {
-      AccountSettingsDomain()
+  @Reducer
+  public struct Destination {
+    public enum State: Equatable {
+      case accountSettings(AccountSettingsDomain.State)
     }
-    
+
+    public enum Action: Equatable, Sendable {
+      case accountSettings(AccountSettingsDomain.Action)
+    }
+
+    public var body: some ReducerOf<Self> {
+      Scope(state: \.accountSettings, action: \.accountSettings) {
+        AccountSettingsDomain()
+      }
+    }
+  }
+  
+  enum CancelID { case debounce }
+  
+  public var body: some ReducerOf<Self> {
     Scope(state: \.userSettings, action: /Action.userSettings) {
       UserSettingsDomain()
     }
     
     Reduce<State, Action> { state, action in
       switch action {
-      case .accountSettings:
+      case .accountSettingsButtonTapped:
+        state.destination = .accountSettings(AccountSettingsDomain.State(accountSettings: AccountSettings(apiToken: "")))
         return .none
-        
+      
       case .openLicensesRowTapped:
-        return .fireAndForget {
+        return .run { send in
           guard
             let url = await URL(string: applicationClient.openSettingsURLString())
           else { return }
@@ -75,31 +89,32 @@ public struct SettingsDomain: Reducer {
         }
         
       case .openImprintTapped:
-        return .fireAndForget {
+        return .run { _ in
           _ = await applicationClient.open(Self.imprintLink, [:])
         }
       case .openGitHubProjectTapped:
-        return .fireAndForget {
+        return .run { _ in
           _ = await applicationClient.open(Self.gitHubProjectLink, [:])
         }
       case .donateTapped:
-        return .fireAndForget {
+        return .run { _ in
           _ = await applicationClient.open(Self.donateLink, [:])
         }
       case .userSettings:
         let userSettings = state.userSettings
-        return .fireAndForget {
-          enum CancelID {}
-          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+        return .run { _ in
+          try await withTaskCancellation(id: CancelID.debounce, cancelInFlight: true) {
             try await clock.sleep(for: .seconds(0.3))
             try await fileClient.saveUserSettings(userSettings)
           }
         }
         
-      case .setDestination(let value):
-        state.destination = value
+      case .destination:
         return .none
       }
+    }
+    .ifLet(\.$destination, action: \.destination) {
+      Destination()
     }
   }
 }
