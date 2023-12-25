@@ -27,18 +27,16 @@ struct WegliApp: App {
 // MARK: AppDelegate
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
-  let store = Store(
-    initialState: .init(),
-    reducer: AppDomain()
-  )
-  lazy var viewStore = ViewStore(self.store.scope(state: { _ in () }))
+  let store = Store(initialState: AppDomain.State()) {
+    AppDomain()
+  }
   
   func application(
     _ application: UIApplication,
     // swiftlint:disable:next discouraged_optional_collection
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    viewStore.send(.internalAction(.appDelegate(.didFinishLaunching)))
+    self.store.send(.internalAction(.appDelegate(.didFinishLaunching)))
     return true
   }
 }

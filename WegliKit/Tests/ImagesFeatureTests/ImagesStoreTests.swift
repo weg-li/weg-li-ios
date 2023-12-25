@@ -50,8 +50,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: ImagesViewDomain.init,
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
@@ -113,8 +113,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [storableImage1, storableImage2],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: ImagesViewDomain.init,
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
@@ -134,8 +134,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: {ImagesViewDomain()},
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
@@ -181,8 +181,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: {ImagesViewDomain()},
+      withDependencies: { values in
         values.continuousClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
@@ -233,8 +233,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: {ImagesViewDomain()},
+      withDependencies: { values in
         values.continuousClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
@@ -262,8 +262,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: {ImagesViewDomain()},
+      withDependencies: { values in
         values.continuousClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
@@ -291,8 +291,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: {ImagesViewDomain()},
+      withDependencies: { values in
         values.continuousClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient
@@ -315,8 +315,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: ImagesViewDomain.init,
+      withDependencies: { values in
         values.continuousClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = .noop
@@ -341,8 +341,8 @@ final class ImagesStoreTests: XCTestCase {
         storedPhotos: [],
         coordinateFromImagePicker: .zero
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: ImagesViewDomain.init,
+      withDependencies: { values in
         values.continuousClock = clock
         values.cameraAccessClient = .mock
         values.photoLibraryAccessClient = accessClient

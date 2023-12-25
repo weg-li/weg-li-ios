@@ -20,8 +20,8 @@ final class CameraAccessTests: XCTestCase {
         showCamera: false,
         storedPhotos: []
       ),
-      reducer: ImagesViewDomain(),
-      prepareDependencies: { values in
+      reducer: ImagesViewDomain.init,
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.cameraAccessClient = accessClient
         values.photoLibraryAccessClient = .noop

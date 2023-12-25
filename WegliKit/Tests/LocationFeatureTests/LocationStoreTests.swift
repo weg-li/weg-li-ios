@@ -17,7 +17,7 @@ final class LocationStoreTests: XCTestCase {
   func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve() async {
     let didRequestInUseAuthorization = ActorIsolated(false)
     let didRequestLocation = ActorIsolated(false)
-    let locationObserver = AsyncStream<LocationManager.Action>.streamWithContinuation()
+    let locationObserver = AsyncStream<LocationManager.Action>.makeStream()
     
     let expectedAddress = Address(
       street: Contact.preview.address.street,
@@ -27,8 +27,8 @@ final class LocationStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: LocationDomain.State(),
-      reducer: LocationDomain(),
-      prepareDependencies: { values in
+      reducer: {LocationDomain()},
+      withDependencies: { values in
         values.locationManager.authorizationStatus = { .notDetermined }
         values.locationManager.delegate = { locationObserver.stream }
         values.locationManager.locationServicesEnabled = { true }
@@ -101,7 +101,7 @@ final class LocationStoreTests: XCTestCase {
   func test_locationOptionCurrentLocation_shouldTriggerLocationRequestAndAddressResolve_whenANewLocationIsFurtherAway() async {
     let didRequestInUseAuthorization = ActorIsolated(false)
     let didRequestLocation = ActorIsolated(false)
-    let locationObserver = AsyncStream<LocationManager.Action>.streamWithContinuation()
+    let locationObserver = AsyncStream<LocationManager.Action>.makeStream()
     
     let expectedAddress = Address(
       street: Contact.preview.address.street,
@@ -111,8 +111,8 @@ final class LocationStoreTests: XCTestCase {
         
     let store = TestStore(
       initialState: LocationDomain.State(),
-      reducer: LocationDomain(),
-      prepareDependencies: { values in
+      reducer: {LocationDomain()},
+      withDependencies: { values in
         values.locationManager.authorizationStatus = { .notDetermined }
         values.locationManager.delegate = { locationObserver.stream }
         values.locationManager.locationServicesEnabled = { true }
@@ -191,12 +191,12 @@ final class LocationStoreTests: XCTestCase {
   
   /// if locationServices disabled, test that alert state is set
   func test_disabledLocationService_shouldSetAlert() async {
-    let locationObserver = AsyncStream<LocationManager.Action>.streamWithContinuation()
+    let locationObserver = AsyncStream<LocationManager.Action>.makeStream()
     
     let store = TestStore(
       initialState: LocationDomain.State(),
-      reducer: LocationDomain(),
-      prepareDependencies: { values in
+      reducer: {LocationDomain()},
+      withDependencies: { values in
         values.locationManager = .unimplemented
         values.locationManager.authorizationStatus = { .denied }
         values.locationManager.delegate = { locationObserver.stream }
@@ -226,12 +226,12 @@ final class LocationStoreTests: XCTestCase {
   /// if locationServices disabled, test that alert state is set
   func test_deniedPermission_shouldSetAlert() async {
     let didRequestInUseAuthorization = ActorIsolated(false)
-    let locationObserver = AsyncStream<LocationManager.Action>.streamWithContinuation()
+    let locationObserver = AsyncStream<LocationManager.Action>.makeStream()
 
     let store = TestStore(
       initialState: LocationDomain.State(),
-      reducer: LocationDomain(),
-      prepareDependencies: { values in
+      reducer: {LocationDomain()},
+      withDependencies: { values in
         values.locationManager = .unimplemented
         values.locationManager.authorizationStatus = { .notDetermined }
         values.locationManager.delegate = { locationObserver.stream }
@@ -273,8 +273,8 @@ final class LocationStoreTests: XCTestCase {
         isResolvingAddress: false,
         resolvedAddress: .init(address: .init())
       ),
-      reducer: LocationDomain(),
-      prepareDependencies: { values in
+      reducer: {LocationDomain()},
+      withDependencies: { values in
         values.locationManager = .unimplemented
         values.placesServiceClient = .noop
         values.applicationClient = .previewValue
@@ -318,8 +318,8 @@ final class LocationStoreTests: XCTestCase {
         isResolvingAddress: false,
         resolvedAddress: .init(address: .init())
       ),
-      reducer: LocationDomain(),
-      prepareDependencies: { values in
+      reducer: {LocationDomain()},
+      withDependencies: { values in
         values.locationManager = .unimplemented
         values.placesServiceClient = .noop
         values.applicationClient = uiApplicationClient
