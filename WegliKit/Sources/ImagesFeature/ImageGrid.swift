@@ -62,7 +62,7 @@ struct ImageGrid_Previews: PreviewProvider {
           ],
           coordinateFromImagePicker: .zero
         ),
-        reducer: ImagesViewDomain()
+        reducer: { ImagesViewDomain() }
       )
     )
   }

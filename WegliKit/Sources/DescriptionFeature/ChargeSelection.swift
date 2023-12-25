@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Dependencies
 import FeedbackGeneratorClient
+import FileClient
 import Foundation
 import SwiftUI
 
@@ -13,7 +14,7 @@ public struct ChargeSelection: Reducer {
   
   public struct State: Equatable {
     public var selectedCharge: Charge?
-    @BindableState public var chargeTypeSearchText = ""
+    @BindingState public var chargeTypeSearchText = ""
     
     public init(
       selectedCharge: Charge? = nil,
@@ -52,12 +53,12 @@ public struct ChargeSelection: Reducer {
         return .none
         
       case .onAppear:
-        return .task {
-          await .favoriteChargesLoaded(
+        return .run { send in
+          await send(.favoriteChargesLoaded(
             TaskResult {
               try await fileClient.loadFavoriteCharges()
             }
-          )
+          ))
         }
         
       case let .favoriteChargesLoaded(result):
@@ -96,14 +97,14 @@ public struct ChargeSelection: Reducer {
           .map(\.id)
         
         return .concatenate(
-          .task {
+          .run { send in
             try await clock.sleep(for: .seconds(0.4))
-            return .sortFavoritedCharges
+            return await send(.sortFavoritedCharges)
           },
-          .fireAndForget {
+          .run { _ in
             await feedbackGenerator.selectionChanged()
           },
-          .fireAndForget(priority: .userInitiated) {
+          .run(priority: .userInitiated) { _ in
             try await fileClient.saveFavoriteCharges(ids)
           }
         )
@@ -143,7 +144,7 @@ public struct ChargeSelectionView: View {
     .onAppear { viewStore.send(.onAppear) }
     .animation(.default, value: viewStore.chargesSearchResults)
     .searchable(
-      text: viewStore.binding(\.$chargeTypeSearchText),
+      text: viewStore.$chargeTypeSearchText,
       placement: .navigationBarDrawer(displayMode: .always)
     )
     .disableAutocorrection(true)

@@ -100,7 +100,7 @@ struct ImageView_Previews: PreviewProvider {
           id: .init(),
           image: PickerImageResult(uiImage: UIImage(systemName: "pencil")!)! // swiftlint:disable:this force_unwrapping
         ),
-        reducer: ImageDomain()
+        reducer: { ImageDomain() }
       )
     )
   }

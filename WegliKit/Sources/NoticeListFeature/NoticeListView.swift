@@ -5,7 +5,6 @@ import L10n
 import SharedModels
 import Styleguide
 import SwiftUI
-import SwiftUINavigation
 
 public struct NoticeListView: View {
   public typealias S = NoticeListDomain.State
@@ -81,25 +80,28 @@ public struct NoticeListView: View {
         }
         
     }
-    .onChange(of: viewStore.state.errorBarMessage, perform: { newValue in
-      withAnimation {
-        errorMessage = newValue
+    .onChange(
+      of: viewStore.state.errorBarMessage,
+      perform: { newValue in
+        withAnimation {
+          errorMessage = newValue
+        }
       }
-    })
-    .overlay(alignment: .bottom, content: {
-      messageBarView()
-    })
-    .onAppear { viewStore.send(.onAppear) }
-    .sheet(
-      unwrapping: viewStore.binding(
-        get: \.destination,
-        send: A.setNavigationDestination
-      ),
-      case: /S.Destination.edit,
-      onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
-    ) { $model in
-      editNoticeSheet(notice: $model)
-    }
+    )
+//    .overlay(alignment: .bottom, coxwntent: {
+//      messageBarView()
+//    })
+//    .onAppear { viewStore.send(.onAppear) }
+//    .sheet(
+//      unwrapping: viewStore.binding(
+//        get: \.destination,
+//        send: A.setNavigationDestination
+//      ),
+//      case: /S.Destination.edit,
+//      onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
+//    ) { $model in
+//      editNoticeSheet(notice: $model)
+//    }
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu(
@@ -265,7 +267,7 @@ struct NoticeListView_Previews: PreviewProvider {
     NoticeListView(
       store: .init(
         initialState: NoticeListDomain.State(notices: .results([.mock, .mock])),
-        reducer: EmptyReducer()
+        reducer: { EmptyReducer() }
       )
     )
   }

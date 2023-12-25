@@ -2,10 +2,10 @@ import ApiClient
 import ComposableArchitecture
 import DescriptionFeature
 import FeedbackGeneratorClient
+import FileClient
 import Foundation
 import Helper
 import L10n
-import PathMonitorClient
 import SharedModels
 import UIKit
 
@@ -16,7 +16,6 @@ public struct NoticeListDomain: Reducer {
   @Dependency(\.apiService) public var apiService
   @Dependency(\.uuid) public var uuid
   @Dependency(\.date) public var date
-  @Dependency(\.pathMonitorClient) public var pathMonitorClient
   @Dependency(\.continuousClock) public var clock
   @Dependency(\.feedbackGenerator) public var feedbackGenerator
   
@@ -127,11 +126,37 @@ public struct NoticeListDomain: Reducer {
     case fetchNoticesResponse(TaskResult<[Notice]>)
     
     case onAppear
-    case observeConnection
     case dismissAlert
     case displayMessageBar(State.MessageBarType?)
-    
-    case observeConnectionResponse(NetworkPath)
+  }
+  
+  @Reducer
+  struct Destination {
+    enum State: Equatable {
+      case alert(AlertState<Action.Alert>)
+      case edit(EditNoticeDomain.Action)
+    }
+
+    enum Action {
+      case edit(EditNoticeDomain.Action)
+      case alert(AlertState<Alert>)
+
+      enum Alert {
+        case confirmDeletion
+      }
+    }
+
+    var body: some ReducerOf<Self> {
+      Reduce<State, Action> { state, action in
+        switch action {
+        case .alert(let alert):
+          return .none
+          
+        case .edit(let notice):
+          return .none
+        }
+      }
+    }
   }
   
   public var body: some ReducerOf<Self> {
@@ -191,17 +216,11 @@ public struct NoticeListDomain: Reducer {
           state.orderSortType[order] = !orderAscending
         }
         
-        return .fireAndForget {
+        return .run { _ in
           try await fileClient.saveNotices(notices)
         }
         
-      case let .fetchNotices(forceReload):
-        guard state.isNetworkAvailable else {
-          state.notices = .empty(.emptyNotices())
-          return .none
-        }
-        
-        // dont reload every time
+      case .fetchNotices(let forceReload):
         if let elements = state.notices.elements, !elements.isEmpty, !forceReload {
           return .none
         }
@@ -211,9 +230,11 @@ public struct NoticeListDomain: Reducer {
         }
         state.isFetchingNotices = true
         
-        return .task {
-          await .fetchNoticesResponse(
-            TaskResult { try await apiService.getNotices(forceReload) }
+        return .run { send in
+          await send(
+            .fetchNoticesResponse(
+              TaskResult { try await apiService.getNotices(forceReload) }
+            )
           )
         }
         
@@ -251,18 +272,6 @@ public struct NoticeListDomain: Reducer {
         state.destination = value
         return .none
         
-      case .observeConnection:
-        return .run { send in
-          for await path in await pathMonitorClient.networkPathPublisher() {
-            await send(.observeConnectionResponse(path))
-          }
-        }
-        .cancellable(id: ObserveConnectionIdentifier.self)
-        
-      case let .observeConnectionResponse(networkPath):
-        state.isNetworkAvailable = networkPath.status == .satisfied
-        return .none
-        
       case .onSaveNoticeButtonTapped:
         state.isSendingEditedNotice = true
         
@@ -271,9 +280,11 @@ public struct NoticeListDomain: Reducer {
         }
         let patch = Notice(notice)
         
-        return .task {
-          await .editNoticeResponse(
-            TaskResult { try await apiService.patchNotice(patch) }
+        return .run { send in
+          await send(
+            .editNoticeResponse(
+              TaskResult { try await apiService.patchNotice(patch) }
+            )
           )
         }
         
@@ -283,16 +294,14 @@ public struct NoticeListDomain: Reducer {
         switch response {
         case .success:
           state.destination = nil
-          return .merge(
-            .task { .fetchNotices(forceReload: true) },
-            .fireAndForget {
-              await feedbackGenerator.notify(.success)
-            }
-          )
+          return .run { send in
+            await send(.fetchNotices(forceReload: true))
+            await feedbackGenerator.notify(.success)
+          }
           
         case .failure:
           state.alert = .editNoticeFailure
-          return .fireAndForget {
+          return .run { _ in
             await feedbackGenerator.notify(.error)
           }
         }
@@ -301,14 +310,12 @@ public struct NoticeListDomain: Reducer {
         switch result {
         case .success:
           state.destination = nil
-          return .merge(
-            .task { .fetchNotices(forceReload: true) },
-            .fireAndForget {
-              await feedbackGenerator.notify(.success)
-            }
-          )
+          return .run { send in
+            await send(.fetchNotices(forceReload: true))
+            await feedbackGenerator.notify(.success)
+          }
         case .failure:
-          return .fireAndForget {
+          return .run { _ in
             await feedbackGenerator.notify(.error)
           }
         }

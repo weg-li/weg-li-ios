@@ -1,3 +1,4 @@
+import ApiClient
 import ComposableArchitecture
 import Foundation
 import DescriptionFeature
@@ -12,7 +13,7 @@ public struct EditNoticeDomain: Reducer {
   public struct State: Equatable {
     var notice: Notice
     
-    public var description: DescriptionDomain.State
+    @BindingState public var description: DescriptionDomain.State
     public var image: ImagesViewDomain.State
     
     @BindingState public var date: Date
@@ -25,9 +26,11 @@ public struct EditNoticeDomain: Reducer {
     
     @BindingState public var showImagePicker = false
     public var destination: Destination?
+    
     public enum Destination: Equatable {
       case selectBrand(CarBrandSelection.State)
     }
+    
     public var isDeletingNotice = false
     public var alert: AlertState<Action>?
     
@@ -94,9 +97,11 @@ public struct EditNoticeDomain: Reducer {
         }
         state.isDeletingNotice = true
         
-        return .task {
-          await .deleteNoticeResponse(
-            TaskResult { try await apiService.deleteNotice(token) }
+        return .run { send in
+          await send(
+            .deleteNoticeResponse(
+              TaskResult { try await apiService.deleteNotice(token) }
+            )
           )
         }
         
