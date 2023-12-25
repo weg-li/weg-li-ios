@@ -34,8 +34,8 @@ final class NoticeListFeatureTests: XCTestCase {
     
     let store = TestStore(
       initialState: .init(notices: .loading),
-      reducer: NoticeListDomain(),
-      prepareDependencies: { dependencies in
+      reducer: {NoticeListDomain()},
+      withDependencies: { dependencies in
         dependencies.continuousClock = ImmediateClock()
         dependencies.fileClient = fileClient
       }
@@ -52,7 +52,7 @@ final class NoticeListFeatureTests: XCTestCase {
   func test_Action_onAppear_shouldFetchNoticesWhenTokenisAdded() async {
     let store = TestStore(
       initialState: .init(notices: .loading),
-      reducer: NoticeListDomain()
+      reducer: {NoticeListDomain()}
     )
     store.exhaustivity = .off
     store.dependencies.keychainClient = .noop
@@ -80,7 +80,7 @@ final class NoticeListFeatureTests: XCTestCase {
   func test_Action_onAppear_shouldPresentNoTokenErrorState() async {
     let store = TestStore(
       initialState: .init(notices: .loading),
-      reducer: NoticeListDomain()
+      reducer: {NoticeListDomain()}
     )
     store.dependencies.pathMonitorClient = .satisfied
     store.dependencies.keychainClient.getToken = { nil }
@@ -102,7 +102,7 @@ final class NoticeListFeatureTests: XCTestCase {
   func test_Action_fetchNotices_shouldNotReload_whenElementsHaveBeenLoaded_andNoForceReload() async {
     let store = TestStore(
       initialState: NoticeListDomain.State(notices: .results([.mock])),
-      reducer: NoticeListDomain()
+      reducer: {NoticeListDomain()}
     )
     
     await store.send(.fetchNotices(forceReload: false))
@@ -114,7 +114,7 @@ final class NoticeListFeatureTests: XCTestCase {
     
     let store = TestStore(
       initialState: NoticeListDomain.State(notices: .results([.mock])),
-      reducer: NoticeListDomain()
+      reducer: {NoticeListDomain()}
     )
     store.dependencies.apiService.getNotices = { _ in [.mock] }
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
@@ -139,7 +139,7 @@ final class NoticeListFeatureTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: NoticeListDomain()
+      reducer: {NoticeListDomain()}
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in
       await didSaveNotices.setValue(true)

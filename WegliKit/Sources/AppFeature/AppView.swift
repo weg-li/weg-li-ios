@@ -70,7 +70,7 @@ struct MainView_Previews: PreviewProvider {
       AppView(
         store: Store(
           initialState: AppDomain.State(),
-          reducer: AppDomain()
+          reducer: { AppDomain() }
         )
       )
     }

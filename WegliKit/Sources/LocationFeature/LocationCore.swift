@@ -10,7 +10,8 @@ import SharedModels
 import SwiftUI
 import UIApplicationClient
 
-public struct LocationDomain: ReducerProtocol {
+@Reducer
+public struct LocationDomain {
   public init() {}
   
   @Dependency(\.placesServiceClient) public var placesServiceClient
@@ -38,7 +39,7 @@ public struct LocationDomain: ReducerProtocol {
       self.isRequestingCurrentLocation = isRequestingCurrentLocation
     }
     
-    public var alert: AlertState<Action>?
+    @PresentationState public var alert: AlertState<Action>?
     public var locationOption: LocationOption = .fromPhotos
     public var isMapExpanded = false
     public var isResolvingAddress = false
@@ -66,18 +67,18 @@ public struct LocationDomain: ReducerProtocol {
     case setPinCoordinate(CLLocationCoordinate2D?)
   }
   
-  public var body: some ReducerProtocol<State, Action> {
+  public var body: some ReducerOf<Self> {
     Reduce<State, Action> { state, action in
       switch action {
       case .onAppear:
         return .merge(
-          .run { sender in
+          .run { send in
             for await event in locationManager.delegate() {
-              await sender.send(.locationManager(event))
+              await send(.locationManager(event))
             }
           }
           .cancellable(id: LocationManagerId()),
-          .fireAndForget {
+          .run { _ in
             await locationManager.setup()
           }
         )
@@ -90,7 +91,7 @@ public struct LocationDomain: ReducerProtocol {
         switch locationManager.authorizationStatus() {
         case .notDetermined:
           state.isRequestingCurrentLocation = true
-          return .fireAndForget {
+          return .run { _ in
             await locationManager.requestWhenInUseAuthorization()
           }
           
@@ -103,7 +104,7 @@ public struct LocationDomain: ReducerProtocol {
           return .none
           
         case .authorizedAlways, .authorizedWhenInUse:
-          return .fireAndForget {
+          return .run { _ in
             await locationManager.startUpdatingLocation()
           }
           
@@ -158,7 +159,7 @@ public struct LocationDomain: ReducerProtocol {
         case .didChangeAuthorization(.authorizedAlways),
             .didChangeAuthorization(.authorizedWhenInUse):
           if state.isRequestingCurrentLocation {
-            return .fireAndForget {
+            return .run { _ in
               await locationManager.requestLocation()
             }
           }
@@ -191,12 +192,14 @@ public struct LocationDomain: ReducerProtocol {
           longitude: coordinate.longitude
         )
         
-        return .task {
-          await withTaskCancellation(id: CancelSearchId.self, cancelInFlight: true) {
-            await .resolveAddressFinished(
-              TaskResult {
-                await placesServiceClient.placemarks(clLocation)
-              }
+        return .run { send in
+          await withTaskCancellation(id: CancelId.search, cancelInFlight: true) {
+            await send(
+              .resolveAddressFinished(
+                TaskResult {
+                  await placesServiceClient.placemarks(clLocation)
+                }
+              )
             )
           }
         }
@@ -235,7 +238,7 @@ public struct LocationDomain: ReducerProtocol {
         return .none
         
       case .onGoToSettingsButtonTapped:
-        return .fireAndForget {
+        return .run { _ in
           guard let url = await URL(string: applicationClient.openSettingsURLString()) else { return }
           _ = await applicationClient.open(url, [:])
         }
@@ -252,7 +255,7 @@ public enum UserLocationError: Error {
 
 // TCA uses Hashable structs for identifying effects
 struct LocationManagerId: Hashable {}
-enum CancelSearchId {}
+enum CancelId { case search  }
 
 // MARK: - Utils
 

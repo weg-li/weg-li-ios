@@ -51,7 +51,7 @@ public struct SettingsDomain: Reducer {
   }
   
   @Reducer
-  public struct Destination {
+  public struct Destination: Equatable {
     public enum State: Equatable {
       case accountSettings(AccountSettingsDomain.State)
     }

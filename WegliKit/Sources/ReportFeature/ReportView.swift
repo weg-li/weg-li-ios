@@ -9,7 +9,6 @@ import L10n
 import LocationFeature
 import Styleguide
 import SwiftUI
-import SwiftUINavigation
 
 public struct ReportView: View {
   public typealias S = ReportDomain.State
@@ -46,34 +45,34 @@ public struct ReportView: View {
         ) {
           DescriptionView(store: store)
             .onTapGesture { viewStore.send(.setDestination(.description)) }
-            .sheet(
-              unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
-              case: /S.Destination.description,
-              onDismiss: { viewStore.send(.setDestination(nil)) },
-              content: { _ in
-                NavigationStack {
-                  List {
-                    EditDescriptionView(
-                      store: store.scope(
-                        state: \.description,
-                        action: A.description
-                      )
-                    )
-                  }
-                  .accessibilityAddTraits([.isModal])
-                  .navigationTitle(Text(L10n.Description.widgetTitle))
-                  .navigationBarTitleDisplayMode(.inline)
-                  .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                      Button(
-                        action: { viewStore.send(.setDestination(nil)) },
-                        label: { Text(L10n.Button.close) }
-                      )
-                    }
-                  }
-                }
-              }
-            )
+//            .sheet(
+//              unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
+//              case: /S.Destination.description,
+//              onDismiss: { viewStore.send(.setDestination(nil)) },
+//              content: { _ in
+//                NavigationStack {
+//                  List {
+//                    EditDescriptionView(
+//                      store: store.scope(
+//                        state: \.description,
+//                        action: A.description
+//                      )
+//                    )
+//                  }
+//                  .accessibilityAddTraits([.isModal])
+//                  .navigationTitle(Text(L10n.Description.widgetTitle))
+//                  .navigationBarTitleDisplayMode(.inline)
+//                  .toolbar {
+//                    ToolbarItem(placement: .cancellationAction) {
+//                      Button(
+//                        action: { viewStore.send(.setDestination(nil)) },
+//                        label: { Text(L10n.Button.close) }
+//                      )
+//                    }
+//                  }
+//                }
+//              }
+//            )
         }
         
         // Location
@@ -95,32 +94,37 @@ public struct ReportView: View {
             title: Text(L10n.Report.Contact.widgetTitle),
             isCompleted: viewStore.isContactValid
           ) {
-            ContactWidget(store: store.scope(state: { $0 }))
-              .onTapGesture { viewStore.send(.setDestination(.contact)) }
-              .sheet(
-                unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
-                case: /S.Destination.contact,
-                onDismiss: { viewStore.send(.setDestination(nil)) },
-                content: { _ in
-                  NavigationStack {
-                    ContactView(
-                      store: store.scope(
-                        state: \.contactState,
-                        action: ReportDomain.Action.contact
-                      )
-                    )
-                    .accessibilityAddTraits([.isModal])
-                    .toolbar {
-                      ToolbarItem(placement: .cancellationAction) {
-                        Button(
-                          action: { viewStore.send(.setDestination(nil)) },
-                          label: { Text(L10n.Button.close) }
-                        )
-                      }
-                    }
-                  }
-                }
+            ContactWidget(
+              store: store.scope(
+                state: \.contactState,
+                action: { .contact($0) }
               )
+            )
+            .onTapGesture { viewStore.send(.setDestination(.contact)) }
+//              .sheet(
+//                unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
+//                case: /S.Destination.contact,
+//                onDismiss: { viewStore.send(.setDestination(nil)) },
+//                content: { _ in
+//                  NavigationStack {
+//                    ContactView(
+//                      store: store.scope(
+//                        state: \.contactState,
+//                        action: ReportDomain.Action.contact
+//                      )
+//                    )
+//                    .accessibilityAddTraits([.isModal])
+//                    .toolbar {
+//                      ToolbarItem(placement: .cancellationAction) {
+//                        Button(
+//                          action: { viewStore.send(.setDestination(nil)) },
+//                          label: { Text(L10n.Button.close) }
+//                        )
+//                      }
+//                    }
+//                  }
+//                }
+//              )
           }
         }
         
@@ -132,7 +136,7 @@ public struct ReportView: View {
           VStack(alignment: .leading) {
             DatePicker(
               L10n.date,
-              selection: viewStore.binding(\.$date)
+              selection: viewStore.$date
             )
             .labelsHidden()
             .padding(.bottom)
@@ -223,7 +227,7 @@ public struct ReportView: View {
       }
     }
     .onAppear { viewStore.send(.onAppear) }
-    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
+//    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
     .toolbar {
       ToolbarItem(placement: .destructiveAction) {
         resetButton
@@ -246,19 +250,16 @@ public struct ReportView: View {
   }
 }
 
-struct ReportForm_Previews: PreviewProvider {
-  static var previews: some View {
-   Preview {
-     ReportView(store:
+#Preview {
+  Preview {
+    ReportView(store:
         .init(
           initialState: .preview,
-          reducer: ReportDomain()
+          reducer: { ReportDomain() }
         )
-     )
-    }
+    )
   }
 }
-
 private extension String {
   var asBulletPoint: Self {
     "\u{2022} \(self)"

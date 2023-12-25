@@ -56,10 +56,10 @@ public struct AppDomain: Reducer {
     
     public var isFetchingNotices = false
     
-    enum NavigationDestination: Equatable {
+    enum Destination: Equatable {
       case noticeList(NoticeListDomain.State.Destination?)
       case report(ReportDomain.State.Destination?)
-      case settings(SettingsDomain.State.Destination?)
+      case settings(SettingsDomain.Destination?)
     }
   }
   
@@ -168,11 +168,7 @@ public struct AppDomain: Reducer {
           state.reportDraft.images.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
           state.reportDraft.alwaysSendNotice = state.settings.userSettings.alwaysSendNotice
           return .none
-        
-        case .accountSettings:
-          state.reportDraft.apiToken = state.settings.accountSettingsState.accountSettings.apiToken
-          return .none
-          
+                  
         default:
           return .none
         }
@@ -208,8 +204,8 @@ public struct AppDomain: Reducer {
         
       case .noticeList(.onNavigateToAccontSettingsButtonTapped):
         return .concatenate(
-          .send(.viewAction(.setSelectedTab(.settings))),
-          .send(.settings(.setDestination(.accountSettings)))
+          .send(.viewAction(.setSelectedTab(.settings)))
+//          .send(.settings(.setDestination(.accountSettings)))
         )
         
       case .noticeList, .report:

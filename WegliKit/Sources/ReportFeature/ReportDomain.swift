@@ -164,6 +164,8 @@ public struct ReportDomain: Reducer {
     case setDestination(State.Destination?)
   }
   
+  enum CancelID { case contact }
+  
   public var body: some ReducerOf<Self> {
     Scope(state: \.images, action: /Action.images) {
       ImagesViewDomain()
@@ -197,11 +199,13 @@ public struct ReportDomain: Reducer {
         
         // Triggers district mapping after geoAddress is stored.
       case let .mapAddressToDistrict(input):
-        return .task {
-          await .mapDistrictFinished(
-            TaskResult {
-              try await regulatoryOfficeMapper.mapAddressToDistrict(input)
-            }
+        return .run { send in
+          await send(
+            .mapDistrictFinished(
+              TaskResult {
+                try await regulatoryOfficeMapper.mapAddressToDistrict(input)
+              }
+            )
           )
         }
         
@@ -327,9 +331,8 @@ public struct ReportDomain: Reducer {
       case .contact:
         let contact = state.contactState.contact
         
-        return .fireAndForget {
-          enum CancelID {}
-          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+        return .run { _ in
+          try await withTaskCancellation(id: CancelID.contact, cancelInFlight: true) {
             try await clock.sleep(for: .seconds(0.3))
             try await fileClient.saveContactSettings(contact)
           }
@@ -357,11 +360,13 @@ public struct ReportDomain: Reducer {
       case .uploadImages:
         let results = state.images.imageStates.map { $0.image }
         
-        return .task {
-          await .uploadImagesResponse(
-            TaskResult {
-              try await imagesUploadClient.uploadImages(results)
-            }
+        return .run { send in
+          await send(
+            .uploadImagesResponse(
+              TaskResult {
+                try await imagesUploadClient.uploadImages(results)
+              }
+            )
           )
         }
         
@@ -377,13 +382,15 @@ public struct ReportDomain: Reducer {
         var notice = NoticeInput(state)
         notice.photos = state.uploadedImagesIds
         
-        return .task { [notice, alwaysSendNotice = state.alwaysSendNotice] in
-          await .postNoticeResponse(
-            TaskResult {
-              try await wegliService.postNotice(notice)
-            }
+        return .run { [notice, alwaysSendNotice = state.alwaysSendNotice] send in
+          await send(
+            .postNoticeResponse(
+              TaskResult {
+                try await wegliService.postNotice(notice)
+              }
+            )
           )
-//          
+//
 //          if alwaysSendNotice {
 //            await .submitNoticeResponse(
 //              TaskResult {
@@ -404,7 +411,7 @@ public struct ReportDomain: Reducer {
         state.uploadedNoticeID = response.token
         
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
-        return .fireAndForget {
+        return .run { _ in
           await withTaskGroup(of: Void.self, body: { group in
             imageURLs.forEach { url in
               group.addTask(priority: .background) {
@@ -428,7 +435,7 @@ public struct ReportDomain: Reducer {
           return .none
         }
         let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
-        return .fireAndForget {
+        return .run { _ in
           _ = await uiApplicationClient.open(editURL, [:])
         }
         
@@ -441,7 +448,7 @@ public struct ReportDomain: Reducer {
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
         
         return .merge(
-          .fireAndForget {
+          .run { _ in
             await withTaskGroup(of: Void.self, body: { group in
               imageURLs.forEach { url in
                 group.addTask(priority: .background) {
@@ -451,7 +458,7 @@ public struct ReportDomain: Reducer {
               debugPrint("removed items")
             })
           },
-          .fireAndForget {
+          .run { _ in
             await feedbackGenerator.notify(.success)
           }
         )
@@ -460,7 +467,7 @@ public struct ReportDomain: Reducer {
         state.isSubmittingNotice = false
         
         state.alert = .sendNoticeFailed(error: error as! ApiError)
-        return .fireAndForget {
+        return .run { _ in
           await feedbackGenerator.notify(.error)
         }
       

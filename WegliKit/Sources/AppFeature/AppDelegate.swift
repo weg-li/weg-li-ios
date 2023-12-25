@@ -4,7 +4,8 @@ import Foundation
 import ReportFeature
 import SharedModels
 
-public struct AppDelegateDomain: ReducerProtocol {
+@Reducer
+public struct AppDelegateDomain {
   public init() {}
   
   public struct State: Equatable {}

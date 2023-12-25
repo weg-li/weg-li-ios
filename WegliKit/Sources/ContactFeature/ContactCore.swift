@@ -18,8 +18,9 @@ public struct ContactViewDomain: Reducer {
     @BindingState public var contact: Contact
     @PresentationState public var alert: AlertState<Action.Alert>?
     
-    public init(contact: Contact = .empty) {
+    public init(contact: Contact = .empty, alert: AlertState<Action.Alert>? = nil) {
       self.contact = contact
+      self.alert = alert
     }
   }
   
@@ -109,7 +110,7 @@ public extension AlertState where Action == ContactViewDomain.Action.Alert {
 }
 
 public extension ContactViewDomain.State {
-  static let empty = Self(contact: .empty)
+  static let empty = Self(contact: .empty, alert: nil)
 
   static let preview = Self(
     contact: .init(
@@ -121,6 +122,7 @@ public extension ContactViewDomain.State {
         city: RowType.city.placeholder
       ),
       phone: RowType.phone.placeholder
-    )
+    ),
+    alert: nil
   )
 }

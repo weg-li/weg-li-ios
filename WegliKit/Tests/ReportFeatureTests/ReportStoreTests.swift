@@ -47,8 +47,8 @@ final class ReportStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: report,
-      reducer: ReportDomain(),
-      prepareDependencies: { values in
+      reducer: {ReportDomain()},
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented
         values.placesServiceClient = .noop
@@ -76,8 +76,8 @@ final class ReportStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: report,
-      reducer: ReportDomain(),
-      prepareDependencies: { values in
+      reducer: {ReportDomain()},
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented
         values.placesServiceClient = .noop
@@ -127,7 +127,7 @@ final class ReportStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: report,
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     let clock = TestClock()
     store.dependencies.continuousClock = clock
@@ -214,7 +214,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.mailComposeClient.canSendMail = { true }
     
@@ -252,7 +252,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.mailComposeClient.canSendMail = { false }
     
@@ -264,7 +264,7 @@ final class ReportStoreTests: XCTestCase {
   func test_locationOptionCurrentLocation_shouldTriggerResolveLocation_andSetDistrict() async {
     let store = TestStore(
       initialState: report,
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
     
@@ -292,7 +292,7 @@ final class ReportStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
         
@@ -315,7 +315,7 @@ final class ReportStoreTests: XCTestCase {
   func test_imagesAction_shouldNotTriggerResolveLocation_whenLocationisNotMappable() async {
     let store = TestStore(
       initialState: report,
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
     
@@ -355,7 +355,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
     
@@ -399,7 +399,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
     
@@ -452,7 +452,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     store.dependencies.regulatoryOfficeMapper = .live(districs)
     store.dependencies.continuousClock = ImmediateClock()
@@ -483,7 +483,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     
     await store.send(.onResetButtonTapped) {
@@ -510,7 +510,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     
     await store.send(.set(\.$showEditContact, true)) {
@@ -537,7 +537,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     
     await store.send(.set(\.$showEditDescription, true)) {
@@ -564,7 +564,7 @@ final class ReportStoreTests: XCTestCase {
           )
         )
       ),
-      reducer: ReportDomain()
+      reducer: {ReportDomain()}
     )
     
     let item = TextItem(id: "123", text: "B-MB 3000")
@@ -640,8 +640,8 @@ final class ReportStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: ReportDomain(),
-      prepareDependencies: { values in
+      reducer: {ReportDomain()},
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.locationManager = .unimplemented
         values.placesServiceClient = .noop

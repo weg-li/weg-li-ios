@@ -134,7 +134,7 @@ struct DescriptionWidgetView_Previews: PreviewProvider {
       DescriptionView(
         store: .init(
           initialState: .preview,
-          reducer: ReportDomain()
+          reducer: { ReportDomain() }
         )
       )
     }

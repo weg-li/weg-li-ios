@@ -31,24 +31,24 @@ struct MailContentView: View {
     }
   }
   
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
+  @ObservedObject private var viewStore: ViewStoreOf<ReportDomain>
   private let store: StoreOf<ReportDomain>
   
   init(store: StoreOf<ReportDomain>) {
     self.store = store
-    self.viewStore = ViewStore(store.scope(state: ViewState.init), observe: { $0 })
+    self.viewStore = ViewStore(store,observe: { $0 })
   }
   
   var body: some View {
     VStack(spacing: .grid(2)) {
       SubmitButton(
-        state: .readyToSubmit(district: viewStore.districtName),
-        disabled: viewStore.isSubmitButtonDisabled
+        state: .readyToSubmit(district: viewStore.district?.name),
+        disabled: !viewStore.isReportValid
       ) { viewStore.send(.mail(.submitButtonTapped)) }
-        .accessibilityValue(viewStore.isSubmitButtonDisabled ? "deaktviert" : "aktiviert")
-        .accessibilityHint(viewStore.isSubmitButtonDisabled ? L10n.Mail.readyToSubmitErrorCopy : "")
+        .accessibilityValue(viewStore.isReportValid ? "aktiviert" : "deaktviert")
+        .accessibilityHint(viewStore.isReportValid ? "" : L10n.Mail.readyToSubmitErrorCopy)
         .padding(.bottom, .grid(2))
-        .disabled(viewStore.isSubmitButtonDisabled)
+        .disabled(viewStore.isReportValid)
       
       VStack(spacing: .grid(2)) {
         if !MFMailComposeViewController.canSendMail() {
@@ -61,7 +61,7 @@ struct MailContentView: View {
       .multilineTextAlignment(.center)
     }
     .sheet(isPresented: viewStore.binding(
-      get: \.isMailComposerPresented,
+      get: \.mail.isPresentingMailContent,
       send: { ReportDomain.Action.mail(.presentMailContentView($0)) }
     )) {
       MailView(
@@ -85,7 +85,7 @@ struct MailContentView_Previews: PreviewProvider {
           contactState: .preview,
           date: Date.init
         ),
-        reducer: ReportDomain()
+        reducer: { ReportDomain() }
       )
     )
   }
