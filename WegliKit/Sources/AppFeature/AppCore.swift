@@ -57,7 +57,7 @@ public struct AppDomain: Reducer {
     public var isFetchingNotices = false
     
     enum Destination: Equatable {
-      case noticeList(NoticeListDomain.State.Destination?)
+      case noticeList(NoticeListDomain.Destination?)
       case report(ReportDomain.State.Destination?)
       case settings(SettingsDomain.Destination?)
     }
@@ -202,7 +202,7 @@ public struct AppDomain: Reducer {
         )
         return .none
         
-      case .noticeList(.onNavigateToAccontSettingsButtonTapped):
+      case .noticeList(.onNavigateToAccountSettingsButtonTapped):
         return .concatenate(
           .send(.viewAction(.setSelectedTab(.settings)))
 //          .send(.settings(.setDestination(.accountSettings)))

@@ -18,6 +18,7 @@ public struct NoticeListDomain: Reducer {
   @Dependency(\.date) public var date
   @Dependency(\.continuousClock) public var clock
   @Dependency(\.feedbackGenerator) public var feedbackGenerator
+  @Dependency(\.dismiss) var dismiss
   
   public struct State: Equatable {
     public var notices: ContentState<[Notice], Action>
@@ -28,6 +29,8 @@ public struct NoticeListDomain: Reducer {
     @BindingState public var isFetchingNotices = false
     @BindingState public var isNetworkAvailable = true
     @BindingState public var isSendingEditedNotice = false
+    
+    @PresentationState var destination: Destination.State?
     
     public var errorBarMessage: MessageBarType?
     
@@ -40,7 +43,6 @@ public struct NoticeListDomain: Reducer {
       notices: ContentState<[Notice],
       NoticeListDomain.Action>,
       editNotice: EditNoticeDomain.State? = nil,
-      destination: NoticeListDomain.State.Destination? = nil,
       isNetworkAvailable: Bool = true,
       alert: AlertState<NoticeListDomain.Action>? = nil,
       noticesSortOrder: NoticeListDomain.State.NoticeSortOrder = .noticeDate,
@@ -54,23 +56,11 @@ public struct NoticeListDomain: Reducer {
     ) {
       self.notices = notices
       self.editNotice = editNotice
-      self.destination = destination
       self.isNetworkAvailable = isNetworkAvailable
       self.alert = alert
       self.noticesSortOrder = noticesSortOrder
       self.orderSortType = orderSortType
       self.isSendingEditedNotice = isSendingEditedNotice
-    }
-    
-    public var destination: Destination? {
-      didSet {
-        switch destination {
-        case .edit(let notice):
-          editNotice = .init(notice: notice)
-        default:
-          return
-        }
-      }
     }
     
     // MARK: Sorting Helper
@@ -94,11 +84,6 @@ public struct NoticeListDomain: Reducer {
       return filteredCount != elements.count || elements.count == 1
     }
     
-    public enum Destination: Equatable {
-      case edit(Notice)
-      case alert(AlertState<AlertAction>)
-    }
-    
     public enum NoticeSortOrder: Hashable {
       case createdAtDate
       case noticeDate
@@ -112,60 +97,54 @@ public struct NoticeListDomain: Reducer {
     }
   }
   
+  @CasePathable
   public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<State>)
-    case setSortOrder(State.NoticeSortOrder)
-    case setNavigationDestination(State.Destination?)
-    case onNavigateToAccontSettingsButtonTapped
+    case onAppear
     
-    case onSaveNoticeButtonTapped
+    case binding(BindingAction<State>)
+    case destination(PresentationAction<Destination.Action>)
+    case setSortOrder(State.NoticeSortOrder)
+    
+    case onNavigateToAccountSettingsButtonTapped
+    case onNoticeItemTapped(Notice)
+
     case editNotice(EditNoticeDomain.Action)
     case editNoticeResponse(TaskResult<Notice>)
     
     case fetchNotices(forceReload: Bool)
     case fetchNoticesResponse(TaskResult<[Notice]>)
     
-    case onAppear
     case dismissAlert
     case displayMessageBar(State.MessageBarType?)
   }
   
   @Reducer
-  struct Destination {
-    enum State: Equatable {
-      case alert(AlertState<Action.Alert>)
+  public struct Destination: Equatable {
+    public enum State: Equatable {
+      case edit(EditNoticeDomain.State)
+    }
+
+    public enum Action: Equatable {
       case edit(EditNoticeDomain.Action)
     }
 
-    enum Action {
-      case edit(EditNoticeDomain.Action)
-      case alert(AlertState<Alert>)
-
-      enum Alert {
-        case confirmDeletion
-      }
-    }
-
-    var body: some ReducerOf<Self> {
-      Reduce<State, Action> { state, action in
-        switch action {
-        case .alert(let alert):
-          return .none
-          
-        case .edit(let notice):
-          return .none
-        }
+    public var body: some ReducerOf<Self> {
+      Scope(state: \.edit, action: \.edit) {
+        EditNoticeDomain()
       }
     }
   }
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    
+      
     Reduce<State, Action> { state, action in
       switch action {
       case .onAppear:
         return .send(.fetchNotices(forceReload: false))
+        
+      case .destination:
+        return .none
         
       case .setSortOrder(let order):
         guard let notices = state.notices.elements else {
@@ -265,35 +244,18 @@ public struct NoticeListDomain: Reducer {
         state.errorBarMessage = value
         return .none
         
-      case .onNavigateToAccontSettingsButtonTapped:
+      case .onNavigateToAccountSettingsButtonTapped:
         return .none
         
-      case .setNavigationDestination(let value):
-        state.destination = value
+      case .onNoticeItemTapped(let notice):
+        state.destination = .edit(EditNoticeDomain.State(notice: notice))
         return .none
-        
-      case .onSaveNoticeButtonTapped:
-        state.isSendingEditedNotice = true
-        
-        guard let notice = state.editNotice else {
-          return .none
-        }
-        let patch = Notice(notice)
-        
-        return .run { send in
-          await send(
-            .editNoticeResponse(
-              TaskResult { try await apiService.patchNotice(patch) }
-            )
-          )
-        }
         
       case .editNoticeResponse(let response):
         state.isSendingEditedNotice = false
         
         switch response {
         case .success:
-          state.destination = nil
           return .run { send in
             await send(.fetchNotices(forceReload: true))
             await feedbackGenerator.notify(.success)
@@ -306,22 +268,21 @@ public struct NoticeListDomain: Reducer {
           }
         }
         
-      case .editNotice(.deleteNoticeResponse(let result)):
-        switch result {
-        case .success:
-          state.destination = nil
+      case .editNotice(let editNoticeAction):
+        switch editNoticeAction {
+        case .editNoticeResponse(.success), .deleteNoticeResponse(.success):
           return .run { send in
             await send(.fetchNotices(forceReload: true))
-            await feedbackGenerator.notify(.success)
           }
-        case .failure:
+          
+        case .closeButtonTapped:
           return .run { _ in
-            await feedbackGenerator.notify(.error)
+            await self.dismiss()
           }
+          
+        default:
+          return .none
         }
-        
-      case .editNotice:
-        return .none
         
       case .dismissAlert:
         state.alert = nil
@@ -331,8 +292,8 @@ public struct NoticeListDomain: Reducer {
         return .none
       }
     }
-    .ifLet(\.editNotice, action: /Action.editNotice) {
-      EditNoticeDomain()
+    .ifLet(\.$destination, action: \.destination) {
+      Destination()
     }
   }
 }

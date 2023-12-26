@@ -218,6 +218,7 @@ let package = Package(
     .target(
       name: "NoticeListFeature",
       dependencies: [
+        .apiClient,
         .l10n,
         .models,
         .tca,

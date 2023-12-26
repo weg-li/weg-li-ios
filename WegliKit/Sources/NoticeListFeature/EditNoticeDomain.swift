@@ -1,5 +1,6 @@
 import ApiClient
 import ComposableArchitecture
+import FeedbackGeneratorClient
 import Foundation
 import DescriptionFeature
 import ImagesFeature
@@ -9,6 +10,7 @@ public struct EditNoticeDomain: Reducer {
   public init() {}
   
   @Dependency(\.apiService) public var apiService
+  @Dependency(\.feedbackGenerator) public var feedbackGenerator
   
   public struct State: Equatable {
     var notice: Notice
@@ -23,6 +25,8 @@ public struct EditNoticeDomain: Reducer {
     @BindingState public var zip: String
     @BindingState public var presentChargeSelection = false
     @BindingState public var presentCarBrandSelection = false
+    @BindingState public var isSendingNoticeUpdate = false
+    
     
     @BindingState public var showImagePicker = false
     public var destination: Destination?
@@ -55,9 +59,12 @@ public struct EditNoticeDomain: Reducer {
     case setDestination(State.Destination?)
     case image(ImagesViewDomain.Action)
     
-    case onDeleteNoticeButtonTapped
+    case closeButtonTapped
+    case saveButtonTapped
+    case deleteNoticeButtonTapped
     case deleteConfirmButtonTapped
     case deleteNoticeResponse(TaskResult<Bool>)
+    case editNoticeResponse(TaskResult<Notice>)
     case dismissAlert
   }
   
@@ -87,7 +94,10 @@ public struct EditNoticeDomain: Reducer {
       case .description, .setDestination:
         return .none
         
-      case .onDeleteNoticeButtonTapped:
+      case .closeButtonTapped:
+        return .none
+      
+      case .deleteNoticeButtonTapped:
         state.alert = .confirmDeleteNotice
         return .none
         
@@ -105,6 +115,33 @@ public struct EditNoticeDomain: Reducer {
           )
         }
         
+      case .saveButtonTapped:
+        state.isSendingNoticeUpdate = true
+
+        return .run { [patch = state.notice] send in
+          await send(
+            .editNoticeResponse(
+              TaskResult { try await apiService.patchNotice(patch) }
+            )
+          )
+        }
+        
+      case .editNoticeResponse(let response):
+        state.isSendingNoticeUpdate = false
+        
+        switch response {
+        case .success:
+          return .run { send in
+            await feedbackGenerator.notify(.success)
+          }
+          
+        case .failure:
+          state.alert = .editNoticeFailure
+          return .run { _ in
+            await feedbackGenerator.notify(.error)
+          }
+        }
+          
       case .deleteNoticeResponse(let response):
         state.isDeletingNotice = false
         

@@ -88,20 +88,13 @@ public struct NoticeListView: View {
         }
       }
     )
-//    .overlay(alignment: .bottom, coxwntent: {
-//      messageBarView()
-//    })
-//    .onAppear { viewStore.send(.onAppear) }
-//    .sheet(
-//      unwrapping: viewStore.binding(
-//        get: \.destination,
-//        send: A.setNavigationDestination
-//      ),
-//      case: /S.Destination.edit,
-//      onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
-//    ) { $model in
-//      editNoticeSheet(notice: $model)
-//    }
+    .overlay(alignment: .bottom) {
+      messageBarView()
+    }
+    .onAppear { viewStore.send(.onAppear) }
+    .sheet(store: store.scope(state: \.$destination.edit, action: \.destination.edit)) { store in
+      editNoticeSheet(store: store)
+    }
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu(
@@ -119,37 +112,12 @@ public struct NoticeListView: View {
     }
   }
   
-  func editNoticeSheet(notice: Binding<Notice>) -> some View {
+  func editNoticeSheet(store: StoreOf<EditNoticeDomain>) -> some View {
     NavigationStack {
-      IfLetStore(
-        self.store.scope(
-          state: \.editNotice,
-          action: A.editNotice
-        ),
-        then: { store in
-          EditNoticeView(store: store)
-        },
-        else: { Text("Error creating EditNotice view") }
-      )
-      .accessibilityAddTraits([.isModal])
-      .navigationTitle(Text("Bearbeiten"))
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button(L10n.Button.close) {
-            viewStore.send(.setNavigationDestination(nil))
-          }
-        }
-        ToolbarItem(placement: .confirmationAction) {
-          if viewStore.state.isSendingEditedNotice {
-            ProgressView()
-          } else {
-            Button("Speichern") {
-              viewStore.send(.onSaveNoticeButtonTapped)
-            }
-          }
-        }
-      }
+      EditNoticeView(store: store)
+        .accessibilityAddTraits([.isModal])
+        .navigationTitle(Text("Bearbeiten"))
+        .navigationBarTitleDisplayMode(.inline)
     }
   }
   
@@ -174,7 +142,7 @@ public struct NoticeListView: View {
   func noticeList(notices: [Notice]) -> some View {
     List(notices) { notice in
       NoticeView(notice: notice)
-        .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
+        .onTapGesture { viewStore.send(.onNoticeItemTapped(notice)) }
         .listRowSeparator(.hidden)
     }
     .refreshable {
@@ -226,7 +194,7 @@ public struct NoticeListView: View {
   @ViewBuilder
   func goToAccountSettings() -> some View {
     Button(
-      action: { viewStore.send(.onNavigateToAccontSettingsButtonTapped) },
+      action: { viewStore.send(.onNavigateToAccountSettingsButtonTapped) },
       label: { Text("Zu den Einstellungen").padding(.horizontal) }
     )
     .buttonStyle(CTAButtonStyle())

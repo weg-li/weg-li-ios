@@ -144,7 +144,7 @@ struct EditNoticeView: View {
           .padding(.vertical, .grid(8))
         
         Button(
-          action: { viewStore.send(.onDeleteNoticeButtonTapped) },
+          action: { viewStore.send(.deleteNoticeButtonTapped) },
           label: {
             if viewStore.isDeletingNotice {
               ProgressView()
@@ -162,6 +162,22 @@ struct EditNoticeView: View {
         .background(Color.red)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .padding()
+      }
+    }
+    .toolbar {
+      ToolbarItem(placement: .cancellationAction) {
+        Button(L10n.Button.close) {
+          viewStore.send(.closeButtonTapped)
+        }
+      }
+      ToolbarItem(placement: .confirmationAction) {
+        if viewStore.isSendingNoticeUpdate {
+          ProgressView()
+        } else {
+          Button("Speichern") {
+            viewStore.send(.saveButtonTapped)
+          }
+        }
       }
     }
     .alert(
