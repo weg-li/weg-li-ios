@@ -11,9 +11,12 @@ public struct EditNoticeDomain: Reducer {
   
   @Dependency(\.apiService) public var apiService
   @Dependency(\.feedbackGenerator) public var feedbackGenerator
+  @Dependency(\.dismiss) var dismiss
   
-  public struct State: Equatable {
-    var notice: Notice
+  public struct State: Equatable, Identifiable {
+    @BindingState public var notice: Notice
+    
+    public var id: String { notice.id }
     
     @BindingState public var description: DescriptionDomain.State
     public var image: ImagesViewDomain.State
@@ -95,7 +98,9 @@ public struct EditNoticeDomain: Reducer {
         return .none
         
       case .closeButtonTapped:
-        return .none
+        return .run { _ in
+          await dismiss()
+        }
       
       case .deleteNoticeButtonTapped:
         state.alert = .confirmDeleteNotice
@@ -118,7 +123,7 @@ public struct EditNoticeDomain: Reducer {
       case .saveButtonTapped:
         state.isSendingNoticeUpdate = true
 
-        return .run { [patch = state.notice] send in
+        return .run { [patch = state.asNoticePatch()] send in
           await send(
             .editNoticeResponse(
               TaskResult { try await apiService.patchNotice(patch) }
@@ -162,5 +167,40 @@ public struct EditNoticeDomain: Reducer {
         return .none
       }
     }
+  }
+}
+
+extension EditNoticeDomain.State {
+  func asNoticePatch() -> Notice {
+    let charge = description.chargeSelection.selectedCharge.flatMap {
+      DescriptionDomain.noticeCharge(with: $0.id) } ?? .init(tbnr: "")
+    
+    return Notice(
+      token: notice.token ?? "",
+      status: notice.status ?? .open,
+      street: street,
+      city: city,
+      zip: zip,
+      latitude: notice.latitude ?? 0,
+      longitude: notice.longitude ?? 0,
+      registration: licensePlateNumber,
+      brand: description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[description.selectedColor].key,
+      tbnr: charge.tbnr,
+      charge: charge,
+      date: date,
+      duration: Int64(description.selectedDuration),
+      severity: notice.severity,
+      note: notice.note ?? "",
+      createdAt: notice.createdAt ?? Date(),
+      updatedAt: Date(),
+      sentAt: Date(),
+      vehicleEmpty: description.vehicleEmpty,
+      hazardLights: description.hazardLights,
+      expiredTuv: description.expiredTuv,
+      expiredEco: description.expiredEco,
+      over28Tons: description.over28Tons,
+      photos: notice.photos ?? []
+    )
   }
 }

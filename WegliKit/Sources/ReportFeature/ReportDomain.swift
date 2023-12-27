@@ -47,14 +47,13 @@ public struct ReportDomain: Reducer {
     public var district: District?
     
     @BindingState public var date: Date
+    @BindingState public var showEditDescription = false
+    @BindingState public var showEditContact = false
+
     public var description: DescriptionDomain.State
     public var location: LocationDomain.State
     public var mail: MailDomain.State
-    
     public var alert: AlertState<Action>?
-    
-    @BindingState public var showEditDescription = false
-    @BindingState public var showEditContact = false
     
     public var apiToken = ""
     public var alwaysSendNotice = true
@@ -79,6 +78,9 @@ public struct ReportDomain: Reducer {
     public var uploadedNoticeID: String?
     
     public var destination: Destination?
+    
+    public var createdAtDate = Date()
+    public var status: Notice.Status = .open
     
     public func isModified() -> Bool {
       district != nil
@@ -622,7 +624,7 @@ public extension SharedModels.NoticeInput {
   init(_ reportState: ReportDomain.State) {
     self.init(
       token: reportState.id,
-      status: "open",
+      status: reportState.status.rawValue,
       street: reportState.location.resolvedAddress.street,
       city: reportState.location.resolvedAddress.city,
       zip: reportState.location.resolvedAddress.postalCode,
@@ -636,9 +638,9 @@ public extension SharedModels.NoticeInput {
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
       note: reportState.description.note,
-      createdAt: .now,
-      updatedAt: .now,
-      sentAt: .now,
+      createdAt: reportState.createdAtDate,
+      updatedAt: Date(),
+      sentAt: Date(),
       vehicleEmpty: reportState.description.vehicleEmpty,
       hazardLights: reportState.description.hazardLights,
       expiredTuv: reportState.description.expiredTuv,
@@ -653,7 +655,7 @@ public extension SharedModels.Notice {
   init(_ reportState: ReportDomain.State) {
     self.init(
       token: reportState.id,
-      status: .open,
+      status: reportState.status,
       street: reportState.location.resolvedAddress.street,
       city: reportState.location.resolvedAddress.city,
       zip: reportState.location.resolvedAddress.postalCode,
@@ -669,9 +671,9 @@ public extension SharedModels.Notice {
       duration: Int64(reportState.description.selectedDuration),
       severity: nil,
       note: reportState.description.note,
-      createdAt: .now,
-      updatedAt: .now,
-      sentAt: .now,
+      createdAt: reportState.createdAtDate,
+      updatedAt: Date(),
+      sentAt: Date(),
       photos: []
     )
   }

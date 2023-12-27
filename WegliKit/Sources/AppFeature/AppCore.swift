@@ -205,7 +205,6 @@ public struct AppDomain: Reducer {
       case .noticeList(.onNavigateToAccountSettingsButtonTapped):
         return .concatenate(
           .send(.viewAction(.setSelectedTab(.settings)))
-//          .send(.settings(.setDestination(.accountSettings)))
         )
         
       case .noticeList, .report:
@@ -222,7 +221,7 @@ public extension AppDomain.State {
       accountSettingsState: .init(accountSettings: .init(apiToken: "")),
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    noticeList: NoticeListDomain.State = .init(notices: .loading)
+    noticeList: NoticeListDomain.State = .init(notices: [])
   ) {
     self.settings = settings
     self.noticeList = noticeList
