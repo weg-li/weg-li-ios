@@ -31,14 +31,14 @@ struct EditNoticeView: View {
               )
             )
             
-            Button(
-              action: { viewStore.send(.image(.onAddPhotosButtonTapped)) },
-              label: {
-                Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
-                  .frame(maxWidth: .infinity)
-              }
-            )
-            .buttonStyle(.edit())
+//            Button(
+//              action: { viewStore.send(.image(.onAddPhotosButtonTapped)) },
+//              label: {
+//                Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
+//                  .frame(maxWidth: .infinity)
+//              }
+//            )
+//            .buttonStyle(.edit())
           }
           .sheet(
             isPresented: viewStore.$showImagePicker,
@@ -107,7 +107,7 @@ struct EditNoticeView: View {
         }
         .padding(.vertical, .grid(1))
         
-        Widget(title: Text( L10n.date), shouldIndicateCompletion: false) {
+        Widget(title: Text(L10n.date), shouldIndicateCompletion: false) {
           HStack {
             DatePicker(
               L10n.date,

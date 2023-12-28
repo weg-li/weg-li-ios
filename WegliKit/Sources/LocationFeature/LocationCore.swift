@@ -67,20 +67,22 @@ public struct LocationDomain {
     case setPinCoordinate(CLLocationCoordinate2D?)
   }
   
+  enum CancelID { case delegate }
+  
   public var body: some ReducerOf<Self> {
     Reduce<State, Action> { state, action in
       switch action {
       case .onAppear:
         return .merge(
+          .run { _ in
+            await locationManager.setup()
+          },
           .run { send in
             for await event in locationManager.delegate() {
               await send(.locationManager(event))
             }
           }
-          .cancellable(id: LocationManagerId()),
-          .run { _ in
-            await locationManager.setup()
-          }
+          .cancellable(id: CancelID.delegate)
         )
         
       case .locationRequested:
@@ -127,8 +129,10 @@ public struct LocationDomain {
           state.isResolvingAddress = false
           return .none
         case .currentLocation:
-          state.isResolvingAddress = true
-          return .send(.locationRequested)
+          // currently disabled
+//          state.isResolvingAddress = true
+//          return .send(.locationRequested)
+          return .none
         case .manual:
           state.isResolvingAddress = false
           return .none
@@ -154,17 +158,16 @@ public struct LocationDomain {
         state.region = .init(center: location.coordinate)
         return .send(.resolveLocation(location.coordinate))
         
-      case .locationManager(let locationAciton):
-        switch locationAciton {
-        case .didChangeAuthorization(.authorizedAlways),
-            .didChangeAuthorization(.authorizedWhenInUse):
+      case .locationManager(let locationAction):
+        switch locationAction {
+        case .didChangeAuthorization(.authorizedAlways), .didChangeAuthorization(.authorizedWhenInUse):
           if state.isRequestingCurrentLocation {
             return .run { _ in
               await locationManager.requestLocation()
             }
+          } else {
+            return .none
           }
-          
-          return .none
           
         case .didChangeAuthorization(.denied):
           if state.isRequestingCurrentLocation {

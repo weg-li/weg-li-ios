@@ -43,36 +43,35 @@ public struct ReportView: View {
           title: Text(L10n.Description.widgetTitle),
           isCompleted: viewStore.isDescriptionValid
         ) {
-          DescriptionView(store: store)
-            .onTapGesture { viewStore.send(.setDestination(.description)) }
-//            .sheet(
-//              unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
-//              case: /S.Destination.description,
-//              onDismiss: { viewStore.send(.setDestination(nil)) },
-//              content: { _ in
-//                NavigationStack {
-//                  List {
-//                    EditDescriptionView(
-//                      store: store.scope(
-//                        state: \.description,
-//                        action: A.description
-//                      )
-//                    )
-//                  }
-//                  .accessibilityAddTraits([.isModal])
-//                  .navigationTitle(Text(L10n.Description.widgetTitle))
-//                  .navigationBarTitleDisplayMode(.inline)
-//                  .toolbar {
-//                    ToolbarItem(placement: .cancellationAction) {
-//                      Button(
-//                        action: { viewStore.send(.setDestination(nil)) },
-//                        label: { Text(L10n.Button.close) }
-//                      )
-//                    }
-//                  }
-//                }
-//              }
-//            )
+          DescriptionView(
+            state: viewStore.state.description,
+            action: { viewStore.send(.descriptionViewTapped) }
+          )
+          .onTapGesture { viewStore.send(.descriptionViewTapped) }
+          .sheet(
+            store: store.scope(
+              state: \.$destination.description,
+              action: \.destination.description
+            ),
+            onDismiss: { viewStore.send(.closeButtonTapped) }
+          ) { store in
+            NavigationStack {
+              List {
+                EditDescriptionView(store: store)
+              }
+              .accessibilityAddTraits([.isModal])
+              .navigationTitle(Text(L10n.Description.widgetTitle))
+              .navigationBarTitleDisplayMode(.inline)
+              .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                  Button(
+                    action: { viewStore.send(.closeButtonTapped) },
+                    label: { Text(L10n.Button.close) }
+                  )
+                }
+              }
+            }
+          }
         }
         
         // Location
@@ -95,36 +94,30 @@ public struct ReportView: View {
             isCompleted: viewStore.isContactValid
           ) {
             ContactWidget(
-              store: store.scope(
-                state: \.contactState,
-                action: { .contact($0) }
-              )
+              contact: viewStore.contactState.contact,
+              buttonAction: { viewStore.send(.contactViewTapped) }
             )
-            .onTapGesture { viewStore.send(.setDestination(.contact)) }
-//              .sheet(
-//                unwrapping: viewStore.binding(get: \.destination, send: A.setDestination),
-//                case: /S.Destination.contact,
-//                onDismiss: { viewStore.send(.setDestination(nil)) },
-//                content: { _ in
-//                  NavigationStack {
-//                    ContactView(
-//                      store: store.scope(
-//                        state: \.contactState,
-//                        action: ReportDomain.Action.contact
-//                      )
-//                    )
-//                    .accessibilityAddTraits([.isModal])
-//                    .toolbar {
-//                      ToolbarItem(placement: .cancellationAction) {
-//                        Button(
-//                          action: { viewStore.send(.setDestination(nil)) },
-//                          label: { Text(L10n.Button.close) }
-//                        )
-//                      }
-//                    }
-//                  }
-//                }
-//              )
+            .onTapGesture { viewStore.send(.contactViewTapped) }
+            .sheet(
+              store: store.scope(
+                state: \.$destination.contact,
+                action: \.destination.contact
+              ),
+              onDismiss: { viewStore.send(.closeButtonTapped) }
+            ) { store in
+              NavigationStack {
+                ContactView(store: store)
+                  .accessibilityAddTraits([.isModal])
+                  .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                      Button(
+                        action: { viewStore.send(.closeButtonTapped) },
+                        label: { Text(L10n.Button.close) }
+                      )
+                    }
+                  }
+              }
+            }
           }
         }
         
@@ -153,7 +146,7 @@ public struct ReportView: View {
           if !viewStore.apiToken.isEmpty {
             VStack(spacing: .grid(1)) {
               Button(
-                action: { viewStore.send(.onSubmitButtonTapped) },
+                action: { viewStore.send(.submitButtonTapped) },
                 label: {
                   VStack(alignment: .center) {
                     if viewStore.isSubmittingNotice {
@@ -171,8 +164,6 @@ public struct ReportView: View {
               .modifier(SubmitButtonStyle(color: .wegliBlue, disabled: !viewStore.state.canSubmitNotice))
               .padding([.horizontal])
               .padding(.vertical, .grid(1))
-              
-              
             }
           } else {
             MailContentView(store: store)
@@ -238,7 +229,7 @@ public struct ReportView: View {
   
   private var resetButton: some View {
     Button(
-      action: { viewStore.send(.onResetButtonTapped) },
+      action: { viewStore.send(.resetButtonTapped) },
       label: {
         Image(systemName: "arrow.counterclockwise")
           .foregroundColor(viewStore.isResetButtonDisabled ? .gray : .red)

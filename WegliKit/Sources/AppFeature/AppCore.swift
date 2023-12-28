@@ -58,7 +58,7 @@ public struct AppDomain: Reducer {
     
     enum Destination: Equatable {
       case noticeList(NoticeListDomain.Destination?)
-      case report(ReportDomain.State.Destination?)
+      case report(ReportDomain.Destination?)
       case settings(SettingsDomain.Destination?)
     }
   }
@@ -177,7 +177,7 @@ public struct AppDomain: Reducer {
       case .report(.mail(.setMailResult(.sent))):
         return .none
         
-      case .report(.onResetConfirmButtonTapped):
+      case .report(.resetConfirmButtonTapped):
         state.reportDraft = ReportDomain.State(
           uuid: uuid.callAsFunction,
           images: .init(),
@@ -188,9 +188,9 @@ public struct AppDomain: Reducer {
         state.reportDraft.apiToken = keychainClient.getToken() ?? ""
         return .none
         
-      case .report(.contact):
-        state.contact = state.reportDraft.contactState.contact
-        return .none
+//      case .report(.contact):
+//        state.contact = state.reportDraft.contactState.contact
+//        return .none
               
       case .reportSaved:
         // Reset report draft after it was saved

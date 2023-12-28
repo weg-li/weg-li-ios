@@ -37,6 +37,8 @@ public struct ReportDomain: Reducer {
   @Dependency(\.date) public var date
   @Dependency(\.mailComposeClient) public var mailComposeClient
   @Dependency(\.feedbackGenerator) public var feedbackGenerator
+  @Dependency(\.dismiss) var dismiss
+  @Dependency(\.isPresented) var isPresented
   
   let postalCodeMinumimCharacters = 5
   
@@ -77,7 +79,7 @@ public struct ReportDomain: Reducer {
     
     public var uploadedNoticeID: String?
     
-    public var destination: Destination?
+    @PresentationState public var destination: Destination.State?
     
     public var createdAtDate = Date()
     public var status: Notice.Status = .open
@@ -134,13 +136,9 @@ public struct ReportDomain: Reducer {
       self.uploadedImagesIds = uploadedImagesIds
       self.isNetworkAvailable = isNetworkAvailable
     }
-    
-    public enum Destination: Equatable {
-      case description
-      case contact
-    }
   }
   
+  @CasePathable
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case onAppear
@@ -152,9 +150,12 @@ public struct ReportDomain: Reducer {
     case mapAddressToDistrict(Address)
     case mapDistrictFinished(TaskResult<District>)
     
-    case onResetButtonTapped
-    case onSubmitButtonTapped
-    case onResetConfirmButtonTapped
+    case resetButtonTapped
+    case submitButtonTapped
+    case resetConfirmButtonTapped
+    case contactViewTapped
+    case descriptionViewTapped
+    case closeButtonTapped
     
     case dismissAlert
     case uploadImages
@@ -163,22 +164,38 @@ public struct ReportDomain: Reducer {
     case postNoticeResponse(TaskResult<Notice>)
     case submitNoticeResponse(TaskResult<Notice>)
     case editNoticeInBrowser
-    case setDestination(State.Destination?)
+    case destination(PresentationAction<Destination.Action>)
+  }
+  
+  @Reducer
+  public struct Destination: Equatable {
+    public enum State: Equatable {
+      case description(DescriptionDomain.State)
+      case contact(ContactViewDomain.State)
+    }
+    
+    public enum Action: Equatable {
+      case description(DescriptionDomain.Action)
+      case contact(ContactViewDomain.Action)
+    }
+    
+    public var body: some ReducerOf<Self> {
+      Scope(state: \.description, action: \.description) {
+        DescriptionDomain()
+      }
+      Scope(state: \.contact, action: \.contact) {
+        ContactViewDomain()
+      }
+    }
   }
   
   enum CancelID { case contact }
   
   public var body: some ReducerOf<Self> {
+    BindingReducer()
+    
     Scope(state: \.images, action: /Action.images) {
       ImagesViewDomain()
-    }
-    
-    Scope(state: \.description, action: /Action.description) {
-      DescriptionDomain()
-    }
-    
-    Scope(state: \.contactState, action: /Action.contact) {
-      ContactViewDomain()
     }
     
     Scope(state: \.location, action: /Action.location) {
@@ -189,11 +206,24 @@ public struct ReportDomain: Reducer {
       MailDomain()
     }
     
-    BindingReducer()
-    
     Reduce<State, Action> { state, action in
       switch action {
       case .binding:
+        return .none
+        
+      case .destination(.presented(.description)):
+        if let newDescription = state.destination?.description {
+          state.description = newDescription
+        }
+        return .none
+        
+      case .destination(.presented(.contact)):
+        if let newContact = state.destination?.contact {
+          state.contactState = newContact
+        }
+        return .none
+        
+      case .destination:
         return .none
         
       case .onAppear:
@@ -341,23 +371,36 @@ public struct ReportDomain: Reducer {
         }
         
       case .description:
+        print(">>> description")
         return .none
         
-      case .onResetButtonTapped:
+      case .descriptionViewTapped:
+        state.destination = .description(state.description)
+        return .none
+        
+      case .contactViewTapped:
+        state.destination = .contact(state.contactState)
+        return .none
+        
+      case .resetButtonTapped:
         state.alert = .resetReportAlert
         return .none
         
-      case .onResetConfirmButtonTapped:
+      case .resetConfirmButtonTapped:
         // Reset report will be handled in the AppDomain reducer
         return .send(.dismissAlert)
         
+      case .submitButtonTapped:
+        state.isSubmittingNotice = true
+        return .send(.uploadImages)
+        
+      case .closeButtonTapped:
+        state.destination = nil
+        return .none
+
       case .dismissAlert:
         state.alert = nil
         return .none
-        
-      case .onSubmitButtonTapped:
-        state.isSubmittingNotice = true
-        return .send(.uploadImages)
         
       case .uploadImages:
         let results = state.images.imageStates.map { $0.image }
@@ -385,27 +428,23 @@ public struct ReportDomain: Reducer {
         notice.photos = state.uploadedImagesIds
         
         return .run { [notice, alwaysSendNotice = state.alwaysSendNotice] send in
-          await send(
-            .postNoticeResponse(
-              TaskResult {
-                try await wegliService.postNotice(notice)
-              }
+          if alwaysSendNotice {
+            await send(
+              .submitNoticeResponse(
+                TaskResult {
+                  try await wegliService.submitNotice(notice)
+                }
+              )
             )
-          )
-//
-//          if alwaysSendNotice {
-//            await .submitNoticeResponse(
-//              TaskResult {
-//                try await wegliService.submitNotice(notice)
-//              }
-//            )
-//          } else {
-//            await .postNoticeResponse(
-//              TaskResult {
-//                try await wegliService.postNotice(notice)
-//              }
-//            )
-//          }
+          } else {
+            await send(
+              .postNoticeResponse(
+                TaskResult {
+                  try await wegliService.postNotice(notice)
+                }
+              )
+            )
+          }
         }
         
       case let .postNoticeResponse(.success(response)):
@@ -472,20 +511,12 @@ public struct ReportDomain: Reducer {
         return .run { _ in
           await feedbackGenerator.notify(.error)
         }
-      
-      case .setDestination(let value):
-        switch value {
-        case .none:
-          state.description.presentChargeSelection = false
-          state.description.presentCarBrandSelection = false
-        case .some:
-          break
-        }
-        state.destination = value
-        return .none
-        
       }
     }
+    .ifLet(\.$destination, action: \.destination) {
+      Destination()
+    }
+    ._printChanges()
   }
 }
 
@@ -510,9 +541,6 @@ public extension ReportDomain.State {
     self.mail = mail
   }
 }
-
-
-struct ObserveConnectionIdentifier: Hashable {}
 
 // MARK: - Helper
 
@@ -568,7 +596,7 @@ public extension AlertState where Action == ReportDomain.Action {
     title: TextState(L10n.Report.Alert.title),
     primaryButton: .destructive(
       TextState(L10n.Report.Alert.reset),
-      action: .send(.onResetConfirmButtonTapped)
+      action: .send(.resetConfirmButtonTapped)
     ),
     secondaryButton: .cancel(
       .init(L10n.cancel),
@@ -580,7 +608,7 @@ public extension AlertState where Action == ReportDomain.Action {
     title: .init("Meldung gesendet"),
     message: .init("Deine Meldung wurde an die Behörden gesendet."),
     buttons: [
-      .default(.init("Ok"), action: .send(.onResetConfirmButtonTapped)),
+      .default(.init("Ok"), action: .send(.resetConfirmButtonTapped)),
       .default(.init("Gehe zu `weg.li`"), action: .send(.editNoticeInBrowser))
     ]
   )
