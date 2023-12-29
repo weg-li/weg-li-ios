@@ -152,19 +152,26 @@ public struct ReportDomain: Reducer {
     
     case resetButtonTapped
     case submitButtonTapped
-    case resetConfirmButtonTapped
     case contactViewTapped
     case descriptionViewTapped
     case closeButtonTapped
     
-    case dismissAlert
     case uploadImages
     case uploadImagesResponse(TaskResult<[ImageUploadResponse]>)
     case composeNotice
     case postNoticeResponse(TaskResult<Notice>)
     case submitNoticeResponse(TaskResult<Notice>)
-    case editNoticeInBrowser
     case destination(PresentationAction<Destination.Action>)
+    
+    public enum Alert: Equatable {
+      case confirmResetButtonTapped
+      case cancelResetButtonTapped
+      case dismiss
+      case retryButtonTapped
+      case goToWebsiteButtonTapped
+      case copyMailToAddressTapped
+      case copyMailBodyTapped
+    }
   }
   
   @Reducer
@@ -172,11 +179,13 @@ public struct ReportDomain: Reducer {
     public enum State: Equatable {
       case description(DescriptionDomain.State)
       case contact(ContactViewDomain.State)
+      case alert(AlertState<ReportDomain.Action.Alert>)
     }
     
     public enum Action: Equatable {
       case description(DescriptionDomain.Action)
       case contact(ContactViewDomain.Action)
+      case alert(ReportDomain.Action.Alert)
     }
     
     public var body: some ReducerOf<Self> {
@@ -223,6 +232,22 @@ public struct ReportDomain: Reducer {
         }
         return .none
         
+      case .destination(.presented(.alert(.retryButtonTapped))):
+        return .send(.composeNotice)
+        
+      case .destination(.presented(.alert(.cancelResetButtonTapped))):
+        state.destination = nil
+        return .none
+        
+      case .destination(.presented(.alert(.goToWebsiteButtonTapped))):
+        guard let id = state.uploadedNoticeID else {
+          return .none
+        }
+        let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
+        return .run { _ in
+          _ = await uiApplicationClient.open(editURL, [:])
+        }
+        
       case .destination:
         return .none
         
@@ -255,19 +280,14 @@ public struct ReportDomain: Reducer {
           // After the images coordinate was set trigger resolve location and map to district.
         case let .setImageCoordinate(coordinate):
           guard let coordinate = coordinate, !state.images.storedPhotos.isEmpty else {
-            state.alert = .noPhotoCoordinate
+            state.destination = .alert(.noPhotoCoordinate)
             return .none
           }
           
           state.location.region = CoordinateRegion(center: coordinate)
           state.images.pickerResultCoordinate = coordinate
           state.location.pinCoordinate = coordinate
-          
-          guard state.isNetworkAvailable else {
-            state.alert = .noInternetConnection(coordinate: state.location.pinCoordinate!)
-            return .none
-          }
-          
+                    
           return .send(Action.location(.resolveLocation(coordinate)))
           
         case .setPhotos:
@@ -302,21 +322,21 @@ public struct ReportDomain: Reducer {
           return .none
         }
         
-      case let .location(locationAction):
+      case .location(let locationAction):
         switch locationAction {
           // Trigger district mapping after address is resolved.
-        case let .resolveAddressFinished(.success(resolvedAddresses)):
+        case .resolveAddressFinished(.success(let resolvedAddresses)):
           guard let address = resolvedAddresses.first else {
             return .none
           }
           return .send(.mapAddressToDistrict(address))
           
-        case let .resolveAddressFinished(.failure(error)):
-          state.alert = .addressResolveFailed(error: error as! PlacesServiceError)
+        case .resolveAddressFinished(.failure(let error)):
+          state.destination = .alert(.addressResolveFailed(error: error as! PlacesServiceError))
           return .none
           
           // Handle manual address entering to trigger district mapping.
-        case let .updateGeoAddressPostalCode(postalCode):
+        case .updateGeoAddressPostalCode(let postalCode):
           guard postalCode.count == postalCodeMinumimCharacters, postalCode.isNumeric else {
             return .none
           }
@@ -325,14 +345,14 @@ public struct ReportDomain: Reducer {
         case .updateGeoAddressCity:
           return .send(.mapAddressToDistrict(state.location.resolvedAddress))
           
-        case let .setLocationOption(option) where option == .fromPhotos:
+        case .setLocationOption(let option) where option == .fromPhotos:
           if !state.images.storedPhotos.isEmpty, let coordinate = state.images.pickerResultCoordinate {
             return .send(.location(.resolveLocation(coordinate)))
           } else {
             return .none
           }
           
-        case let .setPinCoordinate(coordinate):
+        case .setPinCoordinate(let coordinate):
           guard let coordinate = coordinate, state.location.locationOption == .currentLocation else { return .none }
           return .send(.location(.resolveLocation(coordinate)))
           
@@ -343,7 +363,7 @@ public struct ReportDomain: Reducer {
         // Compose mail when send mail button was tapped.
       case .mail(.submitButtonTapped):
         guard mailComposeClient.canSendMail() else {
-          state.alert = .noMailAccount
+          state.destination = .alert(.noMailAccount)
           return .none
         }
         
@@ -371,7 +391,6 @@ public struct ReportDomain: Reducer {
         }
         
       case .description:
-        print(">>> description")
         return .none
         
       case .descriptionViewTapped:
@@ -383,12 +402,8 @@ public struct ReportDomain: Reducer {
         return .none
         
       case .resetButtonTapped:
-        state.alert = .resetReportAlert
+        state.destination = .alert(.resetReportAlert)
         return .none
-        
-      case .resetConfirmButtonTapped:
-        // Reset report will be handled in the AppDomain reducer
-        return .send(.dismissAlert)
         
       case .submitButtonTapped:
         state.isSubmittingNotice = true
@@ -396,10 +411,6 @@ public struct ReportDomain: Reducer {
         
       case .closeButtonTapped:
         state.destination = nil
-        return .none
-
-      case .dismissAlert:
-        state.alert = nil
         return .none
         
       case .uploadImages:
@@ -466,25 +477,16 @@ public struct ReportDomain: Reducer {
       case let .postNoticeResponse(.failure(error)):
         state.isSubmittingNotice = false
         if let apiError = error as? ApiError {
-          state.alert = .sendNoticeFailed(error: apiError)
+          state.destination = .alert(.sendNoticeFailed(error: apiError))
         }
         state.uploadProgressState = nil
         return .none
-        
-      case .editNoticeInBrowser:
-        guard let id = state.uploadedNoticeID else {
-          return .none
-        }
-        let editURL = URL(string: "https://www.weg.li/notices/\(id)/edit")!
-        return .run { _ in
-          _ = await uiApplicationClient.open(editURL, [:])
-        }
         
       case .submitNoticeResponse(.success):
         state.isSubmittingNotice = false
         state.uploadedImagesIds.removeAll()
         
-        state.alert = .reportSent
+        state.destination = .alert(.reportSent)
         
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
         
@@ -504,10 +506,10 @@ public struct ReportDomain: Reducer {
           }
         )
         
-      case let .submitNoticeResponse(.failure(error)):
+      case .submitNoticeResponse(.failure(let error)):
         state.isSubmittingNotice = false
         
-        state.alert = .sendNoticeFailed(error: error as! ApiError)
+        state.destination  = .alert(.sendNoticeFailed(error: error as! ApiError))
         return .run { _ in
           await feedbackGenerator.notify(.error)
         }
@@ -516,7 +518,6 @@ public struct ReportDomain: Reducer {
     .ifLet(\.$destination, action: \.destination) {
       Destination()
     }
-    ._printChanges()
   }
 }
 
@@ -572,18 +573,7 @@ public extension ReportDomain.State {
   )
 }
 
-public extension AlertState where Action == ReportDomain.Action {
-  static func noInternetConnection(coordinate: CLLocationCoordinate2D) -> Self {
-    Self(
-      title: .init("Keine Internetverbindung"),
-      message: .init("Verbinde dich mit dem Internet um eine Adresse für die Fotos zu ermitteln"),
-      buttons: [
-        .cancel(.init(L10n.cancel)),
-        .default(.init("Wiederholen"), action: .send(.location(.resolveLocation(coordinate))))
-      ]
-    )
-  }
-  
+public extension AlertState where Action == ReportDomain.Action.Alert {
   static func addressResolveFailed(error: PlacesServiceError) -> Self {
     Self(
       title: .init("Addresse konnte nicht ermittelt werden"),
@@ -596,11 +586,11 @@ public extension AlertState where Action == ReportDomain.Action {
     title: TextState(L10n.Report.Alert.title),
     primaryButton: .destructive(
       TextState(L10n.Report.Alert.reset),
-      action: .send(.resetConfirmButtonTapped)
+      action: .send(.confirmResetButtonTapped)
     ),
     secondaryButton: .cancel(
       .init(L10n.cancel),
-      action: .send(.dismissAlert)
+      action: .send(.cancelResetButtonTapped)
     )
   )
   
@@ -608,8 +598,8 @@ public extension AlertState where Action == ReportDomain.Action {
     title: .init("Meldung gesendet"),
     message: .init("Deine Meldung wurde an die Behörden gesendet."),
     buttons: [
-      .default(.init("Ok"), action: .send(.resetConfirmButtonTapped)),
-      .default(.init("Gehe zu `weg.li`"), action: .send(.editNoticeInBrowser))
+      .default(.init("Ok"), action: .send(.confirmResetButtonTapped)),
+      .default(.init("Gehe zu `weg.li`"), action: .send(.goToWebsiteButtonTapped))
     ]
   )
   
@@ -618,8 +608,8 @@ public extension AlertState where Action == ReportDomain.Action {
       title: .init("Meldung konnte nicht gesendet werden"),
       message: .init("Fehler: \(error.message)"),
       buttons: [
-        .default(.init(verbatim: "Erneut senden"), action: .send(.composeNotice)),
-        .cancel(.init(verbatim: L10n.cancel), action: .send(.dismissAlert))
+        .default(.init(verbatim: "Erneut senden"), action: .send(.retryButtonTapped)),
+        .cancel(.init(verbatim: L10n.cancel), action: .send(.dismiss))
       ]
     )
   }
@@ -630,15 +620,15 @@ public extension AlertState where Action == ReportDomain.Action {
     buttons: [
       .default(
         .init("Meldung kopieren"),
-        action: .send(.mail(.copyMailBody))
+        action: .send(.copyMailBodyTapped)
       ),
       .default(
         .init("Addresse kopieren"),
-        action: .send(.mail(.copyMailToAddress))
+        action: .send(.copyMailToAddressTapped)
       ),
       .cancel(
         .init(L10n.cancel),
-        action: .send(.dismissAlert)
+        action: .send(.dismiss)
       )
     ]
   )

@@ -26,7 +26,13 @@ public struct APIClient {
       throw ApiError.tokenUnavailable
     }
     urlRequest.addValue(token, forHTTPHeaderField: apiTokenKey)
-    return try await networkDispatcher().dispatch(request: urlRequest)
+    let data = try await networkDispatcher().dispatch(request: urlRequest)
+    
+    if let errorRespone = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+      throw ApiError(message: "Code \(errorRespone.code): \(errorRespone.message)")
+    }
+    
+    return data
   }
 }
 
@@ -36,3 +42,8 @@ extension APIClient {
 }
 
 private let apiTokenKey = "X-API-KEY"
+
+struct ErrorResponse: Decodable {
+  let code: Int
+  let message: String
+}

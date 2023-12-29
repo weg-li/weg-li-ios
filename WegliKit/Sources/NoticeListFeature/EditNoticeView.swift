@@ -181,11 +181,14 @@ struct EditNoticeView: View {
       }
     }
     .alert(
-      item: viewStore.binding(
-        get: { $0.alert },
-        send: .dismissAlert
-      ),
-      content: { Alert(title: Text($0.title)) }
+      item: viewStore.binding(get: \.alert, send: .dismissAlert),
+      content: {
+        Alert($0) { action in
+          if let action {
+            viewStore.send(action)
+          }
+        }
+      }
     )
     .textFieldStyle(.roundedBorder)
   }
@@ -358,22 +361,4 @@ struct SwiftUIView_Previews: PreviewProvider {
       )
     )
   }
-}
-
-public extension AlertState where Action == EditNoticeDomain.Action {
-  static let editNoticeFailure = Self(
-    title: .init("Fehler"),
-    message: .init("Die Meldung konnte nicht gelöscht werden"),
-    buttons: [
-      .default(.init("Ok")),
-      .default(.init("Wiederholen"), action: .send(.deleteConfirmButtonTapped))
-    ]
-  )
-  
-  static let confirmDeleteNotice = Self(
-    title: .init("Meldung löschen"),
-    buttons: [
-      .destructive(.init("Löschen"), action: .send(.deleteConfirmButtonTapped)),
-    ]
-  )
 }

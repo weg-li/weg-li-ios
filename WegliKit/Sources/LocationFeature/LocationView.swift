@@ -95,7 +95,7 @@ public struct LocationView: View {
               get: \.region,
               send: LocationDomain.Action.updateRegion
             ),
-            showsLocation: viewStore.locationOption == .currentLocation,
+            showsLocation: false,
             pinCoordinate: viewStore.binding(
               get: \.pinCoordinate,
               send: LocationDomain.Action.setPinCoordinate

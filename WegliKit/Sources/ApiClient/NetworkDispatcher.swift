@@ -11,9 +11,11 @@ public struct NetworkDispatcher {
 
   func dispatch(request: URLRequest) async throws -> Data {
     let (data, response) = try await urlSession().data(for: request)
+    
     if let response = response as? HTTPURLResponse, !response.isSuccessful {
       throw ApiError(error: httpError(response.statusCode))
     }
+    
     return data
   }
 }

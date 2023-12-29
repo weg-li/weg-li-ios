@@ -177,7 +177,7 @@ public struct AppDomain: Reducer {
       case .report(.mail(.setMailResult(.sent))):
         return .none
         
-      case .report(.resetConfirmButtonTapped):
+      case .report(.destination(.presented(.alert(.confirmResetButtonTapped)))):
         state.reportDraft = ReportDomain.State(
           uuid: uuid.callAsFunction,
           images: .init(),
@@ -187,11 +187,7 @@ public struct AppDomain: Reducer {
         )
         state.reportDraft.apiToken = keychainClient.getToken() ?? ""
         return .none
-        
-//      case .report(.contact):
-//        state.contact = state.reportDraft.contactState.contact
-//        return .none
-              
+                      
       case .reportSaved:
         // Reset report draft after it was saved
         state.reportDraft = ReportDomain.State(

@@ -1,8 +1,9 @@
 import ApiClient
 import ComposableArchitecture
+import DescriptionFeature
 import FeedbackGeneratorClient
 import Foundation
-import DescriptionFeature
+import L10n
 import ImagesFeature
 import SharedModels
 
@@ -29,8 +30,6 @@ public struct EditNoticeDomain: Reducer {
     @BindingState public var presentChargeSelection = false
     @BindingState public var presentCarBrandSelection = false
     @BindingState public var isSendingNoticeUpdate = false
-    
-    
     @BindingState public var showImagePicker = false
     public var destination: Destination?
     
@@ -140,8 +139,8 @@ public struct EditNoticeDomain: Reducer {
             await feedbackGenerator.notify(.success)
           }
           
-        case .failure:
-          state.alert = .editNoticeFailure
+        case .failure(let error):
+          state.alert = .editNoticeFailure(message: error.localizedDescription)
           return .run { _ in
             await feedbackGenerator.notify(.error)
           }
@@ -154,8 +153,7 @@ public struct EditNoticeDomain: Reducer {
         case .success:
           return .none
         case .failure(let error):
-          debugPrint(error.localizedDescription)
-          state.alert = .editNoticeFailure
+          state.alert = .deleteNoticeFailure(message: error.localizedDescription)
           return .none
         }
         
@@ -203,4 +201,36 @@ extension EditNoticeDomain.State {
       photos: notice.photos ?? []
     )
   }
+}
+
+public extension AlertState where Action == EditNoticeDomain.Action {
+  static func editNoticeFailure(message: String? = nil) -> Self {
+    Self(
+      title: .init("Fehler"),
+      message: .init(message ?? "Die Meldung konnte nicht gelöscht werden"),
+      buttons: [
+        .default(.init("Ok")),
+        .default(.init("Wiederholen"), action: .send(.saveButtonTapped))
+      ]
+    )
+  }
+  
+  static func deleteNoticeFailure(message: String? = nil) -> Self {
+    Self(
+      title: .init("Fehler"),
+      message: .init(message ?? "Die Meldung konnte nicht gelöscht werden"),
+      buttons: [
+        .default(.init("Ok")),
+        .default(.init("Wiederholen"), action: .send(.deleteConfirmButtonTapped))
+      ]
+    )
+  }
+  
+  static let confirmDeleteNotice = Self(
+    title: .init("Meldung löschen"),
+    buttons: [
+      .default(.init(L10n.cancel)),
+      .destructive(.init("Löschen"), action: .send(.deleteConfirmButtonTapped)),
+    ]
+  )
 }

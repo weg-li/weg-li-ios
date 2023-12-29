@@ -218,7 +218,7 @@ public struct ReportView: View {
       }
     }
     .onAppear { viewStore.send(.onAppear) }
-//    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
+    .alert(store: self.store.scope(state: \.$destination.alert, action: \.destination.alert))
     .toolbar {
       ToolbarItem(placement: .destructiveAction) {
         resetButton
