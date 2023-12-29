@@ -47,25 +47,30 @@ public struct SettingsView: View {
         }
         
         Section(header: Label("Meldung", systemImage: "gearshape.2.fill")) {
-          Toggle(
-            isOn: viewStore.binding(
-              get: \.alwaysSendNotice,
-              send: { .userSettings(.onAlwaysSendNotice($0)) }
-            ),
-            label: {
-              VStack(alignment: .leading) {
+          VStack(alignment: .leading) {
+            Toggle(
+              isOn: viewStore.binding(
+                get: \.alwaysSendNotice,
+                send: { .userSettings(.onAlwaysSendNotice($0)) }
+              ),
+              label: {
                 Text("Meldung immer direkt senden")
                   .font(.body)
                   .padding(.bottom)
-                Text(
-                  viewStore.state.alwaysSendNotice
-                  ? "Die Meldung wird direkt an die Behörde gesendet."
-                  : "Die Meldung wird hochgeladen und du kannst sie noch einmal auf der Webseite prüfen bevor du sie versendest."
-                )
-                .font(.subheadline)
               }
+            )
+            .padding(.bottom)
+
+            HStack {
+              Image(systemName: "info.circle")
+              Text(
+                viewStore.state.alwaysSendNotice
+                ? "Die Meldung wird direkt an die Behörde gesendet."
+                : "Die Meldung wird hochgeladen und du kannst sie noch einmal auf der Webseite prüfen bevor du sie versendest."
+              )
             }
-          )
+            .font(.system(.caption, design: .default, weight: .light))
+          }
         }
         .headerProminence(.increased)
         
