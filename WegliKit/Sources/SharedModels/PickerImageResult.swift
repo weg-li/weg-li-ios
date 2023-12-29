@@ -20,7 +20,7 @@ public struct PickerImageResult: Hashable, Identifiable, Codable {
     if imageData.isJPEG {
       return imageData
     } else {
-      return UIImage(data: imageData)?.jpegData(compressionQuality: 0.9)
+      return UIImage(data: imageData)?.jpegData(compressionQuality: 0.95)
     }
   }
 

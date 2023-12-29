@@ -1,5 +1,6 @@
 import Combine
 import Dependencies
+import DependenciesMacros
 import Foundation
 import Helper
 import SharedModels
@@ -14,29 +15,14 @@ extension DependencyValues {
 
 
 /// A Service to send a single notice and all persisted notices from the weg-li API
+@DependencyClient
 public struct APIService {
   public var getNotices: @Sendable (Bool) async throws -> [Notice]
   public var postNotice: @Sendable (NoticeInput) async throws -> Notice
-  public var upload: @Sendable (PickerImageResult) async throws -> ImageUploadResponse
+  public var upload: @Sendable (_ id: PickerImageResult.ID, _ imageData: Data?) async throws -> ImageUploadResponse
   public var submitNotice: @Sendable (NoticeInput) async throws -> Notice
   public var patchNotice: @Sendable (Notice) async throws -> Notice
   public var deleteNotice: @Sendable (String) async throws -> Bool
-
-  public init(
-    getNotices: @Sendable @escaping (Bool) async throws -> [Notice],
-    postNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
-    upload: @Sendable @escaping (PickerImageResult) async throws -> ImageUploadResponse,
-    submitNotice: @Sendable @escaping (NoticeInput) async throws -> Notice,
-    patchNotice: @Sendable @escaping (Notice) async throws -> Notice,
-    deleteNotice: @Sendable @escaping (String) async throws -> Bool
-  ) {
-    self.getNotices = getNotices
-    self.postNotice = postNotice
-    self.upload = upload
-    self.submitNotice = submitNotice
-    self.patchNotice = patchNotice
-    self.deleteNotice = deleteNotice
-  }
 }
 
 extension APIService: DependencyKey {
@@ -55,8 +41,11 @@ extension APIService: DependencyKey {
         
         return try data.decoded(decoder: .noticeDecoder)
       },
-      upload: { imagePickerResult in
-        let input: ImageUploadInput? = .make(from: imagePickerResult)
+      upload: { id, imageData in
+        guard let data = imageData else {
+          throw ApiError(message: "no data provided")
+        }
+        let input: ImageUploadInput? = .make(id: id, data: data)
         let body = try input?.encoded(encoder: .noticeEncoder)
         
         let request: Request = .post(.uploads, body: body)
@@ -65,7 +54,7 @@ extension APIService: DependencyKey {
       },
       submitNotice: { notice in
         let body = try notice.encoded(encoder: .noticeEncoder)
-        let data = try await apiClient.send(.patch(.submitNotices, body: body))
+        let data = try await apiClient.send(.patch(.submitNotices(id: notice.id), body: body))
         
         return try data.decoded(decoder: .noticeDecoder)
       },
@@ -94,7 +83,7 @@ extension APIService: TestDependencyKey {
     postNotice: { _ in
       .mock
     },
-    upload: { _ in
+    upload: { _, _ in
       ImageUploadResponse(
         id: 1,
         key: "",
@@ -122,21 +111,12 @@ extension APIService: TestDependencyKey {
     postNotice: { _ in
       throw ApiError(error: NetworkRequestError.invalidRequest)
     },
-    upload: { _ in
+    upload: { _, _ in
       throw NetworkRequestError.badRequest
     },
     submitNotice: { _ in throw ApiError(error: NetworkRequestError.decodingError) },
     patchNotice: { _ in throw ApiError(error: NetworkRequestError.decodingError) },
     deleteNotice: { _ in throw ApiError(error: NetworkRequestError.decodingError) }
-  )
-  
-  public static var testValue: APIService = Self(
-    getNotices: unimplemented("\(Self.self).getNotices"),
-    postNotice: unimplemented("\(Self.self).postNotice"),
-    upload: unimplemented("\(Self.self).upload"),
-    submitNotice: unimplemented("\(Self.self).submitNotice"),
-    patchNotice: unimplemented("\(Self.self).patchNotice"),
-    deleteNotice: unimplemented("\(Self.self).deleteNotice")
   )
 }
 

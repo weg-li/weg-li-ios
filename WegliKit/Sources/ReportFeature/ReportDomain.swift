@@ -58,7 +58,7 @@ public struct ReportDomain: Reducer {
     public var alert: AlertState<Action>?
     
     public var apiToken = ""
-    public var alwaysSendNotice = true
+    public var alwaysSendNotice = false
     
     public var uploadedImagesIds: [String] = []
     public var uploadProgressState: String?
@@ -164,6 +164,7 @@ public struct ReportDomain: Reducer {
     case destination(PresentationAction<Destination.Action>)
     
     public enum Alert: Equatable {
+      case submitButtonTapped
       case confirmResetButtonTapped
       case cancelResetButtonTapped
       case dismiss
@@ -248,6 +249,19 @@ public struct ReportDomain: Reducer {
           _ = await uiApplicationClient.open(editURL, [:])
         }
         
+      case .destination(.presented(.alert(.submitButtonTapped))):
+        var notice = NoticeInput(state)
+        notice.photos = state.uploadedImagesIds
+        return .run { [notice] send in
+          await send(
+            .submitNoticeResponse(
+              TaskResult {
+                try await wegliService.submitNotice(notice)
+              }
+            )
+          )
+        }
+        
       case .destination:
         return .none
         
@@ -275,7 +289,7 @@ public struct ReportDomain: Reducer {
         debugPrint(error)
         return .none
         
-      case let .images(imageViewAction):
+      case .images(let imageViewAction):
         switch imageViewAction {
           // After the images coordinate was set trigger resolve location and map to district.
         case let .setImageCoordinate(coordinate):
@@ -299,7 +313,7 @@ public struct ReportDomain: Reducer {
           
           return .none
           
-        case let .setImageCreationDate(date):
+        case .setImageCreationDate(let date):
           // set report date from selected photos
           state.date = date ?? self.date.now
           return .none
@@ -314,7 +328,7 @@ public struct ReportDomain: Reducer {
           }
           return .none
           
-        case let .selectedTextItem(textItem):
+        case .selectedTextItem(let textItem):
           state.description.licensePlateNumber = textItem.text.uppercased()
           return .none
           
@@ -438,31 +452,29 @@ public struct ReportDomain: Reducer {
         var notice = NoticeInput(state)
         notice.photos = state.uploadedImagesIds
         
-        return .run { [notice, alwaysSendNotice = state.alwaysSendNotice] send in
-          if alwaysSendNotice {
-            await send(
-              .submitNoticeResponse(
-                TaskResult {
-                  try await wegliService.submitNotice(notice)
-                }
-              )
+        return .run { [notice] send in
+          await send(
+            .postNoticeResponse(
+              TaskResult {
+                try await wegliService.postNotice(notice)
+              }
             )
-          } else {
-            await send(
-              .postNoticeResponse(
-                TaskResult {
-                  try await wegliService.postNotice(notice)
-                }
-              )
-            )
-          }
+          )
         }
         
       case let .postNoticeResponse(.success(response)):
         state.isSubmittingNotice = false
         state.uploadedNoticeID = response.token
         
+        if !state.alwaysSendNotice {
+          state.destination = .alert(.reportPosted(submit: state.alwaysSendNotice))
+        }
+        
+        var notice = NoticeInput(state)
+        notice.photos = state.uploadedImagesIds
+        
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
+        
         return .run { _ in
           await withTaskGroup(of: Void.self, body: { group in
             imageURLs.forEach { url in
@@ -470,7 +482,6 @@ public struct ReportDomain: Reducer {
                 try? await fileClient.removeItem(url)
               }
             }
-            debugPrint("removed items")
           })
         }
         
@@ -486,7 +497,7 @@ public struct ReportDomain: Reducer {
         state.isSubmittingNotice = false
         state.uploadedImagesIds.removeAll()
         
-        state.destination = .alert(.reportSent)
+        state.destination = .alert(.reportSubmitted)
         
         let imageURLs = state.images.storedPhotos.compactMap { $0?.imageUrl }
         
@@ -594,12 +605,35 @@ public extension AlertState where Action == ReportDomain.Action.Alert {
     )
   )
   
-  static let reportSent = Self(
+  static func reportPosted(submit: Bool) -> Self {
+    let cta: ButtonState<Action>
+    if submit {
+      cta = .default(
+        .init("Meldung einreichen"),
+        action: .send(.submitButtonTapped)
+      )
+    } else {
+      cta = .default(
+        .init("Gehe zu `weg.li`"),
+        action: .send(.goToWebsiteButtonTapped)
+      )
+    }
+    
+    return Self(
+      title: .init("Meldung hochgeladen"),
+      message: .init("Deine Meldung wurde zu auf weg-li hochgeladen."),
+      buttons: [
+        .default(.init("Ok"), action: .send(.confirmResetButtonTapped)),
+        cta
+      ]
+    )
+  }
+  
+  static let reportSubmitted = Self(
     title: .init("Meldung gesendet"),
     message: .init("Deine Meldung wurde an die Behörden gesendet."),
     buttons: [
-      .default(.init("Ok"), action: .send(.confirmResetButtonTapped)),
-      .default(.init("Gehe zu `weg.li`"), action: .send(.goToWebsiteButtonTapped))
+      .default(.init("Ok"), action: .send(.confirmResetButtonTapped))
     ]
   )
   

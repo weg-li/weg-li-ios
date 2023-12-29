@@ -20,5 +20,5 @@ public extension Endpoint {
   /// `/api/uploads` endpoint
   static let uploads = Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/uploads")
   /// `/api/notices/mail` endpoint
-  static let submitNotices = Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/notices/mail")
+  static func submitNotices(id: String) -> Self { Self(baseUrl: Endpoints.wegliAPIEndpoint, path: "/api/notices/\(id)/mail") } 
 }

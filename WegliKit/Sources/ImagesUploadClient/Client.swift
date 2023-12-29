@@ -1,5 +1,6 @@
 import ApiClient
 import Dependencies
+import DependenciesMacros
 import Foundation
 import SharedModels
 
@@ -12,10 +13,7 @@ extension DependencyValues {
 
 // MARK: Client interface
 
+@DependencyClient
 public struct ImagesUploadClient {
-  public var uploadImages: ([PickerImageResult]) async throws -> [ImageUploadResponse]
-  
-  public init(uploadImages: @escaping ([PickerImageResult]) async throws -> [ImageUploadResponse]) {
-    self.uploadImages = uploadImages
-  }
+  public var uploadImages: (_ results: [PickerImageResult]) async throws -> [ImageUploadResponse]
 }

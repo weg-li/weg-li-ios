@@ -150,6 +150,7 @@ public struct AppDomain: Reducer {
           let userSettings = (try? result.value) ?? UserSettings(showsAllTextRecognitionSettings: false)
           state.settings.userSettings = userSettings
           state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
+          state.reportDraft.alwaysSendNotice = userSettings.alwaysSendNotice
           return .none
         }
         
@@ -186,6 +187,9 @@ public struct AppDomain: Reducer {
           location: .init()
         )
         state.reportDraft.apiToken = keychainClient.getToken() ?? ""
+        state.reportDraft.images.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
+        state.reportDraft.alwaysSendNotice = state.settings.userSettings.alwaysSendNotice
+        
         return .none
                       
       case .reportSaved:
