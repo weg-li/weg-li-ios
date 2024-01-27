@@ -112,6 +112,14 @@ public struct DescriptionDomain: Reducer {
         state.carBrandSelection.carBrandSearchText = ""
         return .none
 
+      case .carBrandSelection(.setBrand):
+        state.presentCarBrandSelection = false
+        return .none
+        
+      case .chargeSelection(.setCharge):
+        state.presentChargeSelection = false
+        return .none
+        
       case .carBrandSelection, .chargeSelection:
         return .none
         

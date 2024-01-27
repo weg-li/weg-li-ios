@@ -561,7 +561,7 @@ public extension ReportDomain.State {
     uuid: UUID.init,
     images: .init(
       showImagePicker: false,
-      storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "swift")!)!] // swiftlint:disable:this force_unwrapping
+      storedPhotos: [PickerImageResult(uiImage: nil)] // swiftlint:disable:this force_unwrapping
     ),
     contactState: .preview,
     district: District(

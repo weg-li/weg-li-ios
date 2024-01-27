@@ -76,32 +76,29 @@ public struct EditDescriptionView: View {
   }
   
   var carBrandView: some View {
-    NavigationLink(
-      isActive: viewStore.$presentCarBrandSelection,
-      destination: {
-        CarBrandSelectorView(
-          store: self.store.scope(
-            state: \.carBrandSelection,
-            action: A.carBrandSelection
-          )
-        )
-        .navigationTitle(Text(L10n.Description.Row.carType))
-        .navigationBarTitleDisplayMode(.inline)
-      },
-      label: {
-        HStack {
-          Text(L10n.Description.Row.carType)
-          if let brand = viewStore.carBrandSelection.selectedBrand {
-            Spacer()
-            Text(brand.title)
-          }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-          viewStore.send(.set(\.$presentCarBrandSelection, true))
-        }
+    HStack {
+      Text(L10n.Description.Row.carType)
+      Spacer()
+      if let brand = viewStore.carBrandSelection.selectedBrand {
+        Text(brand.title)
       }
-    )
+      Image(systemName: "chevron.right")
+        .imageScale(.small)
+    }
+    .contentShape(Rectangle())
+    .onTapGesture {
+      viewStore.send(.set(\.$presentCarBrandSelection, true))
+    }
+    .navigationDestination(isPresented: viewStore.$presentCarBrandSelection) {
+      CarBrandSelectorView(
+        store: self.store.scope(
+          state: \.carBrandSelection,
+          action: A.carBrandSelection
+        )
+      )
+      .navigationTitle(Text(L10n.Description.Row.carType))
+      .navigationBarTitleDisplayMode(.inline)
+    }
   }
   
   var carColorView: some View {
@@ -119,33 +116,29 @@ public struct EditDescriptionView: View {
   }
   
   var chargeTypeView: some View {
-    NavigationLink(
-      isActive: viewStore.$presentChargeSelection,
-      destination: {
-        ChargeSelectionView(
-          store: self.store.scope(
-            state: \.chargeSelection,
-            action: A.chargeSelection
-          )
-        )
-        .accessibilityAddTraits([.isModal])
-        .navigationTitle(Text(L10n.Description.Row.chargeType))
-        .navigationBarTitleDisplayMode(.inline)
-      },
-      label: {
-        HStack {
-          Text(L10n.Description.Row.chargeType)
-          if let charge = viewStore.state.chargeSelection.selectedCharge {
-            Spacer()
-            Text(charge.text)
-          }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-          viewStore.send(.set(\.$presentChargeSelection, true))
-        }
+    HStack {
+      Text(L10n.Description.Row.chargeType)
+      Spacer()
+      if let charge = viewStore.state.chargeSelection.selectedCharge {
+        Text(charge.text)
       }
-    )
+      Image(systemName: "chevron.right")
+        .imageScale(.small)
+    }
+    .contentShape(Rectangle())
+    .onTapGesture {
+      viewStore.send(.set(\.$presentChargeSelection, true))
+    }
+    .navigationDestination(isPresented: viewStore.$presentChargeSelection) {
+      ChargeSelectionView(
+        store: self.store.scope(
+          state: \.chargeSelection,
+          action: A.chargeSelection
+        )
+      )
+      .navigationTitle(Text(L10n.Description.Row.chargeType))
+      .navigationBarTitleDisplayMode(.inline)
+    }
   }
   
   var times: [Int] {

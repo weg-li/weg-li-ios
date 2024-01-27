@@ -34,7 +34,7 @@ final class AppStoreTests: XCTestCase {
       uuid: fixedUUID,
       images: ImagesViewDomain.State(
         showImagePicker: false,
-        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!)!],
+        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!.jpegData(compressionQuality: 1))!],
         coordinateFromImagePicker: .zero
       ),
       contactState: .preview,

@@ -6,6 +6,7 @@ import os.log
 import PhotosUI
 import SharedModels
 import SwiftUI
+import UniformTypeIdentifiers
 
 public struct ImagePicker: UIViewControllerRepresentable {
   public init(isPresented: Binding<Bool>, pickerResult: Binding<[PickerImageResult?]>) {
@@ -27,56 +28,92 @@ public struct ImagePicker: UIViewControllerRepresentable {
       _ picker: PHPickerViewController,
       didFinishPicking results: [PHPickerResult]
     ) {
-      for result in results {
-        let prov = result.itemProvider
-                
-        prov.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { [weak self] url, error in
-          
-          guard error == nil else {
-            debugPrint(error!.localizedDescription, #fileID, #function)
-            return
-          }
-          
+      let dispatchQueue = DispatchQueue(label: "li.weg.iOS.ImagePickerQueue")
+      var selectedImageDatas = [Data?](repeating: nil, count: results.count) // Awkwardly named, sure
+      var totalConversionsCompleted = 0
+      
+      for (index, result) in results.enumerated() {
+        result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { (url, error) in
           guard let url = url else {
-            debugPrint("itemProvider file representation URL is nil")
+            dispatchQueue.sync { totalConversionsCompleted += 1 }
             return
           }
           
-          let tempFileName = !url.lastPathComponent.isEmpty ? url.lastPathComponent : UUID().uuidString
-                    
-          do {
-            let data = try Data(contentsOf: url)
-            let tempFileUrl = FileManager.default.createDataTempFile(withData: data, withFileName: tempFileName)
-            let destinationUrl = try FileManager.default.replaceExistingFile(
-              withTempFile: tempFileUrl,
-              existingFileName: tempFileName,
-              subDirectory: "wegli"
+          let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+          
+          guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
+            dispatchQueue.sync { totalConversionsCompleted += 1 }
+            return
+          }
+          
+          let downsampleOptions = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 2_000,
+          ] as CFDictionary
+          
+          guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
+            dispatchQueue.sync { totalConversionsCompleted += 1 }
+            return
+          }
+          
+          let data = NSMutableData()
+          
+          guard 
+            let imageDestination = CGImageDestinationCreateWithData(
+              data, UTType.jpeg.identifier as CFString, 1, nil
             )
-            
-            DispatchQueue.main.async {
-              var assetCoordinate: CoordinateRegion.Coordinate?
-              var creationDate: Date?
-              if let assetId = result.assetIdentifier {
-                let assetResults = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-                if let coordinate = assetResults.firstObject?.location?.coordinate {
-                  assetCoordinate = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                }
-                creationDate = assetResults.firstObject?.creationDate
-              }
-              self?.parent.pickerResult.append(
-                PickerImageResult(
-                  id: tempFileName,
-                  imageUrl: destinationUrl,
-                  coordinate: assetCoordinate,
-                  creationDate: creationDate
-                )
+          else {
+            dispatchQueue.sync { totalConversionsCompleted += 1 }
+            return
+          }
+          
+          // Don't compress PNGs, they're too pretty
+          let isPNG: Bool = {
+            guard let utType = cgImage.utType else { return false }
+            return (utType as String) == UTType.png.identifier
+          }()
+          
+          let destinationProperties = [
+            kCGImageDestinationLossyCompressionQuality: isPNG ? 1.0 : 0.9
+          ] as CFDictionary
+          
+          CGImageDestinationAddImage(imageDestination, cgImage, destinationProperties)
+          CGImageDestinationFinalize(imageDestination)
+          
+          dispatchQueue.sync {
+            selectedImageDatas[index] = data as Data
+            totalConversionsCompleted += 1
+          }
+          
+          DispatchQueue.main.async {
+            var assetCoordinate: CoordinateRegion.Coordinate?
+            var creationDate: Date?
+            if let assetId = result.assetIdentifier {
+              let assetResults = PHAsset.fetchAssets(
+                withLocalIdentifiers: [assetId],
+                options: nil
               )
+              if let coordinate = assetResults.firstObject?.location?.coordinate {
+                assetCoordinate = .init(
+                  latitude: coordinate.latitude,
+                  longitude: coordinate.longitude
+                )
+              }
+              creationDate = assetResults.firstObject?.creationDate
             }
-          } catch {
-            debugPrint(error.localizedDescription)
+            self.parent.pickerResult.append(
+              PickerImageResult(
+                id: "IMG_\(index)_\(Date().formatted(date: .numeric, time: .omitted)).jpg",
+                uiImage: selectedImageDatas[index],
+                coordinate: assetCoordinate,
+                creationDate: creationDate
+              )
+            )
           }
         }
       }
+      
       DispatchQueue.main.async { [weak self] in
         self?.parent.isPresented = false
         self?.parent.pickerResult.removeAll()
@@ -113,7 +150,7 @@ extension FileManager {
     let documentsDirectory = paths[0]
     return documentsDirectory
   }
-    
+  
   func createDataTempFile(withData data: Data?, withFileName name: String) -> URL? {
     let fileManager = FileManager.default
     guard
