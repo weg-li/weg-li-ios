@@ -104,7 +104,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
             }
             self.parent.pickerResult.append(
               PickerImageResult(
-                id: "IMG_\(index)_\(Date().formatted(date: .numeric, time: .omitted)).jpg",
+                id: "IMG_\(index)_\(UUID().uuidString).jpg",
                 uiImage: selectedImageDatas[index],
                 coordinate: assetCoordinate,
                 creationDate: creationDate

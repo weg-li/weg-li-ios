@@ -15,9 +15,11 @@ extension ImagesUploadClient: DependencyKey {
         results in
         try await withThrowingTaskGroup(of: ImageUploadResponse.self) { group in
           for result in results {
+            guard let imageData = result.jpegData else {
+              continue
+            }
+            
             group.addTask {
-              let imageData = result.jpegData
-              
               let uploadResponse = try await wegliService.upload(
                 id: result.id,
                 imageData: imageData

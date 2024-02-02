@@ -22,7 +22,7 @@ public struct ImageUploadInput: Codable, Equatable {
 }
 
 public extension ImageUploadInput {
-  static func make(id: PickerImageResult.ID, data: Data) -> Self? {
+  static func make(id: PickerImageResult.ID, data: Data) -> Self {
     ImageUploadInput(
       filename: id,
       byteSize: UInt64(data.count),

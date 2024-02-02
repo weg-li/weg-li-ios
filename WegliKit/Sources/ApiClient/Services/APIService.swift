@@ -45,8 +45,8 @@ extension APIService: DependencyKey {
         guard let data = imageData else {
           throw ApiError(message: "no data provided")
         }
-        let input: ImageUploadInput? = .make(id: id, data: data)
-        let body = try input?.encoded(encoder: .noticeEncoder)
+        let input: ImageUploadInput = .make(id: id, data: data)
+        let body = try input.encoded(encoder: .noticeEncoder)
         
         let request: Request = .post(.uploads, body: body)
         let responseData = try await apiClient.send(request)

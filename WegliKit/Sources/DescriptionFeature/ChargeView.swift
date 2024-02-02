@@ -70,7 +70,7 @@ struct ChargeView: View {
     .onTapGesture {
       onTap()
     }
-    .swipeActions(allowsFullSwipe: false) {
+    .swipeActions(edge: .leading, allowsFullSwipe: false) {
       Button(
         action: {
           onSwipe()
