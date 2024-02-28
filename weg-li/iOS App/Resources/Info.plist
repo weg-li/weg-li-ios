@@ -20,10 +20,14 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>NSLocationAlwaysAndWhenInUseUsageDescription</string>
 	<key>LSRequiresIPhoneOS</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>weg-li möchte deine Kamera verwenden um ein Bild des Vorfalles aufzunehmen</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>weg-li will auf deinen Standort zugreifen um die Adresse deienr Anzeige zu bestimmen.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>weg-li will auf deinen Standort zugreifen um die Adresse deienr Anzeige zu bestimmen.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

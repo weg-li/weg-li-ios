@@ -1,12 +1,6 @@
 {
   "configurations" : [
-    {
-      "id" : "795E18A9-02D8-4F00-9EB3-1DE6D6AD1A93",
-      "name" : "Configuration 1",
-      "options" : {
 
-      }
-    }
   ],
   "defaultOptions" : {
     "language" : "de",

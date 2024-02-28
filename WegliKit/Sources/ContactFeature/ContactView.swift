@@ -23,25 +23,33 @@ public struct ContactDetailsView: View {
       Form {
         Section(header: Text(L10n.Contact.Section.required)) {
           dataRow(type: .firstName) {
-            TextField(RowType.firstName.placeholder, text: viewStore.binding(\.$firstName))
-              .multilineTextAlignment(.leading)
-              .keyboardType(RowType.firstName.keyboardType)
-              .textContentType(RowType.firstName.textContentType)
-              .disableAutocorrection(true)
-              .submitLabel(.next)
-              .focused($focusedField, equals: .firstName)
+            TextField(
+              RowType.firstName.placeholder,
+              text: viewStore.$firstName
+            )
+            .multilineTextAlignment(.leading)
+            .keyboardType(RowType.firstName.keyboardType)
+            .textContentType(RowType.firstName.textContentType)
+            .disableAutocorrection(true)
+            .submitLabel(.next)
+            .focused($focusedField, equals: .firstName)
           }
+          
           dataRow(type: .lastName) {
-            TextField(RowType.lastName.placeholder, text: viewStore.binding(\.$name))
-              .multilineTextAlignment(.leading)
-              .keyboardType(RowType.lastName.keyboardType)
-              .textContentType(RowType.lastName.textContentType)
-              .disableAutocorrection(true)
-              .submitLabel(.next)
-              .focused($focusedField, equals: .lastName)
+            TextField(
+              RowType.lastName.placeholder,
+              text: viewStore.$name
+            )
+            .multilineTextAlignment(.leading)
+            .keyboardType(RowType.lastName.keyboardType)
+            .textContentType(RowType.lastName.textContentType)
+            .disableAutocorrection(true)
+            .submitLabel(.next)
+            .focused($focusedField, equals: .lastName)
           }
+          
           dataRow(type: .street) {
-            TextField(RowType.street.placeholder, text: viewStore.binding(\.$address.street))
+            TextField(RowType.street.placeholder, text: viewStore.$address.street)
               .multilineTextAlignment(.leading)
               .keyboardType(RowType.street.keyboardType)
               .textContentType(RowType.street.textContentType)
@@ -49,9 +57,10 @@ public struct ContactDetailsView: View {
               .submitLabel(.next)
               .focused($focusedField, equals: .street)
           }
+          
           HStack {
             dataRow(type: .zipCode) {
-              TextField(RowType.zipCode.placeholder, text: viewStore.binding(\.$address.postalCode))
+              TextField(RowType.zipCode.placeholder, text: viewStore.$address.postalCode)
                 .multilineTextAlignment(.leading)
                 .keyboardType(RowType.zipCode.keyboardType)
                 .textContentType(RowType.zipCode.textContentType)
@@ -60,7 +69,7 @@ public struct ContactDetailsView: View {
                 .focused($focusedField, equals: .zipCode)
             }
             dataRow(type: .city) {
-              TextField(RowType.city.placeholder, text: viewStore.binding(\.$address.city))
+              TextField(RowType.city.placeholder, text: viewStore.$address.city)
                 .multilineTextAlignment(.leading)
                 .keyboardType(RowType.city.keyboardType)
                 .textContentType(RowType.city.textContentType)
@@ -72,7 +81,7 @@ public struct ContactDetailsView: View {
         }
         Section(header: Text(L10n.Contact.Section.optional)) {
           dataRow(type: .phone) {
-            TextField(RowType.phone.placeholder, text: viewStore.binding(\.$phone))
+            TextField(RowType.phone.placeholder, text: viewStore.$phone)
               .multilineTextAlignment(.leading)
               .keyboardType(RowType.phone.keyboardType)
               .textContentType(RowType.phone.textContentType)
@@ -81,7 +90,7 @@ public struct ContactDetailsView: View {
               .focused($focusedField, equals: .phone)
           }
           dataRow(type: .dateOfBirth) {
-            TextField(RowType.dateOfBirth.placeholder, text: viewStore.binding(\.$dateOfBirth))
+            TextField(RowType.dateOfBirth.placeholder, text: viewStore.$dateOfBirth)
               .multilineTextAlignment(.leading)
               .keyboardType(RowType.dateOfBirth.keyboardType)
               .textContentType(RowType.dateOfBirth.textContentType)
@@ -91,7 +100,7 @@ public struct ContactDetailsView: View {
           }
           
           dataRow(type: .addressAddition) {
-            TextField(RowType.addressAddition.placeholder, text: viewStore.binding(\.$address.addition))
+            TextField(RowType.addressAddition.placeholder, text: viewStore.$address.addition)
               .multilineTextAlignment(.leading)
               .keyboardType(RowType.addressAddition.keyboardType)
               .textContentType(RowType.addressAddition.textContentType)
@@ -168,7 +177,7 @@ public struct ContactView: View {
       )
     )
     .textFieldStyle(.plain)
-    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
+    .alert(store: self.store.scope(state: \.$alert, action: \.alert))
     .navigationBarTitle(L10n.Contact.widgetTitle, displayMode: .inline)
     .toolbar {
       ToolbarItem(placement: .destructiveAction) {
@@ -199,7 +208,7 @@ struct PersonalData_Previews: PreviewProvider {
     ContactView(
       store: Store(
         initialState: ContactViewDomain.State(),
-        reducer: ContactViewDomain()
+        reducer: { ContactViewDomain() }
       )
     )
   }

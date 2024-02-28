@@ -14,11 +14,4 @@ public extension Request {
     request.cachePolicy = forceReload ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy
     return request
   }
-  
-  /// Represents a POST ApiRequest to upload images to `/api/uploads`
-  static func postImageUploadResults(pickerResult: PickerImageResult) -> Self {
-    let input: ImageUploadInput? = .make(from: pickerResult)
-    let bodyData = try? JSONEncoder.noticeEncoder.encode(input)
-    return post(.uploads, body: bodyData)
-  }
 }

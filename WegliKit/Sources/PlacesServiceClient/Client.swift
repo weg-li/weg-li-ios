@@ -13,7 +13,6 @@ extension DependencyValues {
 
 // MARK: Client interface
 
-
 public struct PlacesServiceClient {
   public init(placemarks: @escaping (CLLocation) async -> [Address]) {
     self.placemarks = placemarks

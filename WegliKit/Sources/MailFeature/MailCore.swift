@@ -32,7 +32,7 @@ public struct MailDomain: Reducer {
     case copyMailBody
   }
   
-  public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+  public func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
     case .submitButtonTapped:
       return .none

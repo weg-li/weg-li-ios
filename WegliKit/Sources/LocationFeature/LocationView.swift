@@ -12,6 +12,7 @@ import UIKit
 
 public struct LocationView: View {
   public struct ViewState: Equatable {
+    var alert: AlertState<LocationDomain.Action>?
     let locationOption: LocationOption
     let region: CoordinateRegion?
     let isMapExpanded: Bool
@@ -20,6 +21,7 @@ public struct LocationView: View {
     let pinCoordinate: CLLocationCoordinate2D?
     
     public init(state: LocationDomain.State) {
+      self.alert = state.alert
       self.locationOption = state.locationOption
       self.region = state.region
       self.isMapExpanded = state.isMapExpanded
@@ -93,7 +95,7 @@ public struct LocationView: View {
               get: \.region,
               send: LocationDomain.Action.updateRegion
             ),
-            showsLocation: viewStore.locationOption == .currentLocation,
+            showsLocation: false,
             pinCoordinate: viewStore.binding(
               get: \.pinCoordinate,
               send: LocationDomain.Action.setPinCoordinate
@@ -110,11 +112,11 @@ public struct LocationView: View {
     }
     .transition(.opacity)
     .alert(
-      store.scope(
-        state: { $0.alert },
-        action: { _ in LocationDomain.Action.onDismissAlertButtonTapped }
+      item: viewStore.binding(
+        get: { $0.alert },
+        send: .onDismissAlertButtonTapped
       ),
-      dismiss: LocationDomain.Action.onDismissAlertButtonTapped
+      content: { Alert(title: Text($0.title)) }
     )
     .onAppear { viewStore.send(.onAppear) }
   }
@@ -164,7 +166,7 @@ struct Location_Previews: PreviewProvider {
             isRequestingCurrentLocation: true,
             region: nil
           ),
-          reducer: LocationDomain()
+          reducer: { LocationDomain() }
         )
       )
     }

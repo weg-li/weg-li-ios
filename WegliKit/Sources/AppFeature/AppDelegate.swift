@@ -4,7 +4,8 @@ import Foundation
 import ReportFeature
 import SharedModels
 
-public struct AppDelegateDomain: ReducerProtocol {
+@Reducer
+public struct AppDelegateDomain {
   public init() {}
   
   public struct State: Equatable {}
@@ -13,7 +14,7 @@ public struct AppDelegateDomain: ReducerProtocol {
     case didFinishLaunching
   }
   
-  public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+  public func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
     case .didFinishLaunching:
       return .none

@@ -7,7 +7,7 @@ public struct CarBrandSelection: Reducer {
   
   public struct State: Equatable {
     public var selectedBrand: CarBrand?
-    @BindableState public var carBrandSearchText = ""
+    @BindingState public var carBrandSearchText = ""
     
     public init(selectedBrand: CarBrand? = nil, carBrandSearchText: String = "") {
       self.selectedBrand = selectedBrand
@@ -79,7 +79,7 @@ public struct CarBrandSelectorView: View {
       }
     }
     .searchable(
-      text: viewStore.binding(\.$carBrandSearchText),
+      text: viewStore.$carBrandSearchText,
       placement: .navigationBarDrawer(displayMode: .always)
     )
   }

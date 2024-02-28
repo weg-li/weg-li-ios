@@ -21,61 +21,69 @@ public struct ImageView: View {
   }
 
   public var body: some View {
-    if let url = viewStore.image.imageUrl {
-      AsyncThumbnailView(url: url)
-        .gridModifier
-        .padding(.grid(1))
-        .contentShape(Rectangle())
-        .contextMenu {
-          Button {
-            showImageView.toggle()
-          } label: {
-            Label("Ansehen", systemImage: "eye")
-          }
+    Group {
+      if let url = viewStore.image.imageUrl {
+        AsyncThumbnailView(url: url)
+          .gridModifier
+          .padding(.grid(1))
+          .contentShape(Rectangle())
           
-          Button {
-            viewStore.send(.onRecognizeTextButtonTapped)
-          } label: {
-            Label("Nummernschild erkennen", systemImage: "text.magnifyingglass")
-          }
-          
-          Button {
-            viewStore.send(.onRemovePhotoButtonTapped, animation: .easeOut(duration: 0.2))
-          } label: {
-            Label("Löschen", systemImage: "trash")
-          }
-        }
-        .popover(isPresented: $showImageView) {
-          if let url = viewStore.state.image.imageUrl {
-            ZStack(alignment: .topLeading) {
-              ZoomableScrollView {
-                AsyncImageView(url: url)
-              }
-              .edgesIgnoringSafeArea(.all)
-              
-              Button(
-                action: { showImageView = false },
-                label: {
-                  Image(systemName: "xmark.circle.fill")
-                    .resizable()
-                    .frame(width: .grid(8), height: .grid(8))
-                }
-              )
-              .accessibilityLabel(Text(L10n.Button.close))
-              .padding()
-            }
-          } else {
-            ProgressView {
-              Text("Loading ...")
-            }
-          }
-        }
-      
-    } else {
-      ProgressView {
-        Text("Loading ...")
+      } else if let image = viewStore.image.asUIImage {
+        Image(uiImage: image)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+          .gridModifier
+          .padding(.grid(1))
+          .contentShape(Rectangle())
+      } else {
+        EmptyView()
       }
     }
+      .contextMenu {
+        Button {
+          showImageView.toggle()
+        } label: {
+          Label("Ansehen", systemImage: "eye")
+        }
+        
+        Button {
+          viewStore.send(.onRecognizeTextButtonTapped)
+        } label: {
+          Label("Nummernschild erkennen", systemImage: "text.magnifyingglass")
+        }
+        
+        Button {
+          viewStore.send(.onRemovePhotoButtonTapped, animation: .easeOut(duration: 0.2))
+        } label: {
+          Label("Löschen", systemImage: "trash")
+        }
+      }
+      .popover(isPresented: $showImageView) {
+        if let image = viewStore.state.image.asUIImage {
+          ZStack(alignment: .topLeading) {
+            ZoomableScrollView {
+              Image(uiImage: image)
+            }
+            .edgesIgnoringSafeArea(.all)
+            
+            Button(
+              action: { showImageView = false },
+              label: {
+                Image(systemName: "xmark.circle.fill")
+                  .resizable()
+                  .frame(width: .grid(8), height: .grid(8))
+                  .tint(Color.black)
+              }
+            )
+            .accessibilityLabel(Text(L10n.Button.close))
+            .padding()
+          }
+        } else {
+          ProgressView {
+            Text("Loading ...")
+          }
+        }
+      }
   }
 }
 
@@ -98,9 +106,9 @@ struct ImageView_Previews: PreviewProvider {
       store: Store(
         initialState: .init(
           id: .init(),
-          image: PickerImageResult(uiImage: UIImage(systemName: "pencil")!)! // swiftlint:disable:this force_unwrapping
+          image: PickerImageResult(uiImage: UIImage(systemName: "pencil")!.jpegData(compressionQuality: 1))! // swiftlint:disable:this force_unwrapping
         ),
-        reducer: ImageDomain()
+        reducer: { ImageDomain() }
       )
     )
   }

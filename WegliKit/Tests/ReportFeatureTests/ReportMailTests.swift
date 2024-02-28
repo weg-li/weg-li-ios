@@ -12,7 +12,7 @@ final class ReportMailTests: XCTestCase {
       images: .init(
         alert: nil,
         showImagePicker: false,
-        storedPhotos: [.init(uiImage: .init(systemName: "heart")!)],
+        storedPhotos: [.init(uiImage: UIImage(systemName: "heart")?.jpegData(compressionQuality: 1)!)],
         coordinateFromImagePicker: nil
       ),
       contactState: .preview,

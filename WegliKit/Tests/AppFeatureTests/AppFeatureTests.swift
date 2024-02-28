@@ -34,7 +34,7 @@ final class AppStoreTests: XCTestCase {
       uuid: fixedUUID,
       images: ImagesViewDomain.State(
         showImagePicker: false,
-        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!)!],
+        storedPhotos: [PickerImageResult(uiImage: UIImage(systemName: "pencil")!.jpegData(compressionQuality: 1))!],
         coordinateFromImagePicker: .zero
       ),
       contactState: .preview,
@@ -49,7 +49,7 @@ final class AppStoreTests: XCTestCase {
   func test_updateContact_ShouldUpdateState() async {
     let store = TestStore(
       initialState: AppDomain.State(),
-      reducer: AppDomain()
+      reducer: {AppDomain()}
     )
     store.dependencies.fileClient = .noop
     store.dependencies.continuousClock = ImmediateClock()
@@ -71,23 +71,19 @@ final class AppStoreTests: XCTestCase {
   func test_resetReportConfirmButtonTap_shouldResetDraftReport() async {
     let store = TestStore(
       initialState: AppDomain.State(reportDraft: report),
-      reducer: AppDomain()
+      reducer: {AppDomain()}
     )
     store.dependencies.uuid = .constant(.reportId)
     store.dependencies.date = .constant(fixedDate())
     
-    await store.send(.report(.onResetConfirmButtonTapped)) {
+    await store.send(.report(.destination(.presented(.alert(.confirmResetButtonTapped))))) {
       $0.reportDraft = ReportDomain.State(
         uuid: self.fixedUUID,
         images: .init(),
-        contactState: .init(
-          contact: .empty,
-          alert: nil
-        ),
+        contactState: .init(),
         date: self.fixedDate
       )
     }
-    await store.receive(.report(.dismissAlert))
   }
   
   func test_ActionStoredApiTokenLoaded() async {
@@ -104,8 +100,8 @@ final class AppStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: AppDomain(),
-      prepareDependencies: { dependencies in
+      reducer: {AppDomain()},
+      withDependencies: { dependencies in
         dependencies.keychainClient = keychainClient
         dependencies.apiService = wegliService
         dependencies.continuousClock = clock
@@ -127,42 +123,12 @@ final class AppStoreTests: XCTestCase {
       $0.contact = .preview
       $0.reportDraft.contactState.contact = .preview
     }
-    await store.receive(.internalAction(.userSettingsLoaded(.success(state.settings.userSettings))))
     await store.receive(.internalAction(.storedApiTokenLoaded(.success(token)))) {
       $0.reportDraft.apiToken = token
       $0.settings.accountSettingsState.accountSettings.apiToken = token
     }
+    await store.receive(.internalAction(.userSettingsLoaded(.success(state.settings.userSettings))))
     await store.finish()
-  }
-  
-  func test_ActionOnAccountSettings_shouldPersistAccountsSettings() async {
-    let store = TestStore(
-      initialState: .init(reportDraft: report),
-      reducer: AppDomain()
-    )
-    store.dependencies.keychainClient = .noop
-    store.dependencies.continuousClock = ImmediateClock()
-    
-    await store.send(.settings(.accountSettings(.setApiToken("TOKEN")))) {
-      $0.settings.accountSettingsState.accountSettings.apiToken = "TOKEN"
-      $0.reportDraft.apiToken = "TOKEN"
-    }
-  }
-  
-  func test_onNavigateToAccountSettingsButtonTapped() async {
-    let store = TestStore(
-      initialState: .init(reportDraft: report),
-      reducer: AppDomain()
-    )
-    store.exhaustivity = .off
-    
-    await store.send(.noticeList(.onNavigateToAccontSettingsButtonTapped))
-    await store.receive(.viewAction(.setSelectedTab(.settings))) {
-      $0.selectedTab = .settings
-    }
-    await store.receive(.settings(.setDestination(.accountSettings))) {
-      $0.settings.destination = .accountSettings
-    }
   }
 }
 

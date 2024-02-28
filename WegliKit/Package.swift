@@ -48,14 +48,40 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "prerelease/1.0"),
-    .package(url: "https://github.com/mltbnz/composable-core-location", branch: "main"),
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .upToNextMajor(from: "1.10.0")),
-    .package(url: "https://github.com/pointfreeco/swift-custom-dump", .upToNextMajor(from: "0.3.0")),
-    .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "19.0.0")),
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.8.4"),
-    .package(url: "https://github.com/pointfreeco/swiftui-navigation.git", from: "0.7.1"),
-    .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.5.0"),
+    .package(
+      url: "https://github.com/pointfreeco/swift-composable-architecture",
+      from: "1.0.0"
+    ),
+    .package(
+      url: "https://github.com/mltbnz/composable-core-location",
+      branch: "main"
+    ),
+    .package(
+      url: "https://github.com/pointfreeco/swift-snapshot-testing.git",
+      .upToNextMajor(
+        from: "1.10.0"
+      )
+    ),
+    .package(
+      url: "https://github.com/pointfreeco/swift-custom-dump",
+      .upToNextMajor(
+        from: "1.0.0"
+      )
+    ),
+    .package(
+      url: "https://github.com/evgenyneu/keychain-swift.git",
+      .upToNextMajor(
+        from: "19.0.0"
+      )
+    ),
+    .package(
+      url: "https://github.com/pointfreeco/xctest-dynamic-overlay",
+      from: "1.0.0"
+    ),
+    .package(
+      url: "https://github.com/onevcat/Kingfisher.git",
+      from: "7.5.0"
+    ),
   ],
   targets: [
     .target(
@@ -80,8 +106,7 @@ let package = Package(
         "NoticeListFeature",
         .models,
         .styleguide,
-        .tca,
-        .navigation
+        .tca
       ]
     ),
     .target(
@@ -146,7 +171,6 @@ let package = Package(
         .models,
         .styleguide,
         .tca,
-        .navigation,
         .product(name: "Kingfisher", package: "Kingfisher")
       ]
     ),
@@ -194,10 +218,10 @@ let package = Package(
     .target(
       name: "NoticeListFeature",
       dependencies: [
+        .apiClient,
         .l10n,
         .models,
         .tca,
-        .navigation,
         "DescriptionFeature",
         "ImagesFeature",
         .feedbackClient
@@ -269,7 +293,6 @@ let package = Package(
         .styleguide,
         .applicationClient,
         .tca,
-        .navigation
       ],
       resources: [.process("Resources")]
     ),
@@ -429,6 +452,5 @@ extension Target.Dependency {
   static let tca = product(name: "ComposableArchitecture", package: "swift-composable-architecture")
   static let locationClient = product(name: "ComposableCoreLocation", package: "composable-core-location")
   static let testOverlay = product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
-  static let navigation = product(name: "SwiftUINavigation", package: "swiftui-navigation")
   static let customDump = product(name: "CustomDump", package: "swift-custom-dump")
 }

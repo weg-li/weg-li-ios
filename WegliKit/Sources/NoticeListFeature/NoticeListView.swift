@@ -5,7 +5,6 @@ import L10n
 import SharedModels
 import Styleguide
 import SwiftUI
-import SwiftUINavigation
 
 public struct NoticeListView: View {
   public typealias S = NoticeListDomain.State
@@ -23,82 +22,40 @@ public struct NoticeListView: View {
   
   public var body: some View {
     Group {
-      switch viewStore.notices {
+      switch viewStore.contentState {
       case .loading:
         noticeList(notices: .placeholder)
           .redacted(reason: viewStore.isFetchingNotices ? .placeholder : [])
           .disabled(viewStore.isFetchingNotices)
         
-      case let .results(notices):
-        noticeList(notices: notices)
+      case .results(let results):
+        noticeList(notices: results.map(\.notice))
         
-      case let .empty(emptyState):
+      case .empty(let emptyState):
         ScrollView {
           Spacer(minLength: 150)
           emptyStateView(emptyState)
             .padding(.horizontal)
         }
         
-      case let .error(errorState):
-        ScrollView {
-          Spacer(minLength: 150)
-          VStack(alignment: .center, spacing: .grid(2)) {
-            if let systemImageName = errorState.systemImageName {
-              Image(systemName: systemImageName)
-                .font(.title)
-                .padding(.bottom, .grid(3))
-            }
-            
-            Text(errorState.title)
-              .font(.title2.weight(.semibold))
-              .padding(.bottom, .grid(2))
-            
-            if let body = errorState.body {
-              Text(body)
-                .font(.system(.body).monospaced())
-                .multilineTextAlignment(.center)
-                .lineLimit(10)
-            }
-            
-            if errorState == ErrorState.tokenUnavailable {
-              goToAccountSettings()
-                .padding(.vertical)
-            } else {
-              Button(
-                action: { viewStore.send(.fetchNotices(forceReload: true)) },
-                label: {
-                  Text("Neu laden")
-                    .padding(.horizontal)
-                }
-              )
-              .buttonStyle(CTAButtonStyle())
-              .padding(.vertical)
-            }
-          }
-          .padding(.horizontal, .grid(3))
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        }
-        }
-        
-    }
-    .onChange(of: viewStore.state.errorBarMessage, perform: { newValue in
-      withAnimation {
-        errorMessage = newValue
+      case .error(let errorState):
+        errorStateView(errorState)
       }
-    })
-    .overlay(alignment: .bottom, content: {
-      messageBarView()
-    })
+    }
     .onAppear { viewStore.send(.onAppear) }
-    .sheet(
-      unwrapping: viewStore.binding(
-        get: \.destination,
-        send: A.setNavigationDestination
-      ),
-      case: /S.Destination.edit,
-      onDismiss: { viewStore.send(.setNavigationDestination(nil)) }
-    ) { $model in
-      editNoticeSheet(notice: $model)
+    .onChange(
+      of: viewStore.state.errorBarMessage,
+      perform: { newValue in
+        withAnimation {
+          errorMessage = newValue
+        }
+      }
+    )
+    .overlay(alignment: .bottom) {
+      messageBarView()
+    }
+    .sheet(store: self.store.scope(state: \.$selection, action: \.editNotice)) { store in
+      editNoticeSheet(store: store)
     }
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
@@ -117,48 +74,28 @@ public struct NoticeListView: View {
     }
   }
   
-  func editNoticeSheet(notice: Binding<Notice>) -> some View {
+  @ViewBuilder
+  func editNoticeSheet(store: StoreOf<EditNoticeDomain>) -> some View {
     NavigationStack {
-      IfLetStore(
-        self.store.scope(
-          state: \.editNotice,
-          action: A.editNotice
-        ),
-        then: { store in
-          EditNoticeView(store: store)
-        },
-        else: { Text("Error creating EditNotice view") }
-      )
-      .accessibilityAddTraits([.isModal])
-      .navigationTitle(Text("Bearbeiten"))
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button(L10n.Button.close) {
-            viewStore.send(.setNavigationDestination(nil))
-          }
-        }
-        ToolbarItem(placement: .confirmationAction) {
-          if viewStore.state.isSendingEditedNotice {
-            ProgressView()
-          } else {
-            Button("Speichern") {
-              viewStore.send(.onSaveNoticeButtonTapped)
-            }
-          }
-        }
-      }
+      EditNoticeView(store: store)
+        .accessibilityAddTraits([.isModal])
+        .navigationTitle(Text("Bearbeiten"))
+        .navigationBarTitleDisplayMode(.inline)
     }
   }
   
+  @ViewBuilder
   func menuContent() -> some View {
     ForEach(SortAction.allCases, id: \.self) { sortAction in
       Button(
-        action: { viewStore.send(.setSortOrder(sortAction.sortOrder)) },
+        action: {
+          viewStore.send(
+            .setSortOrder(sortAction, viewStore.noticesSortState.sortType.toggled)
+          )
+        },
         label: {
-          if viewStore.noticesSortOrder == sortAction.sortOrder {
-            let isAscending = viewStore.orderSortType[sortAction.sortOrder, default: true]
-            Label(sortAction.text, systemImage: isAscending ? "arrow.down" : "arrow.up")
+          if viewStore.noticesSortState.action == sortAction {
+            Label(sortAction.text, systemImage: viewStore.noticesSortState.sortType.isAscending ? "arrow.down" : "arrow.up")
           } else {
             Text(sortAction.text)
           }
@@ -172,7 +109,7 @@ public struct NoticeListView: View {
   func noticeList(notices: [Notice]) -> some View {
     List(notices) { notice in
       NoticeView(notice: notice)
-        .onTapGesture { viewStore.send(.setNavigationDestination(.edit(notice))) }
+        .onTapGesture { viewStore.send(.onNoticeItemTapped(notice)) }
         .listRowSeparator(.hidden)
     }
     .refreshable {
@@ -194,6 +131,48 @@ public struct NoticeListView: View {
       } else {
         EmptyView()
       }
+    }
+  }
+  
+  @ViewBuilder
+  func errorStateView(_ errorState: ErrorState) -> some View {
+    ScrollView {
+      Spacer(minLength: 150)
+      VStack(alignment: .center, spacing: .grid(2)) {
+        if let systemImageName = errorState.systemImageName {
+          Image(systemName: systemImageName)
+            .font(.title)
+            .padding(.bottom, .grid(3))
+        }
+
+        Text(errorState.title)
+          .font(.title2.weight(.semibold))
+          .padding(.bottom, .grid(2))
+
+        if let body = errorState.body {
+          Text(body)
+            .font(.system(.body).monospaced())
+            .multilineTextAlignment(.center)
+            .lineLimit(10)
+        }
+
+        if errorState == .tokenUnavailable {
+          goToAccountSettings()
+            .padding(.vertical)
+        } else {
+          Button(
+            action: { viewStore.send(.fetchNotices(forceReload: true)) },
+            label: {
+              Text("Neu laden")
+                .padding(.horizontal)
+            }
+          )
+          .buttonStyle(CTAButtonStyle())
+          .padding(.vertical)
+        }
+      }
+      .padding(.horizontal, .grid(3))
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
   }
   
@@ -224,14 +203,14 @@ public struct NoticeListView: View {
   @ViewBuilder
   func goToAccountSettings() -> some View {
     Button(
-      action: { viewStore.send(.onNavigateToAccontSettingsButtonTapped) },
+      action: { viewStore.send(.onNavigateToAccountSettingsButtonTapped) },
       label: { Text("Zu den Einstellungen").padding(.horizontal) }
     )
     .buttonStyle(CTAButtonStyle())
   }
   
   @ViewBuilder
-  private func emptyStateView(_ emptyState: EmptyState<NoticeListDomain.Action>) -> some View {
+  func emptyStateView(_ emptyState: EmptyState<NoticeListDomain.Action>) -> some View {
     VStack(alignment: .center, spacing: .grid(3)) {
       Image(systemName: "doc.richtext")
         .font(Font.system(.largeTitle))
@@ -264,8 +243,8 @@ struct NoticeListView_Previews: PreviewProvider {
   static var previews: some View {
     NoticeListView(
       store: .init(
-        initialState: NoticeListDomain.State(notices: .results([.mock, .mock])),
-        reducer: EmptyReducer()
+        initialState: NoticeListDomain.State(notices: []),
+        reducer: { EmptyReducer() }
       )
     )
   }

@@ -55,14 +55,12 @@ struct ImageGrid_Previews: PreviewProvider {
           showImagePicker: false,
           storedPhotos: [
             // swiftlint:disable force_unwrapping
-            PickerImageResult(uiImage: UIImage(systemName: "book")!)!,
-            PickerImageResult(uiImage: UIImage(systemName: "book")!)!,
-            PickerImageResult(uiImage: UIImage(systemName: "book")!)!
+            PickerImageResult(uiImage: (UIImage(systemName: "book")!).jpegData(compressionQuality: 1))!,
             // swiftlint:enable force_unwrapping
           ],
           coordinateFromImagePicker: .zero
         ),
-        reducer: ImagesViewDomain()
+        reducer: { ImagesViewDomain() }
       )
     )
   }

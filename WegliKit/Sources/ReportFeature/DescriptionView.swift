@@ -10,75 +10,73 @@ import Styleguide
 import SwiftUI
 
 public struct DescriptionView: View {
-  public typealias S = ReportDomain.State
-  public typealias A = ReportDomain.Action
-  
   struct ViewState: Equatable {
     let description: DescriptionDomain.State
-    let chargeType: String
-    let brand: String
-    let color: String
-    let showEditScreen: Bool
+    var chargeType: String {
+      description.chargeSelection.selectedCharge?.text ?? ""
+    }
+    var brand: String {
+      description.carBrandSelection.selectedBrand?.title ?? ""
+    }
+    var color: String {
+      DescriptionDomain.colors[description.selectedColor].value
+    }
     
-    init(state: S) {
-      self.description = state.description
-      self.brand = state.description.carBrandSelection.selectedBrand?.title ?? ""
-      self.color = DescriptionDomain.colors[state.description.selectedColor].value
-      self.chargeType = state.description.chargeSelection.selectedCharge?.text ?? ""
-      self.showEditScreen = state.showEditDescription
+    init(state: DescriptionDomain.State) {
+      self.description = state
     }
   }
   
-  let store: StoreOf<ReportDomain>
-  @ObservedObject private var viewStore: ViewStore<ViewState, A>
+  let viewState: ViewState
+  let buttonAction: () -> Void
   
-  public init(store: StoreOf<ReportDomain>) {
-    self.store = store
-    self.viewStore = ViewStore(store, observe: ViewState.init)
+  public init(state: DescriptionDomain.State, action: @escaping () -> Void) {
+    self.viewState = .init(state: state)
+    self.buttonAction = action
   }
   
   public var body: some View {
     VStack(alignment: .leading) {
       VStack(alignment: .leading, spacing: .grid(3)) {
-        row(title: L10n.Description.Row.licenseplateNumber, content: viewStore.description.licensePlateNumber)
+        row(title: L10n.Description.Row.licenseplateNumber, content: viewState.description.licensePlateNumber)
         
-        row(title: L10n.Description.Row.carType, content: viewStore.brand)
+        row(title: L10n.Description.Row.carType, content: viewState.brand)
         
-        row(title: L10n.Description.Row.carColor, content: viewStore.color)
+        row(title: L10n.Description.Row.carColor, content: viewState.color)
         
-        row(title: L10n.Description.Row.chargeType, content: viewStore.chargeType)
+        row(title: L10n.Description.Row.chargeType, content: viewState.chargeType)
         
-        row(title: L10n.Description.Row.length, content: viewStore.description.time)
+        row(title: L10n.Description.Row.length, content: viewState.description.time)
         
         VStack(alignment: .leading, spacing: .grid(3)) {
           toggleRow(
             label: L10n.Description.Row.didBlockOthers,
-            value: viewStore.description.blockedOthers
+            value: viewState.description.blockedOthers
           )
           
           toggleRow(
             label: "Das Fahrzeug war verlassen",
-            value: viewStore.description.vehicleEmpty
+            value: viewState.description.vehicleEmpty
           )
           
           toggleRow(
             label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
-            value: viewStore.description.hazardLights
+            value: viewState.description.hazardLights
           )
           
           toggleRow(
             label: "Die TÜV-Plakette war abgelaufen",
-            value: viewStore.description.expiredTuv
+            value: viewState.description.expiredTuv
           )
           
           toggleRow(
             label: "Die Umwelt-Plakette fehlte oder war ungültig",
-            value: viewStore.description.expiredEco
+            value: viewState.description.expiredEco
           )
           
           toggleRow(
             label: "Fahrzeug über 2,8 t zulässige Gesamtmasse",
-            value: viewStore.description.over28Tons
+            value: viewState.description.over28Tons
           )
         }
       }
@@ -86,7 +84,7 @@ public struct DescriptionView: View {
       .accessibilityElement(children: .combine)
       
       Button(
-        action: { viewStore.send(.setDestination(.description)) },
+        action: buttonAction,
         label: {
           Label(L10n.Description.EditButton.copy, systemImage: "square.and.pencil")
             .contentShape(Rectangle())
@@ -96,9 +94,6 @@ public struct DescriptionView: View {
       .accessibilitySortPriority(2)
       .buttonStyle(.edit())
       .padding(.top)
-      .accessibilityAction {
-        viewStore.send(.set(\.$showEditDescription, true))
-      }
     }
     .contentShape(Rectangle())
   }
@@ -128,15 +123,6 @@ public struct DescriptionView: View {
   }
 }
 
-struct DescriptionWidgetView_Previews: PreviewProvider {
-  static var previews: some View {
-    Preview {
-      DescriptionView(
-        store: .init(
-          initialState: .preview,
-          reducer: ReportDomain()
-        )
-      )
-    }
-  }
+#Preview {
+  DescriptionView(state: .init(model: .mock), action: {})
 }

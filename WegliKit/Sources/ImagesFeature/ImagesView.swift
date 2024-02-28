@@ -72,12 +72,18 @@ public struct ImagesView: View {
       }
       .accessibilityElement(children: .combine)
     }
-    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
+    .alert(
+      item: viewStore.binding(
+        get: { $0.alert },
+        send: .dismissAlert
+      ),
+      content: { Alert(title: Text($0.title)) }
+    )
     .sheet(
-      isPresented: viewStore.binding(\.$showImagePicker),
+      isPresented: viewStore.$showImagePicker,
       content: {
         ImagePicker(
-          isPresented: viewStore.binding(\.$showImagePicker),
+          isPresented: viewStore.$showImagePicker,
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
             send: ImagesViewDomain.Action.setPhotos
@@ -86,10 +92,10 @@ public struct ImagesView: View {
       }
     )
     .fullScreenCover(
-      isPresented: viewStore.binding(\.$showCamera),
+      isPresented: viewStore.$showCamera,
       content: {
         CameraView(
-          isPresented: viewStore.binding(\.$showCamera),
+          isPresented: viewStore.$showCamera,
           pickerResult: viewStore.binding(
             get: \.storedPhotos,
             send: ImagesViewDomain.Action.setPhotos
@@ -150,13 +156,11 @@ public struct ImagesView: View {
   }
 }
 
-struct Images_Previews: PreviewProvider {
-  static var previews: some View {
-    ImagesView(
-      store: Store(
-        initialState: ImagesViewDomain.State(),
-        reducer: ImagesViewDomain()
-      )
+#Preview {
+  ImagesView(
+    store: Store(
+      initialState: ImagesViewDomain.State(),
+      reducer: { ImagesViewDomain() }
     )
-  }
+  )
 }

@@ -6,7 +6,6 @@ import L10n
 import SharedModels
 import Styleguide
 import SwiftUI
-import SwiftUINavigation
 
 struct EditNoticeView: View {
   public typealias S = EditNoticeDomain.State
@@ -32,20 +31,20 @@ struct EditNoticeView: View {
               )
             )
             
-            Button(
-              action: { viewStore.send(.image(.onAddPhotosButtonTapped)) },
-              label: {
-                Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
-                  .frame(maxWidth: .infinity)
-              }
-            )
-            .buttonStyle(.edit())
+//            Button(
+//              action: { viewStore.send(.image(.onAddPhotosButtonTapped)) },
+//              label: {
+//                Label(L10n.Photos.ImportButton.copy, systemImage: "photo.on.rectangle.angled")
+//                  .frame(maxWidth: .infinity)
+//              }
+//            )
+//            .buttonStyle(.edit())
           }
           .sheet(
-            isPresented: viewStore.binding(\.image.$showImagePicker),
+            isPresented: viewStore.$showImagePicker,
             content: {
               ImagePicker(
-                isPresented: viewStore.binding(\.image.$showImagePicker),
+                isPresented: viewStore.$showImagePicker,
                 pickerResult: viewStore.binding(
                   get: \.image.storedPhotos,
                   send: { EditNoticeDomain.Action.image(.setPhotos($0)) }
@@ -94,25 +93,25 @@ struct EditNoticeView: View {
           VStack(alignment: .leading) {
             TextField(
               L10n.Location.Placeholder.street,
-              text: viewStore.binding(\.$street)
+              text: viewStore.$street
             )
             TextField(
               L10n.Location.Placeholder.city,
-              text: viewStore.binding(\.$city)
+              text: viewStore.$city
             )
             TextField(
               L10n.Location.Placeholder.postalCode,
-              text: viewStore.binding(\.$zip)
+              text: viewStore.$zip
             )
           }
         }
         .padding(.vertical, .grid(1))
         
-        Widget(title: Text( L10n.date), shouldIndicateCompletion: false) {
+        Widget(title: Text(L10n.date), shouldIndicateCompletion: false) {
           HStack {
             DatePicker(
               L10n.date,
-              selection: viewStore.binding(\.$date)
+              selection: viewStore.$date
             )
             .labelsHidden()
             Spacer()
@@ -145,7 +144,7 @@ struct EditNoticeView: View {
           .padding(.vertical, .grid(8))
         
         Button(
-          action: { viewStore.send(.onDeleteNoticeButtonTapped) },
+          action: { viewStore.send(.deleteNoticeButtonTapped) },
           label: {
             if viewStore.isDeletingNotice {
               ProgressView()
@@ -165,14 +164,39 @@ struct EditNoticeView: View {
         .padding()
       }
     }
-    .alert(store.scope(state: \.alert), dismiss: .dismissAlert)
+    .toolbar {
+      ToolbarItem(placement: .cancellationAction) {
+        Button(L10n.Button.close) {
+          viewStore.send(.closeButtonTapped)
+        }
+      }
+      ToolbarItem(placement: .confirmationAction) {
+        if viewStore.isSendingNoticeUpdate {
+          ProgressView()
+        } else {
+          Button("Speichern") {
+            viewStore.send(.saveButtonTapped)
+          }
+        }
+      }
+    }
+    .alert(
+      item: viewStore.binding(get: \.alert, send: .dismissAlert),
+      content: {
+        Alert($0) { action in
+          if let action {
+            viewStore.send(action)
+          }
+        }
+      }
+    )
     .textFieldStyle(.roundedBorder)
   }
   
   var licensePlateView: some View {
     TextField(
       L10n.Description.Row.licenseplateNumber,
-      text: viewStore.binding(\.description.$licensePlateNumber)
+      text: viewStore.$licensePlateNumber
     )
     .textFieldStyle(.roundedBorder)
     .disableAutocorrection(true)
@@ -181,7 +205,7 @@ struct EditNoticeView: View {
   
   var carBrandView: some View {
     NavigationLink(
-      isActive: viewStore.binding(\.$presentCarBrandSelection),
+      isActive: viewStore.$presentCarBrandSelection,
       destination: {
         CarBrandSelectorView(
           store: self.store.scope(
@@ -216,7 +240,7 @@ struct EditNoticeView: View {
       Spacer()
       Picker(
         L10n.Description.Row.carColor,
-        selection: viewStore.binding(\.description.$selectedColor)
+        selection: viewStore.$description.selectedColor
       ) {
         ForEach(1 ..< DescriptionDomain.colors.count, id: \.self) {
           Text(DescriptionDomain.colors[$0].value)
@@ -230,7 +254,7 @@ struct EditNoticeView: View {
   
   var chargeTypeView: some View {
     NavigationLink(
-      isActive: viewStore.binding(\.$presentChargeSelection),
+      isActive: viewStore.$presentChargeSelection,
       destination: {
         ChargeSelectionView(
           store: self.store.scope(
@@ -274,7 +298,7 @@ struct EditNoticeView: View {
       Spacer()
       Picker(
         L10n.Description.Row.length,
-        selection: viewStore.binding(\.description.$selectedDuration)
+        selection: viewStore.$description.selectedDuration
       ) {
         ForEach(times, id: \.self) { time in
           Text(Times.times[time] ?? "")
@@ -288,42 +312,42 @@ struct EditNoticeView: View {
   var blockedOthersView: some View {
     ToggleButton(
       label: L10n.Description.Row.didBlockOthers,
-      isOn: viewStore.binding(\.description.$blockedOthers)
+      isOn: viewStore.$description.blockedOthers
     )
   }
   
   var vehicleEmptyView: some View {
     ToggleButton(
       label: "Das Fahrzeug war verlassen",
-      isOn: viewStore.binding(\.description.$vehicleEmpty)
+      isOn: viewStore.$description.vehicleEmpty
     )
   }
   
   var hazardLightsView: some View {
     ToggleButton(
       label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
-      isOn: viewStore.binding(\.description.$hazardLights)
+      isOn: viewStore.$description.hazardLights
     )
   }
   
   var expiredTuvView: some View {
     ToggleButton(
       label: "Die TÜV-Plakette war abgelaufen",
-      isOn: viewStore.binding(\.description.$expiredTuv)
+      isOn: viewStore.$description.expiredTuv
     )
   }
   
   var expiredEcoView: some View {
     ToggleButton(
       label: "Die Umwelt-Plakette fehlte oder war ungültig",
-      isOn: viewStore.binding(\.description.$expiredEco)
+      isOn: viewStore.$description.expiredEco
     )
   }
   
   var overTwentyEightTonsView: some View {
     ToggleButton(
       label: "Fahrzeug über 2,8 t zulässige Gesamtmasse",
-      isOn: viewStore.binding(\.description.$over28Tons)
+      isOn: viewStore.$description.over28Tons
     )
   }
 }
@@ -333,26 +357,8 @@ struct SwiftUIView_Previews: PreviewProvider {
     EditNoticeView(
       store: .init(
         initialState: EditNoticeDomain.State(notice: .mock),
-        reducer: EditNoticeDomain()
+        reducer: { EditNoticeDomain() }
       )
     )
   }
-}
-
-public extension AlertState where Action == EditNoticeDomain.Action {
-  static let editNoticeFailure = Self(
-    title: .init("Fehler"),
-    message: .init("Die Meldung konnte nicht gelöscht werden"),
-    buttons: [
-      .default(.init("Ok")),
-      .default(.init("Wiederholen"), action: .send(.deleteConfirmButtonTapped))
-    ]
-  )
-  
-  static let confirmDeleteNotice = Self(
-    title: .init("Meldung löschen"),
-    buttons: [
-      .destructive(.init("Löschen"), action: .send(.deleteConfirmButtonTapped)),
-    ]
-  )
 }

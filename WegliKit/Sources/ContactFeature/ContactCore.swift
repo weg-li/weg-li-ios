@@ -15,25 +15,30 @@ public struct ContactViewDomain: Reducer {
   @Dependency(\.fileClient) var fileClient
   
   public struct State: Equatable {
-    public init(
-      contact: Contact = .empty,
-      alert: AlertState<Action>? = nil
-    ) {
+    @BindingState public var contact: Contact
+    @PresentationState public var alert: AlertState<Action.Alert>?
+    
+    public init(contact: Contact = .empty, alert: AlertState<Action.Alert>? = nil) {
       self.contact = contact
       self.alert = alert
     }
-    
-    @BindingState public var contact: Contact
-    @BindingState public var alert: AlertState<Action>?
   }
   
+  @CasePathable
   public enum Action: Equatable {
+    case alert(PresentationAction<Alert>)
     case contact(ContactDomain.Action)
     case onResetContactDataButtonTapped
     case onResetContactConfirmButtonTapped
     case dismissAlert
     case onDisappear
+    
+    public enum Alert: Equatable, Sendable {
+      case onResetButtonTapped
+    }
   }
+  
+  enum CancelID { case debounce }
   
   public var body: some ReducerOf<Self> {
     Scope(state: \.contact, action: /Action.contact) {
@@ -42,11 +47,13 @@ public struct ContactViewDomain: Reducer {
     
     Reduce<State, Action> { state, action in
       switch action {
+      case .alert:
+        return .none
+        
       case .contact:
         let contact = state.contact
-        return .fireAndForget {
-          enum CancelID {}
-          try await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
+        return .run { _ in
+          try await withTaskCancellation(id: CancelID.debounce, cancelInFlight: true) {
             try await clock.sleep(for: .seconds(0.3))
             try await fileClient.saveContactSettings(contact)
           }
@@ -69,7 +76,7 @@ public struct ContactViewDomain: Reducer {
 }
 
 
-public struct ContactDomain: ReducerProtocol {
+public struct ContactDomain: Reducer {
   public init() {}
   
   public typealias State = Contact
@@ -85,14 +92,20 @@ public struct ContactDomain: ReducerProtocol {
 
 // MARK: Helper
 
-public extension AlertState where Action == ContactViewDomain.Action {
+public extension AlertState where Action == ContactViewDomain.Action.Alert {
   static let resetContactDataAlert = Self(
-    title: TextState(L10n.Contact.Alert.title),
-    primaryButton: .destructive(
-      TextState(L10n.Contact.Alert.reset),
-      action: .send(.onResetContactConfirmButtonTapped)
-    ),
-    secondaryButton: .cancel(.init(L10n.cancel), action: .send(.dismissAlert))
+    title: { TextState(L10n.Contact.Alert.title) },
+    actions: {
+      ButtonState(
+        role: .destructive,
+        action: .onResetButtonTapped,
+        label: { TextState(L10n.Contact.Alert.reset) }
+      )
+      
+      ButtonState(role: .cancel) {
+        TextState(L10n.cancel)
+      }
+    }
   )
 }
 

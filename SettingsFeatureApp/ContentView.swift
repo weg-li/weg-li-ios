@@ -1,22 +1,23 @@
+import ComposableArchitecture
+import SharedModels
 import SettingsFeature
 import SwiftUI
 
 struct ContentView: View {
   var body: some View {
     SettingsView(
-      store: .init(
-        initialState: .init(
-          accountSettingsState: .init(accountSettings: .init(apiToken: "")),
-          userSettings: .init()
+      store: Store(initialState: SettingsDomain.State(
+        accountSettingsState: AccountSettingsDomain.State(
+          accountSettings: AccountSettings(apiToken: "")
         ),
-        reducer: SettingsDomain()
-      )
+        userSettings: UserSettings())
+      ) {
+        SettingsDomain()
+      }
     )
   }
 }
 
-struct ContentView_Previews: PreviewProvider {
-  static var previews: some View {
-    ContentView()
-  }
+#Preview {
+  ContentView()
 }

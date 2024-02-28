@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -650,17 +650,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 230329;
+				CURRENT_PROJECT_VERSION = 240115;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/iOS\\ App/Resources/Preview\\ Content";
 				DEVELOPMENT_TEAM = QDDL89SBZ7;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "weg-li/iOS App/Resources/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = li.weg.app.ios;
 				PRODUCT_NAME = "weg-li";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -675,17 +676,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 230329;
+				CURRENT_PROJECT_VERSION = 240115;
 				DEVELOPMENT_ASSET_PATHS = "weg-li/iOS\\ App/Resources/Preview\\ Content";
 				DEVELOPMENT_TEAM = QDDL89SBZ7;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "weg-li/iOS App/Resources/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = li.weg.app.ios;
 				PRODUCT_NAME = "weg-li";
 				PROVISIONING_PROFILE_SPECIFIER = "";

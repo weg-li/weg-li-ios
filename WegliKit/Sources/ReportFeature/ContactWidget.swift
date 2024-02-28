@@ -8,48 +8,34 @@ import Styleguide
 import SwiftUI
 
 public struct ContactWidget: View {
-  public struct ViewState: Equatable {
-    let isResetButtonDisabled: Bool
-    let contact: Contact
-    let showEditScreen: Bool
-    var fullName: String { contact.fullName }
-    var city: String { contact.address.city }
-    
-    init(state: ReportDomain.State) {
-      self.isResetButtonDisabled = state.contactState == .empty
-      self.contact = state.contactState.contact
-      self.showEditScreen = state.showEditContact
-    }
-  }
-  
-  public let store: StoreOf<ReportDomain>
-  @ObservedObject private var viewStore: ViewStore<ViewState, ReportDomain.Action>
-  
-  public init(store: StoreOf<ReportDomain>) {
-    self.store = store
-    self.viewStore = ViewStore(store, observe: ViewState.init)
+  let contact: Contact
+  let buttonAction: () -> Void
+
+  public init(contact: Contact, buttonAction: @escaping () -> Void) {
+    self.contact = contact
+    self.buttonAction = buttonAction
   }
   
   public var body: some View {
     VStack(alignment: .leading, spacing: .grid(2)) {
       VStack(alignment: .leading, spacing: .grid(2)) {
-        row(callout: L10n.Contact.Row.nameCopy, content: viewStore.fullName)
-        row(callout: L10n.Contact.Row.streetCopy, content: viewStore.contact.address.street)
-        row(callout: L10n.Contact.Row.cityCopy, content: viewStore.city)
-        if !viewStore.contact.phone.isEmpty {
-          row(callout: L10n.Contact.Row.phoneCopy, content: viewStore.contact.phone)
+        row(callout: L10n.Contact.Row.nameCopy, content: contact.fullName)
+        row(callout: L10n.Contact.Row.streetCopy, content: contact.address.street)
+        row(callout: L10n.Contact.Row.cityCopy, content: contact.address.city)
+        if !contact.phone.isEmpty {
+          row(callout: L10n.Contact.Row.phoneCopy, content: contact.phone)
         }
-        if !viewStore.contact.dateOfBirth.isEmpty {
-          row(callout: L10n.Contact.Row.dateOfBirth, content: viewStore.contact.dateOfBirth)
+        if !contact.dateOfBirth.isEmpty {
+          row(callout: L10n.Contact.Row.dateOfBirth, content: contact.dateOfBirth)
         }
-        if !viewStore.contact.address.addition.isEmpty {
-          row(callout: L10n.Contact.Row.addressAddition, content: viewStore.contact.address.addition)
+        if !contact.address.addition.isEmpty {
+          row(callout: L10n.Contact.Row.addressAddition, content: contact.address.addition)
         }
       }
       .accessibilityElement(children: .combine)
       VStack(spacing: .grid(2)) {
         Button(
-          action: { viewStore.send(.setDestination(.contact)) },
+          action: buttonAction,
           label: {
             Label(L10n.Contact.editButtonCopy, systemImage: "square.and.pencil")
               .frame(maxWidth: .infinity)
@@ -80,13 +66,6 @@ public struct ContactWidget: View {
   }
 }
 
-struct PersonalDataWidget_Previews: PreviewProvider {
-  static var previews: some View {
-    ContactWidget(
-      store: Store(
-        initialState: .preview,
-        reducer: ReportDomain()
-      )
-    )
-  }
+#Preview {
+  ContactWidget(contact: .preview, buttonAction: {})
 }

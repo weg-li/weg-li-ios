@@ -56,7 +56,7 @@ public struct EditDescriptionView: View {
       }
       
       Section {
-        TextEditor(text: viewStore.binding(\.$note))
+        TextEditor(text: viewStore.$note)
           .font(.body)
           .clipShape(RoundedRectangle(cornerRadius: 4))
       } header: {
@@ -68,7 +68,7 @@ public struct EditDescriptionView: View {
   var licensePlateView: some View {
     TextField(
       L10n.Description.Row.licenseplateNumber,
-      text: viewStore.binding(\.$licensePlateNumber)
+      text: viewStore.$licensePlateNumber
     )
     .textFieldStyle(.plain)
     .disableAutocorrection(true)
@@ -76,38 +76,35 @@ public struct EditDescriptionView: View {
   }
   
   var carBrandView: some View {
-    NavigationLink(
-      isActive: viewStore.binding(\.$presentCarBrandSelection),
-      destination: {
-        CarBrandSelectorView(
-          store: self.store.scope(
-            state: \.carBrandSelection,
-            action: A.carBrandSelection
-          )
-        )
-        .navigationTitle(Text(L10n.Description.Row.carType))
-        .navigationBarTitleDisplayMode(.inline)
-      },
-      label: {
-        HStack {
-          Text(L10n.Description.Row.carType)
-          if let brand = viewStore.carBrandSelection.selectedBrand {
-            Spacer()
-            Text(brand.title)
-          }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-          viewStore.send(.set(\.$presentCarBrandSelection, true))
-        }
+    HStack {
+      Text(L10n.Description.Row.carType)
+      Spacer()
+      if let brand = viewStore.carBrandSelection.selectedBrand {
+        Text(brand.title)
       }
-    )
+      Image(systemName: "chevron.right")
+        .imageScale(.small)
+    }
+    .contentShape(Rectangle())
+    .onTapGesture {
+      viewStore.send(.set(\.$presentCarBrandSelection, true))
+    }
+    .navigationDestination(isPresented: viewStore.$presentCarBrandSelection) {
+      CarBrandSelectorView(
+        store: self.store.scope(
+          state: \.carBrandSelection,
+          action: A.carBrandSelection
+        )
+      )
+      .navigationTitle(Text(L10n.Description.Row.carType))
+      .navigationBarTitleDisplayMode(.inline)
+    }
   }
   
   var carColorView: some View {
     Picker(
       L10n.Description.Row.carColor,
-      selection: viewStore.binding(\.$selectedColor)
+      selection: viewStore.$selectedColor
     ) {
       ForEach(1 ..< DescriptionDomain.colors.count, id: \.self) {
         Text(DescriptionDomain.colors[$0].value)
@@ -119,33 +116,29 @@ public struct EditDescriptionView: View {
   }
   
   var chargeTypeView: some View {
-    NavigationLink(
-      isActive: viewStore.binding(\.$presentChargeSelection),
-      destination: {
-        ChargeSelectionView(
-          store: self.store.scope(
-            state: \.chargeSelection,
-            action: A.chargeSelection
-          )
-        )
-        .accessibilityAddTraits([.isModal])
-        .navigationTitle(Text(L10n.Description.Row.chargeType))
-        .navigationBarTitleDisplayMode(.inline)
-      },
-      label: {
-        HStack {
-          Text(L10n.Description.Row.chargeType)
-          if let charge = viewStore.state.chargeSelection.selectedCharge {
-            Spacer()
-            Text(charge.text)
-          }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-          viewStore.send(.set(\.$presentChargeSelection, true))
-        }
+    HStack {
+      Text(L10n.Description.Row.chargeType)
+      Spacer()
+      if let charge = viewStore.state.chargeSelection.selectedCharge {
+        Text(charge.text)
       }
-    )
+      Image(systemName: "chevron.right")
+        .imageScale(.small)
+    }
+    .contentShape(Rectangle())
+    .onTapGesture {
+      viewStore.send(.set(\.$presentChargeSelection, true))
+    }
+    .navigationDestination(isPresented: viewStore.$presentChargeSelection) {
+      ChargeSelectionView(
+        store: self.store.scope(
+          state: \.chargeSelection,
+          action: A.chargeSelection
+        )
+      )
+      .navigationTitle(Text(L10n.Description.Row.chargeType))
+      .navigationBarTitleDisplayMode(.inline)
+    }
   }
   
   var times: [Int] {
@@ -158,7 +151,7 @@ public struct EditDescriptionView: View {
   var chargeDurationView: some View {
     Picker(
       L10n.Description.Row.length,
-      selection: viewStore.binding(\.$selectedDuration)
+      selection: viewStore.$selectedDuration
     ) {
       ForEach(times, id: \.self) { time in
         Text(Times.times[time] ?? "")
@@ -171,42 +164,42 @@ public struct EditDescriptionView: View {
   var blockedOthersView: some View {
     ToggleButton(
       label: L10n.Description.Row.didBlockOthers,
-      isOn: viewStore.binding(\.$blockedOthers)
+      isOn: viewStore.$blockedOthers
     )
   }
   
   var vehicleEmptyView: some View {
     ToggleButton(
       label: "Das Fahrzeug war verlassen",
-      isOn: viewStore.binding(\.$vehicleEmpty)
+      isOn: viewStore.$vehicleEmpty
     )
   }
   
   var hazardLightsView: some View {
     ToggleButton(
       label: "Das Fahrzeug hatte die Warnblinkanlage aktiviert",
-      isOn: viewStore.binding(\.$hazardLights)
+      isOn: viewStore.$hazardLights
     )
   }
   
   var expiredTuvView: some View {
     ToggleButton(
       label: "Die TÜV-Plakette war abgelaufen",
-      isOn: viewStore.binding(\.$expiredTuv)
+      isOn: viewStore.$expiredTuv
     )
   }
   
   var expiredEcoView: some View {
     ToggleButton(
       label: "Die Umwelt-Plakette fehlte oder war ungültig",
-      isOn: viewStore.binding(\.$expiredEco)
+      isOn: viewStore.$expiredEco
     )
   }
   
   var overTwentyEightTonsView: some View {
     ToggleButton(
       label: "Fahrzeug über 2,8 t zulässige Gesamtmasse",
-      isOn: viewStore.binding(\.$over28Tons)
+      isOn: viewStore.$over28Tons
     )
   }
 }
@@ -217,7 +210,7 @@ struct Description_Previews: PreviewProvider {
       EditDescriptionView(
         store: Store(
           initialState: DescriptionDomain.State(),
-          reducer: DescriptionDomain()
+          reducer: { DescriptionDomain() }
         )
       )
     }

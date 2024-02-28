@@ -56,10 +56,10 @@ public struct AppDomain: Reducer {
     
     public var isFetchingNotices = false
     
-    enum NavigationDestination: Equatable {
-      case noticeList(NoticeListDomain.State.Destination?)
-      case report(ReportDomain.State.Destination?)
-      case settings(SettingsDomain.State.Destination?)
+    enum Destination: Equatable {
+      case noticeList(NoticeListDomain.Destination?)
+      case report(ReportDomain.Destination?)
+      case settings(SettingsDomain.Destination?)
     }
   }
   
@@ -150,6 +150,7 @@ public struct AppDomain: Reducer {
           let userSettings = (try? result.value) ?? UserSettings(showsAllTextRecognitionSettings: false)
           state.settings.userSettings = userSettings
           state.reportDraft.images.showsAllTextRecognitionResults = userSettings.showsAllTextRecognitionSettings
+          state.reportDraft.alwaysSendNotice = userSettings.alwaysSendNotice
           return .none
         }
         
@@ -168,11 +169,7 @@ public struct AppDomain: Reducer {
           state.reportDraft.images.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
           state.reportDraft.alwaysSendNotice = state.settings.userSettings.alwaysSendNotice
           return .none
-        
-        case .accountSettings:
-          state.reportDraft.apiToken = state.settings.accountSettingsState.accountSettings.apiToken
-          return .none
-          
+                  
         default:
           return .none
         }
@@ -181,7 +178,7 @@ public struct AppDomain: Reducer {
       case .report(.mail(.setMailResult(.sent))):
         return .none
         
-      case .report(.onResetConfirmButtonTapped):
+      case .report(.destination(.presented(.alert(.confirmResetButtonTapped)))):
         state.reportDraft = ReportDomain.State(
           uuid: uuid.callAsFunction,
           images: .init(),
@@ -189,12 +186,12 @@ public struct AppDomain: Reducer {
           date: date.callAsFunction,
           location: .init()
         )
-        return .none
+        state.reportDraft.apiToken = keychainClient.getToken() ?? ""
+        state.reportDraft.images.showsAllTextRecognitionResults = state.settings.userSettings.showsAllTextRecognitionSettings
+        state.reportDraft.alwaysSendNotice = state.settings.userSettings.alwaysSendNotice
         
-      case .report(.contact):
-        state.contact = state.reportDraft.contactState.contact
         return .none
-              
+                      
       case .reportSaved:
         // Reset report draft after it was saved
         state.reportDraft = ReportDomain.State(
@@ -205,10 +202,9 @@ public struct AppDomain: Reducer {
         )
         return .none
         
-      case .noticeList(.onNavigateToAccontSettingsButtonTapped):
+      case .noticeList(.onNavigateToAccountSettingsButtonTapped):
         return .concatenate(
-          .send(.viewAction(.setSelectedTab(.settings))),
-          .send(.settings(.setDestination(.accountSettings)))
+          .send(.viewAction(.setSelectedTab(.settings)))
         )
         
       case .noticeList, .report:
@@ -225,7 +221,7 @@ public extension AppDomain.State {
       accountSettingsState: .init(accountSettings: .init(apiToken: "")),
       userSettings: .init(showsAllTextRecognitionSettings: false)
     ),
-    noticeList: NoticeListDomain.State = .init(notices: .loading)
+    noticeList: NoticeListDomain.State = .init(notices: [])
   ) {
     self.settings = settings
     self.noticeList = noticeList

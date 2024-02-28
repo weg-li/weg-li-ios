@@ -14,7 +14,7 @@ final class MailStoreTests: XCTestCase {
         mail: .init(),
         isPresentingMailContent: false
       ),
-      reducer: MailDomain()
+      reducer: {MailDomain()}
     )
     
     await store.send(.presentMailContentView(true)) {
@@ -29,7 +29,7 @@ final class MailStoreTests: XCTestCase {
         mail: .init(),
         isPresentingMailContent: false
       ),
-      reducer: MailDomain()
+      reducer: {MailDomain()}
     )
     
     let result = MFMailComposeResult(rawValue: 2)!

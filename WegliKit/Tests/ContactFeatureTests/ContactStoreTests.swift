@@ -18,7 +18,7 @@ final class ContactStoreTests: XCTestCase {
     
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient = fileClient
     let clock = TestClock()
@@ -36,7 +36,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changeName_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -55,7 +55,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changePhone_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -70,7 +70,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changeStreet_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -85,7 +85,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changeCity_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -100,7 +100,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changePostalCode_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -115,7 +115,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changeDateOfBirth_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -130,7 +130,7 @@ final class ContactStoreTests: XCTestCase {
   func test_changeAddressAddition_shouldUpdateState() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -145,7 +145,7 @@ final class ContactStoreTests: XCTestCase {
   func test_setEmptyValues_shouldInvalidContact() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
     store.dependencies.fileClient.save = { @Sendable _, _ in () }
     store.dependencies.continuousClock = ImmediateClock()
@@ -162,26 +162,26 @@ final class ContactStoreTests: XCTestCase {
     await store.finish()
   }
 
-  func test_resetData_ButtonTap_PresentAnAlert() {
+  func test_resetData_ButtonTap_PresentAnAlert() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
 
-    store.send(.onResetContactDataButtonTapped) {
+    await store.send(.onResetContactDataButtonTapped) {
       $0.alert = .resetContactDataAlert
     }
   }
 
-  func test_resetData_ConfirmButtonTap_shouldResetTheState_andDismissAlert() {
+  func test_resetData_ConfirmButtonTap_shouldResetTheState_andDismissAlert() async {
     let store = TestStore(
       initialState: ContactViewDomain.State.preview,
-      reducer: ContactViewDomain()
+      reducer: { ContactViewDomain() }
     )
 
-    store.send(.onResetContactConfirmButtonTapped) {
+    await store.send(.onResetContactConfirmButtonTapped) {
       $0 = .empty
     }
-    store.receive(.dismissAlert)
+    await store.receive(.dismissAlert)
   }
 }

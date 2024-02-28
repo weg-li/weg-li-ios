@@ -12,7 +12,7 @@ final class DescriptionStoreTests: XCTestCase {
   func test_setCarColor_shouldUpdateState() async {
     let store = TestStore(
       initialState: DescriptionDomain.State(),
-      reducer: DescriptionDomain()
+      reducer: DescriptionDomain.init
     )
     
     await store.send(.set(\.$selectedColor, 1)) { state in
@@ -29,7 +29,7 @@ final class DescriptionStoreTests: XCTestCase {
         selectedColor: 1,
         selectedBrand: brand
       ),
-      reducer: DescriptionDomain()
+      reducer: DescriptionDomain.init
     )
     
     await store.send(.set(\.$licensePlateNumber, "WEG-LI-101")) { state in
@@ -44,7 +44,7 @@ final class DescriptionStoreTests: XCTestCase {
         selectedColor: 1,
         selectedBrand: brand
       ),
-      reducer: DescriptionDomain()
+      reducer: DescriptionDomain.init
     )
     
     await store.send(.set(\.$selectedDuration, 1)) { state in
@@ -62,7 +62,7 @@ final class DescriptionStoreTests: XCTestCase {
         selectedCharge: .init(id: "12", text: "213", isFavorite: false, isSelected: false),
         blockedOthers: false
       ),
-      reducer: DescriptionDomain()
+      reducer: DescriptionDomain.init
     )
     
     await store.send(.set(\.$licensePlateNumber, "WEG-LI-101")) { state in

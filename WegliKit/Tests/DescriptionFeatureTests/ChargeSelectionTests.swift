@@ -9,7 +9,7 @@ final class ChargeSelectionTests: XCTestCase {
   func test_selectCharge_shouldUpdateState() async {
     let store = TestStore(
       initialState: ChargeSelection.State(),
-      reducer: ChargeSelection()
+      reducer: ChargeSelection.init
     )
     
     let testCharge = Charge(id: "1", text: "2", isFavorite: false, isSelected: true)
@@ -23,8 +23,8 @@ final class ChargeSelectionTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: ChargeSelection(),
-      prepareDependencies: { values in
+      reducer: ChargeSelection.init,
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.fileClient = .noop
       }
@@ -52,8 +52,8 @@ final class ChargeSelectionTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: ChargeSelection(),
-      prepareDependencies: { values in
+      reducer: ChargeSelection.init,
+      withDependencies: { values in
         values.continuousClock = clock
         values.fileClient = fileClient
         values.feedbackGenerator = .noop
@@ -90,8 +90,8 @@ final class ChargeSelectionTests: XCTestCase {
     
     let store = TestStore(
       initialState: state,
-      reducer: ChargeSelection(),
-      prepareDependencies: { values in
+      reducer: ChargeSelection.init,
+      withDependencies: { values in
         values.continuousClock = ImmediateClock()
         values.fileClient = fileClient
       }

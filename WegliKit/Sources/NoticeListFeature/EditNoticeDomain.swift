@@ -1,6 +1,9 @@
+import ApiClient
 import ComposableArchitecture
-import Foundation
 import DescriptionFeature
+import FeedbackGeneratorClient
+import Foundation
+import L10n
 import ImagesFeature
 import SharedModels
 
@@ -8,11 +11,15 @@ public struct EditNoticeDomain: Reducer {
   public init() {}
   
   @Dependency(\.apiService) public var apiService
+  @Dependency(\.feedbackGenerator) public var feedbackGenerator
+  @Dependency(\.dismiss) var dismiss
   
-  public struct State: Equatable {
-    var notice: Notice
+  public struct State: Equatable, Identifiable {
+    @BindingState public var notice: Notice
     
-    public var description: DescriptionDomain.State
+    public var id: String { notice.id }
+    
+    @BindingState public var description: DescriptionDomain.State
     public var image: ImagesViewDomain.State
     
     @BindingState public var date: Date
@@ -22,12 +29,14 @@ public struct EditNoticeDomain: Reducer {
     @BindingState public var zip: String
     @BindingState public var presentChargeSelection = false
     @BindingState public var presentCarBrandSelection = false
-    
+    @BindingState public var isSendingNoticeUpdate = false
     @BindingState public var showImagePicker = false
     public var destination: Destination?
+    
     public enum Destination: Equatable {
       case selectBrand(CarBrandSelection.State)
     }
+    
     public var isDeletingNotice = false
     public var alert: AlertState<Action>?
     
@@ -52,9 +61,12 @@ public struct EditNoticeDomain: Reducer {
     case setDestination(State.Destination?)
     case image(ImagesViewDomain.Action)
     
-    case onDeleteNoticeButtonTapped
+    case closeButtonTapped
+    case saveButtonTapped
+    case deleteNoticeButtonTapped
     case deleteConfirmButtonTapped
     case deleteNoticeResponse(TaskResult<Bool>)
+    case editNoticeResponse(TaskResult<Notice>)
     case dismissAlert
   }
   
@@ -84,7 +96,12 @@ public struct EditNoticeDomain: Reducer {
       case .description, .setDestination:
         return .none
         
-      case .onDeleteNoticeButtonTapped:
+      case .closeButtonTapped:
+        return .run { _ in
+          await dismiss()
+        }
+      
+      case .deleteNoticeButtonTapped:
         state.alert = .confirmDeleteNotice
         return .none
         
@@ -94,12 +111,41 @@ public struct EditNoticeDomain: Reducer {
         }
         state.isDeletingNotice = true
         
-        return .task {
-          await .deleteNoticeResponse(
-            TaskResult { try await apiService.deleteNotice(token) }
+        return .run { send in
+          await send(
+            .deleteNoticeResponse(
+              TaskResult { try await apiService.deleteNotice(token) }
+            )
           )
         }
         
+      case .saveButtonTapped:
+        state.isSendingNoticeUpdate = true
+
+        return .run { [patch = state.asNoticePatch()] send in
+          await send(
+            .editNoticeResponse(
+              TaskResult { try await apiService.patchNotice(patch) }
+            )
+          )
+        }
+        
+      case .editNoticeResponse(let response):
+        state.isSendingNoticeUpdate = false
+        
+        switch response {
+        case .success:
+          return .run { send in
+            await feedbackGenerator.notify(.success)
+          }
+          
+        case .failure(let error):
+          state.alert = .editNoticeFailure(message: error.localizedDescription)
+          return .run { _ in
+            await feedbackGenerator.notify(.error)
+          }
+        }
+          
       case .deleteNoticeResponse(let response):
         state.isDeletingNotice = false
         
@@ -107,8 +153,7 @@ public struct EditNoticeDomain: Reducer {
         case .success:
           return .none
         case .failure(let error):
-          debugPrint(error.localizedDescription)
-          state.alert = .editNoticeFailure
+          state.alert = .deleteNoticeFailure(message: error.localizedDescription)
           return .none
         }
         
@@ -121,4 +166,71 @@ public struct EditNoticeDomain: Reducer {
       }
     }
   }
+}
+
+extension EditNoticeDomain.State {
+  func asNoticePatch() -> Notice {
+    let charge = description.chargeSelection.selectedCharge.flatMap {
+      DescriptionDomain.noticeCharge(with: $0.id) } ?? .init(tbnr: "")
+    
+    return Notice(
+      token: notice.token ?? "",
+      status: notice.status ?? .open,
+      street: street,
+      city: city,
+      zip: zip,
+      latitude: notice.latitude ?? 0,
+      longitude: notice.longitude ?? 0,
+      registration: licensePlateNumber,
+      brand: description.carBrandSelection.selectedBrand?.title ?? "",
+      color: DescriptionDomain.colors[description.selectedColor].key,
+      tbnr: charge.tbnr,
+      charge: charge,
+      date: date,
+      duration: Int64(description.selectedDuration),
+      severity: notice.severity,
+      note: notice.note ?? "",
+      createdAt: notice.createdAt ?? Date(),
+      updatedAt: Date(),
+      sentAt: Date(),
+      vehicleEmpty: description.vehicleEmpty,
+      hazardLights: description.hazardLights,
+      expiredTuv: description.expiredTuv,
+      expiredEco: description.expiredEco,
+      over28Tons: description.over28Tons,
+      photos: notice.photos ?? []
+    )
+  }
+}
+
+public extension AlertState where Action == EditNoticeDomain.Action {
+  static func editNoticeFailure(message: String? = nil) -> Self {
+    Self(
+      title: .init("Fehler"),
+      message: .init(message ?? "Die Meldung konnte nicht gelöscht werden"),
+      buttons: [
+        .default(.init("Ok")),
+        .default(.init("Wiederholen"), action: .send(.saveButtonTapped))
+      ]
+    )
+  }
+  
+  static func deleteNoticeFailure(message: String? = nil) -> Self {
+    Self(
+      title: .init("Fehler"),
+      message: .init(message ?? "Die Meldung konnte nicht gelöscht werden"),
+      buttons: [
+        .default(.init("Ok")),
+        .default(.init("Wiederholen"), action: .send(.deleteConfirmButtonTapped))
+      ]
+    )
+  }
+  
+  static let confirmDeleteNotice = Self(
+    title: .init("Meldung löschen"),
+    buttons: [
+      .default(.init(L10n.cancel)),
+      .destructive(.init("Löschen"), action: .send(.deleteConfirmButtonTapped)),
+    ]
+  )
 }

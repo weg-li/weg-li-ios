@@ -22,15 +22,11 @@ public struct ImageUploadInput: Codable, Equatable {
 }
 
 public extension ImageUploadInput {
-  static func make(from pickerResult: PickerImageResult) -> Self? {
-    guard let jpegData = pickerResult.jpegData else {
-      return nil
-    }
-    
-    return ImageUploadInput(
-      filename: pickerResult.id,
-      byteSize: UInt64(jpegData.count),
-      checksum: jpegData.md5DigestBase64()
+  static func make(id: PickerImageResult.ID, data: Data) -> Self {
+    ImageUploadInput(
+      filename: id,
+      byteSize: UInt64(data.count),
+      checksum: data.md5DigestBase64()
     )
   }
 }
@@ -39,7 +35,13 @@ public extension ImageUploadInput {
 
 extension Data {
   func md5DigestBase64() -> String {
-    let digest = Insecure.MD5.hash(data: self)
-    return Data(digest).base64EncodedString()
+    // Calculate MD5 hash
+    let md5Hash = Insecure.MD5.hash(data: self)
+    // Convert hash to Data
+    let md5Data = Data(md5Hash)
+    // Base64 encode the MD5 hash
+    let base64Encoded = md5Data.base64EncodedString()
+    
+    return base64Encoded
   }
 }

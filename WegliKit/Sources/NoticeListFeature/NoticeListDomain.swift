@@ -2,33 +2,36 @@ import ApiClient
 import ComposableArchitecture
 import DescriptionFeature
 import FeedbackGeneratorClient
+import FileClient
 import Foundation
 import Helper
 import L10n
-import PathMonitorClient
 import SharedModels
 import UIKit
 
-public struct NoticeListDomain: Reducer {
+@Reducer
+public struct NoticeListDomain {
   public init() {}
   
   @Dependency(\.fileClient) public var fileClient
   @Dependency(\.apiService) public var apiService
   @Dependency(\.uuid) public var uuid
   @Dependency(\.date) public var date
-  @Dependency(\.pathMonitorClient) public var pathMonitorClient
   @Dependency(\.continuousClock) public var clock
   @Dependency(\.feedbackGenerator) public var feedbackGenerator
+  @Dependency(\.dismiss) var dismiss
   
   public struct State: Equatable {
-    public var notices: ContentState<[Notice], Action>
-    public var editNotice: EditNoticeDomain.State?
+    public var notices: IdentifiedArrayOf<EditNoticeDomain.State> = []
     public var alert: AlertState<Action>?
-    public var noticesSortOrder: NoticeSortOrder = .noticeDate
-    public var orderSortType: [NoticeSortOrder: Bool]
+    public var noticesSortState: SortOrder = .init()
     @BindingState public var isFetchingNotices = false
     @BindingState public var isNetworkAvailable = true
     @BindingState public var isSendingEditedNotice = false
+    
+    @PresentationState public var selection: EditNoticeDomain.State?
+    public var errorState: ErrorState?
+    public var emptyState: EmptyState<Action>?
     
     public var errorBarMessage: MessageBarType?
     
@@ -37,74 +40,45 @@ public struct NoticeListDomain: Reducer {
       case success
     }
     
+    public var contentState: ContentState<IdentifiedArrayOf<EditNoticeDomain.State>, Action> {
+      if let errorState {
+        return .error(errorState)
+      } else if let emptyState {
+        return .empty(emptyState)
+      } else if isFetchingNotices {
+        return .loading
+      } else {
+        return .results(notices)
+      }
+    }
+    
     public init(
-      notices: ContentState<[Notice],
-      NoticeListDomain.Action>,
-      editNotice: EditNoticeDomain.State? = nil,
-      destination: NoticeListDomain.State.Destination? = nil,
+      notices: IdentifiedArrayOf<EditNoticeDomain.State>,
       isNetworkAvailable: Bool = true,
       alert: AlertState<NoticeListDomain.Action>? = nil,
-      noticesSortOrder: NoticeListDomain.State.NoticeSortOrder = .noticeDate,
-      orderSortType: [NoticeListDomain.State.NoticeSortOrder : Bool] = [
-        .noticeDate: true,
-        .createdAtDate: false,
-        .registration: false,
-        .status: false
-      ],
       isSendingEditedNotice: Bool = false
     ) {
       self.notices = notices
-      self.editNotice = editNotice
-      self.destination = destination
       self.isNetworkAvailable = isNetworkAvailable
       self.alert = alert
-      self.noticesSortOrder = noticesSortOrder
-      self.orderSortType = orderSortType
       self.isSendingEditedNotice = isSendingEditedNotice
     }
     
-    public var destination: Destination? {
-      didSet {
-        switch destination {
-        case .edit(let notice):
-          editNotice = .init(notice: notice)
-        default:
-          return
-        }
-      }
-    }
-    
     // MARK: Sorting Helper
-    public func isAscending(for type: NoticeSortOrder) -> Bool {
-      orderSortType[type, default: true]
-    }
-    
     func isSortActionDisabled(_ sortAction: SortAction) -> Bool {
-      guard let elements = notices.elements else { return true }
+      let elements = notices.elements
       let filteredCount: Int
       switch sortAction {
       case .noticeDate:
-        filteredCount = elements.compactMap(\.date).count
+        filteredCount = elements.map(\.date).count
       case .status:
-        filteredCount = elements.compactMap(\.status).count
+        filteredCount = elements.compactMap(\.notice.status).count
       case .registration:
-        filteredCount = elements.compactMap(\.registration).count
+        filteredCount = elements.compactMap(\.notice.registration).count
       case .createdAtDate:
-        filteredCount = elements.compactMap(\.createdAt).count
+        filteredCount = elements.compactMap(\.notice.createdAt).count
       }
       return filteredCount != elements.count || elements.count == 1
-    }
-    
-    public enum Destination: Equatable {
-      case edit(Notice)
-      case alert(AlertState<AlertAction>)
-    }
-    
-    public enum NoticeSortOrder: Hashable {
-      case createdAtDate
-      case noticeDate
-      case registration
-      case status
     }
     
     public enum AlertAction: Equatable {
@@ -113,25 +87,58 @@ public struct NoticeListDomain: Reducer {
     }
   }
   
-  public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<State>)
-    case setSortOrder(State.NoticeSortOrder)
-    case setNavigationDestination(State.Destination?)
-    case onNavigateToAccontSettingsButtonTapped
+  public struct SortOrder: Equatable, Codable {
+    public var action: SortAction
+    public var sortType: SortType
     
-    case onSaveNoticeButtonTapped
-    case editNotice(EditNoticeDomain.Action)
+    public init(action: SortAction = .noticeDate, sortType: SortType = .ascending) {
+      self.action = action
+      self.sortType = sortType
+    }
+    
+    var isAscending: Bool {
+      sortType.isAscending
+    }
+  }
+  
+  @CasePathable
+  public enum Action: Equatable, BindableAction {
+    case onAppear
+    
+    case binding(BindingAction<State>)
+    case destination(PresentationAction<Destination.Action>)
+    case setSortOrder(SortAction, SortType?)
+    
+    case onNavigateToAccountSettingsButtonTapped
+    case onNoticeItemTapped(Notice)
+
+    case editNotice(PresentationAction<EditNoticeDomain.Action>)
     case editNoticeResponse(TaskResult<Notice>)
     
     case fetchNotices(forceReload: Bool)
     case fetchNoticesResponse(TaskResult<[Notice]>)
     
-    case onAppear
-    case observeConnection
     case dismissAlert
     case displayMessageBar(State.MessageBarType?)
     
-    case observeConnectionResponse(NetworkPath)
+    case sortStateLoaded(TaskResult<NoticeListDomain.SortOrder>)
+  }
+  
+  @Reducer
+  public struct Destination: Equatable {
+    public enum State: Equatable {
+      case edit(EditNoticeDomain.State)
+    }
+
+    public enum Action: Equatable {
+      case edit(EditNoticeDomain.Action)
+    }
+
+    public var body: some ReducerOf<Self> {
+      Scope(state: \.edit, action: \.edit) {
+        EditNoticeDomain()
+      }
+    }
   }
   
   public var body: some ReducerOf<Self> {
@@ -140,102 +147,131 @@ public struct NoticeListDomain: Reducer {
     Reduce<State, Action> { state, action in
       switch action {
       case .onAppear:
-        return .send(.fetchNotices(forceReload: false))
+        return .run { send in
+          await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+              await send(.fetchNotices(forceReload: false))
+            }
+            group.addTask {
+              await send(
+                .sortStateLoaded(
+                  TaskResult { try await fileClient.loadSortState() }
+                )
+              )
+            }
+          }
+        }
+      
+      case .sortStateLoaded(let result):
+        let sortOrder = (try? result.value) ?? .init()
+        state.noticesSortState = sortOrder
+        return .none
         
-      case .setSortOrder(let order):
-        guard let notices = state.notices.elements else {
-          return .none
+      case .destination:
+        return .none
+      
+      case .setSortOrder(let action, let sortType):
+        state.noticesSortState.action = action
+        if let type = sortType {
+          state.noticesSortState.sortType = type
         }
         
-        state.noticesSortOrder = order
-        
-        switch order {
+        let notices = state.notices.elements
+        switch action {
         case .noticeDate:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
-            guard let aDate = $0.date, let bDate = $1.date else { return false }
-            let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
+            let aDate = $0.date
+            let bDate = $1.date
+            let sortOperator: (Date, Date) -> Bool =  state.noticesSortState.isAscending ? (>) : (<)
             return sortOperator(aDate, bDate)
           }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
+          state.notices = IdentifiedArray(uniqueElements: sortedNotices, id: \.id)
           
         case .createdAtDate:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
-            guard let aCreatedAtDate = $0.createdAt, let bCreateAtDate = $1.createdAt else { return false }
-            let sortOperator: (Date, Date) -> Bool = orderAscending ? (>) : (<)
+            guard 
+              let aCreatedAtDate = $0.notice.createdAt,
+              let bCreateAtDate = $1.notice.createdAt
+            else {
+              return false
+            }
+            let sortOperator: (Date, Date) -> Bool = state.noticesSortState.isAscending ? (>) : (<)
             return sortOperator(aCreatedAtDate, bCreateAtDate)
           }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
+          state.notices = IdentifiedArray(uniqueElements: sortedNotices, id: \.id)
           
         case .registration:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
-            guard let aRegistration = $0.registration, let bRegistration = $1.registration else { return false }
-            let sortOperator: (String, String) -> Bool = orderAscending ? (>) : (<)
+            guard 
+              let aRegistration = $0.notice.registration,
+              let bRegistration = $1.notice.registration
+            else { return false }
+            
+            let sortOperator: (String, String) -> Bool = state.noticesSortState.isAscending ? (>) : (<)
             return sortOperator(aRegistration, bRegistration)
           }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
+          state.notices = IdentifiedArray(uniqueElements: sortedNotices, id: \.id)
           
         case .status:
-          guard let orderAscending = state.orderSortType[order] else { return .none }
           let sortedNotices = notices.sorted {
-            guard let aStatus = $0.status, let bStatus = $1.status else { return false }
-            let sortOperator: (Notice.Status, Notice.Status) -> Bool = orderAscending ? (>) : (<)
+            guard 
+              let aStatus = $0.notice.status,
+              let bStatus = $1.notice.status
+            else { return false }
+            
+            let sortOperator: (Notice.Status, Notice.Status) -> Bool = state.noticesSortState.isAscending ? (>) : (<)
             return sortOperator(aStatus, bStatus)
           }
-          state.notices = .results(sortedNotices)
-          state.orderSortType[order] = !orderAscending
+          state.notices = IdentifiedArray(uniqueElements: sortedNotices, id: \.id)
         }
         
-        return .fireAndForget {
-          try await fileClient.saveNotices(notices)
+        return .run { _ in
+          try await fileClient.saveNotices(notices.map(\.notice))
         }
         
-      case let .fetchNotices(forceReload):
-        guard state.isNetworkAvailable else {
-          state.notices = .empty(.emptyNotices())
-          return .none
-        }
-        
-        // dont reload every time
-        if let elements = state.notices.elements, !elements.isEmpty, !forceReload {
+      case .fetchNotices(let forceReload):
+        let elements = state.notices.elements
+        if !elements.isEmpty, !forceReload {
           return .none
         }
         
         if !forceReload {
-          state.notices = .loading
+          state.isFetchingNotices = true
         }
-        state.isFetchingNotices = true
         
-        return .task {
-          await .fetchNoticesResponse(
-            TaskResult { try await apiService.getNotices(forceReload) }
+        return .run { send in
+          await send(
+            .fetchNoticesResponse(
+              TaskResult { try await apiService.getNotices(forceReload) }
+            )
           )
         }
         
       case let .fetchNoticesResponse(.success(notices)):
         state.isFetchingNotices = false
-        state.notices = notices.isEmpty ? .empty(.emptyNotices()) : .results(notices)
+        let states = notices.map { EditNoticeDomain.State(notice: $0) }
+        if states.isEmpty {
+          state.emptyState = .emptyNotices()
+          return .none
+        }
+        
+        state.notices = IdentifiedArray(uniqueElements: states, id: \.id)
         
         guard !notices.isEmpty else  {
           return .none
         }
         
-        return .send(.setSortOrder(state.noticesSortOrder))
+        return .send(.setSortOrder(state.noticesSortState.action, nil))
         
       case let .fetchNoticesResponse(.failure(error)):
         state.isFetchingNotices = false
         
         if let apiError = error as? ApiError {
           if apiError == .tokenUnavailable {
-            state.notices = .error(.tokenUnavailable)
+            state.errorState = .tokenUnavailable
             return .none
           } else {
-            state.notices = .error(.loadingError(error: .init(error: apiError)))
+            state.errorState = .loadingError(error: .init(error: apiError))
           }
         }
         return .none
@@ -244,77 +280,40 @@ public struct NoticeListDomain: Reducer {
         state.errorBarMessage = value
         return .none
         
-      case .onNavigateToAccontSettingsButtonTapped:
+      case .onNavigateToAccountSettingsButtonTapped:
         return .none
         
-      case .setNavigationDestination(let value):
-        state.destination = value
+      case .onNoticeItemTapped(let notice):
+        state.selection = EditNoticeDomain.State(notice: notice)
         return .none
-        
-      case .observeConnection:
-        return .run { send in
-          for await path in await pathMonitorClient.networkPathPublisher() {
-            await send(.observeConnectionResponse(path))
-          }
-        }
-        .cancellable(id: ObserveConnectionIdentifier.self)
-        
-      case let .observeConnectionResponse(networkPath):
-        state.isNetworkAvailable = networkPath.status == .satisfied
-        return .none
-        
-      case .onSaveNoticeButtonTapped:
-        state.isSendingEditedNotice = true
-        
-        guard let notice = state.editNotice else {
-          return .none
-        }
-        let patch = Notice(notice)
-        
-        return .task {
-          await .editNoticeResponse(
-            TaskResult { try await apiService.patchNotice(patch) }
-          )
-        }
         
       case .editNoticeResponse(let response):
         state.isSendingEditedNotice = false
         
         switch response {
         case .success:
-          state.destination = nil
-          return .merge(
-            .task { .fetchNotices(forceReload: true) },
-            .fireAndForget {
-              await feedbackGenerator.notify(.success)
-            }
-          )
+          return .run { send in
+            await send(.fetchNotices(forceReload: true))
+            await feedbackGenerator.notify(.success)
+          }
           
         case .failure:
           state.alert = .editNoticeFailure
-          return .fireAndForget {
+          return .run { _ in
             await feedbackGenerator.notify(.error)
           }
         }
         
-      case .editNotice(.deleteNoticeResponse(let result)):
-        switch result {
-        case .success:
-          state.destination = nil
-          return .merge(
-            .task { .fetchNotices(forceReload: true) },
-            .fireAndForget {
-              await feedbackGenerator.notify(.success)
-            }
-          )
-        case .failure:
-          return .fireAndForget {
-            await feedbackGenerator.notify(.error)
+      case .editNotice(let editNoticeAction):
+        switch editNoticeAction {
+        case .presented(.editNoticeResponse(.success)), .presented(.deleteNoticeResponse(.success)):
+          return .run { send in
+            await send(.fetchNotices(forceReload: true))
           }
+
+        default:
+          return .none
         }
-        
-      case .editNotice:
-        return .none
         
       case .dismissAlert:
         state.alert = nil
@@ -324,7 +323,18 @@ public struct NoticeListDomain: Reducer {
         return .none
       }
     }
-    .ifLet(\.editNotice, action: /Action.editNotice) {
+    .onChange(of: \.noticesSortState) { oldValue, newValue in
+      Reduce { state, action in
+          .run { _ in
+            do {
+              try await fileClient.saveSortState(newValue)
+            } catch {
+//              Logger.shared.log("Failed to store sort state")
+            }
+          }
+      }
+    }
+    .ifLet(\.$selection, action: \.editNotice) {
       EditNoticeDomain()
     }
   }
@@ -332,6 +342,25 @@ public struct NoticeListDomain: Reducer {
 
 
 // MARK: - Helper
+let noticeDomainSortOrderKey = "noticeDomainSortOrderKey"
+extension FileClient {
+  func saveSortState(_ state: NoticeListDomain.SortOrder) async throws {
+    guard let data = try? JSONEncoder().encode(state) else {
+      return
+    }
+    try await self.save(noticeDomainSortOrderKey, data)
+  }
+  
+  func loadSortState() async throws -> NoticeListDomain.SortOrder {
+    guard
+      let data = try? await load(noticeDomainSortOrderKey),
+      let sortOrderState = try? JSONDecoder().decode(NoticeListDomain.SortOrder.self, from: data)
+    else {
+      throw NSError(domain: "NoticeListCore", code: -1)
+    }
+    return sortOrderState
+  }
+}
 
 enum LoadingState {}
 enum ObserveConnectionIdentifier {}
@@ -460,13 +489,42 @@ extension Notice {
   }
 }
 
-enum SortAction: CaseIterable {
+public enum SortType: Equatable, Codable {
+  case ascending, descending
+  
+  var isAscending: Bool {
+    switch self {
+    case .ascending: true
+    case .descending: false
+    }
+  }
+  
+  var toggled: Self {
+    switch self {
+    case .ascending:
+        .descending
+    case .descending:
+        .ascending
+    }
+  }
+  
+  func sortType() -> (Date, Date) -> Bool {
+    switch self {
+    case .ascending:
+      (>)
+    case .descending:
+      (<)
+    }
+  }
+}
+
+public enum SortAction: CaseIterable, Equatable, Codable {
   case noticeDate
   case status
   case registration
   case createdAtDate
     
-  var text: String {
+  public var text: String {
     switch self {
     case .noticeDate:
       return "Tatzeit"
@@ -476,19 +534,6 @@ enum SortAction: CaseIterable {
       return "Kennzeichen"
     case .createdAtDate:
       return "Erstellt"
-    }
-  }
-  
-  var sortOrder: NoticeListDomain.State.NoticeSortOrder {
-    switch self {
-    case .noticeDate:
-      return .noticeDate
-    case .status:
-      return .status
-    case .registration:
-      return .registration
-    case .createdAtDate:
-      return .createdAtDate
     }
   }
 }

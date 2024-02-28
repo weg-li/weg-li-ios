@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Foundation
 
-public struct AccountSettingsDomain: ReducerProtocol {
+public struct AccountSettingsDomain: Reducer {
   public init() {}
   
   @Dependency(\.keychainClient) var keychainClient
@@ -9,56 +9,64 @@ public struct AccountSettingsDomain: ReducerProtocol {
   @Dependency(\.continuousClock) var clock
   
   public struct State: Equatable {
+    @PresentationState var alert: AlertState<Action.Alert>?
     public var accountSettings: AccountSettings
     
-    public var link: Link?
+    @PresentationState public var link: Link.State?
     
     public init(accountSettings: AccountSettings) {
       self.accountSettings = accountSettings
     }
-    
-    public struct Link: Identifiable, Equatable {
-      public let id: String
-      public let url: URL
-
-      public init(url: URL) {
-        self.url = url
-        self.id = url.absoluteString
-      }
-    }
   }
   
-  public enum Action: Equatable {
+  @CasePathable
+  public enum Action: Equatable, Sendable {
+    case onAppear
     case setApiToken(String)
     case onGoToProfileButtonTapped
     case onCreateProfileButtonTapped
     case dismissSheet
+    case link(PresentationAction<Link.Action>)
+    
+    enum Alert: Equatable {}
   }
   
-  public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-    switch action {
-    case let .setApiToken(token):
-      state.accountSettings.apiToken = token
-      return .fireAndForget {
-        enum CancelID {}
-        
-        await withTaskCancellation(id: CancelID.self, cancelInFlight: true) {
-          try? await clock.sleep(for: .seconds(0.1))
-          _ = await keychainClient.setApiToken(token)
-        }
-      }
+  enum CancelID { case debounce }
 
-    case .onGoToProfileButtonTapped:
-      state.link = .init(url: URL(string: "https://www.weg.li/user")!)
-      return .none
-      
-    case .onCreateProfileButtonTapped:
-      state.link = .init(url: URL(string: "https://www.weg.li")!)
-      return .none
-      
-    case .dismissSheet:
-      state.link = nil
-      return .none
+  public var body: some Reducer<State, Action> {
+    Reduce { state, action in
+      switch action {
+      case .onAppear:
+        state.accountSettings.apiToken = keychainClient.getToken() ?? ""
+        return .none
+        
+      case let .setApiToken(token):
+        state.accountSettings.apiToken = token
+        return .run { _ in
+          await withTaskCancellation(id: CancelID.debounce, cancelInFlight: true) {
+            try? await clock.sleep(for: .seconds(0.1))
+            _ = await keychainClient.setApiToken(token)
+          }
+        }
+
+      case .onGoToProfileButtonTapped:
+        state.link = .init(url: URL(string: "https://www.weg.li/user")!)
+        return .none
+        
+      case .onCreateProfileButtonTapped:
+        state.link = .init(url: URL(string: "https://www.weg.li")!)
+        return .none
+        
+      case .dismissSheet:
+        state.link = nil
+        return .none
+    
+      case .link:
+        return .none
+      }
+    }
+    .ifLet(\.$link, action: \.link) {
+      Link()
     }
   }
 }
@@ -68,5 +76,31 @@ public struct AccountSettings: Equatable {
   
   public init(apiToken: String) {
     self.apiToken = apiToken
+  }
+}
+
+@Reducer
+public struct Link {
+  public struct State: Equatable {
+    public let id: String
+    public let url: URL
+    
+    public init(url: URL) {
+      self.url = url
+      self.id = url.absoluteString
+    }
+  }
+  
+  public enum Action: Sendable {
+    case dismiss
+  }
+  
+  public var body: some Reducer<State, Action> {
+    Reduce { _, action in
+      switch action {
+      case .dismiss:
+        return .none
+      }
+    }
   }
 }
